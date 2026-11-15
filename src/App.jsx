@@ -22,6 +22,7 @@ import CheckoutModal from './components/CheckoutModal';
 import OrderTrackingModal from './components/OrderTrackingModal';
 import AdminPanel from './components/AdminPanel';
 import BrandAssetsModal from './components/BrandAssetsModal';
+import VisualSearchModal from './components/VisualSearchModal';
 import Toast from './components/Toast';
 
 function StorefrontContent() {
@@ -84,6 +85,7 @@ function StorefrontContent() {
       <OrderTrackingModal />
       <AdminPanel />
       <BrandAssetsModal />
+      <VisualSearchModal />
       <Toast />
 
     </div>

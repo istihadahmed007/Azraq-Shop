@@ -140,6 +140,7 @@ export function ShopProvider({ children }) {
   const [isTrackingOpen, setIsTrackingOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isBrandAssetsOpen, setIsBrandAssetsOpen] = useState(false);
+  const [isVisualSearchOpen, setIsVisualSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [toast, setToast] = useState(null);
 
@@ -396,6 +397,8 @@ export function ShopProvider({ children }) {
         setIsAdminOpen,
         isBrandAssetsOpen,
         setIsBrandAssetsOpen,
+        isVisualSearchOpen,
+        setIsVisualSearchOpen,
         searchQuery,
         setSearchQuery,
         toast,

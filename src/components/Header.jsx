@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Search, Heart, GitCompare, ShoppingBag, Headphones, 
   Menu, X, ChevronDown, Sparkles, Shield, ArrowRight,
-  Globe, Package, Check, Layers
+  Globe, Package, Check, Layers, Camera
 } from 'lucide-react';
 import AzraqLogo from './AzraqLogo';
 import { useShop } from '../context/ShopContext';
@@ -21,6 +21,7 @@ export default function Header() {
     setLanguage, 
     searchQuery, 
     setSearchQuery,
+    setIsVisualSearchOpen,
     t 
   } = useShop();
 
@@ -84,7 +85,7 @@ export default function Header() {
             <AzraqLogo variant="dark" size="md" showDescriptor={true} />
           </button>
 
-          {/* 2. Center: Large Glassy Search Bar (Matching Reference) */}
+          {/* 2. Center: Large Glassy Search Bar (Matching Reference with Search by Image) */}
           <div className="hidden md:flex flex-1 max-w-2xl relative">
             <div className="w-full relative flex items-center">
               <input
@@ -92,8 +93,23 @@ export default function Header() {
                 placeholder={t("Search for products, brands and collections...", "পণ্য, ব্র্যান্ড বা কালেকশন খুঁজুন...")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-5 pr-12 py-2.5 rounded-full bg-[#F0F7FF]/80 backdrop-blur-md border border-[#D9F0FF] text-xs sm:text-sm text-[#062B4F] placeholder-[#062B4F]/45 focus:outline-none focus:border-[#0877C9] focus:bg-white focus:ring-2 focus:ring-[#0877C9]/15 shadow-sm transition-all"
+                className="w-full pl-5 pr-28 py-2.5 rounded-full bg-[#F0F7FF]/80 backdrop-blur-md border border-[#D9F0FF] text-xs sm:text-sm text-[#062B4F] placeholder-[#062B4F]/45 focus:outline-none focus:border-[#0877C9] focus:bg-white focus:ring-2 focus:ring-[#0877C9]/15 shadow-sm transition-all"
               />
+
+              {/* AI Visual Search (Search by Image) Button */}
+              <button
+                type="button"
+                onClick={() => setIsVisualSearchOpen(true)}
+                className="absolute right-12 px-2.5 py-1.5 rounded-full text-[#0877C9] hover:text-[#062B4F] hover:bg-[#D9F0FF]/60 transition-all flex items-center gap-1.5 group/cam"
+                title={t("Search by Image", "ছবি দিয়ে পণ্য খুঁজুন")}
+                aria-label="Search by Image"
+              >
+                <Camera className="w-4 h-4 transition-transform group-hover/cam:scale-110 text-[#0877C9]" />
+                <span className="text-[11px] font-bold text-[#0877C9] group-hover/cam:text-[#062B4F] hidden lg:inline whitespace-nowrap">
+                  {t("Search by Image", "ছবি দিয়ে খুঁজুন")}
+                </span>
+              </button>
+
               <button 
                 onClick={() => {
                   const el = document.getElementById('all-products') || document.getElementById('shop-by-collection');
@@ -310,16 +326,29 @@ export default function Header() {
       {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white/95 backdrop-blur-2xl border-b border-[#D9F0FF] p-5 space-y-4 shadow-xl">
-          {/* Mobile Search */}
-          <div className="relative">
+          {/* Mobile Search with Search by Image */}
+          <div className="relative flex items-center">
             <input
               type="text"
               placeholder={t("Search catalog...", "পণ্য খুঁজুন...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-4 pr-10 py-2.5 rounded-full bg-[#F0F7FF] border border-[#D9F0FF] text-xs text-[#062B4F] focus:outline-none"
+              className="w-full pl-4 pr-18 py-2.5 rounded-full bg-[#F0F7FF] border border-[#D9F0FF] text-xs text-[#062B4F] focus:outline-none"
             />
-            <Search className="w-4 h-4 text-[#062B4F]/40 absolute right-3.5 top-1/2 -translate-y-1/2" />
+            <div className="absolute right-2 flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setIsVisualSearchOpen(true);
+                }}
+                className="p-1.5 rounded-full text-[#0877C9] hover:bg-[#D9F0FF]/60"
+                title={t("Search by Image", "ছবি দিয়ে পণ্য খুঁজুন")}
+              >
+                <Camera className="w-4 h-4 text-[#0877C9]" />
+              </button>
+              <Search className="w-4 h-4 text-[#062B4F]/40" />
+            </div>
           </div>
 
           <div className="flex flex-col space-y-2 text-sm font-semibold text-[#062B4F]">

@@ -164,7 +164,38 @@ CREATE TABLE IF NOT EXISTS supplier_price_logs (
     recorded_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 11. Product Import Jobs & Logs
+-- 12. AI Visual Search & Vector Embeddings (pgvector extension)
+-- Supports CLIP-compatible 128/512-dimension visual embeddings
+CREATE EXTENSION IF NOT EXISTS vector;
+
+CREATE TABLE IF NOT EXISTS product_visual_embeddings (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    embedding vector(128) NOT NULL,
+    dominant_colors TEXT[] DEFAULT '{}',
+    visual_tags TEXT[] DEFAULT '{}',
+    aspect_ratio NUMERIC(5, 3) DEFAULT 1.0,
+    model_version VARCHAR(50) DEFAULT 'clip-vit-b32-v1',
+    indexed_at TIMESTAMPTZ DEFAULT NOW(),
+    CONSTRAINT uq_product_visual_embedding UNIQUE (product_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_product_visual_embeddings_cosine 
+ON product_visual_embeddings USING ivfflat (embedding vector_cosine_ops)
+WITH (lists = 100);
+
+CREATE TABLE IF NOT EXISTS visual_search_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    query_image_hash VARCHAR(64),
+    top_matched_product_id UUID REFERENCES products(id) ON DELETE SET NULL,
+    max_similarity NUMERIC(5, 4),
+    total_candidates_returned INTEGER DEFAULT 0,
+    search_duration_ms INTEGER,
+    client_ip VARCHAR(50),
+    user_agent TEXT,
+    searched_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS product_import_jobs (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     supplier_id UUID NOT NULL REFERENCES suppliers(id) ON DELETE CASCADE,

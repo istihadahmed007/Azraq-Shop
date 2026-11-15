@@ -88,3 +88,24 @@
   animation: gentle-float 7s ease-in-out 2s infinite;
 }
 
+/* AI Visual Search Scanning Laser Beam Animation */
+@keyframes visual-scan {
+  0% {
+    top: 2%;
+    opacity: 0.85;
+  }
+  50% {
+    top: 96%;
+    opacity: 1;
+  }
+  100% {
+    top: 2%;
+    opacity: 0.85;
+  }
+}
+
+.animate-visual-scan {
+  animation: visual-scan 2.2s ease-in-out infinite;
+}
+
+
