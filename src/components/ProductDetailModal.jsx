@@ -55,6 +55,13 @@ export default function ProductDetailModal() {
             <img
               src={images[activeImageIndex] || selectedProduct.main_image}
               alt={selectedProduct.name}
+              loading="eager"
+              decoding="async"
+              onError={(e) => {
+                if (e.target.src !== selectedProduct.main_image) {
+                  e.target.src = selectedProduct.main_image;
+                }
+              }}
               className="w-full h-full object-contain filter drop-shadow-lg transition-all duration-300"
             />
             

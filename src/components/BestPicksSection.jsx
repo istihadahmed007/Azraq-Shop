@@ -44,8 +44,17 @@ export default function BestPicksSection() {
                 <img
                   src={product.main_image}
                   alt={product.name}
-                  className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
+                  decoding="async"
+                  width="600"
+                  height="600"
+                  onError={(e) => {
+                    if (!e.target.dataset.failed) {
+                      e.target.dataset.failed = 'true';
+                      e.target.src = 'https://easydrop.asia/products/image-1794224164356-135288231.jpeg';
+                    }
+                  }}
+                  className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute top-2 left-2 sm:top-3 sm:left-3 px-1.5 sm:px-2 py-0.5 rounded-none bg-azraq-navy text-white text-[8px] sm:text-[9px] font-mono font-bold flex items-center gap-1 shadow-sm">
                   <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-azraq-lime fill-azraq-lime" />

@@ -5,10 +5,10 @@ import { useShop } from '../context/ShopContext';
 export default function HeroSection() {
   const { products, collections, navigateTo, setSelectedProduct, t } = useShop();
 
-  // Dynamic products from multiple collections for the 3D composition
-  const heroPrimary = products.find(p => p.id === 'AZQ-001') || products[0]; // Gadget
-  const heroSecondary = products.find(p => p.id === 'AZQ-061') || products[20]; // Bag
-  const heroTertiary = products.find(p => p.id === 'AZQ-041') || products[40]; // Lifestyle
+  // Dynamic products from multiple collections for the 3D composition (High Resolution Studio Assets)
+  const heroPrimary = products.find(p => p.id === 'AZQ-0001') || products[0]; // Baseus Fast Charging Set
+  const heroSecondary = products.find(p => p.id === 'AZQ-0075') || products[20]; // Premium Shoulder Bag
+  const heroTertiary = products.find(p => p.id === 'AZQ-0054') || products[40]; // Smartwatch
 
   return (
     <section className="relative overflow-hidden pt-6 pb-16 md:pt-10 md:pb-24 bg-hero-gradient">

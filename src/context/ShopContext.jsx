@@ -5,7 +5,7 @@ import initialReconciliationReport from '../data/reconciliation_report.json';
 
 const ShopContext = createContext();
 
-const CATALOG_VERSION = 'v3_organized_hierarchy';
+const CATALOG_VERSION = 'v4_high_res_photography';
 
 export function ShopProvider({ children }) {
   // Collections state (18 EasyDrop categories)

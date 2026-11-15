@@ -114,12 +114,18 @@ export default function CollectionDetailPage() {
             </div>
           </div>
 
-          {/* Collection Cover Art */}
-          <div className="w-36 h-36 sm:w-48 sm:h-48 rounded-2xl bg-white/10 backdrop-blur-md p-4 flex items-center justify-center border border-white/20 shadow-2xl flex-shrink-0">
+          {/* Collection Cover Art - High Resolution Representative Showcase */}
+          <div className="w-48 h-48 sm:w-64 sm:h-64 rounded-none bg-white/10 backdrop-blur-md p-4 flex items-center justify-center border border-white/20 shadow-2xl flex-shrink-0">
             <img
-              src={activeCollection.image_url}
+              src={activeCollection.cover_image || activeCollection.image_url || activeCollection.fallback_image}
               alt={activeCollection.name}
-              className="max-h-full max-w-full object-contain filter drop-shadow-xl"
+              onError={(e) => {
+                if (activeCollection.fallback_image && e.target.src !== activeCollection.fallback_image) {
+                  e.target.src = activeCollection.fallback_image;
+                }
+              }}
+              className="w-full h-full object-contain filter drop-shadow-2xl"
+              loading="eager"
             />
           </div>
         </div>
@@ -270,8 +276,17 @@ export default function CollectionDetailPage() {
                   <img
                     src={product.main_image}
                     alt={product.name}
-                    className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
+                    decoding="async"
+                    width="600"
+                    height="600"
+                    onError={(e) => {
+                      if (!e.target.dataset.failed) {
+                        e.target.dataset.failed = 'true';
+                        e.target.src = 'https://easydrop.asia/products/image-1794224164356-135288231.jpeg';
+                      }
+                    }}
+                    className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-azraq-navy/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <span className="px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-white text-azraq-navy text-[10px] sm:text-xs font-bold shadow-md flex items-center gap-1.5 hover:bg-azraq-lime transition-colors">

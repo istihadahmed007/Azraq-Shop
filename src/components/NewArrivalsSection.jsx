@@ -74,8 +74,17 @@ export default function NewArrivalsSection() {
                 <img
                   src={product.main_image}
                   alt={product.name}
-                  className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
+                  decoding="async"
+                  width="600"
+                  height="600"
+                  onError={(e) => {
+                    if (!e.target.dataset.failed) {
+                      e.target.dataset.failed = 'true';
+                      e.target.src = 'https://easydrop.asia/products/image-1794224164356-135288231.jpeg';
+                    }
+                  }}
+                  className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
                 />
 
                 <div className="absolute inset-0 bg-azraq-navy/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
