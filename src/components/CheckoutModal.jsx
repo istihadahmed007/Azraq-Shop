@@ -329,7 +329,7 @@ export default function CheckoutModal() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-full bg-azraq-lime hover:bg-[#bbf035] text-azraq-navy font-black text-sm tracking-tight shadow-glow-lime transition-all transform hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-full bg-[#062B4F] hover:bg-[#0877C9] text-white font-black text-sm tracking-tight shadow-md transition-all transform hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <span>{t("Processing Order...", "অর্ডার প্রসেস হচ্ছে...")}</span>
@@ -414,7 +414,7 @@ export default function CheckoutModal() {
               </button>
               <button
                 onClick={handleClose}
-                className="flex-1 py-3 px-4 rounded-full bg-azraq-lime text-azraq-navy text-xs font-bold hover:bg-[#bbf035] transition-colors"
+                className="flex-1 py-3 px-4 rounded-full bg-[#0877C9] text-white text-xs font-bold hover:bg-[#062B4F] transition-colors"
               >
                 {t("Continue Shopping", "আরও কেনাকাটা করুন")}
               </button>

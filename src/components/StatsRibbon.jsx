@@ -33,18 +33,18 @@ export default function StatsRibbon() {
   ];
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
-      <div className="rounded-3xl bg-gradient-to-r from-[#4E35B5] via-[#5D3CD6] to-[#7955E8] p-8 sm:p-10 text-white shadow-xl relative overflow-hidden">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+      <div className="rounded-2xl bg-gradient-to-r from-[#062B4F] via-[#0A3D6E] to-[#062B4F] p-8 sm:p-10 text-white shadow-xl border border-[#69C5F5]/30 relative overflow-hidden">
         {/* Subtle decorative glow */}
-        <div className="absolute top-0 right-1/4 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-64 h-64 bg-[#50DDF0]/10 rounded-full blur-2xl pointer-events-none" />
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 items-center">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 items-center relative z-10">
           {stats.map((stat, idx) => {
             const Icon = stat.icon;
             return (
               <div key={idx} className="flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:bg-white/25 transition-all">
-                  <Icon className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 rounded-xl bg-white/10 border border-[#69C5F5]/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:bg-[#0877C9] transition-all">
+                  <Icon className="w-6 h-6 text-[#50DDF0] group-hover:text-white transition-colors" />
                 </div>
                 <div>
                   <div className="text-2xl sm:text-3xl font-black tracking-tight text-white">
@@ -65,4 +65,3 @@ export default function StatsRibbon() {
     </section>
   );
 }
-

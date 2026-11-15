@@ -99,9 +99,9 @@ export default function AdminPanel() {
         district: order.customer.area === 'inside' ? 'Dhaka' : 'Outside Dhaka'
       },
       items: order.items.map(it => ({
-        sku: it.supplier_sku,
+        sku: it.supplier_sku || it.sku || it.id,
         name: it.name,
-        collection: it.collection,
+        collection: it.collection || it.category || 'General',
         qty: it.quantity
       })),
       collectable_amount_bdt: order.paymentMethod === 'COD' ? order.total : 0,

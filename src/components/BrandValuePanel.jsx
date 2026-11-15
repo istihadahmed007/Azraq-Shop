@@ -41,11 +41,14 @@ export default function BrandValuePanel() {
   ];
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="rounded-3xl bg-azraq-navy p-8 sm:p-12 text-white border border-azraq-purple/20 shadow-2xl relative overflow-hidden">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="rounded-2xl bg-[#062B4F] p-8 sm:p-12 text-white border border-[#69C5F5]/30 shadow-xl relative overflow-hidden">
         
-        <div className="mb-8">
-          <span className="text-xs font-black tracking-[0.25em] text-azraq-lime uppercase">
+        {/* Subtle glass reflection */}
+        <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
+
+        <div className="mb-8 relative z-10">
+          <span className="text-xs font-black tracking-[0.25em] text-[#50DDF0] uppercase">
             {t("THE AZRAQ STANDARD • 4 PILLARS", "আজরাকের মূল চার স্তম্ভ")}
           </span>
           <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight mt-1">
@@ -53,15 +56,15 @@ export default function BrandValuePanel() {
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
           {values.map((v, i) => {
             const Icon = v.icon;
             return (
               <div key={i} className="space-y-3 group">
-                <div className="w-11 h-11 rounded-2xl bg-azraq-charcoal border border-azraq-lime/30 flex items-center justify-center text-azraq-lime group-hover:scale-110 transition-transform">
+                <div className="w-11 h-11 rounded-xl bg-white/10 border border-[#69C5F5]/30 flex items-center justify-center text-[#50DDF0] group-hover:scale-110 group-hover:bg-[#0877C9] group-hover:text-white transition-all">
                   <Icon className="w-5 h-5" />
                 </div>
-                <h4 className="font-extrabold text-sm sm:text-base text-white group-hover:text-azraq-lime transition-colors">
+                <h4 className="font-extrabold text-sm sm:text-base text-white group-hover:text-[#50DDF0] transition-colors">
                   {v.title}
                 </h4>
                 <p className="text-xs text-white/70 leading-relaxed font-normal">
@@ -76,4 +79,3 @@ export default function BrandValuePanel() {
     </section>
   );
 }
-

@@ -7,6 +7,7 @@ import {
   Heart, 
   Eye, 
   ArrowRight, 
+  ShoppingBag,
   ShieldCheck, 
   Sparkles,
   Layers
@@ -30,18 +31,38 @@ export default function CollectionDetailPage() {
   const [priceFilter, setPriceFilter] = useState('all'); // 'all', 'under-1500', '1500-3000', 'above-3000'
   const [inStockOnly, setInStockOnly] = useState(false);
   const [sortBy, setSortBy] = useState('featured'); // 'featured', 'price-low', 'price-high', 'rating'
-  const [visibleCount, setVisibleCount] = useState(12);
+  const [visibleCount, setVisibleCount] = useState(24);
+
+  // Safe fallback if collection is undefined
+  if (!activeCollection) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+        <h2 className="text-2xl font-bold text-[#062B4F] mb-4">
+          {t("Collection Not Found", "কালেকশনটি পাওয়া যায়নি")}
+        </h2>
+        <button
+          onClick={() => navigateTo('collections')}
+          className="px-6 py-2.5 rounded-full bg-[#062B4F] text-white text-xs font-bold hover:bg-[#0877C9] transition-colors"
+        >
+          {t("Browse All Collections", "সকল কালেকশন দেখুন")}
+        </button>
+      </div>
+    );
+  }
 
   // Filter and sort products belonging to this collection
   const filteredProducts = useMemo(() => {
-    let result = [...activeCollectionProducts];
+    let result = [...(activeCollectionProducts || [])];
 
-    // Search query within collection
+    // Search query within collection - SAFELY checking properties
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       result = result.filter(p => 
-        p.name.toLowerCase().includes(q) || 
-        p.raw_supplier_name.toLowerCase().includes(q)
+        (p.name && p.name.toLowerCase().includes(q)) || 
+        (p.raw_supplier_name && p.raw_supplier_name.toLowerCase().includes(q)) ||
+        (p.description && p.description.toLowerCase().includes(q)) ||
+        (p.sku && p.sku.toLowerCase().includes(q)) ||
+        (p.id && p.id.toLowerCase().includes(q))
       );
     }
 
@@ -56,7 +77,7 @@ export default function CollectionDetailPage() {
 
     // Stock availability
     if (inStockOnly) {
-      result = result.filter(p => p.in_stock && p.stock > 0);
+      result = result.filter(p => p.in_stock !== false && (p.stock === undefined || p.stock > 0));
     }
 
     // Sorting
@@ -65,7 +86,7 @@ export default function CollectionDetailPage() {
     } else if (sortBy === 'price-high') {
       result.sort((a, b) => b.price - a.price);
     } else if (sortBy === 'rating') {
-      result.sort((a, b) => b.rating - a.rating);
+      result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
     }
 
     return result;
@@ -77,155 +98,115 @@ export default function CollectionDetailPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen">
       
       {/* Breadcrumb Navigation */}
-      <div className="flex items-center gap-2 text-xs font-semibold text-azraq-navy/50 mb-6">
-        <button onClick={() => navigateTo('home')} className="hover:text-azraq-violet">
+      <div className="flex items-center gap-2 text-xs font-semibold text-[#062B4F]/50 mb-6">
+        <button onClick={() => navigateTo('home')} className="hover:text-[#0877C9]">
           {t("Home", "হোম")}
         </button>
         <ChevronRight className="w-3.5 h-3.5" />
-        <button onClick={() => navigateTo('collections')} className="hover:text-azraq-violet">
+        <button onClick={() => navigateTo('collections')} className="hover:text-[#0877C9]">
           {t("Collections", "কালেকশনসমূহ")}
         </button>
         <ChevronRight className="w-3.5 h-3.5" />
-        <span className="text-azraq-navy font-bold">{activeCollection.name}</span>
+        <span className="text-[#062B4F] font-bold">{activeCollection.name}</span>
       </div>
 
-      {/* Collection Hero Banner */}
-      <div className="rounded-3xl bg-gradient-to-r from-azraq-navy via-azraq-charcoal to-[#1A253A] text-white p-8 sm:p-12 mb-10 border border-azraq-purple/20 relative overflow-hidden shadow-xl">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-azraq-violet/15 rounded-full blur-3xl pointer-events-none" />
+      {/* Collection Hero Banner with Glassy Azraq Theme */}
+      <div className="rounded-2xl bg-gradient-to-r from-[#062B4F] via-[#0A3D6E] to-[#062B4F] text-white p-8 sm:p-12 mb-10 border border-[#69C5F5]/30 relative overflow-hidden shadow-xl">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-[#50DDF0]/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
           <div className="space-y-3 text-center md:text-left max-w-xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-azraq-lime/15 text-azraq-lime text-xs font-mono font-bold">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#50DDF0]/20 text-[#50DDF0] text-xs font-mono font-bold">
               <span>{t("EASYDROP SUPPLIER CATEGORY ID", "সাপ্লায়ার ক্যাটাগরি আইডি")}: {activeCollection.id}</span>
             </div>
-
             <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
               {activeCollection.name}
             </h1>
-
-            <p className="text-xs sm:text-sm text-white/70 leading-relaxed font-normal">
+            <p className="text-xs sm:text-sm text-white/80 leading-relaxed font-normal">
               {t(activeCollection.description_en, activeCollection.description_bn)}
             </p>
-
-            <div className="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs font-mono text-white/60">
-              <span>• {activeCollectionProducts.length} {t("Verified Products", "যাচাইকৃত পণ্য")}</span>
-              <span>• {t("Nationwide Delivery Across Bangladesh", "সারা বাংলাদেশে ডেলিভারি")}</span>
-              <span>• {t("100% Quality Inspected", "মান নিয়ন্ত্রিত")}</span>
+            <div className="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-3">
+              <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-white border border-white/20">
+                {activeCollectionProducts?.length || 0} {t("Products Available", "পণ্য অন্তর্ভুক্ত")}
+              </span>
+              <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-white border border-white/20">
+                {t("100% EasyDrop Authentic", "১০০% অনুমোদিত সরবরাহ")}
+              </span>
             </div>
           </div>
 
-          {/* Collection Cover Art - High Resolution Representative Showcase */}
-          <div className="w-48 h-48 sm:w-64 sm:h-64 rounded-none bg-white/10 backdrop-blur-md p-4 flex items-center justify-center border border-white/20 shadow-2xl flex-shrink-0">
+          <div className="w-44 h-44 sm:w-56 sm:h-56 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-4 flex items-center justify-center flex-shrink-0 shadow-lg overflow-hidden">
             <img
               src={activeCollection.cover_image || activeCollection.image_url || activeCollection.fallback_image}
               alt={activeCollection.name}
-              onError={(e) => {
-                if (activeCollection.fallback_image && e.target.src !== activeCollection.fallback_image) {
-                  e.target.src = activeCollection.fallback_image;
-                }
-              }}
-              className="w-full h-full object-contain filter drop-shadow-2xl"
-              loading="eager"
+              className="w-full h-full object-contain filter drop-shadow-xl"
             />
           </div>
         </div>
       </div>
 
-      {/* Sibling Collection Navigation Tabs */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 overflow-x-auto pb-3 no-scrollbar">
-          <span className="text-xs font-bold text-azraq-navy/50 mr-1 flex-shrink-0">
-            {t("Browse Others:", "অন্যান্য কালেকশন:")}
-          </span>
-          {collections.map(col => (
-            <button
-              key={col.id}
-              onClick={() => navigateTo('collection-detail', col.slug)}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
-                col.slug === activeCollection.slug
-                  ? 'bg-azraq-navy text-white shadow-md'
-                  : 'bg-white hover:bg-azraq-lavender text-azraq-navy/70 border border-azraq-purple/20'
-              }`}
-            >
-              {col.name} ({col.imported_product_count})
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Filter and Sort Toolbar */}
-      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 mb-8 bg-white p-4 rounded-2xl border border-azraq-purple/20 shadow-sm">
+      {/* Filter and Search Bar */}
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8 p-4 rounded-xl bg-white/95 backdrop-blur-md border border-[#D9F0FF] shadow-sm">
         
         {/* Search within collection */}
-        <div className="relative flex-1 sm:max-w-xs">
-          <Search className="w-4 h-4 text-azraq-navy/40 absolute left-3 top-1/2 -translate-y-1/2" />
+        <div className="relative flex-1 md:max-w-xs">
+          <Search className="w-4 h-4 text-[#062B4F]/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder={t(`Search in ${activeCollection.name}...`, "পণ্য খুঁজুন...")}
+            placeholder={t("Filter within collection...", "কালেকশনে খুঁজুন...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-gray-200 text-xs text-azraq-navy focus:outline-none focus:border-azraq-violet"
+            className="w-full pl-9 pr-4 py-2 rounded-full bg-[#F8FCFF] border border-[#D9F0FF] text-xs text-[#062B4F] placeholder-[#062B4F]/40 focus:outline-none focus:border-[#0877C9]"
           />
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className="font-bold text-azraq-navy/60 flex items-center gap-1">
-            <Filter className="w-3.5 h-3.5" />
-            {t("Price:", "দাম:")}
-          </span>
-          {[
-            { id: 'all', label: t('All', 'সব') },
-            { id: 'under-1500', label: 'Under ৳1,500' },
-            { id: '1500-3000', label: '৳1,500 – ৳3,000' },
-            { id: 'above-3000', label: '৳3,000+' },
-          ].map(f => (
-            <button
-              key={f.id}
-              onClick={() => setPriceFilter(f.id)}
-              className={`px-2.5 py-1 rounded-lg font-semibold transition-colors ${
-                priceFilter === f.id
-                  ? 'bg-azraq-violet text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+        {/* Filter Badges & Sort */}
+        <div className="flex flex-wrap items-center gap-3">
+          
+          {/* Price Quick Filter */}
+          <div className="flex items-center gap-1 text-xs">
+            {['all', 'under-1500', '1500-3000', 'above-3000'].map((p) => (
+              <button
+                key={p}
+                onClick={() => setPriceFilter(p)}
+                className={`px-3 py-1.5 rounded-full font-bold transition-all ${
+                  priceFilter === p 
+                    ? 'bg-[#062B4F] text-white' 
+                    : 'bg-[#F8FCFF] text-[#062B4F]/70 hover:bg-[#D9F0FF]/50 border border-[#D9F0FF]'
+                }`}
+              >
+                {p === 'all' && t('All Prices', 'সব দাম')}
+                {p === 'under-1500' && '< ৳1,500'}
+                {p === '1500-3000' && '৳1.5K - 3K'}
+                {p === 'above-3000' && '> ৳3,000'}
+              </button>
+            ))}
+          </div>
+
+          {/* Sort Dropdown */}
+          <div className="relative flex items-center">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="appearance-none pl-3 pr-8 py-1.5 rounded-full bg-[#F8FCFF] border border-[#D9F0FF] text-xs font-bold text-[#062B4F] focus:outline-none focus:border-[#0877C9] cursor-pointer"
             >
-              {f.label}
-            </button>
-          ))}
+              <option value="featured">{t("Featured", "সেরা")}</option>
+              <option value="price-low">{t("Price: Low to High", "দাম: কম")}</option>
+              <option value="price-high">{t("Price: High to Low", "দাম: বেশি")}</option>
+              <option value="rating">{t("Top Rated", "রেটিং")}</option>
+            </select>
+            <ArrowUpDown className="w-3.5 h-3.5 text-[#062B4F]/50 absolute right-2.5 pointer-events-none" />
+          </div>
 
-          <label className="flex items-center gap-1.5 ml-2 cursor-pointer font-bold text-azraq-navy">
-            <input
-              type="checkbox"
-              checked={inStockOnly}
-              onChange={(e) => setInStockOnly(e.target.checked)}
-              className="rounded text-azraq-violet focus:ring-0"
-            />
-            <span>{t("In Stock Only", "কেবল স্টকে থাকা")}</span>
-          </label>
-        </div>
-
-        {/* Sorting Dropdown */}
-        <div className="relative flex items-center">
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="appearance-none pl-3 pr-8 py-1.5 rounded-xl border border-gray-200 text-xs font-bold text-azraq-navy bg-white focus:outline-none focus:border-azraq-violet cursor-pointer"
-          >
-            <option value="featured">{t("Sort: Featured", "সাজান: সেরা")}</option>
-            <option value="price-low">{t("Price: Low to High", "দাম: কম থেকে বেশি")}</option>
-            <option value="price-high">{t("Price: High to Low", "দাম: বেশি থেকে কম")}</option>
-            <option value="rating">{t("Rating: Highest", "সর্বোচ্চ রেটিং")}</option>
-          </select>
-          <ArrowUpDown className="w-3 h-3 text-gray-400 absolute right-2.5 pointer-events-none" />
         </div>
 
       </div>
 
-      {/* Product Grid */}
+      {/* Products Grid */}
       {displayedProducts.length === 0 ? (
-        <div className="py-20 text-center rounded-3xl bg-white border border-gray-200 p-8 space-y-4">
-          <p className="text-base font-bold text-azraq-navy">
-            {t("No products matched your filters in this collection", "কোনো পণ্য পাওয়া যায়নি")}
+        <div className="py-16 text-center rounded-2xl bg-white/90 border border-[#D9F0FF] p-8 space-y-4">
+          <p className="text-base font-bold text-[#062B4F]">
+            {t("No products found matching your filters", "কোনো পণ্য খুঁজে পাওয়া যায়নি")}
           </p>
           <button
             onClick={() => {
@@ -233,7 +214,7 @@ export default function CollectionDetailPage() {
               setPriceFilter('all');
               setInStockOnly(false);
             }}
-            className="px-5 py-2 rounded-full bg-azraq-navy text-white text-xs font-bold hover:bg-azraq-violet"
+            className="px-5 py-2 rounded-full bg-[#062B4F] text-white text-xs font-bold hover:bg-[#0877C9] transition-colors"
           >
             {t("Reset Filters", "ফিল্টার রিসেট করুন")}
           </button>
@@ -242,11 +223,12 @@ export default function CollectionDetailPage() {
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
           {displayedProducts.map(product => {
             const isFav = favorites.includes(product.id);
+            const shortName = product.name.split('—')[1] || product.name.split('(')[0] || product.name;
 
             return (
               <div
                 key={product.id}
-                className="rounded-none bg-white border border-azraq-purple/20 p-2 sm:p-4 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between group relative overflow-hidden h-[370px] sm:h-[490px] md:h-[510px]"
+                className="bg-white/95 backdrop-blur-md rounded-xl border border-[#D9F0FF] p-2.5 sm:p-4 shadow-sm hover:shadow-[0_12px_32px_rgba(8,119,201,0.12)] hover:border-[#69C5F5]/60 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden h-[380px] sm:h-[480px] md:h-[500px]"
               >
                 {/* Wishlist Button */}
                 <button
@@ -255,73 +237,88 @@ export default function CollectionDetailPage() {
                     toggleFavorite(product.id);
                   }}
                   className={`absolute top-2.5 right-2.5 sm:top-4 sm:right-4 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all ${
-                    isFav ? 'bg-azraq-violet text-white shadow-md' : 'bg-white/80 text-azraq-navy/40 hover:text-azraq-violet'
+                    isFav 
+                      ? 'bg-[#0877C9] text-white shadow-md' 
+                      : 'bg-white/90 text-[#062B4F]/40 hover:text-[#0877C9] hover:bg-white'
                   }`}
+                  title="Wishlist"
                 >
                   <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isFav ? 'fill-white' : ''}`} />
                 </button>
 
-                {/* SKU Badge */}
-                <div className="absolute top-2.5 left-2.5 sm:top-4 sm:left-4 z-10">
-                  <span className="px-1.5 sm:px-2 py-0.5 rounded-none bg-azraq-cloud border border-azraq-purple/20 text-azraq-navy text-[8px] sm:text-[9px] font-mono font-bold">
+                {/* SKU Tag */}
+                <div className="absolute top-2.5 left-2.5 sm:top-4 sm:left-4 z-10 flex flex-col gap-1 pointer-events-none">
+                  <span className="px-2 py-0.5 rounded bg-[#062B4F]/85 text-white text-[8px] sm:text-[9px] font-mono tracking-tight w-max backdrop-blur-sm">
                     {product.id}
                   </span>
                 </div>
 
-                {/* Product Image - 75-80% visual dominance, completely square corners */}
-                <div
+                {/* Image Area - 75-80% visual dominance */}
+                <div 
                   onClick={() => setSelectedProduct(product)}
-                  className="relative w-full h-[250px] sm:h-[370px] md:h-[390px] rounded-none bg-gradient-to-b from-[#F7F8FC] to-white flex items-center justify-center p-1.5 sm:p-3 cursor-pointer overflow-hidden"
+                  className="relative w-full h-[250px] sm:h-[350px] md:h-[370px] bg-gradient-to-b from-[#F8FCFF] to-white flex items-center justify-center p-2 sm:p-4 cursor-pointer overflow-hidden"
                 >
                   <img
                     src={product.main_image}
                     alt={product.name}
                     loading="lazy"
                     decoding="async"
-                    width="600"
-                    height="600"
                     onError={(e) => {
                       if (!e.target.dataset.failed) {
                         e.target.dataset.failed = 'true';
                         e.target.src = 'https://easydrop.asia/products/image-1794224164356-135288231.jpeg';
                       }
                     }}
-                    className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
+                    className="w-full h-full object-contain filter drop-shadow-sm transition-transform duration-500 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-azraq-navy/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <span className="px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-white text-azraq-navy text-[10px] sm:text-xs font-bold shadow-md flex items-center gap-1.5 hover:bg-azraq-lime transition-colors">
-                      <Eye className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                      {t("Quick View", "বিস্তারিত")}
-                    </span>
+                  
+                  {/* Quick View Overlay Pill */}
+                  <div className="absolute inset-0 bg-[#062B4F]/15 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedProduct(product);
+                      }}
+                      className="px-3 py-1.5 rounded-full bg-white text-[#062B4F] text-xs font-bold shadow-lg flex items-center gap-1.5 hover:bg-[#0877C9] hover:text-white transition-colors"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>{t("Quick View", "বিস্তারিত")}</span>
+                    </button>
                   </div>
                 </div>
 
-                {/* Info & Bottom Action */}
-                <div className="mt-2 sm:mt-3 pt-1.5 sm:pt-2 border-t border-gray-100 flex flex-col justify-between flex-1">
+                {/* Compact Details Bottom Block */}
+                <div className="mt-2 pt-2 border-t border-gray-100 flex flex-col justify-between flex-1">
                   <div>
-                    <h3
+                    <h3 
                       onClick={() => setSelectedProduct(product)}
-                      className="font-bold text-azraq-navy text-xs sm:text-sm line-clamp-1 cursor-pointer hover:text-azraq-violet transition-colors"
+                      className="font-bold text-[#062B4F] text-xs sm:text-sm line-clamp-1 cursor-pointer hover:text-[#0877C9] transition-colors"
                       title={product.name}
                     >
-                      {product.name}
+                      {shortName}
                     </h3>
-                    <p className="text-[10px] sm:text-[11px] text-gray-500 line-clamp-1 mt-0.5">
-                      SKU: {product.easydrop_id || product.sku}
-                    </p>
                   </div>
 
-                  <div className="flex items-center justify-between gap-1.5 sm:gap-2 pt-1.5 sm:pt-2">
-                    <span className="text-xs sm:text-base md:text-lg font-black text-azraq-navy truncate">
-                      ৳{product.price.toLocaleString()}
-                    </span>
+                  {/* Price & Action Row */}
+                  <div className="flex items-center justify-between gap-1.5 sm:gap-2 pt-2">
+                    <div className="min-w-0">
+                      <div className="text-sm sm:text-base md:text-lg font-black text-[#062B4F] truncate">
+                        ৳{product.price.toLocaleString()}
+                      </div>
+                      <span className="text-[9px] sm:text-[10px] text-emerald-600 font-bold block truncate">
+                        {t("In Stock", "স্টকে রয়েছে")}
+                      </span>
+                    </div>
 
+                    {/* Cart Action Button */}
                     <button
-                      onClick={() => addToCart(product, product.variants[0] || 'Default', 1)}
-                      className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-azraq-lime hover:bg-[#bbf035] text-azraq-navy flex items-center justify-center shadow-glow-lime transition-all transform hover:scale-110 flex-shrink-0"
-                      title="Add to bag"
+                      onClick={() => {
+                        addToCart(product, product.variants?.[0] || 'Standard', 1);
+                      }}
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#062B4F] hover:bg-[#0877C9] text-white flex items-center justify-center shadow-md transition-all transform hover:scale-110 active:scale-95 flex-shrink-0"
+                      title={t("Add to Cart", "ব্যাগে যোগ করুন")}
                     >
-                      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-azraq-navy" />
+                      <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                     </button>
                   </div>
                 </div>
@@ -332,14 +329,14 @@ export default function CollectionDetailPage() {
         </div>
       )}
 
-      {/* Load More Pagination */}
+      {/* Load More Button */}
       {visibleCount < filteredProducts.length && (
-        <div className="mt-12 text-center">
+        <div className="text-center pt-10">
           <button
-            onClick={() => setVisibleCount(prev => prev + 12)}
-            className="px-8 py-3 rounded-full bg-azraq-navy text-white hover:bg-azraq-charcoal font-bold text-xs sm:text-sm shadow-md transition-all"
+            onClick={() => setVisibleCount(prev => prev + 24)}
+            className="px-8 py-3 rounded-full bg-white border border-[#D9F0FF] text-[#062B4F] hover:bg-[#F0F7FF] hover:border-[#69C5F5] font-bold text-xs shadow-sm transition-all"
           >
-            {t("Load More Products", "আরও পণ্য লোড করুন")} ({visibleCount} of {filteredProducts.length})
+            {t(`Load More (${filteredProducts.length - visibleCount} remaining)`, `আরও দেখুন (${filteredProducts.length - visibleCount}টি বাকি)`)}
           </button>
         </div>
       )}
@@ -347,4 +344,3 @@ export default function CollectionDetailPage() {
     </div>
   );
 }
-
