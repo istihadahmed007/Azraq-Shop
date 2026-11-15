@@ -134,6 +134,72 @@ export function calculateServerTotal({ items = [], deliveryArea = 'inside', fall
 }
 
 /**
+ * Directly create an authentic dynamic checkout session on azraq.paymently.io
+ * Pre-fills and locks the exact calculated amount (e.g. ৳7,900, ৳12,500, etc.)
+ * Customer is redirected to azraq.paymently.io/checkout/<token> and NEVER types the amount!
+ */
+export async function createPaymentlyLiveSession({ orderId, amount, customer = {} }) {
+  try {
+    console.log(`[Paymently Live Bridge] Generating locked checkout session on azraq.paymently.io for ৳${amount} BDT...`);
+    const getRes = await fetch('https://azraq.paymently.io/paymentlink/default/BDT', {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+      }
+    });
+
+    const getHtml = await getRes.text();
+    const cookies = getRes.headers.getSetCookie ? getRes.headers.getSetCookie() : [getRes.headers.get('set-cookie')];
+    const cookieHeader = cookies ? cookies.filter(Boolean).map(c => c.split(';')[0]).join('; ') : '';
+
+    const csrfMatch = getHtml.match(/name="csrf-token" content="([^"]+)"/);
+    const csrfToken = csrfMatch ? csrfMatch[1] : null;
+    const versionMatch = getHtml.match(/"version":"([^"]+)"/);
+    const version = versionMatch ? versionMatch[1] : '';
+
+    if (!csrfToken) {
+      console.warn('[Paymently Live Bridge] Could not extract CSRF token from payment link');
+      return null;
+    }
+
+    const postRes = await fetch('https://azraq.paymently.io/paymentlink/default', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'text/html, application/xhtml+xml, application/json, text/plain, */*',
+        'X-CSRF-TOKEN': csrfToken,
+        'X-XSRF-TOKEN': csrfToken,
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-Inertia': 'true',
+        'X-Inertia-Version': version,
+        'Cookie': cookieHeader,
+        'Referer': 'https://azraq.paymently.io/paymentlink/default/BDT',
+        'Origin': 'https://azraq.paymently.io',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      },
+      redirect: 'manual',
+      body: JSON.stringify({
+        name: customer.name || 'Valued Customer',
+        email: customer.email || `${customer.phone || 'customer'}@azraqshop.com`,
+        phone: customer.phone || '01700000000',
+        amount: String(amount),
+        currency: 'BDT',
+        reference: orderId
+      })
+    });
+
+    const location = postRes.headers.get('location');
+    if (location && location.includes('/checkout/')) {
+      console.log(`[Paymently Live Session Created] Direct Locked Checkout URL: ${location} (Amount: ৳${amount} BDT)`);
+      return location;
+    }
+  } catch (err) {
+    console.error('[Paymently Live Bridge Error]:', err.message);
+  }
+  return null;
+}
+
+/**
  * 1. Create a dynamic Payment Session via Paymently API
  * Strictly pre-fills and locks the amount (never prompts 0.00)
  */
@@ -163,7 +229,7 @@ export async function createPaymentlyCheckout({
   let gatewayResponse = null;
   let mode = 'live_api';
 
-  // If merchant API Key is configured, execute official Paymently / UddoktaPay POST /api/checkout-v2
+  // 1. If merchant API Key is configured, execute official Paymently / UddoktaPay POST /api/checkout-v2
   if (CONFIG.apiKey && CONFIG.apiKey.trim().length > 5) {
     try {
       const apiEndpoint = `${CONFIG.baseUrl.replace(/\/+$/, '')}/api/checkout-v2`;
@@ -197,21 +263,29 @@ export async function createPaymentlyCheckout({
 
       if (gatewayResponse && (gatewayResponse.payment_url || gatewayResponse.status === true)) {
         paymentUrl = gatewayResponse.payment_url;
-      } else {
-        console.warn('[Paymently API] Endpoint returned unexpected payload, falling back to dynamic session checkout:', gatewayResponse);
-        paymentUrl = `${CONFIG.siteUrl}/payment-checkout?session_id=${invoiceId}&order_id=${encodeURIComponent(orderId)}&amount=${verifiedAmount}`;
-        mode = 'dynamic_session_fallback';
       }
     } catch (apiErr) {
       console.error('[Paymently API Error] Failed to connect to gateway:', apiErr.message);
-      paymentUrl = `${CONFIG.siteUrl}/payment-checkout?session_id=${invoiceId}&order_id=${encodeURIComponent(orderId)}&amount=${verifiedAmount}`;
-      mode = 'dynamic_session_fallback';
     }
-  } else {
-    // API key unconfigured / development mode:
-    // Route to AZRAQ Dynamic Checkout Session where amount is locked & pre-filled
+  }
+
+  // 2. Direct Live Session Creation on azraq.paymently.io (Amount locked & pre-filled)
+  if (!paymentUrl) {
+    const livePaymentlyUrl = await createPaymentlyLiveSession({
+      orderId,
+      amount: verifiedAmount,
+      customer
+    });
+    if (livePaymentlyUrl) {
+      paymentUrl = livePaymentlyUrl;
+      mode = 'paymently_live_session';
+    }
+  }
+
+  // 3. Fallback to local locked dynamic session if live provider is completely offline
+  if (!paymentUrl) {
     paymentUrl = `${CONFIG.siteUrl}/payment-checkout?session_id=${invoiceId}&order_id=${encodeURIComponent(orderId)}&amount=${verifiedAmount}`;
-    mode = 'dynamic_session';
+    mode = 'dynamic_session_fallback';
   }
 
   // Record pending transaction record in store
@@ -245,7 +319,7 @@ export async function createPaymentlyCheckout({
     payment_url: paymentUrl,
     mode,
     merchant_name: CONFIG.merchantName,
-    message: 'Payment session created successfully'
+    message: 'Payment session created successfully with locked amount'
   };
 }
 

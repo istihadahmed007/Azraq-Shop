@@ -24,9 +24,15 @@ export default function CheckoutModal() {
     t
   } = useShop();
 
-  const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
+  const [fullName, setFullName] = useState(() => {
+    try { return localStorage.getItem('azraq_customer_name') || ''; } catch (e) { return ''; }
+  });
+  const [phone, setPhone] = useState(() => {
+    try { return localStorage.getItem('azraq_customer_phone') || ''; } catch (e) { return ''; }
+  });
+  const [address, setAddress] = useState(() => {
+    try { return localStorage.getItem('azraq_customer_address') || ''; } catch (e) { return ''; }
+  });
   const [city, setCity] = useState('Dhaka');
   const [thana, setThana] = useState('');
   const [notes, setNotes] = useState('');
@@ -74,6 +80,12 @@ export default function CheckoutModal() {
     setIsSubmitting(true);
 
     try {
+      try {
+        localStorage.setItem('azraq_customer_name', fullName);
+        localStorage.setItem('azraq_customer_phone', phone);
+        localStorage.setItem('azraq_customer_address', address);
+      } catch (e) {}
+
       // 1. Create order record
       const order = placeOrder({
         name: fullName,
@@ -107,16 +119,11 @@ export default function CheckoutModal() {
 
       setPaymentSession(session);
       setIsSubmitting(false);
+      setCheckoutStep('gateway_redirect');
 
-      if (paymentMethod === 'PAYMENTLY_GATEWAY') {
-        setCheckoutStep('gateway_redirect');
-        // Automatically open the payment gateway in a popup or new tab
-        if (session.payment_url) {
-          window.open(session.payment_url, '_blank');
-        }
-      } else {
-        // Fallback direct payment link
-        setCheckoutStep('gateway_redirect');
+      // Automatically open the payment gateway session with locked pre-filled amount
+      if (session.payment_url) {
+        window.open(session.payment_url, '_blank');
       }
 
     } catch (err) {

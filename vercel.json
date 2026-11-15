@@ -1,0 +1,33 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/api/payments/create",
+      "destination": "/api/payments/create"
+    },
+    {
+      "source": "/api/payments/verify",
+      "destination": "/api/payments/verify"
+    },
+    {
+      "source": "/api/payments/status",
+      "destination": "/api/payments/status"
+    },
+    {
+      "source": "/api/payments/cancel",
+      "destination": "/api/payments/cancel"
+    },
+    {
+      "source": "/api/payments/webhook",
+      "destination": "/api/payments/webhook"
+    },
+    {
+      "source": "/api/payments/transactions",
+      "destination": "/api/payments/transactions"
+    },
+    {
+      "source": "/api/payments/session",
+      "destination": "/api/payments/session"
+    }
+  ]
+}
