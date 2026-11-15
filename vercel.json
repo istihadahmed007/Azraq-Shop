@@ -26,9 +26,8 @@
       "destination": "/api/payments/transactions"
     },
     {
-      "source": "/api/payments/session",
-      "destination": "/api/payments/session"
+      "source": "/api/orders",
+      "destination": "/api/orders/index"
     }
   ]
 }
-

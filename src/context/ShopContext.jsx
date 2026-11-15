@@ -66,70 +66,21 @@ export function ShopProvider({ children }) {
     return saved ? JSON.parse(saved) : ['AZQ-001', 'AZQ-003', 'AZQ-021'];
   });
 
-  // Orders pipeline (persisted in localStorage)
+  // Orders pipeline (persisted in localStorage, production starts empty)
   const [orders, setOrders] = useState(() => {
     const saved = localStorage.getItem('azraq_orders');
-    if (saved) return JSON.parse(saved);
-    return [
-      {
-        id: 'AZQ-BD-92101',
-        date: '2026-11-15T09:40:00Z',
-        customer: {
-          name: 'Shakil Ahmed',
-          phone: '01711223344',
-          address: 'Road 7, Sector 3, Uttara, Dhaka',
-          area: 'inside'
-        },
-        items: [
-          {
-            id: 'AZQ-001',
-            name: 'Baseus Fast Charging Gift Box Set',
-            variant: 'Default',
-            price: 1950,
-            quantity: 1,
-            supplier_sku: 'ED-2-001',
-            collection: 'Gadgets & IT Accessories'
-          }
-        ],
-        subtotal: 1950,
-        deliveryFee: 70,
-        discount: 200,
-        total: 1820,
-        paymentMethod: 'COD',
-        status: 'Sent to EasyDrop',
-        courierTracking: 'STDFST-99412',
-        easyDropOrderId: 'ED-ORD-44910'
-      },
-      {
-        id: 'AZQ-BD-91882',
-        date: '2026-11-14T14:20:00Z',
-        customer: {
-          name: 'Nusrat Jahan',
-          phone: '01899112233',
-          address: 'Mehedibag, Chattogram',
-          area: 'outside'
-        },
-        items: [
-          {
-            id: 'AZQ-061',
-            name: 'AZRAQ Atelier Structured Shoulder Bag',
-            variant: 'Midnight Black',
-            price: 2450,
-            quantity: 1,
-            supplier_sku: 'ED-5-061',
-            collection: 'Jewelries & Accessories'
-          }
-        ],
-        subtotal: 2450,
-        deliveryFee: 130,
-        discount: 0,
-        total: 2580,
-        paymentMethod: 'bKash',
-        status: 'Dispatched',
-        courierTracking: 'PATHAO-77201',
-        easyDropOrderId: 'ED-ORD-44820'
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // Exclude legacy mock orders
+        if (Array.isArray(parsed)) {
+          return parsed.filter(o => o && o.customer && o.customer.name !== 'Shakil Ahmed' && o.customer.name !== 'Nusrat Jahan');
+        }
+      } catch (e) {
+        return [];
       }
-    ];
+    }
+    return [];
   });
 
   // UI States
@@ -263,8 +214,21 @@ export function ShopProvider({ children }) {
     }
   };
 
-  const placeOrder = (customerData, paymentMethod) => {
-    const orderId = `AZQ-BD-${Math.floor(10000 + Math.random() * 90000)}`;
+  // Record a verified/confirmed order into state & clear shopping cart
+  const recordConfirmedOrder = (order) => {
+    setOrders(prev => {
+      const exists = prev.some(o => o.id === order.id);
+      if (exists) return prev;
+      return [order, ...prev];
+    });
+    clearCart();
+    setAppliedPromo(null);
+    return order;
+  };
+
+  // Legacy helper refactored: Only called after explicit COD or verified payment
+  const placeOrder = (customerData, paymentMethod, verifiedOrderId = null) => {
+    const orderId = verifiedOrderId || `AZQ-ORD-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
     const newOrder = {
       id: orderId,
       date: new Date().toISOString(),
@@ -283,16 +247,12 @@ export function ShopProvider({ children }) {
       discount: promoDiscount,
       total: cartTotal,
       paymentMethod,
-      status: 'Confirmed',
-      courierTracking: `STDFST-${Math.floor(10000 + Math.random() * 90000)}`,
-      easyDropOrderId: `ED-ORD-${Math.floor(100000 + Math.random() * 900000)}`
+      status: paymentMethod === 'COD' ? 'Confirmed' : 'Processing',
+      courierTracking: null,
+      easyDropOrderId: null
     };
 
-    setOrders(prev => [newOrder, ...prev]);
-    clearCart();
-    setAppliedPromo(null);
-    setIsCheckoutOpen(false);
-    return newOrder;
+    return recordConfirmedOrder(newOrder);
   };
 
   // EasyDrop Ingestion & Synchronization Handler
@@ -381,6 +341,7 @@ export function ShopProvider({ children }) {
         toggleFavorite,
         orders,
         placeOrder,
+        recordConfirmedOrder,
         updateOrderStatus,
         language,
         setLanguage,

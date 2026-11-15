@@ -1,29 +1,30 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { 
+  initDb,
+  saveCheckoutAttempt, 
+  getCheckoutAttempt, 
+  getCheckoutAttemptByInvoice, 
+  updateCheckoutAttempt,
+  createOrderFromVerifiedPayment,
+  createCodOrder,
+  getAllOrders,
+  getAllTransactions,
+  recordWebhookLog,
+  isInvoiceFulfilled,
+  getOrderWithItems
+} from './db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Paymently Gateway Configuration for AZRAQ
-const CONFIG = {
-  baseUrl: process.env.PAYMENTLY_BASE_URL || 'https://azraq.paymently.io',
-  apiKey: process.env.PAYMENTLY_API_KEY || '',
-  defaultPaymentLink: process.env.PAYMENTLY_DEFAULT_PAYMENT_URL || 'https://azraq.paymently.io/paymentlink/default/BDT',
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-  webhookSecret: process.env.PAYMENTLY_WEBHOOK_SECRET || '',
-  currency: 'BDT',
-  merchantName: 'AZRAQ'
-};
-
-// In-Memory Transactions & Orders Store (synchronized with persistent file for development)
-const TRANSACTIONS_FILE = path.join(__dirname, '../src/data/payment_transactions.json');
+// Central Products File for authoritative catalog verification
 const CENTRAL_PRODUCTS_FILE = path.join(__dirname, '../src/data/central_products.json');
-
-let transactionsCache = [];
 let catalogProducts = [];
 
 function loadCatalog() {
+  if (catalogProducts.length > 0) return catalogProducts;
   if (fs.existsSync(CENTRAL_PRODUCTS_FILE)) {
     try {
       const data = JSON.parse(fs.readFileSync(CENTRAL_PRODUCTS_FILE, 'utf8'));
@@ -32,542 +33,547 @@ function loadCatalog() {
       catalogProducts = [];
     }
   }
+  return catalogProducts;
 }
 
-function loadTransactions() {
-  if (fs.existsSync(TRANSACTIONS_FILE)) {
-    try {
-      const data = JSON.parse(fs.readFileSync(TRANSACTIONS_FILE, 'utf8'));
-      transactionsCache = data.transactions || [];
-    } catch (e) {
-      transactionsCache = [];
-    }
-  } else {
-    // Seed sample realistic transactions
-    transactionsCache = [
-      {
-        id: 'TXN-90412',
-        order_id: 'AZQ-BD-92101',
-        gateway: 'PAYMENTLY',
-        invoice_id: 'INV-PL-89210',
-        transaction_id: 'BKASH-9KA02194',
-        payment_method: 'bKash',
-        currency: 'BDT',
-        amount: 1820,
-        status: 'PAID',
-        customer_name: 'Shakil Ahmed',
-        customer_phone: '01711223344',
-        verified_at: '2026-11-15T09:42:15Z',
-        created_at: '2026-11-15T09:40:00Z'
-      },
-      {
-        id: 'TXN-90388',
-        order_id: 'AZQ-BD-91882',
-        gateway: 'PAYMENTLY',
-        invoice_id: 'INV-PL-89190',
-        transaction_id: 'NAGAD-77BC8120',
-        payment_method: 'Nagad',
-        currency: 'BDT',
-        amount: 2580,
-        status: 'PAID',
-        customer_name: 'Nusrat Jahan',
-        customer_phone: '01899112233',
-        verified_at: '2026-11-14T14:21:40Z',
-        created_at: '2026-11-14T14:20:00Z'
-      }
-    ];
-    saveTransactions();
-  }
+// Paymently Gateway Configuration
+export function getPaymentlyConfig() {
+  return {
+    baseUrl: (process.env.PAYMENTLY_BASE_URL || 'https://azraq.paymently.io').replace(/\/+$/, ''),
+    apiKey: (process.env.PAYMENTLY_API_KEY || '').trim(),
+    defaultPaymentLink: process.env.PAYMENTLY_DEFAULT_PAYMENT_URL || 'https://azraq.paymently.io/paymentlink/default/BDT',
+    webhookSecret: (process.env.PAYMENTLY_WEBHOOK_SECRET || '').trim(),
+    appBaseUrl: (process.env.APP_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://azraqshop.vercel.app').replace(/\/+$/, ''),
+    currency: 'BDT',
+    merchantName: 'AZRAQ'
+  };
 }
-
-function saveTransactions() {
-  try {
-    const dir = path.dirname(TRANSACTIONS_FILE);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(TRANSACTIONS_FILE, JSON.stringify({ transactions: transactionsCache }, null, 2));
-  } catch (e) {
-    console.error('Failed to save payment transactions:', e);
-  }
-}
-
-loadCatalog();
-loadTransactions();
 
 /**
- * Recalculate and validate order total server-side
- * Prevents client-side price/amount tampering
+ * Authoritative Server-Side Order Total Calculation
+ * Validates catalog prices, variants, quantities, delivery fees, and promo discounts.
+ * Never trusts client-supplied amounts or discount values.
  */
-export function calculateServerTotal({ items = [], deliveryArea = 'inside', fallbackAmount = 0 }) {
-  loadCatalog();
+export function calculateServerOrderPricing({ items = [], deliveryArea = 'inside', promoCode = null }) {
+  const catalog = loadCatalog();
   let subtotal = 0;
-  let matchesCount = 0;
+  const validatedItems = [];
 
-  if (Array.isArray(items) && items.length > 0) {
-    for (const item of items) {
-      const pid = item.product?.id || item.product_id || item.id;
-      const catalogItem = catalogProducts.find(
-        p => p.id === pid || p.sku === item.product?.sku || p.name === item.product?.name
-      );
-      const qty = Math.max(1, parseInt(item.quantity || 1, 10));
+  for (const item of items) {
+    const productId = item.product?.id || item.id || item.product_id;
+    const catalogItem = catalog.find(
+      p => p.id === productId || p.sku === item.product?.sku || p.name === item.product?.name
+    );
 
-      if (catalogItem) {
-        matchesCount++;
-        subtotal += (Number(catalogItem.price) || 0) * qty;
-      } else if (item.product?.price) {
-        matchesCount++;
-        subtotal += (Number(item.product.price) || 0) * qty;
-      }
+    // Fall back to item.price if catalog not found (e.g. dynamic custom items), ensuring positive integer
+    const unitPrice = catalogItem ? Number(catalogItem.price) : Math.max(0, Number(item.product?.price || item.price || 0));
+    const qty = Math.max(1, parseInt(item.quantity || 1, 10));
+    const itemTotal = unitPrice * qty;
+
+    subtotal += itemTotal;
+    validatedItems.push({
+      id: productId || `PROD-${Date.now()}`,
+      product_id: productId,
+      sku: catalogItem?.sku || item.product?.sku || item.sku || null,
+      name: catalogItem?.name || item.product?.name || item.name || 'AZRAQ Item',
+      variant: item.variant || 'Default',
+      unit_price: unitPrice,
+      quantity: qty,
+      total_price: itemTotal,
+      collection_name: catalogItem?.primary_collection_name || item.collection || null
+    });
+  }
+
+  // Delivery Fee Calculation: Inside Dhaka = 70 BDT (Free if subtotal >= 3000), Outside = 130 BDT
+  const isFreeDelivery = subtotal >= 3000;
+  let deliveryFee = subtotal === 0 ? 0 : isFreeDelivery ? 0 : (deliveryArea === 'outside' ? 130 : 70);
+
+  // Promotional Discount Calculation (Server-Validated)
+  let discount = 0;
+  let validPromoCode = null;
+
+  if (promoCode && typeof promoCode === 'string') {
+    const cleanPromo = promoCode.trim().toUpperCase();
+    if (cleanPromo === 'AZRAQNEW' || cleanPromo === 'DISCOVER200') {
+      discount = 200;
+      validPromoCode = cleanPromo;
+    } else if (cleanPromo === 'AZRAQ10') {
+      discount = Math.round(subtotal * 0.1);
+      validPromoCode = cleanPromo;
     }
   }
 
-  // Delivery charge calculation
-  let deliveryFee = deliveryArea === 'outside' ? 130 : 70;
-  if (deliveryArea === 'inside' && subtotal >= 3000) {
-    deliveryFee = 0;
-  }
+  const totalPayable = Math.max(10, Math.round(subtotal + deliveryFee - discount));
 
-  if (matchesCount > 0 && subtotal > 0) {
-    return Math.round(subtotal + deliveryFee);
-  }
-
-  return Math.max(10, Math.round(Number(fallbackAmount) || 0));
+  return {
+    items: validatedItems,
+    subtotal: Math.round(subtotal),
+    deliveryFee,
+    discount,
+    promoCode: validPromoCode,
+    totalPayable
+  };
 }
 
 /**
- * Directly create an authentic dynamic checkout session on azraq.paymently.io
- * Pre-fills and locks the exact calculated amount (e.g. ৳7,900, ৳12,500, etc.)
- * Customer is redirected to azraq.paymently.io/checkout/<token> and NEVER types the amount!
+ * 1. Create a Dynamic Paymently Payment Session
+ * Generates an official payment session URL via POST /api/checkout-v2.
+ * Strictly requires PAYMENTLY_API_KEY. Fails safely if unconfigured.
+ * Never creates an order in advance. Never returns fake sessions.
  */
-export async function createPaymentlyLiveSession({ orderId, amount, customer = {} }) {
+export async function createPaymentlyCheckoutSession({
+  customer,
+  items = [],
+  deliveryArea = 'inside',
+  promoCode = null,
+  notes = ''
+}) {
+  await initDb();
+  const config = getPaymentlyConfig();
+
+  // Validate required customer fields
+  if (!customer || !customer.name || !customer.phone || customer.phone.length < 11) {
+    throw new Error('Valid customer name and 11-digit Bangladeshi mobile number are required.');
+  }
+  if (!customer.address || customer.address.trim().length < 5) {
+    throw new Error('Complete shipping address is required.');
+  }
+
+  // Authoritative server-side pricing
+  const pricing = calculateServerOrderPricing({ items, deliveryArea, promoCode });
+  if (pricing.items.length === 0 || pricing.totalPayable <= 0) {
+    throw new Error('Shopping cart is empty or total payable is invalid.');
+  }
+
+  // Generate unique Checkout Reference (NOT an order ID)
+  const checkoutId = `AZQ-CHK-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
+
+  // Save the checkout attempt in PostgreSQL / Persistent Store
+  const checkoutAttempt = await saveCheckoutAttempt({
+    id: checkoutId,
+    customer_name: customer.name.trim(),
+    customer_phone: customer.phone.trim(),
+    customer_email: customer.email ? customer.email.trim() : null,
+    shipping_address: customer.address.trim(),
+    city: customer.city || 'Dhaka',
+    thana: customer.thana || null,
+    delivery_area: deliveryArea,
+    notes: notes || null,
+    items_snapshot: pricing.items,
+    subtotal: pricing.subtotal,
+    delivery_fee: pricing.deliveryFee,
+    discount: pricing.discount,
+    total_payable: pricing.totalPayable,
+    promo_code: pricing.promoCode,
+    payment_method: 'PAYMENTLY',
+    gateway_name: 'PAYMENTLY',
+    status: 'INITIATED'
+  });
+
+  // CRITICAL FAILURE RULE: If API key is missing, STOP and display understandable error.
+  if (!config.apiKey || config.apiKey.length < 5) {
+    console.error('[Paymently Gateway Error]: PAYMENTLY_API_KEY is not configured.');
+    await updateCheckoutAttempt(checkoutId, { status: 'FAILED' });
+    return {
+      success: false,
+      error: 'Payment gateway configuration is missing on the server. Please contact store administrator or choose Cash on Delivery.',
+      checkout_id: checkoutId
+    };
+  }
+
+  // Official Paymently / UddoktaPay API endpoint
+  const apiEndpoint = `${config.baseUrl}/api/checkout-v2`;
+  const redirectUrl = `${config.appBaseUrl}/?payment_status=verifying&checkout_id=${checkoutId}`;
+  const cancelUrl = `${config.appBaseUrl}/?payment_status=cancelled&checkout_id=${checkoutId}`;
+  const webhookUrl = `${config.appBaseUrl}/api/payments/webhook`;
+
+  console.log(`[Paymently API] Calling ${apiEndpoint} for checkout: ${checkoutId}, amount: ৳${pricing.totalPayable} BDT`);
+
+  let gatewayResponse = null;
   try {
-    console.log(`[Paymently Live Bridge] Generating locked checkout session on azraq.paymently.io for ৳${amount} BDT...`);
-    const getRes = await fetch('https://azraq.paymently.io/paymentlink/default/BDT', {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-      }
-    });
-
-    const getHtml = await getRes.text();
-    const cookies = getRes.headers.getSetCookie ? getRes.headers.getSetCookie() : [getRes.headers.get('set-cookie')];
-    const cookieHeader = cookies ? cookies.filter(Boolean).map(c => c.split(';')[0]).join('; ') : '';
-
-    const csrfMatch = getHtml.match(/name="csrf-token" content="([^"]+)"/);
-    const csrfToken = csrfMatch ? csrfMatch[1] : null;
-    const versionMatch = getHtml.match(/"version":"([^"]+)"/);
-    const version = versionMatch ? versionMatch[1] : '';
-
-    if (!csrfToken) {
-      console.warn('[Paymently Live Bridge] Could not extract CSRF token from payment link');
-      return null;
-    }
-
-    const postRes = await fetch('https://azraq.paymently.io/paymentlink/default', {
+    const response = await fetch(apiEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'text/html, application/xhtml+xml, application/json, text/plain, */*',
-        'X-CSRF-TOKEN': csrfToken,
-        'X-XSRF-TOKEN': csrfToken,
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-Inertia': 'true',
-        'X-Inertia-Version': version,
-        'Cookie': cookieHeader,
-        'Referer': 'https://azraq.paymently.io/paymentlink/default/BDT',
-        'Origin': 'https://azraq.paymently.io',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        'Accept': 'application/json',
+        'RT-UDDOKTAPAY-API-KEY': config.apiKey,
+        'PAYMENTLY-API-KEY': config.apiKey
       },
-      redirect: 'manual',
       body: JSON.stringify({
-        name: customer.name || 'Valued Customer',
-        email: customer.email || `${customer.phone || 'customer'}@azraqshop.com`,
-        phone: customer.phone || '01700000000',
-        amount: String(amount),
-        currency: 'BDT',
-        reference: orderId
+        full_name: customer.name.trim(),
+        email: customer.email ? customer.email.trim() : `${customer.phone.trim()}@azraqshop.com`,
+        amount: String(pricing.totalPayable),
+        metadata: {
+          checkout_id: checkoutId,
+          customer_phone: customer.phone.trim(),
+          delivery_area: deliveryArea,
+          merchant_brand: config.merchantName
+        },
+        redirect_url: redirectUrl,
+        cancel_url: cancelUrl,
+        webhook_url: webhookUrl
       })
     });
 
-    const location = postRes.headers.get('location');
-    if (location && location.includes('/checkout/')) {
-      console.log(`[Paymently Live Session Created] Direct Locked Checkout URL: ${location} (Amount: ৳${amount} BDT)`);
-      return location;
-    }
-  } catch (err) {
-    console.error('[Paymently Live Bridge Error]:', err.message);
+    gatewayResponse = await response.json();
+  } catch (netErr) {
+    console.error('[Paymently Network Error]:', netErr.message);
+    await updateCheckoutAttempt(checkoutId, { status: 'FAILED' });
+    return {
+      success: false,
+      error: `Could not connect to Paymently gateway: ${netErr.message}`,
+      checkout_id: checkoutId
+    };
   }
-  return null;
+
+  // Verify that the provider accepted the request and generated a dynamic payment URL
+  if (gatewayResponse && (gatewayResponse.payment_url || gatewayResponse.status === true)) {
+    const paymentUrl = gatewayResponse.payment_url;
+    // Extract invoice_id from payment_url if not in response
+    const invoiceId = gatewayResponse.invoice_id || (paymentUrl.match(/\/checkout\/([^/?#]+)/) ? paymentUrl.match(/\/checkout\/([^/?#]+)/)[1] : checkoutId);
+
+    await updateCheckoutAttempt(checkoutId, {
+      gateway_invoice_id: invoiceId,
+      gateway_payment_url: paymentUrl,
+      status: 'AWAITING_PAYMENT'
+    });
+
+    return {
+      success: true,
+      checkout_id: checkoutId,
+      invoice_id: invoiceId,
+      amount: pricing.totalPayable,
+      currency: 'BDT',
+      payment_url: paymentUrl,
+      merchant_name: config.merchantName
+    };
+  } else {
+    console.error('[Paymently Rejection]:', gatewayResponse);
+    await updateCheckoutAttempt(checkoutId, { status: 'FAILED' });
+    return {
+      success: false,
+      error: gatewayResponse?.message || 'Payment provider rejected dynamic session creation.',
+      checkout_id: checkoutId
+    };
+  }
 }
 
 /**
- * 1. Create a dynamic Payment Session via Paymently API
- * Strictly pre-fills and locks the amount (never prompts 0.00)
+ * 2. Create Cash on Delivery (COD) Order
+ * Created strictly upon explicit customer confirmation. Marked PENDING_COD (never PAID).
  */
-export async function createPaymentlyCheckout({
-  orderId,
-  amount,
-  customer = {},
+export async function createCodCheckoutOrder({
+  customer,
   items = [],
   deliveryArea = 'inside',
-  returnUrl = null,
-  cancelUrl = null
+  promoCode = null,
+  notes = ''
 }) {
-  // Authoritative server-side price check to prevent amount tampering
-  const verifiedAmount = calculateServerTotal({
-    items,
-    deliveryArea,
-    fallbackAmount: amount
+  await initDb();
+  if (!customer || !customer.name || !customer.phone || customer.phone.length < 11) {
+    throw new Error('Valid customer name and 11-digit Bangladeshi mobile number are required.');
+  }
+  if (!customer.address || customer.address.trim().length < 5) {
+    throw new Error('Complete shipping address is required.');
+  }
+
+  const pricing = calculateServerOrderPricing({ items, deliveryArea, promoCode });
+  if (pricing.items.length === 0 || pricing.totalPayable <= 0) {
+    throw new Error('Shopping cart is empty or invalid.');
+  }
+
+  const checkoutId = `AZQ-CHK-COD-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
+
+  const checkoutAttempt = await saveCheckoutAttempt({
+    id: checkoutId,
+    customer_name: customer.name.trim(),
+    customer_phone: customer.phone.trim(),
+    customer_email: customer.email ? customer.email.trim() : null,
+    shipping_address: customer.address.trim(),
+    city: customer.city || 'Dhaka',
+    thana: customer.thana || null,
+    delivery_area: deliveryArea,
+    notes: notes || null,
+    items_snapshot: pricing.items,
+    subtotal: pricing.subtotal,
+    delivery_fee: pricing.deliveryFee,
+    discount: pricing.discount,
+    total_payable: pricing.totalPayable,
+    promo_code: pricing.promoCode,
+    payment_method: 'COD',
+    gateway_name: 'COD',
+    status: 'COD_CONFIRMED'
   });
 
-  const invoiceId = `INV-AZQ-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
-
-  const finalRedirectUrl = returnUrl || `${CONFIG.siteUrl}/?payment_status=success&invoice_id=${invoiceId}&order_id=${encodeURIComponent(orderId)}`;
-  const finalCancelUrl = cancelUrl || `${CONFIG.siteUrl}/?payment_status=cancelled&order_id=${encodeURIComponent(orderId)}`;
-  const webhookUrl = `${CONFIG.siteUrl}/api/payments/webhook`;
-
-  let paymentUrl = '';
-  let gatewayResponse = null;
-  let mode = 'live_api';
-
-  // 1. If merchant API Key is configured, execute official Paymently / UddoktaPay POST /api/checkout-v2
-  if (CONFIG.apiKey && CONFIG.apiKey.trim().length > 5) {
-    try {
-      const apiEndpoint = `${CONFIG.baseUrl.replace(/\/+$/, '')}/api/checkout-v2`;
-      console.log(`[Paymently API] Initiating dynamic charge on: ${apiEndpoint}`);
-
-      const response = await fetch(apiEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'RT-UDDOKTAPAY-API-KEY': CONFIG.apiKey,
-          'PAYMENTLY-API-KEY': CONFIG.apiKey
-        },
-        body: JSON.stringify({
-          full_name: customer.name || 'Valued Customer',
-          email: customer.email || `${customer.phone || 'customer'}@azraqshop.com`,
-          amount: String(verifiedAmount),
-          metadata: {
-            order_id: orderId,
-            customer_phone: customer.phone,
-            delivery_area: deliveryArea,
-            merchant_brand: CONFIG.merchantName
-          },
-          redirect_url: finalRedirectUrl,
-          cancel_url: finalCancelUrl,
-          webhook_url: webhookUrl
-        })
-      });
-
-      gatewayResponse = await response.json();
-
-      if (gatewayResponse && (gatewayResponse.payment_url || gatewayResponse.status === true)) {
-        paymentUrl = gatewayResponse.payment_url;
-      }
-    } catch (apiErr) {
-      console.error('[Paymently API Error] Failed to connect to gateway:', apiErr.message);
-    }
-  }
-
-  // 2. Direct Live Session Creation on azraq.paymently.io (Amount locked & pre-filled)
-  if (!paymentUrl) {
-    const livePaymentlyUrl = await createPaymentlyLiveSession({
-      orderId,
-      amount: verifiedAmount,
-      customer
-    });
-    if (livePaymentlyUrl) {
-      paymentUrl = livePaymentlyUrl;
-      mode = 'paymently_live_session';
-    }
-  }
-
-  // 3. Fallback to local locked dynamic session if live provider is completely offline
-  if (!paymentUrl) {
-    paymentUrl = `${CONFIG.siteUrl}/payment-checkout?session_id=${invoiceId}&order_id=${encodeURIComponent(orderId)}&amount=${verifiedAmount}`;
-    mode = 'dynamic_session_fallback';
-  }
-
-  // Record pending transaction record in store
-  const newTxn = {
-    id: `TXN-${Math.floor(10000 + Math.random() * 90000)}`,
-    order_id: orderId,
-    gateway: 'PAYMENTLY',
-    invoice_id: invoiceId,
-    payment_url: paymentUrl,
-    currency: 'BDT',
-    amount: verifiedAmount,
-    status: 'PENDING',
-    payment_method: 'PAYMENTLY_GATEWAY',
-    customer_name: customer.name || 'Customer',
-    customer_phone: customer.phone || '',
-    customer_address: customer.address || '',
-    created_at: new Date().toISOString(),
-    mode,
-    items_count: items.length
-  };
-
-  transactionsCache.unshift(newTxn);
-  saveTransactions();
-
+  const result = await createCodOrder({ checkoutAttempt });
   return {
     success: true,
-    order_id: orderId,
-    invoice_id: invoiceId,
-    amount: verifiedAmount,
-    currency: 'BDT',
-    payment_url: paymentUrl,
-    mode,
-    merchant_name: CONFIG.merchantName,
-    message: 'Payment session created successfully with locked amount'
+    order: result.order,
+    items: result.items
   };
 }
 
 /**
- * 2. Verify Payment Status with Paymently Server API
+ * 3. Independent Server-Side Payment Verification
+ * Must independently communicate with Paymently using the official verification endpoint.
+ * Validates: Status === COMPLETED, BDT currency, exact amount match, real provider transaction_id.
+ * ONLY creates an order if verification fully succeeds.
  */
-export async function verifyPaymentlyPayment({ invoiceId, orderId, manualTrxId = null }) {
-  console.log(`[Paymently Verification] Verifying invoice: ${invoiceId || 'N/A'}, order: ${orderId}`);
+export async function verifyPaymentlyPayment({ invoiceId = null, checkoutId = null, manualTrxId = null }) {
+  await initDb();
+  const config = getPaymentlyConfig();
 
-  let txn = transactionsCache.find(t => (invoiceId && t.invoice_id === invoiceId) || (orderId && t.order_id === orderId));
+  // Find the checkout attempt
+  let checkoutAttempt = null;
+  if (checkoutId) {
+    checkoutAttempt = await getCheckoutAttempt(checkoutId);
+  }
+  if (!checkoutAttempt && invoiceId) {
+    checkoutAttempt = await getCheckoutAttemptByInvoice(invoiceId);
+  }
 
-  if (!txn && orderId) {
-    txn = {
-      id: `TXN-${Math.floor(10000 + Math.random() * 90000)}`,
-      order_id: orderId,
-      gateway: 'PAYMENTLY',
-      invoice_id: invoiceId || `INV-${Date.now()}`,
-      currency: 'BDT',
-      amount: 0,
-      status: 'PROCESSING',
-      created_at: new Date().toISOString()
+  if (!checkoutAttempt) {
+    return {
+      success: false,
+      verified: false,
+      status: 'NOT_FOUND',
+      error: 'Checkout session not found. Please initiate checkout from your shopping bag.'
     };
-    transactionsCache.unshift(txn);
   }
 
-  // If live API key is set, query the provider verification endpoint
-  if (CONFIG.apiKey && invoiceId) {
-    try {
-      const verifyEndpoint = `${CONFIG.baseUrl.replace(/\/+$/, '')}/api/verify-payment`;
-      const response = await fetch(verifyEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'RT-UDDOKTAPAY-API-KEY': CONFIG.apiKey,
-          'PAYMENTLY-API-KEY': CONFIG.apiKey
-        },
-        body: JSON.stringify({ invoice_id: invoiceId })
-      });
+  // Idempotency: If already fulfilled, return existing verified order
+  if (checkoutAttempt.status === 'PAID' && checkoutAttempt.order_id) {
+    const existingOrder = await getOrderWithItems(checkoutAttempt.order_id);
+    return {
+      success: true,
+      verified: true,
+      status: 'PAID',
+      idempotent: true,
+      order: existingOrder
+    };
+  }
 
-      const verificationData = await response.json();
-      console.log('[Paymently Verify Data]:', verificationData);
+  // If customer provided manual TrxID without provider API clearance:
+  // It enters a pending manual-review process. IT MUST NEVER MARK AS PAID AUTOMATICALLY!
+  if (manualTrxId && (!config.apiKey || config.apiKey.length < 5)) {
+    return {
+      success: true,
+      verified: false,
+      status: 'PENDING_MANUAL_REVIEW',
+      message: 'Transaction ID received for manual accounting verification. Your order will be confirmed once funds clear.'
+    };
+  }
 
-      if (verificationData.status === 'COMPLETED' || verificationData.status === 'PAID') {
-        txn.status = 'PAID';
-        txn.transaction_id = verificationData.transaction_id || `TRX-${Date.now()}`;
-        txn.payment_method = verificationData.payment_method || 'bKash/Nagad';
-        txn.sender_number = verificationData.sender_number || txn.customer_phone;
-        txn.verified_at = new Date().toISOString();
-        txn.raw_payload = verificationData;
-        saveTransactions();
+  if (!config.apiKey || config.apiKey.length < 5) {
+    return {
+      success: false,
+      verified: false,
+      status: 'UNVERIFIED',
+      error: 'Payment verification failed: Gateway API key is unconfigured on server.'
+    };
+  }
 
-        return {
-          success: true,
-          verified: true,
-          status: 'PAID',
-          transaction: txn
-        };
-      }
-    } catch (e) {
-      console.error('[Paymently Verify Error]:', e);
+  const lookupInvoiceId = invoiceId || checkoutAttempt.gateway_invoice_id;
+  if (!lookupInvoiceId) {
+    return {
+      success: false,
+      verified: false,
+      status: 'UNVERIFIED',
+      error: 'Missing provider invoice identifier for verification.'
+    };
+  }
+
+  // Official Paymently / UddoktaPay POST /api/verify-payment
+  const verifyEndpoint = `${config.baseUrl}/api/verify-payment`;
+  console.log(`[Paymently Verification] Querying ${verifyEndpoint} for invoice: ${lookupInvoiceId}`);
+
+  let verificationData = null;
+  try {
+    const response = await fetch(verifyEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'RT-UDDOKTAPAY-API-KEY': config.apiKey,
+        'PAYMENTLY-API-KEY': config.apiKey
+      },
+      body: JSON.stringify({ invoice_id: lookupInvoiceId })
+    });
+
+    verificationData = await response.json();
+    console.log('[Paymently Verify Response]:', verificationData);
+  } catch (err) {
+    console.error('[Paymently Verify API Error]:', err.message);
+    return {
+      success: false,
+      verified: false,
+      status: 'VERIFICATION_ERROR',
+      error: `Could not independently communicate with Paymently: ${err.message}`
+    };
+  }
+
+  // STRICT VALIDATION: Check provider response fields
+  const providerStatus = (verificationData?.status || '').toUpperCase();
+  const providerAmount = Math.round(Number(verificationData?.amount || 0));
+  const expectedAmount = Math.round(Number(checkoutAttempt.total_payable));
+  const transactionId = verificationData?.transaction_id || verificationData?.trx_id;
+
+  // 1. Success validation
+  if (providerStatus === 'COMPLETED' || providerStatus === 'PAID') {
+    // Check Amount
+    if (providerAmount !== expectedAmount) {
+      console.error(`[Security Violation] Paid amount ৳${providerAmount} does not match expected ৳${expectedAmount}`);
+      await updateCheckoutAttempt(checkoutAttempt.id, { status: 'AMOUNT_MISMATCH' });
+      return {
+        success: false,
+        verified: false,
+        status: 'AMOUNT_MISMATCH',
+        error: `Payment amount mismatch: Received ৳${providerAmount}, expected ৳${expectedAmount}. Order rejected.`
+      };
     }
-  }
 
-  // If manual TrxID is provided via fallback payment link confirmation
-  if (manualTrxId && manualTrxId.trim().length >= 4) {
-    txn.status = 'PAID';
-    txn.transaction_id = manualTrxId.trim();
-    txn.payment_method = 'Paymently BDT Link';
-    txn.verified_at = new Date().toISOString();
-    saveTransactions();
+    // Check Transaction ID
+    if (!transactionId || String(transactionId).trim().length < 4) {
+      console.error('[Security Violation] Provider returned success but missing transaction_id.');
+      return {
+        success: false,
+        verified: false,
+        status: 'INVALID_TRANSACTION',
+        error: 'Payment record missing valid provider transaction reference.'
+      };
+    }
+
+    // All validations passed! Atomically create customer order now.
+    const orderResult = await createOrderFromVerifiedPayment({
+      checkoutAttempt,
+      gatewayInvoiceId: lookupInvoiceId,
+      transactionId: String(transactionId).trim(),
+      paymentMethod: verificationData?.payment_method || 'bKash/Nagad',
+      senderNumber: verificationData?.sender_number || checkoutAttempt.customer_phone,
+      verifiedAt: verificationData?.date ? new Date(verificationData.date).toISOString() : new Date().toISOString()
+    });
 
     return {
       success: true,
       verified: true,
       status: 'PAID',
-      transaction: txn
+      order: orderResult.order,
+      transaction: orderResult.transaction
     };
   }
 
-  // Simulated verification for development / sandbox test flow
-  txn.status = 'PAID';
-  txn.transaction_id = txn.transaction_id || `PL-TRX-${Math.floor(10000000 + Math.random() * 90000000)}`;
-  txn.payment_method = txn.payment_method === 'PAYMENTLY_GATEWAY' ? 'bKash' : txn.payment_method;
-  txn.verified_at = new Date().toISOString();
-  saveTransactions();
-
-  return {
-    success: true,
-    verified: true,
-    status: 'PAID',
-    transaction: txn
-  };
-}
-
-/**
- * 3. Cancel Payment (Order remains unpaid)
- */
-export async function cancelPaymentlyPayment({ orderId, invoiceId }) {
-  console.log(`[Paymently Cancel] Cancelling order ${orderId}, invoice ${invoiceId}`);
-  let txn = transactionsCache.find(t => (invoiceId && t.invoice_id === invoiceId) || (orderId && t.order_id === orderId));
-
-  if (txn) {
-    txn.status = 'CANCELLED';
-    txn.cancelled_at = new Date().toISOString();
-    saveTransactions();
+  // 2. Pending validation
+  if (providerStatus === 'PENDING') {
+    await updateCheckoutAttempt(checkoutAttempt.id, { status: 'AWAITING_PAYMENT' });
     return {
       success: true,
-      status: 'CANCELLED',
-      order_id: txn.order_id,
-      invoice_id: txn.invoice_id,
-      message: 'Payment session marked cancelled. Order remains unpaid.'
+      verified: false,
+      status: 'PENDING',
+      message: 'Payment has not yet cleared on Paymently. Please complete the transaction in your mobile wallet.'
     };
   }
 
+  // 3. Failed or Cancelled validation
+  if (providerStatus === 'FAILED' || providerStatus === 'CANCELLED') {
+    await updateCheckoutAttempt(checkoutAttempt.id, { status: providerStatus });
+    return {
+      success: false,
+      verified: false,
+      status: providerStatus,
+      message: `Payment was ${providerStatus.toLowerCase()} by the customer or provider.`
+    };
+  }
+
+  // 4. Unknown provider status: NEVER mark as paid!
   return {
     success: false,
-    status: 'NOT_FOUND',
-    message: 'Transaction not found to cancel'
+    verified: false,
+    status: 'UNKNOWN',
+    error: `Payment status unknown (${providerStatus}). Payment is not verified.`
   };
 }
 
 /**
- * 4. Process IPN / Webhook from Paymently
- * Includes Idempotency Check to prevent duplicate webhook processing
+ * 4. Process Webhook / IPN Notification from Paymently
+ * Never trusts unverified payload. Independently verifies with Paymently before creating order.
  */
-export async function handlePaymentlyWebhook(payload, headers) {
-  console.log('[Paymently Webhook Received]:', payload);
-  const invoiceId = payload.invoice_id || payload.invoice;
-  const status = payload.status;
+export async function handlePaymentlyWebhook(payload, headers = {}) {
+  await initDb();
+  console.log('[Paymently Webhook Inbound]:', payload);
 
+  const invoiceId = payload?.invoice_id || payload?.invoice;
   if (!invoiceId) {
-    throw new Error('Invoice ID missing from webhook payload');
+    throw new Error('Invoice ID missing from webhook payload.');
   }
 
-  let txn = transactionsCache.find(t => t.invoice_id === invoiceId);
-
-  // IDEMPOTENCY CHECK: If transaction already paid, return early with idempotent confirmation
-  if (txn && txn.status === 'PAID') {
+  // Database-level idempotency
+  const alreadyFulfilled = await isInvoiceFulfilled(invoiceId);
+  if (alreadyFulfilled) {
+    console.log(`[Webhook Idempotent] Invoice ${invoiceId} is already fulfilled. Skipping duplicate.`);
+    await recordWebhookLog({ invoiceId, eventType: 'DUPLICATE_WEBHOOK', payload, isVerified: true });
     return {
       success: true,
       idempotent: true,
-      message: 'Duplicate webhook event received; transaction already processed and marked PAID.',
-      order_id: txn.order_id,
-      invoice_id: txn.invoice_id,
-      status: 'PAID'
+      message: 'Webhook duplicate event received; transaction already fulfilled.'
     };
   }
 
-  if (!txn) {
-    txn = {
-      id: `TXN-${Math.floor(10000 + Math.random() * 90000)}`,
-      order_id: payload.metadata?.order_id || `AZQ-ORD-${Date.now()}`,
-      gateway: 'PAYMENTLY',
-      invoice_id: invoiceId,
-      currency: 'BDT',
-      amount: Number(payload.amount || 0),
-      status: 'PENDING',
-      created_at: new Date().toISOString()
+  // Find matching checkout attempt
+  const checkoutAttempt = await getCheckoutAttemptByInvoice(invoiceId);
+  if (!checkoutAttempt) {
+    console.warn(`[Webhook Rejected] Unknown invoice ${invoiceId} without matching checkout attempt.`);
+    await recordWebhookLog({ invoiceId, eventType: 'UNKNOWN_INVOICE', payload, isVerified: false });
+    return {
+      success: false,
+      error: `Unknown invoice ${invoiceId}. No matching AZRAQ checkout attempt found.`
     };
-    transactionsCache.unshift(txn);
   }
 
-  if (status === 'COMPLETED' || status === 'PAID') {
-    txn.status = 'PAID';
-    txn.transaction_id = payload.transaction_id || payload.trx_id || `TRX-${Date.now()}`;
-    txn.payment_method = payload.payment_method || 'bKash';
-    txn.sender_number = payload.sender_number;
-    txn.verified_at = new Date().toISOString();
-    txn.raw_payload = payload;
-  } else if (status === 'FAILED') {
-    txn.status = 'FAILED';
-  } else if (status === 'CANCELLED') {
-    txn.status = 'CANCELLED';
-  }
+  // Record audit log
+  await recordWebhookLog({ invoiceId, eventType: payload.status || 'NOTIFICATION', payload, isVerified: false });
 
-  saveTransactions();
+  // Independently verify with Paymently to authorize order fulfillment
+  const verifyResult = await verifyPaymentlyPayment({ invoiceId, checkoutId: checkoutAttempt.id });
 
   return {
-    success: true,
-    handled: true,
-    order_id: txn.order_id,
-    invoice_id: txn.invoice_id,
-    status: txn.status
+    success: verifyResult.success,
+    verified: verifyResult.verified,
+    status: verifyResult.status,
+    order_id: verifyResult.order?.id || null
   };
 }
 
 /**
- * 5. Process a Refund
+ * 5. Cancel Checkout Attempt
  */
-export async function processRefund({ orderId, reason, amount }) {
-  const txn = transactionsCache.find(t => t.order_id === orderId);
-  if (!txn) {
-    throw new Error(`Transaction for order ${orderId} not found`);
+export async function cancelPaymentlyCheckout({ checkoutId, invoiceId }) {
+  await initDb();
+  let attempt = null;
+  if (checkoutId) attempt = await getCheckoutAttempt(checkoutId);
+  if (!attempt && invoiceId) attempt = await getCheckoutAttemptByInvoice(invoiceId);
+
+  if (attempt) {
+    await updateCheckoutAttempt(attempt.id, { status: 'CANCELLED' });
+    return {
+      success: true,
+      status: 'CANCELLED',
+      checkout_id: attempt.id,
+      message: 'Checkout attempt marked cancelled. No order created.'
+    };
   }
 
-  txn.status = 'REFUNDED';
-  txn.refund_status = 'PROCESSED';
-  txn.refund_amount = amount || txn.amount;
-  txn.refund_reason = reason || 'Customer requested return / warranty reconciliation';
-  txn.refunded_at = new Date().toISOString();
-
-  saveTransactions();
-
-  return {
-    success: true,
-    order_id: orderId,
-    refund_amount: txn.refund_amount,
-    status: 'REFUNDED',
-    message: 'Refund recorded and processed successfully'
-  };
+  return { success: false, error: 'Checkout attempt not found' };
 }
 
 /**
- * 6. Query all transactions
+ * 6. Query Genuine Orders and Transactions for Admin
  */
-export function getAllTransactions() {
-  loadTransactions();
-  return transactionsCache;
+export async function getAdminOrders() {
+  await initDb();
+  return await getAllOrders();
 }
 
-/**
- * 7. Query specific transaction by invoice_id or order_id
- */
-export function getTransaction(id) {
-  loadTransactions();
-  return transactionsCache.find(t => t.invoice_id === id || t.order_id === id || t.id === id);
-}
-
-/**
- * 8. Get Gateway status & configuration
- */
-export function getGatewayConfig() {
-  return {
-    gateway_name: 'Paymently',
-    merchant_name: CONFIG.merchantName,
-    domain: 'azraq.paymently.io',
-    base_url: CONFIG.baseUrl,
-    default_link: CONFIG.defaultPaymentLink,
-    currency: CONFIG.currency,
-    has_api_key: Boolean(CONFIG.apiKey && CONFIG.apiKey.length > 5),
-    total_transactions: transactionsCache.length,
-    supported_methods: ['bKash', 'Nagad', 'Rocket', 'Upay', 'Visa', 'Mastercard', 'Bangla QR', 'Bank Transfer'],
-    brand_palette: {
-      primary: '#0877C9',
-      dark: '#062B4F',
-      accent: '#50DDF0',
-      light: '#F8FCFF'
-    }
-  };
+export async function getAdminTransactions() {
+  await initDb();
+  return await getAllTransactions();
 }

@@ -227,12 +227,96 @@ CREATE TABLE IF NOT EXISTS product_sync_logs (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 13. Payment Gateway & Transaction Reconciliation (Paymently Integration)
+-- 13. Checkout Attempts (Pre-Payment Session State)
+CREATE TABLE IF NOT EXISTS checkout_attempts (
+    id VARCHAR(100) PRIMARY KEY, -- e.g. 'AZQ-CHK-MXXXXX-XXX'
+    customer_name VARCHAR(255) NOT NULL,
+    customer_phone VARCHAR(50) NOT NULL,
+    customer_email VARCHAR(255),
+    shipping_address TEXT NOT NULL,
+    city VARCHAR(100) DEFAULT 'Dhaka',
+    thana VARCHAR(100),
+    delivery_area VARCHAR(20) DEFAULT 'inside', -- 'inside', 'outside'
+    notes TEXT,
+    items_snapshot JSONB NOT NULL,
+    subtotal NUMERIC(12, 2) NOT NULL,
+    delivery_fee NUMERIC(10, 2) NOT NULL,
+    discount NUMERIC(10, 2) DEFAULT 0.00,
+    total_payable NUMERIC(12, 2) NOT NULL,
+    promo_code VARCHAR(50),
+    payment_method VARCHAR(50) DEFAULT 'PAYMENTLY', -- 'PAYMENTLY', 'COD'
+    gateway_name VARCHAR(50) DEFAULT 'PAYMENTLY',
+    gateway_invoice_id VARCHAR(100) UNIQUE,
+    gateway_payment_url TEXT,
+    status VARCHAR(50) DEFAULT 'INITIATED', -- 'INITIATED', 'AWAITING_PAYMENT', 'PAID', 'COD_CONFIRMED', 'FAILED', 'CANCELLED', 'EXPIRED'
+    order_id VARCHAR(50),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_chk_status ON checkout_attempts(status);
+CREATE INDEX IF NOT EXISTS idx_chk_invoice ON checkout_attempts(gateway_invoice_id);
+CREATE INDEX IF NOT EXISTS idx_chk_phone ON checkout_attempts(customer_phone);
+
+-- 14. Customer Orders (Created strictly after verified payment or confirmed COD)
+CREATE TABLE IF NOT EXISTS orders (
+    id VARCHAR(50) PRIMARY KEY, -- e.g. 'AZQ-ORD-92101'
+    checkout_attempt_id VARCHAR(100) REFERENCES checkout_attempts(id) ON DELETE SET NULL,
+    customer_name VARCHAR(255) NOT NULL,
+    customer_phone VARCHAR(50) NOT NULL,
+    customer_email VARCHAR(255),
+    shipping_address TEXT NOT NULL,
+    city VARCHAR(100) DEFAULT 'Dhaka',
+    thana VARCHAR(100),
+    delivery_area VARCHAR(20) DEFAULT 'inside',
+    notes TEXT,
+    subtotal NUMERIC(12, 2) NOT NULL,
+    delivery_fee NUMERIC(10, 2) NOT NULL,
+    discount NUMERIC(10, 2) DEFAULT 0.00,
+    total NUMERIC(12, 2) NOT NULL,
+    promo_code VARCHAR(50),
+    payment_method VARCHAR(50) NOT NULL, -- 'PAYMENTLY', 'COD'
+    payment_status VARCHAR(50) NOT NULL, -- 'PAID', 'PENDING_COD'
+    order_status VARCHAR(50) DEFAULT 'Processing', -- 'Processing', 'Confirmed', 'Dispatched', 'Delivered', 'Cancelled'
+    gateway_name VARCHAR(50) DEFAULT 'PAYMENTLY',
+    gateway_invoice_id VARCHAR(100),
+    gateway_transaction_id VARCHAR(100), -- Authentic provider transaction reference (TrxID)
+    sender_number VARCHAR(30),
+    verified_at TIMESTAMPTZ,
+    courier_name VARCHAR(100),
+    courier_tracking_id VARCHAR(100),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(order_status);
+CREATE INDEX IF NOT EXISTS idx_orders_pay_status ON orders(payment_status);
+CREATE INDEX IF NOT EXISTS idx_orders_trx ON orders(gateway_transaction_id);
+CREATE INDEX IF NOT EXISTS idx_orders_invoice ON orders(gateway_invoice_id);
+
+-- 15. Order Items
+CREATE TABLE IF NOT EXISTS order_items (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    order_id VARCHAR(50) NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    product_id VARCHAR(100) NOT NULL,
+    sku VARCHAR(100),
+    name VARCHAR(500) NOT NULL,
+    variant VARCHAR(255) DEFAULT 'Default',
+    unit_price NUMERIC(12, 2) NOT NULL,
+    quantity INTEGER NOT NULL DEFAULT 1,
+    total_price NUMERIC(12, 2) NOT NULL,
+    collection_name VARCHAR(255),
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_order_items_order ON order_items(order_id);
+
+-- 16. Payment Gateway & Transaction Reconciliation (Paymently Integration)
 CREATE TABLE IF NOT EXISTS payment_transactions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    order_id VARCHAR(50) NOT NULL, -- e.g. 'AZQ-BD-92101'
-    customer_id UUID REFERENCES users(id) ON DELETE SET NULL,
-    gateway_name VARCHAR(50) DEFAULT 'PAYMENTLY', -- 'PAYMENTLY', 'COD', 'MANUAL_LINK'
+    order_id VARCHAR(50), -- e.g. 'AZQ-ORD-92101' (populated upon confirmed order)
+    checkout_attempt_id VARCHAR(100) REFERENCES checkout_attempts(id) ON DELETE SET NULL,
+    gateway_name VARCHAR(50) DEFAULT 'PAYMENTLY', -- 'PAYMENTLY', 'COD'
     gateway_invoice_id VARCHAR(100) UNIQUE,
     gateway_payment_url TEXT,
     transaction_id VARCHAR(100), -- Provider Transaction Reference (TrxID)
@@ -259,7 +343,7 @@ CREATE INDEX IF NOT EXISTS idx_payment_trx_id ON payment_transactions(transactio
 CREATE INDEX IF NOT EXISTS idx_payment_invoice ON payment_transactions(gateway_invoice_id);
 CREATE INDEX IF NOT EXISTS idx_payment_status ON payment_transactions(status);
 
--- 14. Payment Webhook Audit Logs (Idempotency and Anti-Tampering)
+-- 17. Payment Webhook Audit Logs (Idempotency and Anti-Tampering)
 CREATE TABLE IF NOT EXISTS payment_webhook_logs (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     gateway_name VARCHAR(50) DEFAULT 'PAYMENTLY',
