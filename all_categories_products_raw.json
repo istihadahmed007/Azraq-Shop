@@ -1,0 +1,1533 @@
+{
+  "2": {
+    "id": 2,
+    "name": "Gadgets & IT Accessories",
+    "img_location": "image-1721294464350-523600701.png",
+    "status": 1,
+    "products_count": 20,
+    "products": [
+      {
+        "name": "Baseus Limited Edition Fast Charging Gift Box Set – 20W Power Bank, 20W Charger & 3-in-1 Retractable Charging Cable",
+        "img_location": "image-1794224164353-570692128.jpeg|image-1794224164355-250565168.jpeg|image-1794224164356-135288231.jpeg",
+        "main_img": 2
+      },
+      {
+        "name": "Awei PD90-L US 20W GAN Mini Fast Charger",
+        "img_location": "image-1793787476974-159460506.jpeg|image-1793787476975-865268165.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Awei PD90-US 20W GAN Mini Adapter",
+        "img_location": "image-1793786561200-295964908.jpeg|image-1793786561202-692012609.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Awei PD91-US 30W GaN Mini Charger: Fast Charging",
+        "img_location": "image-1793786236271-614184987.jpeg|image-1793786236273-738221653.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "Awei AT8 Wireless Overhead Earphone",
+        "img_location": "image-1793785736570-415262366.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Desktop Simulated Wood Fireplace Flame Aroma Diffuser & Humidifier",
+        "img_location": "image-1793781182347-371952294.jpeg|image-1793781951949-366943491.jpeg|image-1793781966400-909998033.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "3-in-1 Mini Vacuum Cleaner | Portable for Home & Car | AS-228",
+        "img_location": "image-1792915821615-11421108.jpg|image-1792915821618-534448988.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Mini Portable Personal Desktop Household Use PTC Ceramic Fast Heating Space Air Hot Electric Fan Heater For Winter Room Office",
+        "img_location": "image-1792062401922-670303443.jpeg|image-1792062401927-422794001.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "Camera Protector for iPhone 16 Pro Max WSKEN Ring Camera Lens Protector for Mobile",
+        "img_location": "image-1791281055838-264252868.jpg|image-1791281055839-82003410.png|image-1791281055852-834719719.jpg|image-1791281055853-823224196.png|image-1791281055855-400025652.jpg|image-1791281055856-785146771.png",
+        "main_img": 0
+      },
+      {
+        "name": "Camera Protector for iPhone 17 Air WSKEN Ring Camera Lens Protector for Mobile",
+        "img_location": "image-1791279824094-392123467.jpg|image-1791279824096-972780363.jpg|image-1791279824100-230950910.jpg|image-1791279824103-99550588.jpg|image-1791279824108-224004997.jpg|image-1791279824109-87330605.jpg|image-1791279824111-825919507.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Camera Protector for iPhone 17 Pro Max WSKEN Ring Camera Lens Protector for Mobile",
+        "img_location": "image-1791273098168-330928139.jpg|image-1791273098169-82521574.jpg|image-1791273098170-173701457.jpg|image-1791273098171-717392750.jpg|image-1791273098172-919549398.jpg|image-1791273098174-757736875.jpg|image-1791273098175-314889607.jpg|image-1791273098176-858592783.jpg|image-1791273098192-600288162.jpg|image-1791273098193-587921003.jpg|image-1791273098195-795844408.jpg|image-1791273098196-19396108.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Hoco W117 (Gaming Headphones)",
+        "img_location": "image-1791196961427-662589791.jfif",
+        "main_img": 0
+      },
+      {
+        "name": "২৪০ ওয়াট টি-শেপড ফাস্ট চার্জিং এবং ফোল্ডিং স্ট্যান্ড ডেটা ক্যাবল",
+        "img_location": "image-1790591844424-331594343.jfif|image-1790591844425-869324306.jfif",
+        "main_img": 0
+      },
+      {
+        "name": "CYXG Wireless Q10 (2-in-1 High Definition True Wireless Earbuds",
+        "img_location": "image-1790590767482-569172659.jfif|image-1790590767482-503595854.jfif|image-1791971101339-477198218.jpeg|image-1791971101343-462211536.jpeg|image-1791971101347-159828084.jpeg",
+        "main_img": 4
+      },
+      {
+        "name": "P6 ControllerView Retro Console",
+        "img_location": "image-1790512154512-711816105.jfif",
+        "main_img": 0
+      },
+      {
+        "name": "J36 Ultra All-in-One Handheld Gaming Console",
+        "img_location": "image-1790511212032-817317463.jfif|image-1790511212033-866314492.jfif",
+        "main_img": 0
+      },
+      {
+        "name": "R36S Retro Handheld Game Console Model :R36s retro game console .",
+        "img_location": "image-1790509798617-635754275.jfif|image-1790509798617-682915443.jfif|image-1790509798618-793709132.jfif|image-1790509798620-689785103.jfif",
+        "main_img": 0
+      },
+      {
+        "name": "Digital Mini Camera (Instant Print / Toy Camera Model :ac300",
+        "img_location": "image-1790509214827-856388758.jfif|image-1790509214830-392742731.jfif|image-1790509214832-290982003.jfif|image-1790509214833-821187137.jfif",
+        "main_img": 1
+      },
+      {
+        "name": "DIY Instant Digital Camera (The first camera of Childhood).মডেল (Model): Y80s",
+        "img_location": "image-1790507923541-199657401.jfif|image-1790507923541-422243814.jfif|image-1790507923542-594774101.jfif",
+        "main_img": 2
+      },
+      {
+        "name": "Model :m8 dual version most famous version   Joystick and inbuild game for TVGame Stick Lite 4K (2.4G Wireless Controller Gamepad)  64GB Edition: 10,000+ Preloaded GamesHi",
+        "img_location": "image-1790062828664-932357978.jfif|image-1790062828664-33984618.jfif|image-1790062828665-378372613.jfif",
+        "main_img": 0
+      }
+    ]
+  },
+  "3": {
+    "id": 3,
+    "name": "Health & Beauty",
+    "img_location": "image-1704651726678-434810988.png",
+    "status": 1,
+    "products_count": 20,
+    "products": [
+      {
+        "name": "Gatsby Water Gloss Hair Gel 75g Hyper Solid Level 7 Holding Power - Wet Look, Shine Effect, Non Sticky, Easy Wash Off",
+        "img_location": "image-1791720772813-951206600.jpeg|image-1791720772814-37169301.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Kemei 4 in 1 Beauty Tools Kit",
+        "img_location": "image-1788611817839-870364954.jpeg|image-1788611817845-304262427.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "Adjustable Hand Gripper Digital",
+        "img_location": "image-1787830119555-508307583.png|image-1787830119565-869928795.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Portable Electric Menstrual Heating Pad Smart Warm Palace Belt Belly Vibration Massager Period Pain Relief Waist Cramps Device",
+        "img_location": "image-1784618139655-651027032.jpeg|image-1788847881196-869428851.jpeg|image-1788847881197-702635264.jpeg",
+        "main_img": 2
+      },
+      {
+        "name": "Automatic Rechargeable Digital Touch Screen Wrist type Blood-Pressure Machine",
+        "img_location": "image-1784191381604-910364098.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Wellmed Digital Blood Pressure Machine original",
+        "img_location": "image-1783573865596-211968367.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Automatic Digital Blood Pressure Monitor",
+        "img_location": "image-1782643364031-591835091.png",
+        "main_img": 0
+      },
+      {
+        "name": "Electronic Blood Pressure Monitor With Voice Function",
+        "img_location": "image-1782643010745-68559964.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Mini Massager Rechargeabl",
+        "img_location": "image-1777807864742-134010195.jpg|image-1777807864742-76593341.png",
+        "main_img": 0
+      },
+      {
+        "name": "Dot & Key Watermelon Cooling Gel Face Wash With Vitamin C & Cucumber 100ml",
+        "img_location": "image-1775043876371-670128502.png",
+        "main_img": 0
+      },
+      {
+        "name": "Dot & Key Vitamin C + E Super Bright Sunscreen 80gm SPF50 PA+++",
+        "img_location": "image-1775043775065-244258836.png",
+        "main_img": 0
+      },
+      {
+        "name": "DOT & KEY Vitamin C + E Super Bright Gel Face Wash 100ml | India",
+        "img_location": "image-1775043512349-345103885.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Dot & Key Strawberry Dew Tinted Sunscreen 50ml SPF50+ Sand | Made in India",
+        "img_location": "image-1775043441470-72290926.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Dot & Key Strawberry Dew Tinted Sunscreen 50ml SPF50+ Beige | Made in India",
+        "img_location": "image-1775043376877-411366450.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Dot & Key Strawberry Dew Sunscreen Stick Spf50 Pa+++ 20gm | India",
+        "img_location": "image-1775039581177-675396293.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Dot & Key Mango Detan Gel Sunscreen SPF 50+ PA+++ 80gm",
+        "img_location": "image-1775038714521-432812948.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Dot & Key Lime Rush Sports Facewash 100ml | India",
+        "img_location": "image-1775038641422-22536420.png",
+        "main_img": 0
+      },
+      {
+        "name": "Dot & Key CICA Calming Niacinamide Sunscreen 50gm SPF50+ PA+++ 80g | India",
+        "img_location": "image-1775038567418-991026633.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Dot & Key CICA Calming Mattifying Sunscreen SPF 50 PA++++ 50gm | India",
+        "img_location": "image-1775038221528-618226218.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Dot & Key Blueberry Hydrate Barrier Repair Sunscreen 80gm SPF50+ PA++++",
+        "img_location": "image-1775038170142-678447346.jpg",
+        "main_img": 0
+      }
+    ]
+  },
+  "4": {
+    "id": 4,
+    "name": "Home & Lifestyle",
+    "img_location": "image-1704651740851-410226143.png",
+    "status": 1,
+    "products_count": 20,
+    "products": [
+      {
+        "name": "Automatic Stirring Mug with Digital Display Electric Magnetic Self-Mixing Cup with Lid for Coffee and Tea",
+        "img_location": "image-1792995442375-678891328.jpg|image-1792995442378-146594948.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Hoco H104 Riding Holder (Motorcycle & Bicycle Phone Holder)",
+        "img_location": "image-1791195848529-148834273.jpeg|image-1791195848530-514370249.jpeg|image-1791195848530-674063210.jpeg|image-1791195848532-567835062.jpeg|image-1791195848534-928976990.jpeg|image-1791195848534-875489546.jpeg",
+        "main_img": 3
+      },
+      {
+        "name": "সোলার ইন্টারেক্টিভ ওয়াল ল্যাম্প (DORT / CBK-888)",
+        "img_location": "image-1791194815747-145094280.jfif|image-1791194815747-437711974.jfif",
+        "main_img": 1
+      },
+      {
+        "name": "SMART TOILET MOPE",
+        "img_location": "image-1791193421050-85648081.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "AC Cover",
+        "img_location": "image-1789365192068-991438794.jpeg|image-1789365192077-783988046.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Transparent Hair Oil Applicator Comb",
+        "img_location": "image-1788689440157-121130098.jpeg|image-1788689440161-976374392.jpeg|image-1788689440166-481892898.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Hair Straightening Comb",
+        "img_location": "image-1787229380212-743530438.jpeg|image-1787229380214-422825402.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "Wireless Multifunction Coffee Whisk",
+        "img_location": "image-1787228834192-297286481.jpeg|image-1787228834195-913442834.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "Toothpick holder",
+        "img_location": "image-1786625073322-155233788.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Fascial gun light age",
+        "img_location": "image-1786622806459-26628789.jpeg|image-1786622806461-481001458.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Smart portable LED Flax",
+        "img_location": "image-1786367548529-190522391.jpeg|image-1786367548529-946895397.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "halterneck two-wheel small fan (Random colour)",
+        "img_location": "image-1784182919066-601362120.png",
+        "main_img": 0
+      },
+      {
+        "name": "7 in 1 Nail Clippers Set, 7pcs Manicure & Pedicure Tools, Stainless Steel Nail Cutter Kit for men and women with Protective Case, Travel Grooming Kit for Facial, Cuticle and Nail Care",
+        "img_location": "image-1781956453412-310738407.png",
+        "main_img": 0
+      },
+      {
+        "name": "Wish Ball LED Fairy Light for Curtains- 16 feet, 12 Wish Ball-MHN - light decoration",
+        "img_location": "image-1779007548409-381543076.jpg|image-1779007548417-503465362.jpg|image-1779007548419-345888224.jpg|image-1779007548421-793841609.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Art Set with Colors Box Pencil Colors, Crayons Colors, Water Color, Sketch Pens Set for Kids - 46 Pieces",
+        "img_location": "image-1775380490068-543375064.png|image-1775380490069-400610900.png",
+        "main_img": 0
+      },
+      {
+        "name": "Dual Tip Brush Marker Pen, Colored Pen Fine Point Art Marker & Brush Highlighter Pen for Adult Coloring Hand Lettering Writing Planner Art Supplier(12 Colors Pen black bodySet)",
+        "img_location": "image-1775380354247-587155747.png",
+        "main_img": 0
+      },
+      {
+        "name": "145 pieces watercolor pen set art painting stationery crayon oil pastel brush",
+        "img_location": "image-1775380219129-432352944.png|image-1775380219131-334208067.png|image-1775380219132-971342059.png",
+        "main_img": 0
+      },
+      {
+        "name": "DOMS Smart Kit Combo Pack for Painting , Sketching, Drawing & Learning with an excellent Bag.",
+        "img_location": "image-1775377788288-58171223.png",
+        "main_img": 0
+      },
+      {
+        "name": "Art Markers Set Dual Headed Artist Sketch Oily Alcoholl Based Markers Pen 30",
+        "img_location": "image-1775377681313-131179931.png|image-1775377681315-990881487.png",
+        "main_img": 0
+      },
+      {
+        "name": "Deli 8933 Pen Holder (Any Color)",
+        "img_location": "image-1775377475697-954865750.png|image-1776487592684-16518787.png",
+        "main_img": 1
+      }
+    ]
+  },
+  "5": {
+    "id": 5,
+    "name": "Jewelries & Accessories",
+    "img_location": "image-1704651751963-240932262.png",
+    "status": 1,
+    "products_count": 20,
+    "products": [
+      {
+        "name": "Stylish Shoulder Bag Collection ( RM82 )",
+        "img_location": "image-1788073687788-382792069.jpg|image-1788073687793-993818438.jpg|image-1788073687794-662152673.jpg|image-1788073687798-479405782.jpg|image-1788073687800-259408303.jpg|image-1788073687802-149447932.jpg|image-1788073687803-845722406.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Stylish Shoulder Bag Collection ( RM89 )",
+        "img_location": "image-1788072779875-942153601.jpg|image-1788072779877-961357677.jpg|image-1788072779878-427036573.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Classy Shoulder Bag Collection ( RM197 )",
+        "img_location": "image-1788071633606-711310645.jpg|image-1788071633614-675734598.jpg|image-1788071633616-321864758.jpg|image-1788071633616-663768571.jpg|image-1788071633618-501680551.jpg|image-1788071633618-865256423.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Tote Bag",
+        "img_location": "image-1788010242255-835208157.jpg|image-1788010242257-278412131.jpg|image-1788010242261-95566814.jpg|image-1788010242261-968085178.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Tote Bag Rm62",
+        "img_location": "image-1784715678237-210674691.jpg|image-1784715678238-424882949.jpg|image-1784715678240-4882019.jpg|image-1784715678241-321823269.jpg|image-1784715678242-77666909.jpg|image-1784715678246-926592669.jpg|image-1784715678248-20564673.jpg",
+        "main_img": 2
+      },
+      {
+        "name": "Tote Bag( RM60 )",
+        "img_location": "image-1784715231218-192779264.jpg|image-1784715231220-930906054.jpg|image-1784715231224-342200224.jpg|image-1784715231224-92218480.jpg|image-1784715231225-776937548.jpg|image-1784715231226-352359121.jpg|image-1784715231228-72965092.jpg|image-1784715231230-18047130.jpg|image-1784715231271-798185808.jpg|image-1784715231272-745229776.jpg",
+        "main_img": 3
+      },
+      {
+        "name": "Tote Bag 2",
+        "img_location": "image-1784713569077-43911533.jpg|image-1784713569080-314456376.jpg|image-1784713569083-632682202.jpg|image-1784713569084-665181679.jpg|image-1784713569090-387865711.jpg|image-1784713569096-298224273.jpg",
+        "main_img": 5
+      },
+      {
+        "name": "Tote bag 1",
+        "img_location": "image-1784713283882-992615448.jpg|image-1784713284486-250852691.jpg|image-1784713284977-168330262.jpg|image-1784713285146-564929960.jpg|image-1784713285175-142851188.jpg|image-1784713285194-126962731.jpg",
+        "main_img": 5
+      },
+      {
+        "name": "Casual travel shoulder bag",
+        "img_location": "image-1782622642431-101331695.jpg|image-1782622642436-243322303.jpg|image-1782622642441-744290900.jpg|image-1782622642445-294399714.jpg|image-1782622642448-804798154.jpg|image-1782622642449-970158993.jpg|image-1782622642450-525495015.jpg",
+        "main_img": 6
+      },
+      {
+        "name": "Premium Ladies Bag S3",
+        "img_location": "image-1776684600066-87607674.jpeg|image-1776684600068-209241256.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Premium Ladies Bag S2",
+        "img_location": "image-1776684482543-841496798.jpeg|image-1776684482544-567676566.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "Premium Ladies Bag S1",
+        "img_location": "image-1776684025262-85725331.jpeg|image-1776684025311-764690961.jpeg|image-1776684025312-26834228.jpeg|image-1776684025313-410485586.jpeg|image-1776684025313-216774863.jpeg|image-1776684025317-683742755.jpeg|image-1776684025318-220301226.jpeg|image-1776684025319-293598993.jpeg",
+        "main_img": 5
+      },
+      {
+        "name": "Adjustable Belt Shoulder Bag RM150",
+        "img_location": "image-1760947036758-735468233.jpeg|image-1760947036763-164285594.jpeg|image-1760947036764-176677672.jpeg|image-1760947036765-190287283.jpeg|image-1760947036766-427322129.jpeg|image-1760947036767-950410090.jpeg|image-1760947036769-400805351.jpeg|image-1760947036770-954908416.jpeg|image-1760947036771-895188864.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Cute Women Shoulder Bag N325",
+        "img_location": "image-1758608729870-666275561.jpg|image-1758608729875-479753980.jpg|image-1758608729876-829610230.jpg|image-1758608729877-309363351.jpg|image-1758608729878-305835585.jpg|image-1758608729879-829800347.jpg|image-1758608729880-139901844.jpg",
+        "main_img": 3
+      },
+      {
+        "name": "Tote Bag Handbag Shoulder Bag Large Capacity Shoulder Bag Women's Handbag  RM140",
+        "img_location": "image-1758606797424-43956255.jpg|image-1758606797425-845547920.jpg|image-1758606797426-424736827.jpg|image-1758606797427-44692963.jpg|image-1758606797427-111673174.jpg|image-1758606797428-900242203.jpg|image-1758606797429-280689924.jpg|image-1758606797430-643190505.jpg",
+        "main_img": 7
+      },
+      {
+        "name": "Women’s PU Leather Handbag – Stylish & Practical RM48",
+        "img_location": "image-1757762234269-306216425.jpg|image-1757762234270-433366069.jpg|image-1757762234270-42666574.jpg|image-1757762234271-18058226.jpg|image-1757762234271-851007562.jpg|image-1757762234272-165618177.jpg|image-1757762234272-624623826.jpg|image-1757762234273-445565674.jpg|image-1757762234273-863343381.jpg|image-1757762234274-104363049.jpg|image-1757762234274-942150857.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Women’s PU Leather Shoulder Bag – Spacious & Functional RM149",
+        "img_location": "image-1757760681676-229552632.jpg|image-1757760681676-414461970.jpg|image-1757760681677-574157328.jpg|image-1757760681679-778363854.jpg|image-1757760681679-593523950.jpg|image-1757760681679-948033170.jpg|image-1757760681680-22254512.jpg|image-1757760681680-764892126.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Women’s PU Leather Compact Shoulder Bag – Lightweight & Stylish  RM148",
+        "img_location": "image-1757760300596-570054233.jpg|image-1757760300596-895437898.jpg|image-1757760300596-26643687.jpg|image-1757760300597-608920869.jpg|image-1757760300597-535322437.jpg|image-1757760300598-426832139.jpg|image-1757760300598-924902801.jpg|image-1757760300598-183713041.jpg|image-1757760300598-729489025.jpg|image-1757760300598-704716341.jpg|image-1757760300600-16074901.jpg",
+        "main_img": 3
+      },
+      {
+        "name": "Women’s PU Leather One-Shoulder Crossbody Bag – Compact & Stylish RM147",
+        "img_location": "image-1757759825520-287393404.jpg|image-1757759825520-596636757.jpg|image-1757759825520-967286247.jpg|image-1757759825520-43654012.jpg|image-1757759825521-318412981.jpg|image-1757759825521-725981222.jpg|image-1757759825521-421892943.jpg|image-1757759825522-470941028.jpg|image-1757759825522-447815585.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Women’s PU Leather Handheld & Shoulder Bag – Stylish & Versatile RM146",
+        "img_location": "image-1757759432949-914155695.jpg|image-1757759432949-989107185.jpg|image-1757759432950-882962460.jpg|image-1757759432950-98789457.jpg|image-1757759432950-497618260.jpg|image-1757759432951-937589358.jpg|image-1757759432951-723055030.jpg",
+        "main_img": 0
+      }
+    ]
+  },
+  "6": {
+    "id": 6,
+    "name": "Kitchen Appliances ",
+    "img_location": "image-1704651762473-983345475.png",
+    "status": 1,
+    "products_count": 20,
+    "products": [
+      {
+        "name": "Waterproof Kitchen Apron Apron Kitchen Cooking And Washing Dishes Big Pocket Housework Apron Good Effect And Easy To Use",
+        "img_location": "image-1793709572888-96349451.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "FUMA JAPAN Electric Multicooker FMC-55G",
+        "img_location": "image-1792301863055-905113410.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "৫০০ml ফায়ার স্টপ ফোম, বাড়ি, অফিস, গাড়ি, ট্রাক, জাহাজ, নৌকা için পোর্টেবল ফায়ার এক্সিংগুইশার স্প্রে",
+        "img_location": "image-1792068220549-854113891.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Double Foam Door Draft Stopper | Noise Reduction Dust Proof Under Door Seal",
+        "img_location": "image-1792066913669-303019965.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Manual Hand Press Push Chopper",
+        "img_location": "image-1792066404133-429503566.jpeg|image-1792994768267-438697282.jpg|image-1792994768297-952891807.jpg|image-1792994768321-67647168.jpg",
+        "main_img": 3
+      },
+      {
+        "name": "Vegetable cutter 5 pcs set",
+        "img_location": "image-1790505601883-989040645.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "1 Pcs Multifunctional Scraper & Garlic Peeler",
+        "img_location": "image-1790500191560-510247092.jpg|image-1790500561087-110330435.jpg|image-1790500561087-282233858.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Digital Display Portable Juicing Cup HP-189",
+        "img_location": "image-1790493252842-3546115.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Kitchen Knife  Tool Set",
+        "img_location": "image-1790058735856-91275485.jpeg|image-1790058735857-815169401.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Tape Dispenser",
+        "img_location": "image-1789365406785-193597463.jpeg|image-1789365406786-215132296.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Copper Oven Air Fryer",
+        "img_location": "image-1789218677522-504090852.jpeg|image-1789218677523-149897212.jpeg|image-1789218677525-107092349.jpeg|image-1789218677526-317414811.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "*Swiss Clean Scratch Cleaning Mop",
+        "img_location": "image-1789218251766-616520500.jpeg|image-1789218251767-211751548.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "Grinding Machine",
+        "img_location": "image-1788869246427-455057859.jpeg|image-1788869246428-135179442.jpeg|image-1793879291495-439187882.jpeg|image-1793879291497-694533124.jpeg",
+        "main_img": 3
+      },
+      {
+        "name": "Portable Mini Juicer Blender (420ml) – Fresh Juice Anytime, Anywhere!",
+        "img_location": "image-1788698324971-646346488.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Stainless Steel Vegetable Cutter",
+        "img_location": "image-1788612276571-3182797.jpeg|image-1788612276571-483079022.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "Multifunctional Peeler Knife.",
+        "img_location": "image-1787835103810-14567139.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Nima 2 in 1 Electric Blender & Grinder (NM-8400",
+        "img_location": "image-1787489227136-140503625.jpeg|image-1787489227137-298887801.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Prestige Electric Kettle",
+        "img_location": "image-1786962340193-294775109.jpeg|image-1786962340194-376333220.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "4 PCS Refrigerator Liners Washable Waterproof Oilproof EVA Refrigerator Mats for Home Kitchen",
+        "img_location": "image-1786686575954-35150537.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "1 pair Sell Will Housework Gloves",
+        "img_location": "image-1786627535578-52080427.jpg|image-1786627535578-739379648.jpeg|image-1786627535579-604878088.jpeg|image-1786627535579-484434886.jpeg",
+        "main_img": 0
+      }
+    ]
+  },
+  "9": {
+    "id": 9,
+    "name": "Sunglass Collection",
+    "img_location": "image-1704651795401-906194306.png",
+    "status": 1,
+    "products_count": 2,
+    "products": [
+      {
+        "name": "Sunglass With Sunglass Case",
+        "img_location": "image-1697995450996-196189395.jpg|image-1697995450996-921211442.jpg|image-1697995450997-791094908.jpg|image-1697995450997-673737711.jpg|image-1697995450997-165444529.jpg|image-1697995450997-869915288.jpg|image-1697995450998-611010123.jpg|image-1697995450998-409727116.jpg|image-1697995450998-111359704.jpg",
+        "main_img": 5
+      },
+      {
+        "name": "Folding Sunglass",
+        "img_location": "image-1697826517934-193821468.jpeg|image-1697826517935-984481029.jpeg|image-1697826517936-312770798.jpeg|image-1697826517936-988071122.jpeg|image-1752898087452-940870465.jpeg|image-1752898087456-46572074.jpeg",
+        "main_img": 1
+      }
+    ]
+  },
+  "10": {
+    "id": 10,
+    "name": "Gifts",
+    "img_location": "image-1704651803304-632313545.png",
+    "status": 1,
+    "products_count": 16,
+    "products": [
+      {
+        "name": "Fancy Bear Table Decor & Pen Holder",
+        "img_location": "image-1766491984160-512702375.jfif",
+        "main_img": 0
+      },
+      {
+        "name": "Volcanic Aroma Diffuser Air Humidifier Portable 360ml Usb Night Light Sprayer",
+        "img_location": "image-1765272117588-527058075.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "LED Fire Flames Rustic Clock",
+        "img_location": "image-1764586872444-776973277.png|image-1764586872457-213920832.jpg|image-1764586872458-199497075.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Post Box Bank",
+        "img_location": "image-1764585894781-192629282.jfif|image-1764585894786-54575416.jfif|image-1764585894787-258887588.jfif",
+        "main_img": 0
+      },
+      {
+        "name": "Die cast metal telephone box money bank",
+        "img_location": "image-1764567679675-235238997.jfif|image-1764567679680-218831896.jfif|image-1764567679681-678161939.jfif|image-1764567679685-726238271.jfif|image-1764567679704-633976425.jfif|image-1764567679714-814440465.jfif",
+        "main_img": 0
+      },
+      {
+        "name": "Teddy Bear for Girls Soft Stuffed Lovable Huggable Non-Toxic Fabric Cute Gift Teddy Bear",
+        "img_location": "image-1759054097808-657386849.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Exclusiv Gift Box for girls and women",
+        "img_location": "image-1758784085428-554361122.webp|image-1758784085444-535955339.webp",
+        "main_img": 0
+      },
+      {
+        "name": "Valentine Special Premium Balloon With Lightning Flower",
+        "img_location": "image-1707730498048-514308306.jpg|image-1707730498049-692584674.jpg|image-1707730498050-147172581.jpg|image-1707730498050-715567129.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Valentine's Special Collection Premium Gift Box Set 5",
+        "img_location": "image-1707477471843-101921352.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Valentine's Special Collection Premium Gift Box Set 4",
+        "img_location": "image-1707477391536-673938287.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Valentine's Special Collection Premium Gift Box Set 3",
+        "img_location": "image-1707477254199-746219670.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Valentine's Special Collection Premium Gift Box Set 2",
+        "img_location": "image-1707477081539-585963038.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Valentine's Special Collection Premium Gift Box Set 1",
+        "img_location": "image-1707476085938-985640891.jpg|image-1707476866626-743579676.jpg",
+        "main_img": 1
+      },
+      {
+        "name": "Couple Ring Set For Valentine Special",
+        "img_location": "|image-1707571716407-916578333.jpg|image-1707571716407-762395913.jpg|image-1707571716408-860565896.jpg|image-1707571891399-657361003.jpg|image-1707571891400-546339374.jpg|image-1707571891400-384059102.jpg",
+        "main_img": 1
+      },
+      {
+        "name": "Valentine Special High Appearance Premium Mark Water Cup Gift Box",
+        "img_location": "image-1707300579218-341641013.jpg|image-1707300579218-407146035.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Valentine Special Premium Gift Box New Arrival 2025",
+        "img_location": "image-1707299661202-671307305.jpg|image-1707299661202-879696173.jpg|image-1707299661204-157310413.jpg|image-1707299661204-596379914.jpg|image-1707299661204-952242525.jpg",
+        "main_img": 0
+      }
+    ]
+  },
+  "11": {
+    "id": 11,
+    "name": "Men Clothing",
+    "img_location": "image-1721294760198-986383799.png",
+    "status": 1,
+    "products_count": 20,
+    "products": [
+      {
+        "name": "Punjabi combo set",
+        "img_location": "image-1793788431024-871806518.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Eid Collection 2026 Black Zic-Zac Embroidery Punjabi",
+        "img_location": "image-1769678346354-466056740.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Eid Collection 2026 White Zic-Zac Embroidery Punjabi",
+        "img_location": "image-1769678198715-479158851.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Eid Collection 2026 White-Black Pattern Embroidery Punjabi",
+        "img_location": "image-1769678152194-108742153.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Eid Collection 2026 Black-Golden Pattern Embroidery Punjabi",
+        "img_location": "image-1769677980236-422342368.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Eid Collection 2026 Digital Print Punjabi (Orange)",
+        "img_location": "image-1769677442480-507049269.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Eid Collection 2026 White Color Embroidery Punjabi",
+        "img_location": "image-1769341322968-733184698.jpeg|image-1769341323986-702557731.jpeg|image-1769341325616-50422278.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "Eid Collection 2026 Black Color Embroidery Punjabi",
+        "img_location": "image-1769341159665-458972208.jpeg|image-1769341160620-75917977.jpeg|image-1769341162807-38645320.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Eid Collection 2026 Black Sequence Embroidery Punjabi",
+        "img_location": "image-1769339366820-211311257.jpeg|image-1769339367541-476040166.jpeg|image-1769339368857-536683413.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Eid Collection 2026 White Sequence Embroidery Punjabi",
+        "img_location": "image-1769339202444-949561941.jpeg|image-1769339202915-87790423.jpeg|image-1769339204669-536432793.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Eid Collection 2026 Purple Sequence Embroidery Punjabi",
+        "img_location": "image-1769338355662-120787524.jpeg|image-1769338356351-361445847.jpeg|image-1769338358277-592061159.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Shirt Combo Purpel | Full Sleeve 100% High Quality Shirt Oxford cotton fabric",
+        "img_location": "image-1752580975655-176920054.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Shirt Combo Dark Blue | Full Sleeve 100% High Quality Shirt Oxford cotton fabric",
+        "img_location": "image-1752578978041-839226683.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Shirt Combo Pink | Full Sleeve 100% High Quality Shirt Oxford cotton fabric",
+        "img_location": "image-1752578901017-103167743.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Shirt Combo White | Full Sleeve 100% High Quality Shirt Oxford cotton fabric",
+        "img_location": "image-1752578823903-592418916.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Shirt Combo Blue | Full Sleeve 100% High Quality Shirt Oxford cotton fabric",
+        "img_location": "image-1752578729025-38687232.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Men’s Regular Fit Screen Printed Panjabi",
+        "img_location": "image-1747817665102-4907623.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Men’s Regular Fit Printed Panjabi",
+        "img_location": "image-1747816169874-308916216.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Men’s Cotton Shirt Combo",
+        "img_location": "image-1745238657676-323620759.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Men’s Cotton Shirt Combo",
+        "img_location": "image-1745238605659-221904059.jpeg",
+        "main_img": 0
+      }
+    ]
+  },
+  "12": {
+    "id": 12,
+    "name": "Men Accessories",
+    "img_location": "image-1721295004507-83813568.png",
+    "status": 1,
+    "products_count": 17,
+    "products": [
+      {
+        "name": "10 Stick Cigarete Box Case Lighter Cigarete Holder For Mens (RANDOM COLOR)",
+        "img_location": "image-1758784361667-941649431.webp|image-1758784361676-407362767.webp|image-1758784361685-489869582.webp",
+        "main_img": 0
+      },
+      {
+        "name": "Premium Quality Adidas Logo Cap : A Touch of Class, A Dash of Style!",
+        "img_location": "image-1757935463804-549170592.jpg|image-1757935463805-264122864.jpg|image-1757935463808-633709601.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Calvin Klein Cap! A Touch of Class, A Dash of Style! 🧢✨",
+        "img_location": "image-1751182009189-512526043.jpeg|image-1751182009190-373947489.jpg|image-1756369833027-235456366.jpg|image-1756369833035-633100207.jpg",
+        "main_img": 1
+      },
+      {
+        "name": "Tommy Hilfiger Cap! A Touch of Class, A Dash of Style! 🧢✨",
+        "img_location": "image-1748674600762-98676317.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Calvin Klein Cap! A Touch of Class, A Dash of Style! 🧢✨",
+        "img_location": "image-1748674438665-735132173.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "The North Face Cap! A Touch of Class, A Dash of Style! 🧢✨",
+        "img_location": "image-1748674045798-963458296.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Mercedes-Benz Cap! A Touch of Class, A Dash of Style! 🧢✨",
+        "img_location": "image-1748673107702-929459403.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "New York Yankees Cap! A Touch of Class, A Dash of Style! 🧢✨",
+        "img_location": "image-1748672816404-775874188.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Men’s Crocodile Leather Belt",
+        "img_location": "image-1748409251442-271547107.webp|image-1748409251442-539144381.webp|image-1748409251443-692327558.webp|image-1748409251443-245556596.webp|image-1748409251443-960511860.webp|image-1748409251444-578670188.webp|image-1748409251444-114856540.webp|image-1748409251444-706008463.webp",
+        "main_img": 0
+      },
+      {
+        "name": "Crocodile bifold slim wallet",
+        "img_location": "image-1748408837835-216784434.webp|image-1748408837836-490080785.webp|image-1748408837836-93079015.webp|image-1748408837836-405492431.webp",
+        "main_img": 2
+      },
+      {
+        "name": "Tommy Hilfiger Cap: A Touch of Class, A Dash of Style! 🧢✨",
+        "img_location": "image-1742194918309-30788684.jpg|image-1742194918310-288114366.jpg|image-1742194918310-964309659.jpg|image-1742194918310-932670393.jpg|image-1742194918311-853200526.jpg|image-1742194918311-798718688.jpg|image-1742194918311-90991140.jpg|image-1742194918312-815329438.jpg|image-1742194918313-261481585.jpg",
+        "main_img": 8
+      },
+      {
+        "name": "Nike logo Cap: A Touch of Class, A Dash of Style! 🧢✨",
+        "img_location": "image-1742194505379-756355673.jpg|image-1742194505380-828656252.jpg|image-1742194505380-785146936.jpg|image-1742194505380-502478076.jpg|image-1742194505388-113669078.jpg|image-1742194505389-539503824.jpg|image-1742194505390-824638160.jpg",
+        "main_img": 3
+      },
+      {
+        "name": "Nike Cap: A Touch of Class, A Dash of Style! 🧢✨",
+        "img_location": "image-1742193651923-288914932.jpg|image-1742193651923-729608481.jpg|image-1742193651923-207950684.jpg|image-1742193651924-56034506.jpg|image-1742193651925-698432033.jpg|image-1742193651925-400845510.jpg|image-1758085417846-674386698.jpg",
+        "main_img": 2
+      },
+      {
+        "name": "Adidas Logo Cap: A Touch of Class, A Dash of Style! 🧢✨",
+        "img_location": "image-1742192446601-817956533.jpg|image-1742192446602-363668612.jpg|image-1742192446602-965141711.jpg|image-1742192446603-615281846.jpg|image-1742192446603-506292810.jpg|image-1742192446603-862063974.jpg|image-1742192446604-436684513.jpg|image-1742192446606-456941459.jpg|image-1742192446608-675533976.jpg|image-1742192446608-265431715.jpg|image-1742192446612-981419096.jpg|image-1742192446615-411534765.jpg|image-1742192446616-367969727.jpg|image-1742192446619-236290102.jpg",
+        "main_img": 8
+      },
+      {
+        "name": "BINBOND Top Brand Luxury Fashion Watch Men (Master Copy)",
+        "img_location": "image-1727957470749-825315939.jpg|image-1727957470749-785985939.jpg|image-1727957470749-874699446.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Football Club Team Logo Metal Keychain",
+        "img_location": "image-1724309476152-857225451.jpg|image-1724309476155-985081473.jpg|image-1724309476159-470632121.jpg|image-1724309476163-314737538.jpg|image-1724309476166-32313600.jpg|image-1724309476170-687301870.jpg|image-1724309476173-913905180.jpg|image-1724309476177-262765410.webp|image-1724309476177-287872659.webp",
+        "main_img": 0
+      },
+      {
+        "name": "Premium Quality Ayatul Kursi Metal Bracelet",
+        "img_location": "image-1704657689257-612693706.jpeg",
+        "main_img": 0
+      }
+    ]
+  },
+  "13": {
+    "id": 13,
+    "name": "Consumer Electronics",
+    "img_location": "image-1721295245809-957502547.png",
+    "status": 1,
+    "products_count": 15,
+    "products": [
+      {
+        "name": "AG-GO Massage Fascial Gun",
+        "img_location": "image-1769686171775-563922529.jpeg|image-1769686171775-16244193.webp",
+        "main_img": 0
+      },
+      {
+        "name": "Portable Mesh Nebulizer",
+        "img_location": "image-1766467683400-667482845.webp",
+        "main_img": 0
+      },
+      {
+        "name": "Instant Hot Water Tap Digital Display",
+        "img_location": "image-1766467378479-906526080.png",
+        "main_img": 0
+      },
+      {
+        "name": "Electric instant hot water tap with hand shower",
+        "img_location": "image-1766466914296-444456040.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "45 in 1 Cordless Electric Screwdriver with Bits Holder with LED Light Screwdriver, Rechargeable Screwdriver Tools Kit, Wireless Screwdriver Drill Machine with Reversible Function",
+        "img_location": "image-1760427392578-368647882.avif|image-1760427392581-974453334.jpg|image-1760427392582-776112006.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Mini portable multipurpose travel iron",
+        "img_location": "image-1759055038796-230324337.webp|image-1759055038796-283380317.webp|image-1759055038796-88543462.webp|image-1759055038796-787839126.webp",
+        "main_img": 3
+      },
+      {
+        "name": "Prestige 2200 Watts Infrared Cooker Use Any Pot (Blue Magic / Black Berry) Eight Cooking Function Digital Display Japan Technology",
+        "img_location": "image-1759052492159-312448862.webp|image-1759052492159-460889819.webp",
+        "main_img": 0
+      },
+      {
+        "name": "Mini Hot Melt Glue Gun - Blue",
+        "img_location": "image-1759052208534-916230151.png|image-1759052208540-891279524.jpeg|image-1759052208540-582362605.jpg|image-1759052208540-430055275.png",
+        "main_img": 3
+      },
+      {
+        "name": "Mini Hot Melt Glue Gun - Black",
+        "img_location": "image-1759051952803-601960524.jpeg|image-1759051952803-858990425.jpg",
+        "main_img": 1
+      },
+      {
+        "name": "Kennede Rechargeable Fan 2936HRS 16 Inch Digital Display ( With Remote)",
+        "img_location": "image-1749029185334-686525344.png|image-1749029185334-981757186.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "VGR V-937 Cord Cordless Hair and Beard Trimmer for Men",
+        "img_location": "image-1745314158156-175963805.jpg|image-1745314158158-551390565.jpg|image-1745314975667-464350646.jpg|image-1745314975667-571563931.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Electric Mosquito Killer Lamp",
+        "img_location": "image-1716115378802-974664566.webp|image-1716115378802-979240347.webp|image-1716115378803-394969869.webp|image-1716115378803-625834852.webp|image-1716115378803-613027257.webp",
+        "main_img": 1
+      },
+      {
+        "name": "MHR Mini Handheld Fan",
+        "img_location": "image-1716113461606-194157379.jpg|image-1716113461607-656037093.jpg|image-1716113461607-23791380.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Mini Portable Washing Machine",
+        "img_location": "image-1698076992263-187566565.jpg|image-1698076992264-11363431.jpg|image-1698076992264-834802735.jpg|image-1698076992265-479505262.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Desk Fan",
+        "img_location": "image-1698069853539-804046704.jpg|image-1698069853539-206075169.jpg|image-1698069853540-793038630.jpg",
+        "main_img": 1
+      }
+    ]
+  },
+  "14": {
+    "id": 14,
+    "name": "Drop Shoulder T-Shirt",
+    "img_location": "image-1721302958933-281859680.png",
+    "status": 1,
+    "products_count": 2,
+    "products": [
+      {
+        "name": "Solid Sky blue  Cotton Drop Shoulder T-Shirt",
+        "img_location": "image-1742272455068-479948467.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Dark Drop Shoulder Unisex T-Shirt",
+        "img_location": "image-1722343785447-510924779.jpg|image-1722343785448-388363018.jpeg",
+        "main_img": 0
+      }
+    ]
+  },
+  "15": {
+    "id": 15,
+    "name": "Sports & Kids",
+    "img_location": "image-1724143558031-583738198.png",
+    "status": 1,
+    "products_count": 20,
+    "products": [
+      {
+        "name": "YONEX ASTROX 100 ZZ    Yonex Mastet Copy",
+        "img_location": "image-1793796430036-687433107.jpeg|image-1793796430039-841389811.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Duora 7  Yonex Mastet Copy",
+        "img_location": "image-1793794359196-252458779.jpeg|image-1793794359197-703303960.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "ASTROX 99 PRO  Yonex Mastet Copy",
+        "img_location": "image-1793790212274-685141655.jpeg|image-1793790212275-524665844.jpeg|image-1793790212276-784545765.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "Titan 10",
+        "img_location": "image-1792395204036-665299614.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Titan 7",
+        "img_location": "image-1792395148923-356908505.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Titan 10 Special",
+        "img_location": "image-1792395036871-182625196.jpeg|image-1792395036872-998342636.jpeg|image-1792395036873-666896043.jpeg|image-1792395036875-332864642.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Yonex Lining x 1",
+        "img_location": "image-1792394670910-684643319.jpeg|image-1792394670911-640127084.jpeg|image-1792394670912-270232712.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Yonex Carbonex 25sp",
+        "img_location": "image-1792229219338-835025743.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Yonex Doura 88",
+        "img_location": "image-1792229173645-28248749.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Yonex Voltric 60",
+        "img_location": "image-1792229112077-312164467.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Yonex Voltric 10DG",
+        "img_location": "image-1792229011018-422439497.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Yonex Carbonex 21sp",
+        "img_location": "image-1792228120859-346678834.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "World cup high quality ball",
+        "img_location": "image-1783571923238-289077779.jpeg|image-1783571923250-128066812.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "Argentina jersey (away) thailand varient",
+        "img_location": "image-1778397146847-447004501.jpeg|image-1778397146848-816381921.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Argentina jersey ( home) thailand varient 3xl 4xl",
+        "img_location": "image-1778396897551-859949522.jpeg|image-1778396897558-147470691.jpeg|image-1778396897559-34622066.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Argentina jersey ( home) thailand varient",
+        "img_location": "image-1778396735454-129171467.jpeg|image-1778396735456-969593596.jpeg|image-1778396735458-868622664.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Sports Jersey 21",
+        "img_location": "image-1777810846253-46670774.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Sports Jersey 20",
+        "img_location": "image-1777810782224-106431621.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Sports Jersey 19",
+        "img_location": "image-1777810713597-603805258.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Sports Jersey 18",
+        "img_location": "image-1777810651722-946074212.jpeg",
+        "main_img": 0
+      }
+    ]
+  },
+  "16": {
+    "id": 16,
+    "name": "Winter Collection",
+    "img_location": "image-1728903027603-174802864.webp",
+    "status": 1,
+    "products_count": 11,
+    "products": [
+      {
+        "name": "Premium Winter Muffler 08",
+        "img_location": "image-1764677606013-548032216.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Premium Winter Muffler 07",
+        "img_location": "image-1764677532394-302728447.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Premium Winter Muffler 06",
+        "img_location": "image-1764677489765-86829094.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Premium Winter Muffler 05",
+        "img_location": "image-1764677458649-885811380.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Premium Winter Muffler 04 (Light Pink color)",
+        "img_location": "image-1764677437544-750114416.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "•Solid Hoodie• (Size M)",
+        "img_location": "image-1763897319093-51648284.jfif|image-1763897319093-663015912.jfif|image-1763897458647-801376832.jfif|image-1763897458651-586274981.jfif|image-1763897458652-323918109.jfif|image-1763897458652-747013984.jfif|image-1763897458654-882747417.jfif|image-1763897458654-406561996.jfif|image-1763897458654-78155830.jfif",
+        "main_img": 0
+      },
+      {
+        "name": "Pading jacket",
+        "img_location": "image-1763895148402-652264369.jpg|image-1763895148403-744733032.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Shacket",
+        "img_location": "image-1763894808959-469007621.png|image-1763894808989-321139300.jpg|image-1763894808989-236700784.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Long corduroy jacket Sky Blue",
+        "img_location": "image-1730710431450-332355305.jpeg|image-1730710431451-746327556.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Premium Winter  Muffler 02",
+        "img_location": "image-1730618210317-952350936.jpg|image-1730618210318-815627980.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Premium Winter  Muffler",
+        "img_location": "image-1730617654030-65533752.jpg|image-1730617654032-591492272.jpg",
+        "main_img": 0
+      }
+    ]
+  },
+  "17": {
+    "id": 17,
+    "name": "Baby & Mom",
+    "img_location": "image-1739009270098-447793113.png",
+    "status": 1,
+    "products_count": 20,
+    "products": [
+      {
+        "name": "Baby Patter",
+        "img_location": "image-1763269309773-62849923.jpg|image-1763269309783-113013174.jpg|image-1763269309798-712897388.jpg|image-1763269309829-412348123.jpg|image-1763269309831-805760153.jpg|image-1763269309833-480559810.jpg|image-1763269309836-595118305.jpg|image-1763274623651-617731711.jpg",
+        "main_img": 6
+      },
+      {
+        "name": "KuQin 300ml water bottle",
+        "img_location": "image-1759731190686-963138506.webp|image-1759731190686-920530287.webp|image-1759731190687-431294853.webp|image-1759731190687-100045754.webp|image-1759731190688-461975337.webp|image-1759731190688-190879508.webp|image-1759731190688-528487057.webp",
+        "main_img": 1
+      },
+      {
+        "name": "EARLY EDUCATION DEVICE KIDS READING AND LEARNING DEVICE EDUCATIONAL TOY ( Random Cololur )",
+        "img_location": "image-1757936993219-881823427.JPG|image-1757936993293-359938019.JPG|image-1757936993321-421052556.JPG|image-1757936993465-752822709.JPG|image-1757936993720-787138429.JPG|image-1757936993827-917532192.JPG|image-1757936993859-865061163.JPG|image-1757936993886-606395087.JPG|image-1757936993931-109334274.JPG|image-1757936993983-290319775.JPG",
+        "main_img": 0
+      },
+      {
+        "name": "USB Milk Water Bottle Warmer Travel Stroller Insulated Bag Infant Bottle Feeding Warmer | Portable USB Bottle Warmer, Milk Water Warmer Safe Insulated Baby Bottle Stroller Bag Multipurpose On The Go O",
+        "img_location": "image-1756630135117-801129318.webp|image-1756630135117-991062773.jpg|image-1756630135117-595158656.jpg|image-1756630135117-121257482.webp|image-1756630135117-821756522.webp",
+        "main_img": 4
+      },
+      {
+        "name": "Tommee Tippee Natural Start 2x Fast Flow Soft Teat 2s Pack 6m+",
+        "img_location": "image-1756629201319-580131051.webp|image-1756629201319-456848045.jpg|image-1756629201320-213890176.png",
+        "main_img": 2
+      },
+      {
+        "name": "Philips Avent Mumpot My Easy Sip Cup 200ml 6month+ Random Colour (Made in Indonesia)",
+        "img_location": "image-1756037349105-315524703.jpg|image-1756037349105-602925508.jpg|image-1756037349105-642111711.jpeg",
+        "main_img": 2
+      },
+      {
+        "name": "Philips Avent Bottle_Nipple - 1 month plus - 2pcs",
+        "img_location": "image-1756037157897-774338369.webp|image-1756037157898-469335844.png",
+        "main_img": 0
+      },
+      {
+        "name": "Philips Avent Bottle Nipple Natural 3 Month Plus 2pcs",
+        "img_location": "image-1756036893256-859720710.png",
+        "main_img": 0
+      },
+      {
+        "name": "Philips Avent Bottle Nipple Anti Colic Teat Medium Flow 2pc - 3m+",
+        "img_location": "image-1756036625768-389618043.jpeg|image-1756036625768-597888967.png",
+        "main_img": 0
+      },
+      {
+        "name": "MotherCare Baby Tap to Toe Wash | 300ml",
+        "img_location": "image-1756030970971-160865313.webp|image-1756030970971-747377620.jpg|image-1756030970978-49500537.png|image-1756030970982-678932562.jpg",
+        "main_img": 2
+      },
+      {
+        "name": "MotherCare Baby Shampoo 300ml",
+        "img_location": "image-1756030798728-101208653.webp|image-1756030798729-265505010.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "BabySmile Cartoon Face Petals Type Liquid Silicone Pacifier 1pcs",
+        "img_location": "image-1754996416858-536826960.jpg|image-1754996416858-454717877.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "Baby Toothbrush Baby Tongue Cleaner for 0-18 Months 3pcs Set Multicolor Toddler Baby Care 3pcs set with Box",
+        "img_location": "image-1754996269119-382062112.jpeg|image-1754996269119-107586446.jpeg|image-1754996269119-4512725.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "Baby Mumpot Waterbottle Smile Baby Drinking Water Pot With Straw & Pipe 300Ml Multicolor Available",
+        "img_location": "image-1754995980014-330129554.jpeg|image-1754995980014-979155998.jpeg|image-1754995980014-547343747.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Baby Food Chewing Mash & Serve Bowl for Homemade Baby Food",
+        "img_location": "image-1754995838263-951255306.jpeg|image-1754995838263-77317924.jpeg|image-1754995838263-702804724.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Baby Finger Toothbrush - Children's Silicon Finger Transparent Toothbrush",
+        "img_location": "image-1754995714647-798557778.jpeg|image-1754995714647-641620236.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "Baby Feeder Philips Avent Natural Response Baby Feeder Bottle 1m+ 260ml Pack of 2",
+        "img_location": "image-1754994984214-166918298.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Baby Feeder Philips Avent Natural Feeder Bottle 0m+ 125ml (Pack Of 2)",
+        "img_location": "image-1754994846837-618552461.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Baby Feeder Applebear Standard Caliber Glass Bottle 60ml | Multicolor Available",
+        "img_location": "image-1754994567332-119761881.jpeg|image-1754994567332-129844753.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "Baby Feeder | Philips Avent Natural Ultra Soft & Flexible Pink Feeding Bottle for 1 month+ 1 Bottle | 260ml",
+        "img_location": "image-1754994299740-528184520.jpeg|image-1754994299740-796339547.png",
+        "main_img": 0
+      }
+    ]
+  },
+  "19": {
+    "id": 19,
+    "name": "Soap & Fragrance",
+    "img_location": "image-1750919685813-614632166.png",
+    "status": 1,
+    "products_count": 12,
+    "products": [
+      {
+        "name": "Permethrin Soap for prevention of scabies 75g",
+        "img_location": "image-1756036106847-790055028.webp|image-1756036106847-91165021.png",
+        "main_img": 0
+      },
+      {
+        "name": "Luliford Luliconazole Soap Medicated Soap 50g",
+        "img_location": "image-1755769033275-374038056.png|image-1755769033281-585251312.jpeg|image-1755769033283-725622708.webp",
+        "main_img": 0
+      },
+      {
+        "name": "Leeford Ketofly Soap 75g Ketoconazole & Cetrimide Anti Fungal Medicated Soap",
+        "img_location": "image-1755759706587-950296889.png|image-1755759706588-31439601.jpg|image-1755759706588-654569788.png",
+        "main_img": 0
+      },
+      {
+        "name": "Ketoconazole 1% Soap 75g Inventive Keto Medicated Soap",
+        "img_location": "image-1755687870276-720646712.webp|image-1755687870276-484808541.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "EXS Delay Spray For Men 50ml | UK",
+        "img_location": "image-1755432304347-357863298.jpeg|image-1755432304348-325283352.jpeg|image-1755432304349-701912014.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "Cussons Imperial Leather Classic Soap - 200g Bar (Made in Thailand)",
+        "img_location": "image-1755165016948-113189811.jpg|image-1755165016949-444598638.jpg|image-1755165016950-408050301.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Ombre Perfumed Body Mist - Munsell Dream - 120ml",
+        "img_location": "image-1753169442729-211159415.png|image-1753169442747-654067299.png",
+        "main_img": 0
+      },
+      {
+        "name": "Ombre Perfumed Body Mist - Golden Hour - 120ml",
+        "img_location": "image-1753169361642-317546628.jpg|image-1753169361642-301559692.png|image-1753169361646-4051297.jpg",
+        "main_img": 1
+      },
+      {
+        "name": "Ombre Perfumed Body Mist - Holiday Bliss - 120ml",
+        "img_location": "image-1753169227992-536053515.png|image-1753169227994-302770008.png",
+        "main_img": 1
+      },
+      {
+        "name": "Ombre Body Mist- Blue Pearl (W) -120ml",
+        "img_location": "image-1753169100431-285028620.webp|image-1753169100431-578843286.jpeg|image-1753169100431-464240869.webp",
+        "main_img": 1
+      },
+      {
+        "name": "Ombre Body Mist- I found You (W) -120ml",
+        "img_location": "image-1753168965890-471582294.jpg|image-1753168965891-149022962.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Ombre Body Mist- Bali Trip (W) -120ml",
+        "img_location": "image-1753168787171-548132932.jpeg|image-1753168787172-872591482.webp",
+        "main_img": 0
+      }
+    ]
+  },
+  "20": {
+    "id": 20,
+    "name": "Print on demand",
+    "img_location": "image-1751093089566-206554026.jpg",
+    "status": 1,
+    "products_count": 0,
+    "products": []
+  },
+  "21": {
+    "id": 21,
+    "name": "Couple Combo",
+    "img_location": "image-1752572447382-244805033.jpg",
+    "status": 1,
+    "products_count": 20,
+    "products": [
+      {
+        "name": "Matching Couple Dress | 2 Pcs and shirt",
+        "img_location": "image-1776495527774-877548560.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Matching Couple Dress | 2 Pcs and shirt",
+        "img_location": "image-1776495263399-293484533.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Matching Couple Dress | 2 Pcs and shirt",
+        "img_location": "image-1776494893186-659823867.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Matching Couple Dress | 2 Pcs and shirt",
+        "img_location": "image-1776494236177-954621372.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Shirt Combo Green | Full Sleeve 100% High Quality Shirt Oxford cotton fabric",
+        "img_location": "image-1752581837136-815797973.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Shirt Combo Red | Full Sleeve 100% High Quality Shirt Oxford cotton fabric",
+        "img_location": "image-1752578690864-274152992.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Shirt Combo | Full Sleeve 100% High Quality Shirt Oxford cotton fabric",
+        "img_location": "image-1752578469119-143273501.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Printed shirt Combo | Full Sleeve 100% High Quality Shirt",
+        "img_location": "image-1752578230312-552657839.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Printed shirt Combo | Full Sleeve 100% High Quality Shirt",
+        "img_location": "image-1752578123941-573632743.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Printed shirt Combo | Full Sleeve 100% High Quality Shirt",
+        "img_location": "image-1752578024801-936813156.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Printed shirt Combo | Full Sleeve 100% High Quality Shirt",
+        "img_location": "image-1752575640617-41002310.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Printed shirt Combo | Full Sleeve 100% High Quality Shirt",
+        "img_location": "image-1752575500891-566716936.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Printed shirt Combo | Full Sleeve 100% High Quality Shirt",
+        "img_location": "image-1752575423928-502598981.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Printed shirt Combo | Full Sleeve 100% High Quality Shirt",
+        "img_location": "image-1752575296353-268039375.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Printed shirt Combo | Full Sleeve 100% High Quality Shirt",
+        "img_location": "image-1752575153575-151946075.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Printed shirt Combo | Full Sleeve 100% High Quality Shirt",
+        "img_location": "image-1752575059591-965118149.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Printed shirt Combo | Full Sleeve 100% High Quality Shirt",
+        "img_location": "image-1752574814561-117668829.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Matching Couple Dress | 2 Pcs and shirt",
+        "img_location": "image-1752574374626-156925351.jpeg|image-1752574374629-197053869.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Matching Couple Dress | 2 Pcs and shirt",
+        "img_location": "image-1752574334992-347439215.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Matching Couple Dress | 2 Pcs and shirt",
+        "img_location": "image-1752574132233-424966155.jpeg|image-1752574132240-145260417.jpeg",
+        "main_img": 0
+      }
+    ]
+  },
+  "22": {
+    "id": 22,
+    "name": "Personal Wellness",
+    "img_location": "image-1758107239862-879376280.png",
+    "status": 1,
+    "products_count": 19,
+    "products": [
+      {
+        "name": "EXS Choco Lube 100ml Water Based Lubricant",
+        "img_location": "image-1758181936000-528763316.jpg|image-1758181936000-891625058.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "Manforce Epic Lube Strawberry Flavor Lubricant 60ml (Made in India)",
+        "img_location": "image-1758181650952-199445283.jpg|image-1758181650952-684825235.webp|image-1758181650953-110715210.webp|image-1758181650953-901572148.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Durex KY Jelly Water Based Personal Lubricant 50g Tube (Made in Thailand)",
+        "img_location": "image-1758181466610-211276587.jpg|image-1758181466610-384345055.jpg|image-1758181466611-207505391.webp",
+        "main_img": 0
+      },
+      {
+        "name": "Skore Cool Sensation Lubricant Water Based 50ml | India",
+        "img_location": "image-1758181329785-475466807.webp|image-1758181329785-40594855.jpeg|image-1758181329786-81597615.jpeg|image-1758181329786-903106448.png",
+        "main_img": 3
+      },
+      {
+        "name": "Durex Play Tingle H2O Lube - H2O Water Based Lubricant Gel for Men & Women- 100ml (Made In Thailand)",
+        "img_location": "image-1758181054112-866895648.jpeg|image-1758181054126-412731106.jpg|image-1758181054130-671718970.jpg|image-1758181054132-117687090.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Fun Time Lube Cherry Lubricant Gel Water Based Red 75ml | UK",
+        "img_location": "image-1758180906790-319627494.jpg|image-1758180906790-723116714.jpg|image-1758180906790-354091012.jpg|image-1758180906790-534581950.jpeg",
+        "main_img": 1
+      },
+      {
+        "name": "EXS Lubricant - Peach Flavored Water Based Lubricant 5ml x 4 Pouch - Travel/Honeymoon Pack",
+        "img_location": "image-1758180702767-882556206.jpg|image-1758180702767-379593907.webp",
+        "main_img": 0
+      },
+      {
+        "name": "Skore Lubes - Chocolate Flavor Lubricant Gel 50ml (Made in India)",
+        "img_location": "image-1758179981755-922602040.jpg|image-1758179981755-136485206.png",
+        "main_img": 0
+      },
+      {
+        "name": "EXS Cherry & Peach Flavor Lube Water Based Lubricant 5ml x 4 Pack Combo | UK | Wedding, Honeymoon, Valentine Couple Combo Pack",
+        "img_location": "image-1758179776524-980445951.jpeg|image-1758179776524-778370540.jpg",
+        "main_img": 1
+      },
+      {
+        "name": "EXS Lubricant - Chocolate Flavored Water Based Lubricant 5ml x 4 Pouch - Travel/Honeymoon Pack",
+        "img_location": "image-1758179556911-534612900.jpeg|image-1758179556913-134702957.png",
+        "main_img": 0
+      },
+      {
+        "name": "EXS Lubricant - Cherry Flavored Water Based Lubricant 5ml x 4 Pouch - Travel/Honeymoon Pack",
+        "img_location": "image-1758179382802-671965502.webp|image-1758179382802-687216204.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "Durex Play Classic Lube - H2O Water Based Lubricant Gel for Men & Women- 100ml | Made In Thailand",
+        "img_location": "image-1758175959082-172292382.jpg|image-1758175959082-823253396.jpg|image-1758175959083-7300257.png",
+        "main_img": 2
+      },
+      {
+        "name": "Fun Time Original Water-Based Lubricant | 75ml | UK",
+        "img_location": "image-1758111783264-199135874.webp|image-1758111783264-828894203.jpg",
+        "main_img": 0
+      },
+      {
+        "name": "Durex Play Sensitive Gel 50ml Water-based Lubricant | UK",
+        "img_location": "image-1758111565000-547676817.jpeg",
+        "main_img": 0
+      },
+      {
+        "name": "EXS Lubricant Mix Combo Pack - Cherry, Chocolate, Strawberry & Peach Flavored Water Based Lubricant 5ml x 4 Pouch - Travel/Honeymoon Pack",
+        "img_location": "image-1758110999861-149712624.webp|image-1758110999862-149620710.webp",
+        "main_img": 0
+      },
+      {
+        "name": "KY Personal Water Based Lubricant 50gm Tube",
+        "img_location": "image-1758110800362-142501569.jpeg|image-1758110800362-268273053.jpeg|image-1758110800363-3574297.jpeg",
+        "main_img": 2
+      },
+      {
+        "name": "Durex Play Lube | Warming Lubricant Gel for Men & Women- 100ml | Made In Thailand",
+        "img_location": "image-1758109629701-787718113.jpg|image-1758109629702-112397602.jpg|image-1758109629702-836510541.jpg|image-1758109629702-421360925.webp",
+        "main_img": 0
+      },
+      {
+        "name": "Eazy Jelly Personal Lubricant 50gm Pack",
+        "img_location": "image-1758108936120-256015233.jpg|image-1758108936128-342928348.jpg|image-1758108936133-924524663.webp|image-1758108936133-892516538.webp",
+        "main_img": 0
+      },
+      {
+        "name": "Durex Lube Strawberry Flavoured Lubricant Gel for Men & Women 100ml (Made In Thailand)",
+        "img_location": "image-1758108594621-55584351.jpeg|image-1758108594622-80960356.jpeg",
+        "main_img": 0
+      }
+    ]
+  }
+}

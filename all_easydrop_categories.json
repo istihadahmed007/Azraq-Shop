@@ -1,0 +1,113 @@
+{
+  "flag": "SUCCESS",
+  "list": [
+    {
+      "id": 2,
+      "category": "Gadgets & IT Accessories",
+      "img_location": "image-1721294464350-523600701.png",
+      "status": 1
+    },
+    {
+      "id": 3,
+      "category": "Health & Beauty",
+      "img_location": "image-1704651726678-434810988.png",
+      "status": 1
+    },
+    {
+      "id": 4,
+      "category": "Home & Lifestyle",
+      "img_location": "image-1704651740851-410226143.png",
+      "status": 1
+    },
+    {
+      "id": 5,
+      "category": "Jewelries & Accessories",
+      "img_location": "image-1704651751963-240932262.png",
+      "status": 1
+    },
+    {
+      "id": 6,
+      "category": "Kitchen Appliances ",
+      "img_location": "image-1704651762473-983345475.png",
+      "status": 1
+    },
+    {
+      "id": 9,
+      "category": "Sunglass Collection",
+      "img_location": "image-1704651795401-906194306.png",
+      "status": 1
+    },
+    {
+      "id": 10,
+      "category": "Gifts",
+      "img_location": "image-1704651803304-632313545.png",
+      "status": 1
+    },
+    {
+      "id": 11,
+      "category": "Men Clothing",
+      "img_location": "image-1721294760198-986383799.png",
+      "status": 1
+    },
+    {
+      "id": 12,
+      "category": "Men Accessories",
+      "img_location": "image-1721295004507-83813568.png",
+      "status": 1
+    },
+    {
+      "id": 13,
+      "category": "Consumer Electronics",
+      "img_location": "image-1721295245809-957502547.png",
+      "status": 1
+    },
+    {
+      "id": 14,
+      "category": "Drop Shoulder T-Shirt",
+      "img_location": "image-1721302958933-281859680.png",
+      "status": 1
+    },
+    {
+      "id": 15,
+      "category": "Sports & Kids",
+      "img_location": "image-1724143558031-583738198.png",
+      "status": 1
+    },
+    {
+      "id": 16,
+      "category": "Winter Collection",
+      "img_location": "image-1728903027603-174802864.webp",
+      "status": 1
+    },
+    {
+      "id": 17,
+      "category": "Baby & Mom",
+      "img_location": "image-1739009270098-447793113.png",
+      "status": 1
+    },
+    {
+      "id": 19,
+      "category": "Soap & Fragrance",
+      "img_location": "image-1750919685813-614632166.png",
+      "status": 1
+    },
+    {
+      "id": 20,
+      "category": "Print on demand",
+      "img_location": "image-1751093089566-206554026.jpg",
+      "status": 1
+    },
+    {
+      "id": 21,
+      "category": "Couple Combo",
+      "img_location": "image-1752572447382-244805033.jpg",
+      "status": 1
+    },
+    {
+      "id": 22,
+      "category": "Personal Wellness",
+      "img_location": "image-1758107239862-879376280.png",
+      "status": 1
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="16" fill="#12233F" />
+  <!-- Geometric AZ Monogram -->
+  <path d="M16 46L27 18H33L44 46H37.5L34.8 39H25.2L22.5 46H16ZM27.2 33.5H32.8L30 25.5L27.2 33.5Z" fill="#FFFFFF"/>
+  <path d="M26 31L46 19V24L34 32H46V37L26 49V44L38 36H26V31Z" fill="#C9F34A" fill-opacity="0.95"/>
+  <circle cx="48" cy="16" r="3.5" fill="#2677D9"/>
+</svg>
+

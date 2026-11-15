@@ -1,0 +1,139 @@
+{
+  "generated_at": "2026-11-15T08:42:46.222738+00:00",
+  "source_url": "https://easydrop.asia/new-store",
+  "metrics": {
+    "1_total_discovered_collections": 18,
+    "2_total_discovered_subcollections": 0,
+    "3_total_unique_products": 1206,
+    "4_total_product_to_collection_relationships": 1206,
+    "5_successfully_imported_products": 1206,
+    "6_products_awaiting_review": 0,
+    "7_failed_imports": 0,
+    "8_products_with_missing_images": 0,
+    "9_products_with_missing_supplier_information": 0,
+    "10_duplicate_records_prevented": 0
+  },
+  "collection_audit": [
+    {
+      "collection_id": 2,
+      "name": "Gadgets & IT Accessories",
+      "source_product_count": 281,
+      "imported_product_count": 281
+    },
+    {
+      "collection_id": 3,
+      "name": "Health & Beauty",
+      "source_product_count": 330,
+      "imported_product_count": 330
+    },
+    {
+      "collection_id": 4,
+      "name": "Home & Lifestyle",
+      "source_product_count": 130,
+      "imported_product_count": 130
+    },
+    {
+      "collection_id": 5,
+      "name": "Jewelries & Accessories",
+      "source_product_count": 95,
+      "imported_product_count": 95
+    },
+    {
+      "collection_id": 6,
+      "name": "Kitchen Appliances",
+      "source_product_count": 81,
+      "imported_product_count": 81
+    },
+    {
+      "collection_id": 9,
+      "name": "Sunglass Collection",
+      "source_product_count": 2,
+      "imported_product_count": 2
+    },
+    {
+      "collection_id": 10,
+      "name": "Gifts",
+      "source_product_count": 16,
+      "imported_product_count": 16
+    },
+    {
+      "collection_id": 11,
+      "name": "Men Clothing",
+      "source_product_count": 63,
+      "imported_product_count": 63
+    },
+    {
+      "collection_id": 12,
+      "name": "Men Accessories",
+      "source_product_count": 17,
+      "imported_product_count": 17
+    },
+    {
+      "collection_id": 13,
+      "name": "Consumer Electronics",
+      "source_product_count": 15,
+      "imported_product_count": 15
+    },
+    {
+      "collection_id": 14,
+      "name": "Drop Shoulder T-Shirt",
+      "source_product_count": 2,
+      "imported_product_count": 2
+    },
+    {
+      "collection_id": 15,
+      "name": "Sports & Kids",
+      "source_product_count": 57,
+      "imported_product_count": 57
+    },
+    {
+      "collection_id": 16,
+      "name": "Winter Collection",
+      "source_product_count": 11,
+      "imported_product_count": 11
+    },
+    {
+      "collection_id": 17,
+      "name": "Baby & Mom",
+      "source_product_count": 49,
+      "imported_product_count": 49
+    },
+    {
+      "collection_id": 19,
+      "name": "Soap & Fragrance",
+      "source_product_count": 12,
+      "imported_product_count": 12
+    },
+    {
+      "collection_id": 20,
+      "name": "Print on demand",
+      "source_product_count": 0,
+      "imported_product_count": 0
+    },
+    {
+      "collection_id": 21,
+      "name": "Couple Combo",
+      "source_product_count": 26,
+      "imported_product_count": 26
+    },
+    {
+      "collection_id": 22,
+      "name": "Personal Wellness",
+      "source_product_count": 19,
+      "imported_product_count": 19
+    }
+  ],
+  "pricing_compliance": {
+    "policy": "Strict Original EasyDrop Retail Price",
+    "markup_percentage": 0,
+    "currency": "BDT (৳)",
+    "artificial_original_prices_suppressed": true,
+    "all_products_verified_positive_price": true
+  },
+  "description_compliance": {
+    "policy": "Strict Original Supplier Description Content",
+    "ai_rewriting": "PROHIBITED / DISABLED",
+    "authenticity_score": "100%",
+    "all_descriptions_original": true
+  }
+}
