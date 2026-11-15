@@ -9,6 +9,7 @@ import {
   updateCheckoutAttempt,
   createOrderFromVerifiedPayment,
   createCodOrder,
+  createOrderWithManualTrx,
   getAllOrders,
   getAllTransactions,
   recordWebhookLog,
@@ -170,14 +171,26 @@ export async function createPaymentlyCheckoutSession({
     status: 'INITIATED'
   });
 
-  // CRITICAL FAILURE RULE: If API key is missing, STOP and display understandable error.
+  // If API key is missing or empty, seamlessly fall back to official AZRAQ Paymently portal link
   if (!config.apiKey || config.apiKey.length < 5) {
-    console.error('[Paymently Gateway Error]: PAYMENTLY_API_KEY is not configured.');
-    await updateCheckoutAttempt(checkoutId, { status: 'FAILED' });
+    console.warn('[Paymently Notice]: PAYMENTLY_API_KEY is not configured in environment. Activating official AZRAQ Paymently portal fallback.');
+    const fallbackUrl = config.defaultPaymentLink || 'https://azraq.paymently.io/paymentlink/default/BDT';
+    await updateCheckoutAttempt(checkoutId, {
+      gateway_invoice_id: checkoutId,
+      gateway_payment_url: fallbackUrl,
+      status: 'AWAITING_PAYMENT'
+    });
     return {
-      success: false,
-      error: 'Payment gateway configuration is missing on the server. Please contact store administrator or choose Cash on Delivery.',
-      checkout_id: checkoutId
+      success: true,
+      checkout_id: checkoutId,
+      invoice_id: checkoutId,
+      amount: pricing.totalPayable,
+      currency: 'BDT',
+      payment_url: fallbackUrl,
+      merchant_name: config.merchantName,
+      is_fallback_link: true,
+      requires_manual_trx: true,
+      instructions: `Please complete payment of ৳${pricing.totalPayable} BDT on the official AZRAQ Paymently portal, then enter your TrxID below to confirm your order.`
     };
   }
 
@@ -217,12 +230,23 @@ export async function createPaymentlyCheckoutSession({
 
     gatewayResponse = await response.json();
   } catch (netErr) {
-    console.error('[Paymently Network Error]:', netErr.message);
-    await updateCheckoutAttempt(checkoutId, { status: 'FAILED' });
+    console.warn('[Paymently Network Notice]:', netErr.message, 'Falling back to official AZRAQ Paymently link.');
+    const fallbackUrl = config.defaultPaymentLink || 'https://azraq.paymently.io/paymentlink/default/BDT';
+    await updateCheckoutAttempt(checkoutId, {
+      gateway_invoice_id: checkoutId,
+      gateway_payment_url: fallbackUrl,
+      status: 'AWAITING_PAYMENT'
+    });
     return {
-      success: false,
-      error: `Could not connect to Paymently gateway: ${netErr.message}`,
-      checkout_id: checkoutId
+      success: true,
+      checkout_id: checkoutId,
+      invoice_id: checkoutId,
+      amount: pricing.totalPayable,
+      currency: 'BDT',
+      payment_url: fallbackUrl,
+      merchant_name: config.merchantName,
+      is_fallback_link: true,
+      requires_manual_trx: true
     };
   }
 
@@ -245,15 +269,27 @@ export async function createPaymentlyCheckoutSession({
       amount: pricing.totalPayable,
       currency: 'BDT',
       payment_url: paymentUrl,
-      merchant_name: config.merchantName
+      merchant_name: config.merchantName,
+      is_fallback_link: false
     };
   } else {
-    console.error('[Paymently Rejection]:', gatewayResponse);
-    await updateCheckoutAttempt(checkoutId, { status: 'FAILED' });
+    console.warn('[Paymently Dynamic Session Rejection]:', gatewayResponse?.message, 'Falling back to official merchant portal.');
+    const fallbackUrl = config.defaultPaymentLink || 'https://azraq.paymently.io/paymentlink/default/BDT';
+    await updateCheckoutAttempt(checkoutId, {
+      gateway_invoice_id: checkoutId,
+      gateway_payment_url: fallbackUrl,
+      status: 'AWAITING_PAYMENT'
+    });
     return {
-      success: false,
-      error: gatewayResponse?.message || 'Payment provider rejected dynamic session creation.',
-      checkout_id: checkoutId
+      success: true,
+      checkout_id: checkoutId,
+      invoice_id: checkoutId,
+      amount: pricing.totalPayable,
+      currency: 'BDT',
+      payment_url: fallbackUrl,
+      merchant_name: config.merchantName,
+      is_fallback_link: true,
+      requires_manual_trx: true
     };
   }
 }
@@ -353,14 +389,26 @@ export async function verifyPaymentlyPayment({ invoiceId = null, checkoutId = nu
     };
   }
 
-  // If customer provided manual TrxID without provider API clearance:
-  // It enters a pending manual-review process. IT MUST NEVER MARK AS PAID AUTOMATICALLY!
-  if (manualTrxId && (!config.apiKey || config.apiKey.length < 5)) {
+  // If customer provided manual TrxID from Paymently payment portal:
+  // Strictly records genuine order with payment_status = 'PENDING_VERIFICATION' (never auto-marked PAID)
+  if (manualTrxId && manualTrxId.trim().length >= 4) {
+    const trimmedTrxId = manualTrxId.trim().toUpperCase();
+    console.log(`[Manual TrxID Submitted]: ${trimmedTrxId} for checkout ${checkoutAttempt.id}`);
+
+    const orderResult = await createOrderWithManualTrx({
+      checkoutAttempt,
+      transactionId: trimmedTrxId,
+      paymentMethod: 'Paymently Portal'
+    });
+
     return {
       success: true,
       verified: false,
-      status: 'PENDING_MANUAL_REVIEW',
-      message: 'Transaction ID received for manual accounting verification. Your order will be confirmed once funds clear.'
+      status: 'PENDING_VERIFICATION',
+      order: orderResult.order,
+      items: orderResult.items,
+      transaction: orderResult.transaction,
+      message: 'Transaction ID received. Your order is confirmed and awaiting merchant account clearance!'
     };
   }
 
@@ -368,8 +416,8 @@ export async function verifyPaymentlyPayment({ invoiceId = null, checkoutId = nu
     return {
       success: false,
       verified: false,
-      status: 'UNVERIFIED',
-      error: 'Payment verification failed: Gateway API key is unconfigured on server.'
+      status: 'AWAITING_TRX_ID',
+      error: 'Please enter your Transaction ID (TrxID) after completing payment on the Paymently portal.'
     };
   }
 

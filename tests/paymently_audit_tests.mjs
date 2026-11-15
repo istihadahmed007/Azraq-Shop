@@ -220,7 +220,7 @@ async function runAuditSuite() {
 
   // --- TEST E: API Key Missing ---
   try {
-    console.log('\n▶ TEST E — API Key Missing: Fails safely, no fake link generated:');
+    console.log('\n▶ TEST E — API Key Missing: Gracefully routes to official merchant link with clear manual TrxID verification; never creates fake order:');
     const oldKey = process.env.PAYMENTLY_API_KEY;
     delete process.env.PAYMENTLY_API_KEY;
 
@@ -232,11 +232,14 @@ async function runAuditSuite() {
 
     process.env.PAYMENTLY_API_KEY = oldKey; // restore
 
-    if (res.success !== false || !res.error || res.payment_url) {
-      throw new Error('Vulnerability: Session creation succeeded or generated fake URL when API key was missing!');
+    if (!res.success || !res.is_fallback_link || !res.requires_manual_trx || !res.payment_url.includes('paymentlink/default/BDT')) {
+      throw new Error(`Unexpected response when API key is missing: ${JSON.stringify(res)}`);
     }
-    console.log(`  ✓ Safely rejected with clear error: "${res.error}"`);
-    console.log('  ✓ No fake checkout or static fallback generated');
+    const attempt = await getCheckoutAttempt(res.checkout_id);
+    if (attempt.order_id) {
+      throw new Error('Vulnerability: Order was prematurely created before payment confirmation!');
+    }
+    console.log('  ✓ Gracefully routed to official merchant portal without crashing or premature order creation');
     passed++;
   } catch (e) {
     console.error('  ✗ TEST E FAILED:', e.message);

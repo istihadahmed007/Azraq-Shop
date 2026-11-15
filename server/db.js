@@ -549,6 +549,162 @@ export async function createCodOrder({ checkoutAttempt }) {
 }
 
 /**
+ * 7. Manual TrxID Order Creation (Pending Review)
+ * Created when customer submits genuine TrxID via official merchant payment portal.
+ * Strictly marked PENDING_VERIFICATION (never auto-marked PAID).
+ */
+export async function createOrderWithManualTrx({
+  checkoutAttempt,
+  transactionId,
+  paymentMethod = 'Paymently Portal'
+}) {
+  const now = new Date().toISOString();
+  const orderId = `AZQ-ORD-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
+
+  const orderRecord = {
+    id: orderId,
+    checkout_attempt_id: checkoutAttempt.id,
+    customer_name: checkoutAttempt.customer_name,
+    customer_phone: checkoutAttempt.customer_phone,
+    customer_email: checkoutAttempt.customer_email || null,
+    shipping_address: checkoutAttempt.shipping_address,
+    city: checkoutAttempt.city || 'Dhaka',
+    thana: checkoutAttempt.thana || null,
+    delivery_area: checkoutAttempt.delivery_area || 'inside',
+    notes: checkoutAttempt.notes || null,
+    subtotal: checkoutAttempt.subtotal,
+    delivery_fee: checkoutAttempt.delivery_fee,
+    discount: checkoutAttempt.discount || 0,
+    total: checkoutAttempt.total_payable,
+    promo_code: checkoutAttempt.promo_code || null,
+    payment_method: 'PAYMENTLY',
+    payment_status: 'PENDING_VERIFICATION',
+    order_status: 'Processing',
+    gateway_name: 'PAYMENTLY',
+    gateway_invoice_id: checkoutAttempt.gateway_invoice_id || checkoutAttempt.id,
+    gateway_transaction_id: transactionId,
+    sender_number: checkoutAttempt.customer_phone,
+    verified_at: null,
+    courier_name: null,
+    courier_tracking_id: null,
+    created_at: now,
+    updated_at: now
+  };
+
+  const p = getDbPool();
+  if (p) {
+    const client = await p.connect();
+    try {
+      await client.query('BEGIN');
+
+      await client.query(
+        `INSERT INTO orders (
+          id, checkout_attempt_id, customer_name, customer_phone, customer_email,
+          shipping_address, city, thana, delivery_area, notes, subtotal, delivery_fee,
+          discount, total, promo_code, payment_method, payment_status, order_status,
+          gateway_name, gateway_invoice_id, gateway_transaction_id, sender_number,
+          verified_at, courier_name, courier_tracking_id, created_at, updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27)`,
+        [
+          orderRecord.id, orderRecord.checkout_attempt_id, orderRecord.customer_name, orderRecord.customer_phone,
+          orderRecord.customer_email, orderRecord.shipping_address, orderRecord.city, orderRecord.thana,
+          orderRecord.delivery_area, orderRecord.notes, orderRecord.subtotal, orderRecord.delivery_fee,
+          orderRecord.discount, orderRecord.total, orderRecord.promo_code, orderRecord.payment_method,
+          orderRecord.payment_status, orderRecord.order_status, orderRecord.gateway_name,
+          orderRecord.gateway_invoice_id, orderRecord.gateway_transaction_id, orderRecord.sender_number,
+          null, null, null, orderRecord.created_at, orderRecord.updated_at
+        ]
+      );
+
+      const items = Array.isArray(checkoutAttempt.items_snapshot) ? checkoutAttempt.items_snapshot : [];
+      for (const item of items) {
+        const itemId = `ITEM-${Date.now().toString(36)}-${Math.floor(1000 + Math.random() * 9000)}`;
+        await client.query(
+          `INSERT INTO order_items (id, order_id, product_id, sku, name, variant, unit_price, quantity, total_price, collection_name)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+          [
+            itemId, orderId, item.id || item.product_id, item.sku || null,
+            item.name, item.variant || 'Default', item.unit_price || item.price,
+            item.quantity, (item.unit_price || item.price) * item.quantity,
+            item.collection_name || null
+          ]
+        );
+      }
+
+      const txnId = `TXN-${Date.now().toString(36).toUpperCase()}`;
+      await client.query(
+        `INSERT INTO payment_transactions (
+          id, order_id, checkout_attempt_id, gateway_name, gateway_invoice_id,
+          transaction_id, payment_method, currency, amount, status, verified_at, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+        [
+          txnId, orderId, checkoutAttempt.id, 'PAYMENTLY',
+          orderRecord.gateway_invoice_id, transactionId, paymentMethod,
+          'BDT', checkoutAttempt.total_payable, 'PENDING_VERIFICATION', null, now
+        ]
+      );
+
+      await client.query(
+        `UPDATE checkout_attempts SET status = 'PENDING_VERIFICATION', order_id = $2, updated_at = $3 WHERE id = $1`,
+        [checkoutAttempt.id, orderId, now]
+      );
+
+      await client.query('COMMIT');
+
+      orderRecord.items = items;
+      return {
+        order: orderRecord,
+        items,
+        transaction: {
+          id: txnId,
+          order_id: orderId,
+          transaction_id: transactionId,
+          amount: checkoutAttempt.total_payable,
+          status: 'PENDING_VERIFICATION'
+        }
+      };
+    } catch (e) {
+      await client.query('ROLLBACK');
+      console.error('[DB Error createOrderWithManualTrx]:', e.message);
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
+
+  // Fallback in-memory
+  const items = Array.isArray(checkoutAttempt.items_snapshot) ? checkoutAttempt.items_snapshot : [];
+  orderRecord.items = items;
+  memoryStore.orders.set(orderId, orderRecord);
+
+  const txnRecord = {
+    id: `TXN-${Date.now().toString(36).toUpperCase()}`,
+    order_id: orderId,
+    checkout_attempt_id: checkoutAttempt.id,
+    gateway_name: 'PAYMENTLY',
+    gateway_invoice_id: orderRecord.gateway_invoice_id,
+    transaction_id: transactionId,
+    payment_method: paymentMethod,
+    currency: 'BDT',
+    amount: checkoutAttempt.total_payable,
+    status: 'PENDING_VERIFICATION',
+    created_at: now
+  };
+  memoryStore.payment_transactions.set(txnRecord.id, txnRecord);
+
+  checkoutAttempt.status = 'PENDING_VERIFICATION';
+  checkoutAttempt.order_id = orderId;
+  checkoutAttempt.updated_at = now;
+  memoryStore.checkout_attempts.set(checkoutAttempt.id, checkoutAttempt);
+
+  return {
+    order: orderRecord,
+    items,
+    transaction: txnRecord
+  };
+}
+
+/**
  * 7. Query All Orders (Genuine Records Only)
  */
 export async function getAllOrders() {

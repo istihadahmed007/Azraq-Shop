@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { 
   X, CheckCircle2, ShieldCheck, ArrowRight, Banknote, 
-  ExternalLink, RefreshCw, AlertCircle, Clock, ChevronRight
+  ExternalLink, RefreshCw, AlertCircle, Clock, ChevronRight,
+  Copy, Check
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useShop } from '../context/ShopContext';
@@ -47,6 +48,8 @@ export default function CheckoutModal() {
   const [verifiedTransaction, setVerifiedTransaction] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [manualTrxId, setManualTrxId] = useState('');
+  const [isCopiedAmount, setIsCopiedAmount] = useState(false);
 
   if (!isCheckoutOpen) return null;
 
@@ -54,8 +57,55 @@ export default function CheckoutModal() {
     setIsCheckoutOpen(false);
     setConfirmedOrder(null);
     setPaymentSession(null);
+    setManualTrxId('');
     setCheckoutStep('form');
     setErrorMessage('');
+  };
+
+  const handleCopyAmount = () => {
+    const amt = String(paymentSession?.amount || cartTotal);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(amt);
+    }
+    setIsCopiedAmount(true);
+    showToast(t("Amount copied to clipboard!", "টাকার পরিমাণ কপি করা হয়েছে!"), 'success');
+    setTimeout(() => setIsCopiedAmount(false), 2000);
+  };
+
+  const handleDirectCod = async () => {
+    setIsSubmitting(true);
+    setErrorMessage('');
+    try {
+      const res = await createCheckoutSession({
+        customer: {
+          name: fullName || 'Valued Customer',
+          phone: phone || '01700000000',
+          address: address || 'Dhaka',
+          city,
+          thana
+        },
+        items: cart,
+        deliveryArea,
+        promoCode: appliedPromo?.code || null,
+        paymentMethod: 'COD',
+        notes
+      });
+      setIsSubmitting(false);
+      if (res.order) {
+        recordConfirmedOrder(res.order);
+        setConfirmedOrder(res.order);
+        setCheckoutStep('success');
+        triggerConfetti();
+        showToast(`Order ${res.order.id} confirmed with Cash on Delivery!`, 'success');
+      } else {
+        setErrorMessage(res.error || 'Failed to place Cash on Delivery order.');
+        setCheckoutStep('failed');
+      }
+    } catch (err) {
+      setIsSubmitting(false);
+      setErrorMessage(err.message || 'Failed to place Cash on Delivery order.');
+      setCheckoutStep('failed');
+    }
   };
 
   // Submit checkout & initiate payment
@@ -162,30 +212,39 @@ export default function CheckoutModal() {
     } catch (err) {}
   };
 
-  // Verify Payment Status with Paymently Server API
-  const handleVerifyPayment = async () => {
+  // Verify Payment Status with Paymently Server API or submit manual TrxID
+  const handleVerifyPayment = async (overrideTrxId = null) => {
     if (!paymentSession) return;
     setIsSubmitting(true);
     setCheckoutStep('verifying');
     setErrorMessage('');
 
+    const trxToSubmit = typeof overrideTrxId === 'string' ? overrideTrxId : manualTrxId;
+
     try {
       const res = await verifyPaymentStatus({
         invoiceId: paymentSession.invoice_id,
-        checkoutId: paymentSession.checkout_id
+        checkoutId: paymentSession.checkout_id,
+        manualTrxId: trxToSubmit ? trxToSubmit.trim() : null
       });
 
       setIsSubmitting(false);
 
-      if (res.verified && res.status === 'PAID' && res.order) {
+      if (res.order && (res.status === 'PAID' || res.status === 'PENDING_VERIFICATION' || res.verified)) {
         recordConfirmedOrder(res.order);
         setConfirmedOrder(res.order);
         setVerifiedTransaction(res.transaction);
         setCheckoutStep('success');
         triggerConfetti();
-        showToast(t("Payment verified successfully via Paymently!", "পেমেন্ট সফলভাবে ভেরিফাই হয়েছে!"), 'success');
-      } else if (res.status === 'PENDING' || res.status === 'AWAITING_PAYMENT') {
-        setCheckoutStep('pending');
+        showToast(
+          res.status === 'PAID' 
+            ? t("Payment verified successfully via Paymently!", "পেমেন্ট সফলভাবে ভেরিফাই হয়েছে!")
+            : t("Order confirmed! Payment recorded for verification.", "অর্ডার কনফার্ম হয়েছে!"),
+          'success'
+        );
+      } else if (res.status === 'PENDING' || res.status === 'AWAITING_PAYMENT' || res.status === 'AWAITING_TRX_ID') {
+        if (res.error) showToast(res.error, 'error');
+        setCheckoutStep('gateway_redirect');
       } else {
         setErrorMessage(res.error || res.message || t("Payment verification was not completed. Please try again.", "পেমেন্ট ভেরিফিকেশন সম্পন্ন হয়নি।"));
         setCheckoutStep('failed');
@@ -479,63 +538,108 @@ export default function CheckoutModal() {
 
         {/* STEP 2: Gateway Redirecting / Awaiting Payment */}
         {checkoutStep === 'gateway_redirect' && (
-          <div className="p-8 sm:p-10 text-center space-y-6">
+          <div className="p-6 sm:p-8 text-center space-y-5 overflow-y-auto">
             
-            <div className="w-16 h-16 rounded-full bg-[#EBF6FF] text-[#0877C9] flex items-center justify-center mx-auto shadow-inner animate-pulse">
-              <ExternalLink className="w-8 h-8" />
+            <div className="w-14 h-14 rounded-full bg-[#EBF6FF] text-[#0877C9] flex items-center justify-center mx-auto shadow-inner animate-pulse">
+              <ExternalLink className="w-7 h-7" />
             </div>
 
-            <div className="space-y-2 max-w-md mx-auto">
-              <span className="text-xs font-mono font-bold tracking-widest text-[#0877C9] uppercase">
-                {t("SECURE GATEWAY REDIRECT", "পেমেন্ট গেটওয়ে পেজ")}
+            <div className="space-y-1.5 max-w-md mx-auto">
+              <span className="text-[11px] font-mono font-bold tracking-widest text-[#0877C9] uppercase">
+                {paymentSession?.is_fallback_link ? t("OFFICIAL MERCHANT PORTAL", "অফিসিয়াল পেমেন্ট পোর্টাল") : t("SECURE GATEWAY CHECKOUT", "নিরাপদ পেমেন্ট গেটওয়ে")}
               </span>
               <h3 className="text-xl sm:text-2xl font-black text-[#062B4F]">
                 {t("Complete Payment on Paymently", "পেমেন্ট সম্পন্ন করুন")}
               </h3>
               <p className="text-xs text-[#062B4F]/70 leading-relaxed">
                 {t(
-                  "A secure Paymently payment page has been opened. Complete your bKash, Nagad or Card checkout of ৳",
-                  "একটি নিরাপদ পেমেন্ট পেইজ ওপেন হয়েছে। আপনার বিকাশ, নগদ বা কার্ডের মাধ্যমে ৳"
+                  "Pay securely using bKash, Nagad, Rocket, or Cards via official AZRAQ Paymently portal.",
+                  "বিকাশ, নগদ, রকেট বা কার্ডের মাধ্যমে পেমেন্ট সম্পন্ন করুন।"
                 )}
-                <strong>{paymentSession?.amount?.toLocaleString() || cartTotal.toLocaleString()} BDT</strong>.
               </p>
             </div>
 
-            {/* Direct Open Link in case popup was blocked */}
-            <div className="p-4 rounded-xl bg-[#F8FCFF] border border-[#D9F0FF] max-w-md mx-auto text-xs space-y-3">
-              <div className="flex items-center justify-between text-gray-500">
-                <span>Invoice: {paymentSession?.invoice_id}</span>
-                <span className="font-bold text-[#062B4F]">৳{paymentSession?.amount?.toLocaleString()} BDT</span>
+            {/* Amount & Direct Link Card */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-[#F8FCFF] to-[#EBF6FF] border border-[#69C5F5]/40 max-w-md mx-auto text-xs space-y-3.5 shadow-sm text-left">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[11px] text-[#062B4F]/60 block">{t("Payable Total", "মোট প্রদেয়")}</span>
+                  <span className="text-xl font-black text-[#0877C9]">৳{paymentSession?.amount?.toLocaleString() || cartTotal.toLocaleString()} BDT</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyAmount}
+                  className="px-3 py-1.5 rounded-lg bg-white border border-[#D9F0FF] hover:border-[#0877C9] text-xs font-bold text-[#062B4F] flex items-center gap-1.5 shadow-xs transition-colors"
+                >
+                  {isCopiedAmount ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-[#0877C9]" />}
+                  <span>{isCopiedAmount ? t("Copied!", "কপি হয়েছে!") : t("Copy Amount", "টাকা কপি করুন")}</span>
+                </button>
               </div>
+
+              <div className="pt-2 border-t border-[#D9F0FF]/60 flex items-center justify-between text-[11px] text-[#062B4F]/70">
+                <span>{t("Merchant", "মার্চেন্ট")}: <strong>AZRAQ (azraq.paymently.io)</strong></span>
+                <span className="font-mono text-[10px] text-gray-500">{paymentSession?.invoice_id}</span>
+              </div>
+
               <a
-                href={paymentSession?.payment_url}
+                href={paymentSession?.payment_url || 'https://azraq.paymently.io/paymentlink/default/BDT'}
                 target="_blank"
                 rel="noreferrer"
-                className="w-full py-2.5 px-4 rounded-lg bg-[#0877C9] hover:bg-[#062B4F] text-white font-bold flex items-center justify-center gap-2 transition-colors"
+                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#0877C9] to-[#062B4F] hover:from-[#062B4F] hover:to-[#0877C9] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all transform hover:scale-[1.01]"
               >
-                <span>{t("Open Paymently Checkout Page", "পেমেন্ট পেইজ ওপেন করুন")}</span>
+                <span>{t("Open Official Paymently Page", "পেমেন্টলি পেইজ ওপেন করুন")}</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>
 
-            {/* Verification Button */}
-            <div className="max-w-md mx-auto space-y-3 pt-2">
-              <button
-                onClick={handleVerifyPayment}
-                disabled={isSubmitting}
-                className="w-full py-3 px-6 rounded-xl bg-[#062B4F] hover:bg-[#0877C9] text-white text-xs font-bold transition-colors flex items-center justify-center gap-2 shadow-sm"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${isSubmitting ? 'animate-spin' : ''}`} />
-                <span>{t("I Have Completed Payment — Verify Now", "পেমেন্ট সম্পন্ন করেছি — ভেরিফাই করুন")}</span>
-              </button>
+            {/* TrxID Submission for Immediate Confirmation */}
+            <div className="p-4 rounded-2xl bg-white border border-gray-200 max-w-md mx-auto space-y-3 text-left">
+              <label className="block text-xs font-bold text-[#062B4F]">
+                {t("Enter bKash / Nagad Transaction ID (TrxID):", "বিকাশ / নগদ ট্রানজেকশন আইডি (TrxID) দিন:")}
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={manualTrxId}
+                  onChange={(e) => setManualTrxId(e.target.value.toUpperCase())}
+                  placeholder="e.g. 9KA02194 or TRX-12345"
+                  className="flex-1 px-3.5 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0877C9] font-mono text-xs uppercase"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleVerifyPayment(manualTrxId)}
+                  disabled={isSubmitting || manualTrxId.trim().length < 4}
+                  className="px-4 py-2 rounded-xl bg-[#062B4F] hover:bg-[#0877C9] text-white text-xs font-bold transition-colors disabled:opacity-40 whitespace-nowrap shadow-sm"
+                >
+                  {isSubmitting ? <RefreshCw className="w-3.5 h-3.5 animate-spin mx-auto" /> : t("Confirm Order", "অর্ডার কনফার্ম করুন")}
+                </button>
+              </div>
+              <p className="text-[10px] text-gray-500">
+                {t(
+                  "After completing your payment on Paymently, copy the TrxID from your SMS/app and paste it above.",
+                  "পেমেন্টলি পেইজে পেমেন্ট শেষ করে SMS থেকে প্রাপ্ত TrxID টি এখানে দিয়ে কনফার্ম করুন।"
+                )}
+              </p>
             </div>
 
-            <div className="pt-4 border-t border-gray-100 flex justify-center gap-3">
+            {/* Alternative: Switch to Cash on Delivery */}
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 text-xs">
               <button
-                onClick={() => setCheckoutStep('form')}
-                className="text-xs text-gray-500 hover:text-[#062B4F] font-semibold"
+                type="button"
+                onClick={handleDirectCod}
+                disabled={isSubmitting}
+                className="text-emerald-700 font-bold hover:underline flex items-center gap-1.5"
               >
-                ← {t("Change Payment Method", "পেমেন্ট মাধ্যম পরিবর্তন করুন")}
+                <Banknote className="w-3.5 h-3.5" />
+                <span>{t("Or Switch to Cash on Delivery", "অথবা ক্যাশ অন ডেলিভারি বেছে নিন")}</span>
+              </button>
+              <span className="text-gray-300 hidden sm:inline">•</span>
+              <button
+                type="button"
+                onClick={() => setCheckoutStep('form')}
+                className="text-gray-500 hover:text-[#062B4F] font-semibold"
+              >
+                ← {t("Change Details", "তথ্য পরিবর্তন করুন")}
               </button>
             </div>
 
@@ -673,12 +777,12 @@ export default function CheckoutModal() {
 
         {/* STEP 6: FAILED / CANCELLED PAYMENT VIEW */}
         {checkoutStep === 'failed' && (
-          <div className="p-8 sm:p-10 text-center space-y-6">
-            <div className="w-16 h-16 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
-              <AlertCircle className="w-10 h-10" />
+          <div className="p-8 sm:p-10 text-center space-y-5">
+            <div className="w-14 h-14 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
+              <AlertCircle className="w-8 h-8" />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <h3 className="text-xl sm:text-2xl font-black text-[#062B4F]">
                 {t("Payment Was Not Completed", "পেমেন্ট সম্পন্ন হয়নি")}
               </h3>
@@ -687,19 +791,31 @@ export default function CheckoutModal() {
               </p>
             </div>
 
-            <div className="flex justify-center gap-3">
+            {/* Instant Alternative Actions: 1-Click COD or Retry */}
+            <div className="flex flex-col gap-2.5 max-w-md mx-auto pt-2">
               <button
-                onClick={() => setCheckoutStep('form')}
-                className="px-6 py-2.5 rounded-full bg-[#062B4F] text-white text-xs font-bold hover:bg-[#0877C9] transition-colors"
+                onClick={handleDirectCod}
+                disabled={isSubmitting}
+                className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-colors"
               >
-                {t("Retry Checkout / Choose COD", "পুনরায় চেষ্টা করুন")}
+                <Banknote className="w-4 h-4" />
+                <span>{t("Switch to Cash on Delivery (COD) — Instant Confirmation", "ক্যাশ অন ডেলিভারিতে অর্ডার কনফার্ম করুন")}</span>
               </button>
-              <button
-                onClick={handleClose}
-                className="px-6 py-2.5 rounded-full bg-gray-100 text-[#062B4F] text-xs font-bold hover:bg-gray-200 transition-colors"
-              >
-                {t("Close", "বন্ধ")}
-              </button>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setCheckoutStep('form')}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-[#062B4F] hover:bg-[#0877C9] text-white text-xs font-bold transition-colors"
+                >
+                  {t("Retry Checkout", "পুনরায় চেষ্টা করুন")}
+                </button>
+                <button
+                  onClick={handleClose}
+                  className="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs font-bold transition-colors"
+                >
+                  {t("Close", "বন্ধ")}
+                </button>
+              </div>
             </div>
           </div>
         )}
