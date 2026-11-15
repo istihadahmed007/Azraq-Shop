@@ -9,6 +9,7 @@ import {
   getPaymentlyConfig 
 } from './paymentlyService.js';
 import { getAllTransactions, getAllOrders } from './db.js';
+import orderTrackingHandler from '../api/orders/track.js';
 
 export async function handlePaymentRoutes(req, res) {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost:3000'}`);
@@ -60,6 +61,28 @@ export async function handlePaymentRoutes(req, res) {
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify({ success: true, orders }));
     return true;
+  }
+
+  // 3b. Customer Order Tracking (GET or POST /api/orders/track)
+  if (pathname === '/api/orders/track') {
+    if (method === 'GET') {
+      req.query = Object.fromEntries(url.searchParams);
+      await orderTrackingHandler(req, res);
+      return true;
+    }
+    if (method === 'POST') {
+      let body = '';
+      req.on('data', chunk => { body += chunk; });
+      req.on('end', async () => {
+        try {
+          req.body = JSON.parse(body || '{}');
+        } catch (e) {
+          req.body = {};
+        }
+        await orderTrackingHandler(req, res);
+      });
+      return true;
+    }
   }
 
   // 4. POST /api/payments/create - Create verified checkout session (or COD)

@@ -261,6 +261,7 @@ CREATE INDEX IF NOT EXISTS idx_chk_phone ON checkout_attempts(customer_phone);
 -- 14. Customer Orders (Created strictly after verified payment or confirmed COD)
 CREATE TABLE IF NOT EXISTS orders (
     id VARCHAR(50) PRIMARY KEY, -- e.g. 'AZQ-ORD-92101'
+    tracking_token VARCHAR(100) UNIQUE NOT NULL, -- Secure unguessable token for tracking authorization
     checkout_attempt_id VARCHAR(100) REFERENCES checkout_attempts(id) ON DELETE SET NULL,
     customer_name VARCHAR(255) NOT NULL,
     customer_phone VARCHAR(50) NOT NULL,
@@ -270,14 +271,16 @@ CREATE TABLE IF NOT EXISTS orders (
     thana VARCHAR(100),
     delivery_area VARCHAR(20) DEFAULT 'inside',
     notes TEXT,
+    currency VARCHAR(10) DEFAULT 'BDT',
     subtotal NUMERIC(12, 2) NOT NULL,
     delivery_fee NUMERIC(10, 2) NOT NULL,
     discount NUMERIC(10, 2) DEFAULT 0.00,
     total NUMERIC(12, 2) NOT NULL,
     promo_code VARCHAR(50),
     payment_method VARCHAR(50) NOT NULL, -- 'PAYMENTLY', 'COD'
-    payment_status VARCHAR(50) NOT NULL, -- 'PAID', 'PENDING_COD'
-    order_status VARCHAR(50) DEFAULT 'Processing', -- 'Processing', 'Confirmed', 'Dispatched', 'Delivered', 'Cancelled'
+    payment_status VARCHAR(50) NOT NULL, -- 'PAID', 'PENDING_COD', 'PENDING_VERIFICATION'
+    fulfillment_status VARCHAR(50) DEFAULT 'Processing', -- 'Processing', 'Confirmed', 'Dispatched', 'Delivered', 'Cancelled'
+    order_status VARCHAR(50) DEFAULT 'Processing', -- Kept in sync with fulfillment_status
     gateway_name VARCHAR(50) DEFAULT 'PAYMENTLY',
     gateway_invoice_id VARCHAR(100),
     gateway_transaction_id VARCHAR(100), -- Authentic provider transaction reference (TrxID)
@@ -285,14 +288,34 @@ CREATE TABLE IF NOT EXISTS orders (
     verified_at TIMESTAMPTZ,
     courier_name VARCHAR(100),
     courier_tracking_id VARCHAR(100),
+    dispatched_at TIMESTAMPTZ,
+    delivered_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(order_status);
+CREATE INDEX IF NOT EXISTS idx_orders_fulfillment ON orders(fulfillment_status);
 CREATE INDEX IF NOT EXISTS idx_orders_pay_status ON orders(payment_status);
+CREATE INDEX IF NOT EXISTS idx_orders_tracking_token ON orders(tracking_token);
+CREATE INDEX IF NOT EXISTS idx_orders_phone ON orders(customer_phone);
 CREATE INDEX IF NOT EXISTS idx_orders_trx ON orders(gateway_transaction_id);
 CREATE INDEX IF NOT EXISTS idx_orders_invoice ON orders(gateway_invoice_id);
+
+-- 14b. Append-Only Order Status Audit History
+CREATE TABLE IF NOT EXISTS order_status_history (
+    id VARCHAR(100) PRIMARY KEY,
+    order_id VARCHAR(50) NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    status_type VARCHAR(20) NOT NULL, -- 'fulfillment' | 'payment'
+    previous_status VARCHAR(50),
+    new_status VARCHAR(50) NOT NULL,
+    actor_source VARCHAR(100) DEFAULT 'SYSTEM',
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_osh_order_id ON order_status_history(order_id);
+CREATE INDEX IF NOT EXISTS idx_osh_created ON order_status_history(created_at);
 
 -- 15. Order Items
 CREATE TABLE IF NOT EXISTS order_items (

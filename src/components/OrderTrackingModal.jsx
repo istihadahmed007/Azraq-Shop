@@ -1,47 +1,108 @@
 import React, { useState } from 'react';
-import { X, Search, CheckCircle2, Clock, Truck, Package, Phone, Headphones } from 'lucide-react';
+import { X, Search, CheckCircle2, Clock, Truck, Package, ShieldCheck, Headphones, Loader2, KeyRound } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 
 export default function OrderTrackingModal() {
-  const { orders, isTrackingOpen, setIsTrackingOpen, t } = useShop();
+  const { isTrackingOpen, setIsTrackingOpen, t } = useShop();
 
-  const [searchCode, setSearchCode] = useState('');
-  const [activeOrder, setActiveOrder] = useState(() => orders[0] || null);
+  const [orderReference, setOrderReference] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [activeOrder, setActiveOrder] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchError, setSearchError] = useState('');
 
   if (!isTrackingOpen) return null;
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     setSearchError('');
-    const query = searchCode.trim().toLowerCase();
-    if (!query) {
-      setSearchError(t("Please enter your Order ID or phone number.", "অনুগ্রহ করে আপনার অর্ডার আইডি বা ফোন নম্বর দিন।"));
+
+    const cleanOrderRef = orderReference.trim();
+    const cleanPhone = customerPhone.trim();
+
+    if (!cleanOrderRef) {
+      setSearchError(t("Please enter your Order Reference (e.g. AZQ-ORD-...).", "অনুগ্রহ করে আপনার অর্ডার আইডি (যেমন AZQ-ORD-...) দিন।"));
       return;
     }
-    const found = orders.find(
-      o => o.id?.toLowerCase().includes(query) || (o.customer && o.customer.phone?.includes(query))
-    );
-    if (found) {
-      setActiveOrder(found);
-      setSearchError('');
-    } else {
-      setSearchError(
-        t(
-          "No order found with that ID or Phone number. Please check your order confirmation details or contact customer care.",
-          "এই আইডি বা ফোন নম্বরে কোনো অর্ডার পাওয়া যায়নি। অনুগ্রহ করে সঠিক তথ্য দিন অথবা কাস্টমার কেয়ারে যোগাযোগ করুন।"
-        )
-      );
+
+    if (!cleanPhone) {
+      setSearchError(t("Customer phone number or tracking token is required for security verification.", "নিরাপত্তা নিশ্চিত করতে অনুগ্রহ করে গ্রাহকের ফোন নম্বর বা ট্র্যাকিং টোকেন দিন।"));
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Call backend secure order tracking API
+      const isToken = cleanPhone.startsWith('trk_');
+      const payload = {
+        orderId: cleanOrderRef,
+        phone: isToken ? '' : cleanPhone,
+        trackingToken: isToken ? cleanPhone : ''
+      };
+
+      const res = await fetch('/api/orders/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        if (data.code === 'RATE_LIMITED') {
+          setSearchError(t("Too many tracking attempts. Please wait 5 minutes before trying again.", "অতিরিক্ত ট্র্যাকিং প্রচেষ্টার কারণে সাময়িক বন্ধ। ৫ মিনিট পর আবার চেষ্টা করুন।"));
+        } else if (data.code === 'FORBIDDEN') {
+          setSearchError(t("Security Verification Failed: The phone number or token does not match this order reference.", "নিরাপত্তা যাচাই ব্যর্থ: এই ফোন নম্বর বা টোকেনের সাথে অর্ডার আইডির মিল নেই।"));
+        } else if (data.code === 'ORDER_NOT_FOUND') {
+          setSearchError(t("No order found with reference " + cleanOrderRef + ". Please check your receipt.", cleanOrderRef + " নম্বরে কোনো অর্ডার খুঁজে পাওয়া যায়নি।"));
+        } else {
+          setSearchError(data.error || t("Unable to locate order. Please check details or contact customer care.", "অর্ডারের তথ্য পাওয়া যায়নি। অনুগ্রহ করে কাস্টমার সার্ভিসে যোগাযোগ করুন।"));
+        }
+        setActiveOrder(null);
+      } else {
+        setActiveOrder(data.order);
+        setSearchError('');
+      }
+    } catch (err) {
+      setSearchError(t("Connection error. Please check your network and try again.", "নেটওয়ার্ক ত্রুটি। অনুগ্রহ করে সংযোগ পরীক্ষা করে পুনরায় চেষ্টা করুন।"));
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const steps = [
-    { title: t("Order Placed", "অর্ডার গৃহীত"), desc: "Order details verified & logged into AZRAQ system", status: "completed" },
-    { title: t("Quality Inspected", "মান যাচাই"), desc: "Product checked by AZRAQ QC inspection team", status: "completed" },
-    { title: t("Dispatched to Courier", "কুরিয়ারে হস্তান্তর"), desc: "Handed over to Steadfast Courier BD", status: activeOrder?.status === 'Processing' || activeOrder?.order_status === 'Processing' ? 'current' : 'completed' },
-    { title: t("Out for Delivery", "ডেলিভারির পথে"), desc: "Rider on the way to recipient address", status: activeOrder?.status === 'Delivered' || activeOrder?.order_status === 'Delivered' ? 'completed' : 'current' },
-    { title: t("Delivered & Inspected", "ডেলিভারি সম্পন্ন"), desc: "Payment received and parcel handed to customer", status: activeOrder?.status === 'Delivered' || activeOrder?.order_status === 'Delivered' ? 'completed' : 'upcoming' },
-  ];
+  const getFulfillmentMilestones = (order) => {
+    const fStatus = order?.fulfillment_status || order?.order_status || 'Processing';
+    const isDispatched = fStatus === 'Dispatched' || fStatus === 'Delivered';
+    const isDelivered = fStatus === 'Delivered';
+
+    return [
+      {
+        title: t("Order Registered", "অর্ডার গৃহীত"),
+        desc: t("Order verified & logged into AZRAQ logistics", "অর্ডারের তথ্য আজরাক লজিস্টিকসে নিবন্ধিত"),
+        status: "completed",
+        time: order?.created_at ? new Date(order.created_at).toLocaleDateString('en-GB') : null
+      },
+      {
+        title: t("Quality Inspection & Packaging", "মান যাচাই ও প্যাকেজিং"),
+        desc: t("Inspected by AZRAQ QC inspection team in Dhaka", "আজরাক কিউসি টিম দ্বারা পণ্য যাচাইকৃত"),
+        status: isDispatched || isDelivered ? "completed" : "current"
+      },
+      {
+        title: t("Dispatched to Courier", "কুরিয়ারে হস্তান্তর"),
+        desc: order?.courier_name ? `${order.courier_name} (${order.courier_tracking_id || 'Assigned'})` : t("Steadfast Courier BD logistics partner", "স্টেডফাস্ট কুরিয়ার পার্টনার"),
+        status: isDelivered ? "completed" : isDispatched ? "current" : "upcoming",
+        time: order?.dispatched_at ? new Date(order.dispatched_at).toLocaleDateString('en-GB') : null
+      },
+      {
+        title: t("Delivered & Handed Over", "ডেলিভারি সম্পন্ন"),
+        desc: t("Parcel inspected and safely delivered to customer", "গ্রাহকের নিকট পার্সেল সফলভাবে হস্তান্তর"),
+        status: isDelivered ? "completed" : "upcoming",
+        time: order?.delivered_at ? new Date(order.delivered_at).toLocaleDateString('en-GB') : null
+      }
+    ];
+  };
+
+  const milestones = activeOrder ? getFulfillmentMilestones(activeOrder) : [];
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-[#062B4F]/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
@@ -52,7 +113,7 @@ export default function OrderTrackingModal() {
         {/* Close Button */}
         <button
           onClick={() => setIsTrackingOpen(false)}
-          className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-[#062B4F] flex items-center justify-center transition-colors"
+          className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center transition-colors"
           aria-label="Close modal"
         >
           <X className="w-4 h-4" />
@@ -60,43 +121,73 @@ export default function OrderTrackingModal() {
 
         {/* Header */}
         <div className="p-6 bg-[#062B4F] text-white">
-          <span className="text-[10px] font-mono tracking-widest text-[#50DDF0] uppercase">
-            {t("AZRAQ CONCIERGE & LOGISTICS", "আজরাক লজিস্টিকস ও ট্র্যাকিং")}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-mono tracking-widest text-[#50DDF0] uppercase font-bold">
+              {t("AZRAQ CONCIERGE & LOGISTICS", "আজরাক লজিস্টিকস ও সিকিউর ট্র্যাকিং")}
+            </span>
+            <ShieldCheck className="w-3.5 h-3.5 text-[#50DDF0]" />
+          </div>
           <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-1">
-            {t("Track Your Order", "অর্ডারের লাইভ অবস্থান")}
+            {t("Secure Order Tracking", "অর্ডারের লাইভ অবস্থান")}
           </h2>
           <p className="text-xs text-white/70 mt-1">
-            {t("Enter your AZRAQ Order ID (e.g. AZQ-ORD-...) or 11-digit mobile number.", "আপনার ট্র্যাকিং আইডি অথবা ফোন নম্বর দিন।")}
+            {t("To protect customer privacy, enter your Order ID along with your phone number or tracking token.", "গ্রাহকের তথ্য সুরক্ষায় অনুগ্রহ করে অর্ডার আইডি ও ফোন নম্বর দিন।")}
           </p>
 
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} className="mt-4 flex gap-2">
-            <div className="relative flex-1">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="e.g. AZQ-ORD-MWI... or 018..."
-                value={searchCode}
-                onChange={(e) => {
-                  setSearchCode(e.target.value);
-                  if (searchError) setSearchError('');
-                }}
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-white/10 text-white text-xs placeholder:text-white/40 border border-white/20 focus:outline-none focus:border-[#50DDF0]"
-              />
+          {/* Secure Search Form */}
+          <form onSubmit={handleSearch} className="mt-4 space-y-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="relative">
+                <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Order ID (e.g. AZQ-ORD-...)"
+                  value={orderReference}
+                  onChange={(e) => {
+                    setOrderReference(e.target.value);
+                    if (searchError) setSearchError('');
+                  }}
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-white/10 text-white text-xs placeholder:text-white/40 border border-white/20 focus:outline-none focus:border-[#50DDF0]"
+                />
+              </div>
+
+              <div className="relative">
+                <KeyRound className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Mobile (018...) or Token"
+                  value={customerPhone}
+                  onChange={(e) => {
+                    setCustomerPhone(e.target.value);
+                    if (searchError) setSearchError('');
+                  }}
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-white/10 text-white text-xs placeholder:text-white/40 border border-white/20 focus:outline-none focus:border-[#50DDF0]"
+                />
+              </div>
             </div>
-            <button
-              type="submit"
-              className="px-5 py-2.5 rounded-xl bg-[#50DDF0] text-[#062B4F] text-xs font-black hover:bg-[#69C5F5] transition-colors"
-            >
-              {t("Track", "ট্র্যাক")}
-            </button>
+
+            <div className="flex justify-end pt-1">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#50DDF0] text-[#062B4F] text-xs font-black hover:bg-[#69C5F5] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>{t("Verifying...", "যাচাই করা হচ্ছে...")}</span>
+                  </>
+                ) : (
+                  <span>{t("Track Securely", "নিরাপদে ট্র্যাক করুন")}</span>
+                )}
+              </button>
+            </div>
           </form>
 
           {searchError && (
-            <p className="mt-2 text-xs text-rose-300 font-medium">
+            <div className="mt-3 p-2.5 rounded-xl bg-rose-500/20 border border-rose-400/30 text-rose-200 text-xs font-medium">
               {searchError}
-            </p>
+            </div>
           )}
         </div>
 
@@ -110,17 +201,23 @@ export default function OrderTrackingModal() {
                 <span className="text-[10px] font-mono uppercase text-[#062B4F]/50">Order Reference</span>
                 <p className="text-base font-mono font-black text-[#062B4F]">{activeOrder.id}</p>
                 <p className="text-xs text-[#062B4F]/60">
-                  {activeOrder.customer?.name || activeOrder.customer_name} • {activeOrder.customer?.phone || activeOrder.customer_phone}
+                  {activeOrder.customer_name_masked || 'Customer'} • {activeOrder.customer_phone_masked || '018****'}
                 </p>
+                {activeOrder.city && (
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Destination: {activeOrder.city} ({activeOrder.delivery_area === 'inside' ? 'Inside Dhaka' : 'Outside Dhaka'})
+                  </p>
+                )}
               </div>
 
               <div className="text-right">
-                <span className="text-[10px] font-mono uppercase text-[#062B4F]/50">Courier Partner</span>
-                <p className="text-xs font-bold text-[#062B4F]">{activeOrder.courierTracking || activeOrder.courier_name || 'Steadfast BD'}</p>
+                <span className="text-[10px] font-mono uppercase text-[#062B4F]/50">Statuses</span>
                 <div className="flex items-center gap-1.5 justify-end mt-1">
+                  {/* Fulfillment Status */}
                   <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#D9F0FF] text-[#0877C9] text-[10px] font-bold">
-                    {activeOrder.order_status || activeOrder.status || 'Processing'}
+                    Fulfillment: {activeOrder.fulfillment_status || 'Processing'}
                   </span>
+                  {/* Payment Status */}
                   <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                     activeOrder.payment_status === 'PAID'
                       ? 'bg-emerald-100 text-emerald-700'
@@ -128,9 +225,14 @@ export default function OrderTrackingModal() {
                       ? 'bg-amber-100 text-amber-700'
                       : 'bg-blue-100 text-blue-700'
                   }`}>
-                    {activeOrder.payment_status || 'CONFIRMED'}
+                    Payment: {activeOrder.payment_status || 'PENDING'}
                   </span>
                 </div>
+                {activeOrder.courier_name && (
+                  <p className="text-[11px] font-mono text-slate-500 mt-1">
+                    Courier: {activeOrder.courier_name} {activeOrder.courier_tracking_id ? `(#${activeOrder.courier_tracking_id})` : ''}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -141,7 +243,7 @@ export default function OrderTrackingModal() {
               </h4>
 
               <div className="space-y-4 relative before:absolute before:left-3.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-[#D9F0FF]">
-                {steps.map((st, i) => (
+                {milestones.map((st, i) => (
                   <div key={i} className="flex items-start gap-4 relative">
                     <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 z-10 ${
                       st.status === 'completed'
@@ -152,8 +254,11 @@ export default function OrderTrackingModal() {
                     }`}>
                       {st.status === 'completed' ? '✓' : i + 1}
                     </div>
-                    <div>
-                      <h5 className="text-xs font-bold text-[#062B4F]">{st.title}</h5>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h5 className="text-xs font-bold text-[#062B4F]">{st.title}</h5>
+                        {st.time && <span className="text-[10px] font-mono text-slate-400">{st.time}</span>}
+                      </div>
                       <p className="text-[11px] text-[#062B4F]/60">{st.desc}</p>
                     </div>
                   </div>
@@ -161,7 +266,7 @@ export default function OrderTrackingModal() {
               </div>
             </div>
 
-            {/* Order Items */}
+            {/* Order Items Snapshot */}
             {activeOrder.items && activeOrder.items.length > 0 && (
               <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 text-xs space-y-2">
                 <span className="font-bold text-[#062B4F] block">Items in this Parcel:</span>
@@ -172,9 +277,26 @@ export default function OrderTrackingModal() {
                   </div>
                 ))}
                 <div className="pt-2 border-t border-gray-200 flex justify-between font-bold text-[#062B4F]">
-                  <span>Total Payable:</span>
-                  <span>৳{(activeOrder.total || activeOrder.total_payable || 0).toLocaleString()} ({activeOrder.payment_method || activeOrder.paymentMethod})</span>
+                  <span>Total Authoritative Amount:</span>
+                  <span className="font-mono text-[#0877C9]">৳{Number(activeOrder.total || 0).toLocaleString()} BDT ({activeOrder.payment_method})</span>
                 </div>
+              </div>
+            )}
+
+            {/* Audit Status History Log */}
+            {activeOrder.history && activeOrder.history.length > 0 && (
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/60 text-xs space-y-1.5">
+                <span className="text-[10px] font-mono uppercase text-slate-500 font-bold block">Status Audit Log:</span>
+                {activeOrder.history.map((h, idx) => (
+                  <div key={idx} className="text-[11px] text-slate-600 flex justify-between">
+                    <span>
+                      <strong className="text-slate-800">[{h.status_type}]</strong> {h.new_status} — {h.notes}
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-400 ml-2">
+                      {new Date(h.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                ))}
               </div>
             )}
 
@@ -182,7 +304,7 @@ export default function OrderTrackingModal() {
             <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#062B4F] text-white text-xs">
               <div className="flex items-center gap-2">
                 <Headphones className="w-4 h-4 text-[#50DDF0]" />
-                <span>Need delivery assistance? Helpline: <strong>+880 1711-223344</strong></span>
+                <span>Concierge Helpline: <strong>+880 1851-172032</strong></span>
               </div>
               <a 
                 href="https://wa.me/8801851172032" 
@@ -190,14 +312,14 @@ export default function OrderTrackingModal() {
                 rel="noreferrer"
                 className="px-3 py-1 rounded-full bg-[#50DDF0] text-[#062B4F] text-[10px] font-bold hover:bg-[#69C5F5] transition-colors"
               >
-                WhatsApp Support
+                WhatsApp
               </a>
             </div>
 
           </div>
         ) : (
           <div className="p-12 text-center text-xs text-[#062B4F]/60">
-            {t("Enter your order tracking ID above to see live dispatch updates.", "লাইভ আপডেট দেখতে উপরে অর্ডার আইডি দিয়ে ট্র্যাক করুন।")}
+            {t("Enter your Order ID and phone number above to see real-time verified dispatch updates.", "লাইভ আপডেট দেখতে উপরে অর্ডার আইডি ও ফোন নম্বর দিন।")}
           </div>
         )}
 
@@ -205,4 +327,3 @@ export default function OrderTrackingModal() {
     </div>
   );
 }
-

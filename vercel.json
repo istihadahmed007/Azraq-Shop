@@ -26,6 +26,10 @@
       "destination": "/api/payments/transactions"
     },
     {
+      "source": "/api/orders/track",
+      "destination": "/api/orders/track"
+    },
+    {
       "source": "/api/orders",
       "destination": "/api/orders/index"
     }

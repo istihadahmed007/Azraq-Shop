@@ -2,6 +2,7 @@ import pg from 'pg';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import crypto from 'crypto';
 
 const { Pool } = pg;
 
@@ -17,7 +18,8 @@ const memoryStore = {
   orders: new Map(),
   order_items: new Map(),
   payment_transactions: new Map(),
-  payment_webhook_logs: new Map()
+  payment_webhook_logs: new Map(),
+  order_status_history: new Map()
 };
 
 function persistFallbackStore() {
@@ -27,7 +29,8 @@ function persistFallbackStore() {
       orders: Array.from(memoryStore.orders.entries()),
       order_items: Array.from(memoryStore.order_items.entries()),
       payment_transactions: Array.from(memoryStore.payment_transactions.entries()),
-      payment_webhook_logs: Array.from(memoryStore.payment_webhook_logs.entries())
+      payment_webhook_logs: Array.from(memoryStore.payment_webhook_logs.entries()),
+      order_status_history: Array.from(memoryStore.order_status_history.entries())
     };
     fs.writeFileSync(DB_CACHE_FILE, JSON.stringify(data), 'utf8');
   } catch (e) {
@@ -54,6 +57,9 @@ function hydrateFallbackStore() {
       }
       if (data.payment_webhook_logs) {
         data.payment_webhook_logs.forEach(([k, v]) => memoryStore.payment_webhook_logs.set(k, v));
+      }
+      if (data.order_status_history) {
+        data.order_status_history.forEach(([k, v]) => memoryStore.order_status_history.set(k, v));
       }
     }
   } catch (e) {
@@ -121,6 +127,7 @@ export async function initDb() {
 
         CREATE TABLE IF NOT EXISTS orders (
             id VARCHAR(50) PRIMARY KEY,
+            tracking_token VARCHAR(100) UNIQUE,
             checkout_attempt_id VARCHAR(100) REFERENCES checkout_attempts(id) ON DELETE SET NULL,
             customer_name VARCHAR(255) NOT NULL,
             customer_phone VARCHAR(50) NOT NULL,
@@ -130,6 +137,7 @@ export async function initDb() {
             thana VARCHAR(100),
             delivery_area VARCHAR(20) DEFAULT 'inside',
             notes TEXT,
+            currency VARCHAR(10) DEFAULT 'BDT',
             subtotal NUMERIC(12, 2) NOT NULL,
             delivery_fee NUMERIC(10, 2) NOT NULL,
             discount NUMERIC(10, 2) DEFAULT 0.00,
@@ -137,6 +145,7 @@ export async function initDb() {
             promo_code VARCHAR(50),
             payment_method VARCHAR(50) NOT NULL,
             payment_status VARCHAR(50) NOT NULL,
+            fulfillment_status VARCHAR(50) DEFAULT 'Processing',
             order_status VARCHAR(50) DEFAULT 'Processing',
             gateway_name VARCHAR(50) DEFAULT 'PAYMENTLY',
             gateway_invoice_id VARCHAR(100),
@@ -145,9 +154,35 @@ export async function initDb() {
             verified_at TIMESTAMPTZ,
             courier_name VARCHAR(100),
             courier_tracking_id VARCHAR(100),
+            dispatched_at TIMESTAMPTZ,
+            delivered_at TIMESTAMPTZ,
             created_at TIMESTAMPTZ DEFAULT NOW(),
             updated_at TIMESTAMPTZ DEFAULT NOW()
         );
+
+        -- Backward-compatible column additions for existing PostgreSQL tables
+        ALTER TABLE orders ADD COLUMN IF NOT EXISTS tracking_token VARCHAR(100) UNIQUE;
+        ALTER TABLE orders ADD COLUMN IF NOT EXISTS currency VARCHAR(10) DEFAULT 'BDT';
+        ALTER TABLE orders ADD COLUMN IF NOT EXISTS fulfillment_status VARCHAR(50) DEFAULT 'Processing';
+        ALTER TABLE orders ADD COLUMN IF NOT EXISTS dispatched_at TIMESTAMPTZ;
+        ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivered_at TIMESTAMPTZ;
+
+        CREATE TABLE IF NOT EXISTS order_status_history (
+            id VARCHAR(100) PRIMARY KEY,
+            order_id VARCHAR(50) NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+            status_type VARCHAR(20) NOT NULL, -- 'fulfillment' | 'payment'
+            previous_status VARCHAR(50),
+            new_status VARCHAR(50) NOT NULL,
+            actor_source VARCHAR(100) DEFAULT 'SYSTEM',
+            notes TEXT,
+            created_at TIMESTAMPTZ DEFAULT NOW()
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_orders_tracking_token ON orders(tracking_token);
+        CREATE INDEX IF NOT EXISTS idx_orders_customer_phone ON orders(customer_phone);
+        CREATE INDEX IF NOT EXISTS idx_orders_fulfillment ON orders(fulfillment_status);
+        CREATE INDEX IF NOT EXISTS idx_osh_order_id ON order_status_history(order_id);
+        CREATE INDEX IF NOT EXISTS idx_osh_created ON order_status_history(created_at);
 
         CREATE TABLE IF NOT EXISTS order_items (
             id VARCHAR(100) PRIMARY KEY,
@@ -342,6 +377,328 @@ export async function updateCheckoutAttempt(id, updates) {
   return updated;
 }
 
+// ====================================================================
+// SECURITY, TOKEN GENERATION & PHONE NORMALIZATION HELPERS
+// ====================================================================
+
+export function generateTrackingToken() {
+  return `trk_${Date.now().toString(36)}_${crypto.randomBytes(12).toString('hex')}`;
+}
+
+export function normalizeBdPhone(phoneStr) {
+  if (!phoneStr || typeof phoneStr !== 'string') return '';
+  const digits = phoneStr.replace(/\D/g, '');
+  if (digits.startsWith('880')) {
+    return '0' + digits.slice(3);
+  }
+  if (digits.length === 11 && digits.startsWith('01')) {
+    return digits;
+  }
+  if (digits.length > 11) {
+    return digits.slice(-11);
+  }
+  return digits;
+}
+
+export function maskCustomerName(name) {
+  if (!name || typeof name !== 'string') return 'Valued Customer';
+  const parts = name.trim().split(/\s+/);
+  return parts.map(p => {
+    if (p.length <= 2) return p;
+    return p[0] + '*'.repeat(Math.max(1, p.length - 2)) + p[p.length - 1];
+  }).join(' ');
+}
+
+export function maskPhoneNumber(phone) {
+  const norm = normalizeBdPhone(phone);
+  if (norm.length === 11) {
+    return norm.slice(0, 3) + '****' + norm.slice(7);
+  }
+  return phone ? phone.slice(0, 2) + '****' + phone.slice(-2) : '****';
+}
+
+// ====================================================================
+// APPEND-ONLY ORDER STATUS AUDIT LOG
+// ====================================================================
+
+export async function recordOrderStatusHistory({
+  orderId,
+  statusType, // 'fulfillment' | 'payment'
+  previousStatus = null,
+  newStatus,
+  actorSource = 'SYSTEM',
+  notes = null
+}) {
+  const p = getDbPool();
+  const id = `HIST-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
+  const now = new Date().toISOString();
+
+  const record = {
+    id,
+    order_id: orderId,
+    status_type: statusType,
+    previous_status: previousStatus,
+    new_status: newStatus,
+    actor_source: actorSource,
+    notes: notes || null,
+    created_at: now
+  };
+
+  if (p) {
+    try {
+      await p.query(
+        `INSERT INTO order_status_history (id, order_id, status_type, previous_status, new_status, actor_source, notes, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [record.id, record.order_id, record.status_type, record.previous_status, record.new_status, record.actor_source, record.notes, record.created_at]
+      );
+    } catch (e) {
+      console.error('[DB Error recordOrderStatusHistory]:', e.message);
+    }
+  }
+
+  memoryStore.order_status_history.set(record.id, record);
+  persistFallbackStore();
+  return record;
+}
+
+export async function getOrderStatusHistory(orderId) {
+  if (!orderId) return [];
+  const p = getDbPool();
+  if (p) {
+    try {
+      const res = await p.query(
+        `SELECT id, order_id, status_type, previous_status, new_status, actor_source, notes, created_at
+         FROM order_status_history
+         WHERE order_id = $1
+         ORDER BY created_at ASC`,
+        [orderId]
+      );
+      if (res.rows.length > 0) return res.rows;
+    } catch (e) {
+      console.error('[DB Error getOrderStatusHistory]:', e.message);
+    }
+  }
+
+  hydrateFallbackStore();
+  return Array.from(memoryStore.order_status_history.values())
+    .filter(h => h.order_id === orderId)
+    .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+}
+
+// ====================================================================
+// AUTHORIZED STATUS TRANSITIONS (SEPARATE FULFILLMENT & PAYMENT)
+// ====================================================================
+
+export async function updateOrderFulfillmentStatus(orderId, newStatus, optionsOrActor = 'ADMIN', notesArg = null) {
+  const order = await getOrderWithItems(orderId);
+  if (!order) throw new Error(`Order ${orderId} not found`);
+
+  let actorSource = typeof optionsOrActor === 'object' ? (optionsOrActor.actorSource || 'ADMIN') : optionsOrActor;
+  let notes = typeof optionsOrActor === 'object' ? (optionsOrActor.notes || null) : notesArg;
+  const courierName = typeof optionsOrActor === 'object' ? optionsOrActor.courierName : null;
+  const courierTrackingId = typeof optionsOrActor === 'object' ? optionsOrActor.courierTrackingId : null;
+
+  const prevStatus = order.fulfillment_status || order.order_status || 'Processing';
+  if (prevStatus === newStatus && !courierName && !courierTrackingId) return order;
+
+  const now = new Date().toISOString();
+  let dispatchedAt = order.dispatched_at;
+  let deliveredAt = order.delivered_at;
+
+  if (newStatus === 'Dispatched' && !dispatchedAt) dispatchedAt = now;
+  if (newStatus === 'Delivered' && !deliveredAt) deliveredAt = now;
+  if (courierName) order.courier_name = courierName;
+  if (courierTrackingId) order.courier_tracking_id = courierTrackingId;
+
+  const p = getDbPool();
+  if (p) {
+    try {
+      await p.query(
+        `UPDATE orders SET
+          fulfillment_status = $2,
+          order_status = $2,
+          courier_name = COALESCE($3, courier_name),
+          courier_tracking_id = COALESCE($4, courier_tracking_id),
+          dispatched_at = COALESCE($5, dispatched_at),
+          delivered_at = COALESCE($6, delivered_at),
+          updated_at = $7
+         WHERE id = $1`,
+        [orderId, newStatus, order.courier_name, order.courier_tracking_id, dispatchedAt, deliveredAt, now]
+      );
+    } catch (e) {
+      console.error('[DB Error updateOrderFulfillmentStatus]:', e.message);
+    }
+  }
+
+  order.fulfillment_status = newStatus;
+  order.order_status = newStatus;
+  order.dispatched_at = dispatchedAt;
+  order.delivered_at = deliveredAt;
+  order.updated_at = now;
+  memoryStore.orders.set(orderId, order);
+  persistFallbackStore();
+
+  await recordOrderStatusHistory({
+    orderId,
+    statusType: 'fulfillment',
+    previousStatus: prevStatus,
+    newStatus,
+    actorSource,
+    notes: notes || `Fulfillment state changed from ${prevStatus} to ${newStatus}`
+  });
+
+  return order;
+}
+
+export async function updateOrderPaymentStatus(orderId, newStatus, optionsOrActor = 'SYSTEM', notesArg = null) {
+  const order = await getOrderWithItems(orderId);
+  if (!order) throw new Error(`Order ${orderId} not found`);
+
+  let actorSource = typeof optionsOrActor === 'object' ? (optionsOrActor.actorSource || 'SYSTEM') : optionsOrActor;
+  let notes = typeof optionsOrActor === 'object' ? (optionsOrActor.notes || null) : notesArg;
+  const transactionId = typeof optionsOrActor === 'object' ? optionsOrActor.transactionId : null;
+
+  const prevStatus = order.payment_status;
+  if (prevStatus === newStatus && !transactionId) return order;
+
+  const now = new Date().toISOString();
+  let verifiedAt = order.verified_at;
+  if (newStatus === 'PAID' && !verifiedAt) verifiedAt = now;
+  if (transactionId) order.gateway_transaction_id = transactionId;
+
+  const p = getDbPool();
+  if (p) {
+    try {
+      await p.query(
+        `UPDATE orders SET
+          payment_status = $2,
+          gateway_transaction_id = COALESCE($3, gateway_transaction_id),
+          verified_at = COALESCE($4, verified_at),
+          updated_at = $5
+         WHERE id = $1`,
+        [orderId, newStatus, order.gateway_transaction_id, verifiedAt, now]
+      );
+    } catch (e) {
+      console.error('[DB Error updateOrderPaymentStatus]:', e.message);
+    }
+  }
+
+  order.payment_status = newStatus;
+  order.verified_at = verifiedAt;
+  order.updated_at = now;
+  memoryStore.orders.set(orderId, order);
+  persistFallbackStore();
+
+  await recordOrderStatusHistory({
+    orderId,
+    statusType: 'payment',
+    previousStatus: prevStatus,
+    newStatus,
+    actorSource,
+    notes: notes || `Payment status transitioned from ${prevStatus} to ${newStatus}`
+  });
+
+  return order;
+}
+
+// ====================================================================
+// AUTHORIZED CUSTOMER ORDER TRACKING ACCESS (VERIFIED OWNERSHIP CHECK)
+// ====================================================================
+
+export async function getOrderByTrackingAuth(orderId, { phone = null, trackingToken = null } = {}) {
+  if (!orderId || typeof orderId !== 'string') {
+    return { success: false, error: 'INVALID_REQUEST', message: 'Valid Order ID reference is required.' };
+  }
+
+  const cleanOrderId = orderId.trim();
+  const order = await getOrderWithItems(cleanOrderId);
+  if (!order) {
+    return { success: false, error: 'NOT_FOUND', message: 'No matching order found for this reference.' };
+  }
+
+  // OWNERSHIP VERIFICATION RULE:
+  // Must provide EITHER a matching customer phone number OR the unguessable tracking token.
+  // Order ID alone is NEVER sufficient authorization.
+  const hasTokenAuth = Boolean(
+    trackingToken && 
+    typeof trackingToken === 'string' && 
+    order.tracking_token && 
+    order.tracking_token.toLowerCase() === trackingToken.trim().toLowerCase()
+  );
+
+  const cleanPhone = normalizeBdPhone(phone);
+  const orderPhone = normalizeBdPhone(order.customer_phone);
+  const hasPhoneAuth = Boolean(
+    cleanPhone && 
+    cleanPhone.length >= 10 && 
+    orderPhone && 
+    (cleanPhone === orderPhone || orderPhone.endsWith(cleanPhone) || cleanPhone.endsWith(orderPhone))
+  );
+
+  if (!hasTokenAuth && !hasPhoneAuth) {
+    return {
+      success: false,
+      error: 'UNAUTHORIZED',
+      message: 'Authentication failed. Please provide the 11-digit phone number or secure tracking token associated with this order.'
+    };
+  }
+
+  // Load audit history
+  const history = await getOrderStatusHistory(cleanOrderId);
+
+  // Return minimal, privacy-safe tracking payload
+  return {
+    success: true,
+    order: {
+      id: order.id,
+      order_id: order.id,
+      tracking_token: order.tracking_token,
+      fulfillment_status: order.fulfillment_status || order.order_status || 'Processing',
+      order_status: order.order_status || order.fulfillment_status || 'Processing',
+      payment_status: order.payment_status,
+      payment_method: order.payment_method,
+      currency: order.currency || 'BDT',
+      subtotal: Number(order.subtotal || 0),
+      delivery_fee: Number(order.delivery_fee || 0),
+      discount: Number(order.discount || 0),
+      total: Number(order.total || 0),
+      delivery_area: order.delivery_area || 'inside',
+      shipping_city: order.city || 'Dhaka',
+      courier_name: order.courier_name || null,
+      courier_tracking_id: order.courier_tracking_id || null,
+      customer_name_masked: maskCustomerName(order.customer_name),
+      customer_phone_masked: maskPhoneNumber(order.customer_phone),
+      masked_customer: {
+        name: maskCustomerName(order.customer_name),
+        phone: maskPhoneNumber(order.customer_phone)
+      },
+      item_count: (order.items || []).reduce((sum, it) => sum + (it.quantity || 1), 0),
+      items: (order.items || []).map(it => ({
+        name: it.name,
+        variant: it.variant || 'Standard',
+        quantity: it.quantity || 1,
+        unit_price: Number(it.unit_price || it.price || 0)
+      })),
+      timestamps: {
+        created_at: order.created_at,
+        verified_at: order.verified_at || null,
+        dispatched_at: order.dispatched_at || null,
+        delivered_at: order.delivered_at || null,
+        updated_at: order.updated_at
+      },
+      status_history: history.map(h => ({
+        id: h.id,
+        status_type: h.status_type,
+        previous_status: h.previous_status,
+        new_status: h.new_status,
+        actor_source: h.actor_source,
+        notes: h.notes,
+        created_at: h.created_at
+      }))
+    }
+  };
+}
+
 /**
  * 5. Atomic Order Creation upon Verified Online Payment
  * ONLY CALLED AFTER GENUINE VERIFICATION SUCCEEDS!
@@ -357,9 +714,11 @@ export async function createOrderFromVerifiedPayment({
   const now = new Date().toISOString();
   const verificationTime = verifiedAt || now;
   const orderId = `AZQ-ORD-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
+  const trackingToken = generateTrackingToken();
 
   const orderRecord = {
     id: orderId,
+    tracking_token: trackingToken,
     checkout_attempt_id: checkoutAttempt.id,
     customer_name: checkoutAttempt.customer_name,
     customer_phone: checkoutAttempt.customer_phone,
@@ -369,6 +728,7 @@ export async function createOrderFromVerifiedPayment({
     thana: checkoutAttempt.thana || null,
     delivery_area: checkoutAttempt.delivery_area || 'inside',
     notes: checkoutAttempt.notes || null,
+    currency: 'BDT',
     subtotal: checkoutAttempt.subtotal,
     delivery_fee: checkoutAttempt.delivery_fee,
     discount: checkoutAttempt.discount || 0,
@@ -376,6 +736,7 @@ export async function createOrderFromVerifiedPayment({
     promo_code: checkoutAttempt.promo_code || null,
     payment_method: 'PAYMENTLY',
     payment_status: 'PAID',
+    fulfillment_status: 'Processing',
     order_status: 'Processing',
     gateway_name: 'PAYMENTLY',
     gateway_invoice_id: gatewayInvoiceId || checkoutAttempt.gateway_invoice_id,
@@ -384,6 +745,8 @@ export async function createOrderFromVerifiedPayment({
     verified_at: verificationTime,
     courier_name: null,
     courier_tracking_id: null,
+    dispatched_at: null,
+    delivered_at: null,
     created_at: now,
     updated_at: now
   };
@@ -397,20 +760,20 @@ export async function createOrderFromVerifiedPayment({
       // 1. Insert into orders
       await client.query(
         `INSERT INTO orders (
-          id, checkout_attempt_id, customer_name, customer_phone, customer_email,
-          shipping_address, city, thana, delivery_area, notes, subtotal, delivery_fee,
-          discount, total, promo_code, payment_method, payment_status, order_status,
+          id, tracking_token, checkout_attempt_id, customer_name, customer_phone, customer_email,
+          shipping_address, city, thana, delivery_area, notes, currency, subtotal, delivery_fee,
+          discount, total, promo_code, payment_method, payment_status, fulfillment_status, order_status,
           gateway_name, gateway_invoice_id, gateway_transaction_id, sender_number,
-          verified_at, courier_name, courier_tracking_id, created_at, updated_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27)`,
+          verified_at, courier_name, courier_tracking_id, dispatched_at, delivered_at, created_at, updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32)`,
         [
-          orderRecord.id, orderRecord.checkout_attempt_id, orderRecord.customer_name, orderRecord.customer_phone,
+          orderRecord.id, orderRecord.tracking_token, orderRecord.checkout_attempt_id, orderRecord.customer_name, orderRecord.customer_phone,
           orderRecord.customer_email, orderRecord.shipping_address, orderRecord.city, orderRecord.thana,
-          orderRecord.delivery_area, orderRecord.notes, orderRecord.subtotal, orderRecord.delivery_fee,
+          orderRecord.delivery_area, orderRecord.notes, orderRecord.currency, orderRecord.subtotal, orderRecord.delivery_fee,
           orderRecord.discount, orderRecord.total, orderRecord.promo_code, orderRecord.payment_method,
-          orderRecord.payment_status, orderRecord.order_status, orderRecord.gateway_name, orderRecord.gateway_invoice_id,
+          orderRecord.payment_status, orderRecord.fulfillment_status, orderRecord.order_status, orderRecord.gateway_name, orderRecord.gateway_invoice_id,
           orderRecord.gateway_transaction_id, orderRecord.sender_number, orderRecord.verified_at,
-          orderRecord.courier_name, orderRecord.courier_tracking_id, orderRecord.created_at, orderRecord.updated_at
+          orderRecord.courier_name, orderRecord.courier_tracking_id, orderRecord.dispatched_at, orderRecord.delivered_at, orderRecord.created_at, orderRecord.updated_at
         ]
       );
 
@@ -452,6 +815,21 @@ export async function createOrderFromVerifiedPayment({
         [checkoutAttempt.id, orderId, now]
       );
 
+      // 5. Initial status history audit records
+      const histFulfillId = `HIST-${Date.now().toString(36)}-${Math.floor(1000 + Math.random() * 9000)}`;
+      await client.query(
+        `INSERT INTO order_status_history (id, order_id, status_type, previous_status, new_status, actor_source, notes, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [histFulfillId, orderId, 'fulfillment', null, 'Processing', 'SYSTEM', 'Order placed & verified', now]
+      );
+
+      const histPayId = `HIST-${Date.now().toString(36)}-${Math.floor(1000 + Math.random() * 9000)}`;
+      await client.query(
+        `INSERT INTO order_status_history (id, order_id, status_type, previous_status, new_status, actor_source, notes, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [histPayId, orderId, 'payment', null, 'PAID', 'PAYMENTLY_GATEWAY', `Payment verified via Paymently (TrxID: ${transactionId})`, now]
+      );
+
       await client.query('COMMIT');
     } catch (e) {
       await client.query('ROLLBACK');
@@ -463,17 +841,19 @@ export async function createOrderFromVerifiedPayment({
   }
 
   // Also maintain in memoryStore
-  memoryStore.orders.set(orderRecord.id, orderRecord);
   const items = Array.isArray(checkoutAttempt.items_snapshot) ? checkoutAttempt.items_snapshot : [];
-  memoryStore.order_items.set(orderRecord.id, items);
+  orderRecord.items = items;
+  memoryStore.orders.set(orderId, orderRecord);
 
   const txnRecord = {
-    id: `TXN-${Date.now().toString(36).toUpperCase()}`,
+    id: `TXN-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`,
     order_id: orderId,
     checkout_attempt_id: checkoutAttempt.id,
     gateway_name: 'PAYMENTLY',
-    gateway_invoice_id: gatewayInvoiceId,
+    gateway_invoice_id: gatewayInvoiceId || checkoutAttempt.gateway_invoice_id,
+    gateway_payment_url: checkoutAttempt.gateway_payment_url,
     transaction_id: transactionId,
+    sender_number: senderNumber || checkoutAttempt.customer_phone,
     payment_method: paymentMethod,
     currency: 'BDT',
     amount: checkoutAttempt.total_payable,
@@ -482,6 +862,30 @@ export async function createOrderFromVerifiedPayment({
     created_at: now
   };
   memoryStore.payment_transactions.set(txnRecord.id, txnRecord);
+
+  // Status history in memory
+  const histFulfill = {
+    id: `HIST-${Date.now().toString(36)}-1`,
+    order_id: orderId,
+    status_type: 'fulfillment',
+    previous_status: null,
+    new_status: 'Processing',
+    actor_source: 'SYSTEM',
+    notes: 'Order placed & verified',
+    created_at: now
+  };
+  const histPay = {
+    id: `HIST-${Date.now().toString(36)}-2`,
+    order_id: orderId,
+    status_type: 'payment',
+    previous_status: null,
+    new_status: 'PAID',
+    actor_source: 'PAYMENTLY_GATEWAY',
+    notes: `Payment verified via Paymently (TrxID: ${transactionId})`,
+    created_at: now
+  };
+  memoryStore.order_status_history.set(histFulfill.id, histFulfill);
+  memoryStore.order_status_history.set(histPay.id, histPay);
 
   // Update memory checkout attempt
   checkoutAttempt.status = 'PAID';
@@ -504,9 +908,11 @@ export async function createOrderFromVerifiedPayment({
 export async function createCodOrder({ checkoutAttempt }) {
   const now = new Date().toISOString();
   const orderId = `AZQ-ORD-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
+  const trackingToken = generateTrackingToken();
 
   const orderRecord = {
     id: orderId,
+    tracking_token: trackingToken,
     checkout_attempt_id: checkoutAttempt.id,
     customer_name: checkoutAttempt.customer_name,
     customer_phone: checkoutAttempt.customer_phone,
@@ -516,6 +922,7 @@ export async function createCodOrder({ checkoutAttempt }) {
     thana: checkoutAttempt.thana || null,
     delivery_area: checkoutAttempt.delivery_area || 'inside',
     notes: checkoutAttempt.notes || null,
+    currency: 'BDT',
     subtotal: checkoutAttempt.subtotal,
     delivery_fee: checkoutAttempt.delivery_fee,
     discount: checkoutAttempt.discount || 0,
@@ -523,7 +930,8 @@ export async function createCodOrder({ checkoutAttempt }) {
     promo_code: checkoutAttempt.promo_code || null,
     payment_method: 'COD',
     payment_status: 'PENDING_COD', // Strictly marked PENDING_COD, NOT PAID!
-    order_status: 'Confirmed',
+    fulfillment_status: 'Processing',
+    order_status: 'Processing',
     gateway_name: 'COD',
     gateway_invoice_id: null,
     gateway_transaction_id: null,
@@ -531,6 +939,8 @@ export async function createCodOrder({ checkoutAttempt }) {
     verified_at: null,
     courier_name: null,
     courier_tracking_id: null,
+    dispatched_at: null,
+    delivered_at: null,
     created_at: now,
     updated_at: now
   };
@@ -543,19 +953,19 @@ export async function createCodOrder({ checkoutAttempt }) {
 
       await client.query(
         `INSERT INTO orders (
-          id, checkout_attempt_id, customer_name, customer_phone, customer_email,
-          shipping_address, city, thana, delivery_area, notes, subtotal, delivery_fee,
-          discount, total, promo_code, payment_method, payment_status, order_status,
+          id, tracking_token, checkout_attempt_id, customer_name, customer_phone, customer_email,
+          shipping_address, city, thana, delivery_area, notes, currency, subtotal, delivery_fee,
+          discount, total, promo_code, payment_method, payment_status, fulfillment_status, order_status,
           gateway_name, gateway_invoice_id, gateway_transaction_id, sender_number,
-          verified_at, courier_name, courier_tracking_id, created_at, updated_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27)`,
+          verified_at, courier_name, courier_tracking_id, dispatched_at, delivered_at, created_at, updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32)`,
         [
-          orderRecord.id, orderRecord.checkout_attempt_id, orderRecord.customer_name, orderRecord.customer_phone,
+          orderRecord.id, orderRecord.tracking_token, orderRecord.checkout_attempt_id, orderRecord.customer_name, orderRecord.customer_phone,
           orderRecord.customer_email, orderRecord.shipping_address, orderRecord.city, orderRecord.thana,
-          orderRecord.delivery_area, orderRecord.notes, orderRecord.subtotal, orderRecord.delivery_fee,
+          orderRecord.delivery_area, orderRecord.notes, orderRecord.currency, orderRecord.subtotal, orderRecord.delivery_fee,
           orderRecord.discount, orderRecord.total, orderRecord.promo_code, orderRecord.payment_method,
-          orderRecord.payment_status, orderRecord.order_status, orderRecord.gateway_name, null, null, null,
-          null, null, null, orderRecord.created_at, orderRecord.updated_at
+          orderRecord.payment_status, orderRecord.fulfillment_status, orderRecord.order_status, orderRecord.gateway_name, null, null, null,
+          null, null, null, null, null, orderRecord.created_at, orderRecord.updated_at
         ]
       );
 
@@ -579,6 +989,21 @@ export async function createCodOrder({ checkoutAttempt }) {
         [checkoutAttempt.id, orderId, now]
       );
 
+      // Status history
+      const histFulfillId = `HIST-${Date.now().toString(36)}-${Math.floor(1000 + Math.random() * 9000)}`;
+      await client.query(
+        `INSERT INTO order_status_history (id, order_id, status_type, previous_status, new_status, actor_source, notes, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [histFulfillId, orderId, 'fulfillment', null, 'Processing', 'CUSTOMER_COD', 'Cash on Delivery order confirmed by customer', now]
+      );
+
+      const histPayId = `HIST-${Date.now().toString(36)}-${Math.floor(1000 + Math.random() * 9000)}`;
+      await client.query(
+        `INSERT INTO order_status_history (id, order_id, status_type, previous_status, new_status, actor_source, notes, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [histPayId, orderId, 'payment', null, 'PENDING_COD', 'CUSTOMER_COD', 'Payment collectable upon doorstep delivery', now]
+      );
+
       await client.query('COMMIT');
     } catch (e) {
       await client.query('ROLLBACK');
@@ -589,9 +1014,33 @@ export async function createCodOrder({ checkoutAttempt }) {
     }
   }
 
-  memoryStore.orders.set(orderRecord.id, orderRecord);
   const items = Array.isArray(checkoutAttempt.items_snapshot) ? checkoutAttempt.items_snapshot : [];
+  orderRecord.items = items;
+  memoryStore.orders.set(orderRecord.id, orderRecord);
   memoryStore.order_items.set(orderRecord.id, items);
+
+  const histFulfill = {
+    id: `HIST-${Date.now().toString(36)}-COD-1`,
+    order_id: orderId,
+    status_type: 'fulfillment',
+    previous_status: null,
+    new_status: 'Processing',
+    actor_source: 'CUSTOMER_COD',
+    notes: 'Cash on Delivery order confirmed by customer',
+    created_at: now
+  };
+  const histPay = {
+    id: `HIST-${Date.now().toString(36)}-COD-2`,
+    order_id: orderId,
+    status_type: 'payment',
+    previous_status: null,
+    new_status: 'PENDING_COD',
+    actor_source: 'CUSTOMER_COD',
+    notes: 'Payment collectable upon doorstep delivery',
+    created_at: now
+  };
+  memoryStore.order_status_history.set(histFulfill.id, histFulfill);
+  memoryStore.order_status_history.set(histPay.id, histPay);
 
   checkoutAttempt.status = 'COD_CONFIRMED';
   checkoutAttempt.order_id = orderId;
@@ -617,9 +1066,11 @@ export async function createOrderWithManualTrx({
 }) {
   const now = new Date().toISOString();
   const orderId = `AZQ-ORD-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
+  const trackingToken = generateTrackingToken();
 
   const orderRecord = {
     id: orderId,
+    tracking_token: trackingToken,
     checkout_attempt_id: checkoutAttempt.id,
     customer_name: checkoutAttempt.customer_name,
     customer_phone: checkoutAttempt.customer_phone,
@@ -629,6 +1080,7 @@ export async function createOrderWithManualTrx({
     thana: checkoutAttempt.thana || null,
     delivery_area: checkoutAttempt.delivery_area || 'inside',
     notes: checkoutAttempt.notes || null,
+    currency: 'BDT',
     subtotal: checkoutAttempt.subtotal,
     delivery_fee: checkoutAttempt.delivery_fee,
     discount: checkoutAttempt.discount || 0,
@@ -636,6 +1088,7 @@ export async function createOrderWithManualTrx({
     promo_code: checkoutAttempt.promo_code || null,
     payment_method: 'PAYMENTLY',
     payment_status: 'PENDING_VERIFICATION',
+    fulfillment_status: 'Processing',
     order_status: 'Processing',
     gateway_name: 'PAYMENTLY',
     gateway_invoice_id: checkoutAttempt.gateway_invoice_id || checkoutAttempt.id,
@@ -644,6 +1097,8 @@ export async function createOrderWithManualTrx({
     verified_at: null,
     courier_name: null,
     courier_tracking_id: null,
+    dispatched_at: null,
+    delivered_at: null,
     created_at: now,
     updated_at: now
   };
@@ -656,20 +1111,20 @@ export async function createOrderWithManualTrx({
 
       await client.query(
         `INSERT INTO orders (
-          id, checkout_attempt_id, customer_name, customer_phone, customer_email,
-          shipping_address, city, thana, delivery_area, notes, subtotal, delivery_fee,
-          discount, total, promo_code, payment_method, payment_status, order_status,
+          id, tracking_token, checkout_attempt_id, customer_name, customer_phone, customer_email,
+          shipping_address, city, thana, delivery_area, notes, currency, subtotal, delivery_fee,
+          discount, total, promo_code, payment_method, payment_status, fulfillment_status, order_status,
           gateway_name, gateway_invoice_id, gateway_transaction_id, sender_number,
-          verified_at, courier_name, courier_tracking_id, created_at, updated_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27)`,
+          verified_at, courier_name, courier_tracking_id, dispatched_at, delivered_at, created_at, updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32)`,
         [
-          orderRecord.id, orderRecord.checkout_attempt_id, orderRecord.customer_name, orderRecord.customer_phone,
+          orderRecord.id, orderRecord.tracking_token, orderRecord.checkout_attempt_id, orderRecord.customer_name, orderRecord.customer_phone,
           orderRecord.customer_email, orderRecord.shipping_address, orderRecord.city, orderRecord.thana,
-          orderRecord.delivery_area, orderRecord.notes, orderRecord.subtotal, orderRecord.delivery_fee,
+          orderRecord.delivery_area, orderRecord.notes, orderRecord.currency, orderRecord.subtotal, orderRecord.delivery_fee,
           orderRecord.discount, orderRecord.total, orderRecord.promo_code, orderRecord.payment_method,
-          orderRecord.payment_status, orderRecord.order_status, orderRecord.gateway_name,
+          orderRecord.payment_status, orderRecord.fulfillment_status, orderRecord.order_status, orderRecord.gateway_name,
           orderRecord.gateway_invoice_id, orderRecord.gateway_transaction_id, orderRecord.sender_number,
-          null, null, null, orderRecord.created_at, orderRecord.updated_at
+          null, null, null, null, null, orderRecord.created_at, orderRecord.updated_at
         ]
       );
 
@@ -704,6 +1159,21 @@ export async function createOrderWithManualTrx({
       await client.query(
         `UPDATE checkout_attempts SET status = 'PENDING_VERIFICATION', order_id = $2, updated_at = $3 WHERE id = $1`,
         [checkoutAttempt.id, orderId, now]
+      );
+
+      // Status history
+      const histFulfillId = `HIST-${Date.now().toString(36)}-${Math.floor(1000 + Math.random() * 9000)}`;
+      await client.query(
+        `INSERT INTO order_status_history (id, order_id, status_type, previous_status, new_status, actor_source, notes, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [histFulfillId, orderId, 'fulfillment', null, 'Processing', 'CUSTOMER_MANUAL_TRX', 'Order placed via Paymently portal; awaiting manual verification', now]
+      );
+
+      const histPayId = `HIST-${Date.now().toString(36)}-${Math.floor(1000 + Math.random() * 9000)}`;
+      await client.query(
+        `INSERT INTO order_status_history (id, order_id, status_type, previous_status, new_status, actor_source, notes, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [histPayId, orderId, 'payment', null, 'PENDING_VERIFICATION', 'CUSTOMER_MANUAL_TRX', `Manual TrxID submitted: ${transactionId}`, now]
       );
 
       await client.query('COMMIT');
@@ -748,6 +1218,29 @@ export async function createOrderWithManualTrx({
     created_at: now
   };
   memoryStore.payment_transactions.set(txnRecord.id, txnRecord);
+
+  const histFulfill = {
+    id: `HIST-${Date.now().toString(36)}-TRX-1`,
+    order_id: orderId,
+    status_type: 'fulfillment',
+    previous_status: null,
+    new_status: 'Processing',
+    actor_source: 'CUSTOMER_MANUAL_TRX',
+    notes: 'Order placed via Paymently portal; awaiting manual verification',
+    created_at: now
+  };
+  const histPay = {
+    id: `HIST-${Date.now().toString(36)}-TRX-2`,
+    order_id: orderId,
+    status_type: 'payment',
+    previous_status: null,
+    new_status: 'PENDING_VERIFICATION',
+    actor_source: 'CUSTOMER_MANUAL_TRX',
+    notes: `Manual TrxID submitted: ${transactionId}`,
+    created_at: now
+  };
+  memoryStore.order_status_history.set(histFulfill.id, histFulfill);
+  memoryStore.order_status_history.set(histPay.id, histPay);
 
   checkoutAttempt.status = 'PENDING_VERIFICATION';
   checkoutAttempt.order_id = orderId;

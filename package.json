@@ -7,9 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node tests/paymently_audit_tests.mjs && node tests/storefront_audit_tests.mjs",
+    "test": "node tests/paymently_audit_tests.mjs && node tests/storefront_audit_tests.mjs && node tests/order_tracking_audit_tests.mjs && node tests/localization_and_currency_tests.mjs",
     "test:payment": "node tests/paymently_audit_tests.mjs",
-    "test:storefront": "node tests/storefront_audit_tests.mjs"
+    "test:storefront": "node tests/storefront_audit_tests.mjs",
+    "test:tracking": "node tests/order_tracking_audit_tests.mjs",
+    "test:locale": "node tests/localization_and_currency_tests.mjs"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.2",
