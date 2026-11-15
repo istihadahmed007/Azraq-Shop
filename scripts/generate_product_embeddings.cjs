@@ -172,3 +172,4 @@ fs.writeFileSync(outputPath, JSON.stringify({
 }, null, 2));
 
 console.log(`Successfully generated and saved ${embeddingsIndex.length} embeddings to ${outputPath}`);
+

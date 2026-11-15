@@ -16,9 +16,11 @@ import {
   Truck,
   Eye,
   EyeOff,
-  Star
+  Star,
+  CreditCard
 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
+import { fetchTransactions, verifyPaymentStatus, requestRefund, fetchGatewayStatus } from '../services/paymentService';
 
 export default function AdminPanel() {
   const { 
@@ -37,12 +39,22 @@ export default function AdminPanel() {
     t 
   } = useShop();
 
-  const [activeTab, setActiveTab] = useState('collections'); // 'collections' | 'audit' | 'products' | 'orders' | 'analytics'
+  const [activeTab, setActiveTab] = useState('collections'); // 'collections' | 'audit' | 'products' | 'orders' | 'payments' | 'analytics'
+  const [paymentTransactions, setPaymentTransactions] = useState([]);
+  const [gatewayConfig, setGatewayConfig] = useState(null);
+  const [isVerifyingTxn, setIsVerifyingTxn] = useState(false);
   const [editingCollectionId, setEditingCollectionId] = useState(null);
   const [editDesc, setEditDesc] = useState('');
   const [editingProductId, setEditingProductId] = useState(null);
   const [editPrice, setEditPrice] = useState('');
   const [editStock, setEditStock] = useState('');
+
+  React.useEffect(() => {
+    if (isAdminOpen) {
+      fetchTransactions().then(txns => setPaymentTransactions(txns || []));
+      fetchGatewayStatus().then(cfg => setGatewayConfig(cfg));
+    }
+  }, [isAdminOpen]);
 
   if (!isAdminOpen) return null;
 
@@ -196,6 +208,18 @@ export default function AdminPanel() {
           >
             <ShoppingBag className="w-3.5 h-3.5" />
             <span>Orders & Supplier Dispatch ({orders.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('payments')}
+            className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'payments'
+                ? 'border-[#0877C9] text-[#0877C9] bg-white rounded-t-xl shadow-sm'
+                : 'border-transparent text-azraq-navy/60 hover:text-azraq-navy'
+            }`}
+          >
+            <CreditCard className="w-3.5 h-3.5 text-[#0877C9]" />
+            <span>Paymently & Transactions ({paymentTransactions.length})</span>
           </button>
 
           <button
@@ -547,7 +571,173 @@ export default function AdminPanel() {
             </div>
           )}
 
-          {/* TAB 5: Financials */}
+          {/* TAB 5: Paymently Gateway & Transactions */}
+          {activeTab === 'payments' && (
+            <div className="space-y-6">
+              
+              {/* Gateway Configuration & Status Bar */}
+              <div className="p-5 rounded-2xl bg-gradient-to-r from-[#062B4F] via-[#0A3D6E] to-[#062B4F] text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#50DDF0] shadow-[0_0_8px_#50DDF0]" />
+                    <span className="font-black text-sm tracking-wide text-white">Paymently Gateway Integration</span>
+                    <span className="px-2 py-0.5 rounded-full bg-[#50DDF0]/20 text-[#50DDF0] text-[10px] font-mono font-bold">
+                      BDT Active
+                    </span>
+                  </div>
+                  <p className="text-xs text-white/70">
+                    Merchant: <strong>AZRAQ</strong> • Provider: Paymently BD • Dynamic UddoktaPay-compatible API
+                  </p>
+                  <p className="text-[11px] font-mono text-white/50">
+                    Base URL: {gatewayConfig?.base_url || 'https://vartualtutor.paymently.io'}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <a
+                    href={gatewayConfig?.default_link || 'https://vartualtutor.paymently.io/paymentlink/default/BDT'}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                  >
+                    <span>Open Payment Link</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+
+                  <button
+                    onClick={async () => {
+                      setIsVerifyingTxn(true);
+                      const txns = await fetchTransactions();
+                      setPaymentTransactions(txns || []);
+                      setIsVerifyingTxn(false);
+                      showToast('Transactions synchronized with gateway!', 'success');
+                    }}
+                    className="px-3.5 py-1.5 rounded-lg bg-[#0877C9] hover:bg-[#50DDF0] hover:text-[#062B4F] text-white text-xs font-bold flex items-center gap-1.5 transition-colors"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isVerifyingTxn ? 'animate-spin' : ''}`} />
+                    <span>Sync Gateway</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Transactions Ledger Table */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-black text-sm text-[#062B4F]">Paymently Transaction Records & Reconciliation</h4>
+                  <span className="text-xs text-gray-500 font-bold">{paymentTransactions.length} recorded</span>
+                </div>
+
+                <div className="border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-[#F8FCFF] border-b border-gray-200 text-gray-600 font-bold uppercase tracking-wider text-[10px]">
+                      <tr>
+                        <th className="p-3">Order ID</th>
+                        <th className="p-3">Invoice & TrxID</th>
+                        <th className="p-3">Customer</th>
+                        <th className="p-3">Amount</th>
+                        <th className="p-3">Method</th>
+                        <th className="p-3">Status</th>
+                        <th className="p-3 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {paymentTransactions.length === 0 ? (
+                        <tr>
+                          <td colSpan="7" className="p-6 text-center text-gray-400">
+                            No payment transactions recorded yet.
+                          </td>
+                        </tr>
+                      ) : (
+                        paymentTransactions.map((txn, idx) => (
+                          <tr key={txn.id || idx} className="hover:bg-gray-50">
+                            <td className="p-3 font-mono font-bold text-[#062B4F]">{txn.order_id}</td>
+                            <td className="p-3">
+                              <div className="font-mono text-[11px] font-bold text-[#0877C9]">{txn.invoice_id}</div>
+                              <div className="font-mono text-[10px] text-gray-400">{txn.transaction_id || 'Pending'}</div>
+                            </td>
+                            <td className="p-3">
+                              <div className="font-semibold text-gray-800">{txn.customer_name || 'Customer'}</div>
+                              <div className="text-[10px] text-gray-400">{txn.customer_phone || ''}</div>
+                            </td>
+                            <td className="p-3 font-bold font-mono text-[#062B4F]">৳{Number(txn.amount || 0).toLocaleString()}</td>
+                            <td className="p-3">
+                              <span className="px-2 py-0.5 rounded-full bg-blue-50 text-[#0877C9] font-bold text-[10px]">
+                                {txn.payment_method || 'Online'}
+                              </span>
+                            </td>
+                            <td className="p-3">
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                                txn.status === 'PAID' 
+                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                                  : txn.status === 'REFUNDED'
+                                    ? 'bg-purple-50 text-purple-700 border border-purple-200'
+                                    : 'bg-amber-50 text-amber-700 border border-amber-200'
+                              }`}>
+                                {txn.status}
+                              </span>
+                            </td>
+                            <td className="p-3 text-right space-x-1">
+                              {txn.status !== 'REFUNDED' ? (
+                                <button
+                                  onClick={async () => {
+                                    if (confirm(`Process refund for order ${txn.order_id} (৳${txn.amount})?`)) {
+                                      const res = await requestRefund({ orderId: txn.order_id, amount: txn.amount });
+                                      if (res.success) {
+                                        showToast(`Order ${txn.order_id} marked as Refunded!`, 'success');
+                                        const txns = await fetchTransactions();
+                                        setPaymentTransactions(txns || []);
+                                      }
+                                    }
+                                  }}
+                                  className="px-2 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 text-[10px] font-bold transition-colors"
+                                >
+                                  Refund
+                                </button>
+                              ) : (
+                                <span className="text-[10px] text-gray-400 italic">Refunded</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Merchant Account Branding Checklist */}
+              <div className="p-5 rounded-2xl bg-[#F8FCFF] border border-[#D9F0FF] space-y-3">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-[#0877C9]" />
+                  <h4 className="font-black text-sm text-[#062B4F]">Paymently Merchant Dashboard Branding Configuration</h4>
+                </div>
+                <p className="text-xs text-gray-600">
+                  To ensure full AZRAQ branding across the Paymently hosted checkout screens:
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-700">
+                  <div className="p-3 bg-white rounded-xl border border-gray-200 space-y-1">
+                    <p className="font-bold text-[#062B4F]">1. Brand Display Name</p>
+                    <p className="text-gray-500">Change merchant title from <code>vartualtutor</code> to <strong>AZRAQ</strong> in Paymently Settings &gt; General.</p>
+                  </div>
+                  <div className="p-3 bg-white rounded-xl border border-gray-200 space-y-1">
+                    <p className="font-bold text-[#062B4F]">2. Brand Logos & Favicon</p>
+                    <p className="text-gray-500">Upload official AZRAQ logo and favicon in Paymently Branding settings.</p>
+                  </div>
+                  <div className="p-3 bg-white rounded-xl border border-gray-200 space-y-1">
+                    <p className="font-bold text-[#062B4F]">3. Theme Hex Colors</p>
+                    <p className="text-gray-500">Primary: <code>#0877C9</code>, Dark: <code>#062B4F</code>, Accent: <code>#50DDF0</code>, Background: <code>#F8FCFF</code>.</p>
+                  </div>
+                  <div className="p-3 bg-white rounded-xl border border-gray-200 space-y-1">
+                    <p className="font-bold text-[#062B4F]">4. Instant Webhook URL</p>
+                    <p className="text-gray-500">Set Webhook to: <code>https://shop.azraqtrips.com/api/payments/webhook</code></p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          )}
+
+          {/* TAB 6: Financials */}
           {activeTab === 'analytics' && (
             <div className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

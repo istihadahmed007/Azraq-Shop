@@ -168,3 +168,4 @@ export async function searchProductsByImage({ imageBase64, mimeType = 'image/jpe
     }
   };
 }
+

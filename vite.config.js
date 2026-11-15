@@ -1,21 +1,28 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { searchProductsByImage } from './server/visualSearchService.js';
+import { handlePaymentRoutes } from './server/paymentRoutes.js';
 
-// Custom API route plugin for AI Visual Product Search
-function visualSearchApiPlugin() {
+// Custom API route plugin for AI Visual Product Search & Paymently Gateway
+function azraqApiPlugin() {
   return {
-    name: 'visual-search-api',
+    name: 'azraq-api-endpoints',
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
-        // Health check endpoint
+        // 1. Paymently Gateway API Endpoints
+        if (req.url?.startsWith('/api/payments')) {
+          const handled = await handlePaymentRoutes(req, res);
+          if (handled) return;
+        }
+
+        // 2. Visual Search Health check endpoint
         if (req.url === '/api/search-by-image/health' && req.method === 'GET') {
           res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify({ status: 'healthy', engine: 'clip-visual-embeddings', total_indexed: 1206 }));
           return;
         }
 
-        // Image Search endpoint
+        // 3. Visual Search Image Search endpoint
         if (req.url?.startsWith('/api/search-by-image') && req.method === 'POST') {
           let body = '';
           req.on('data', chunk => {
@@ -45,7 +52,7 @@ function visualSearchApiPlugin() {
 
 export default defineConfig({
   base: './',
-  plugins: [react(), visualSearchApiPlugin()],
+  plugins: [react(), azraqApiPlugin()],
   server: {
     port: 3000,
     open: false

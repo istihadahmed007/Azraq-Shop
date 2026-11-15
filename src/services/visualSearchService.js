@@ -173,3 +173,4 @@ export async function performVisualSearch({ imageBase64, mimeType = 'image/jpeg'
     img.src = imageBase64;
   });
 }
+

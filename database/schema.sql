@@ -227,3 +227,50 @@ CREATE TABLE IF NOT EXISTS product_sync_logs (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- 13. Payment Gateway & Transaction Reconciliation (Paymently Integration)
+CREATE TABLE IF NOT EXISTS payment_transactions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    order_id VARCHAR(50) NOT NULL, -- e.g. 'AZQ-BD-92101'
+    customer_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    gateway_name VARCHAR(50) DEFAULT 'PAYMENTLY', -- 'PAYMENTLY', 'COD', 'MANUAL_LINK'
+    gateway_invoice_id VARCHAR(100) UNIQUE,
+    gateway_payment_url TEXT,
+    transaction_id VARCHAR(100), -- Provider Transaction Reference (TrxID)
+    sender_number VARCHAR(30), -- Customer wallet / phone (e.g. 017...)
+    payment_method VARCHAR(50) DEFAULT 'ONLINE', -- 'bkash', 'nagad', 'rocket', 'upay', 'cards', 'cod'
+    currency VARCHAR(10) DEFAULT 'BDT',
+    amount NUMERIC(12, 2) NOT NULL,
+    fee NUMERIC(10, 2) DEFAULT 0.00,
+    charged_amount NUMERIC(12, 2),
+    status VARCHAR(50) DEFAULT 'PENDING', -- 'PENDING', 'PROCESSING', 'PAID', 'FAILED', 'CANCELLED', 'REFUNDED'
+    idempotency_key VARCHAR(100) UNIQUE,
+    verified_at TIMESTAMPTZ,
+    raw_payload JSONB,
+    refund_status VARCHAR(50), -- 'NONE', 'REQUESTED', 'APPROVED', 'PROCESSED'
+    refund_amount NUMERIC(12, 2),
+    refund_reason TEXT,
+    refunded_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_payment_order_id ON payment_transactions(order_id);
+CREATE INDEX IF NOT EXISTS idx_payment_trx_id ON payment_transactions(transaction_id);
+CREATE INDEX IF NOT EXISTS idx_payment_invoice ON payment_transactions(gateway_invoice_id);
+CREATE INDEX IF NOT EXISTS idx_payment_status ON payment_transactions(status);
+
+-- 14. Payment Webhook Audit Logs (Idempotency and Anti-Tampering)
+CREATE TABLE IF NOT EXISTS payment_webhook_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    gateway_name VARCHAR(50) DEFAULT 'PAYMENTLY',
+    invoice_id VARCHAR(100),
+    event_type VARCHAR(100),
+    signature VARCHAR(255),
+    payload JSONB NOT NULL,
+    is_verified BOOLEAN DEFAULT FALSE,
+    processed_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_webhook_invoice ON payment_webhook_logs(invoice_id);
+
+
