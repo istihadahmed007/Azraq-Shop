@@ -395,7 +395,7 @@ export async function createCodCheckoutOrder({
  * Validates: Status === COMPLETED, BDT currency, exact amount match, real provider transaction_id.
  * ONLY creates an order if verification fully succeeds.
  */
-export async function verifyPaymentlyPayment({ invoiceId = null, checkoutId = null, manualTrxId = null }) {
+export async function verifyPaymentlyPayment({ invoiceId = null, checkoutId = null, manualTrxId = null, checkoutSnapshot = null }) {
   await initDb();
   const config = getPaymentlyConfig();
 
@@ -406,6 +406,43 @@ export async function verifyPaymentlyPayment({ invoiceId = null, checkoutId = nu
   }
   if (!checkoutAttempt && invoiceId) {
     checkoutAttempt = await getCheckoutAttemptByInvoice(invoiceId);
+  }
+
+  // If not found in memory (e.g. fresh serverless container spin-up), re-hydrate if snapshot provided
+  if (!checkoutAttempt && checkoutSnapshot && checkoutSnapshot.customer && checkoutSnapshot.items) {
+    try {
+      const pricing = calculateServerOrderPricing({
+        items: checkoutSnapshot.items,
+        deliveryArea: checkoutSnapshot.deliveryArea || 'inside',
+        promoCode: checkoutSnapshot.promoCode || null
+      });
+
+      const fallbackId = checkoutId || invoiceId || `AZQ-CHK-${Date.now().toString(36).toUpperCase()}`;
+      checkoutAttempt = await saveCheckoutAttempt({
+        id: fallbackId,
+        customer_name: checkoutSnapshot.customer.name.trim(),
+        customer_phone: checkoutSnapshot.customer.phone.trim(),
+        customer_email: checkoutSnapshot.customer.email ? checkoutSnapshot.customer.email.trim() : null,
+        shipping_address: checkoutSnapshot.customer.address.trim(),
+        city: checkoutSnapshot.customer.city || 'Dhaka',
+        thana: checkoutSnapshot.customer.thana || null,
+        delivery_area: checkoutSnapshot.deliveryArea || 'inside',
+        notes: checkoutSnapshot.notes || null,
+        items_snapshot: pricing.items,
+        subtotal: pricing.subtotal,
+        delivery_fee: pricing.deliveryFee,
+        discount: pricing.discount,
+        total_payable: pricing.totalPayable,
+        promo_code: pricing.promoCode,
+        payment_method: 'PAYMENTLY',
+        gateway_name: 'PAYMENTLY',
+        gateway_invoice_id: invoiceId || fallbackId,
+        gateway_payment_url: config.defaultPaymentLink,
+        status: 'AWAITING_PAYMENT'
+      });
+    } catch (rehydrateErr) {
+      console.warn('[Rehydrate Warning]:', rehydrateErr.message);
+    }
   }
 
   if (!checkoutAttempt) {

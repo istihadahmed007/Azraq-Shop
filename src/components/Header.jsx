@@ -36,7 +36,7 @@ export default function Header() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-[#50DDF0] inline-block animate-pulse" />
-            <span>{t("Free Delivery inside Dhaka over ৳1,500 • EasyDrop Verified Source", "ঢাকা সিটিতে ১৫০০৳ এর অর্ডারে ফ্রি ডেলিভারি • ইজিড্রপ অনুমোদিত ক্যাটালগ")}</span>
+            <span>{t("Free Nationwide Delivery over ৳3,000 • EasyDrop Verified Source", "সারা বাংলাদেশে ৩০০০৳ এর অর্ডারে ফ্রি হোম ডেলিভারি • ইজিড্রপ অনুমোদিত ক্যাটালগ")}</span>
           </div>
 
           <div className="flex items-center gap-4 text-[11px]">
@@ -327,13 +327,21 @@ export default function Header() {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white/95 backdrop-blur-2xl border-b border-[#D9F0FF] p-5 space-y-4 shadow-xl">
           {/* Mobile Search with Search by Image */}
-          <div className="relative flex items-center">
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();
+              setIsMobileMenuOpen(false);
+              const el = document.getElementById('all-products') || document.getElementById('shop-by-collection');
+              el?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="relative flex items-center"
+          >
             <input
               type="text"
               placeholder={t("Search catalog...", "পণ্য খুঁজুন...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-4 pr-18 py-2.5 rounded-full bg-[#F0F7FF] border border-[#D9F0FF] text-xs text-[#062B4F] focus:outline-none"
+              className="w-full pl-4 pr-20 py-2.5 rounded-full bg-[#F0F7FF] border border-[#D9F0FF] text-xs text-[#062B4F] focus:outline-none focus:border-[#0877C9]"
             />
             <div className="absolute right-2 flex items-center gap-1">
               <button
@@ -344,12 +352,19 @@ export default function Header() {
                 }}
                 className="p-1.5 rounded-full text-[#0877C9] hover:bg-[#D9F0FF]/60"
                 title={t("Search by Image", "ছবি দিয়ে পণ্য খুঁজুন")}
+                aria-label="Search by Image"
               >
                 <Camera className="w-4 h-4 text-[#0877C9]" />
               </button>
-              <Search className="w-4 h-4 text-[#062B4F]/40" />
+              <button
+                type="submit"
+                className="p-1.5 rounded-full text-[#062B4F] hover:text-[#0877C9]"
+                aria-label="Submit search"
+              >
+                <Search className="w-4 h-4" />
+              </button>
             </div>
-          </div>
+          </form>
 
           <div className="flex flex-col space-y-2 text-sm font-semibold text-[#062B4F]">
             <button 
@@ -379,6 +394,27 @@ export default function Header() {
             >
               {t("Track Order", "অর্ডার ট্র্যাকিং")}
             </button>
+
+            {/* Language Switcher in Mobile Drawer */}
+            <div className="py-2 border-b border-gray-100 flex items-center justify-between">
+              <span className="text-xs text-gray-500">{t("Language", "ভাষা")}:</span>
+              <button
+                onClick={() => setLanguage(language === 'en' ? 'bn' : 'en')}
+                className="px-3 py-1 rounded-full bg-[#F0F7FF] text-[#0877C9] border border-[#D9F0FF] text-xs font-bold flex items-center gap-1.5"
+              >
+                <Globe className="w-3.5 h-3.5" />
+                <span>{language === 'en' ? 'বাংলা' : 'English'}</span>
+              </button>
+            </div>
+
+            {/* Support Helpline in Mobile Drawer */}
+            <div className="py-2 border-b border-gray-100 flex items-center justify-between text-xs">
+              <span className="text-gray-500">Helpline:</span>
+              <a href="tel:+8801711223344" className="font-bold text-[#062B4F] hover:text-[#0877C9]">
+                +880 1711-223344
+              </a>
+            </div>
+
             <button 
               onClick={() => {
                 setIsMobileMenuOpen(false);

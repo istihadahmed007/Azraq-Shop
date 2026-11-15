@@ -1,12 +1,17 @@
 import pg from 'pg';
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
 
 const { Pool } = pg;
 
 let pool = null;
 let isInitialized = false;
 
-// Fallback in-memory store for local environments without DATABASE_URL
+// Fallback in-memory and disk-cache store for serverless/local environments without DATABASE_URL
 // ALWAYS STARTS COMPLETELY EMPTY — NO DUMMY OR FAKE TRANSACTIONS
+const DB_CACHE_FILE = path.join(os.tmpdir(), 'azraq_db_cache.json');
+
 const memoryStore = {
   checkout_attempts: new Map(),
   orders: new Map(),
@@ -14,6 +19,50 @@ const memoryStore = {
   payment_transactions: new Map(),
   payment_webhook_logs: new Map()
 };
+
+function persistFallbackStore() {
+  try {
+    const data = {
+      checkout_attempts: Array.from(memoryStore.checkout_attempts.entries()),
+      orders: Array.from(memoryStore.orders.entries()),
+      order_items: Array.from(memoryStore.order_items.entries()),
+      payment_transactions: Array.from(memoryStore.payment_transactions.entries()),
+      payment_webhook_logs: Array.from(memoryStore.payment_webhook_logs.entries())
+    };
+    fs.writeFileSync(DB_CACHE_FILE, JSON.stringify(data), 'utf8');
+  } catch (e) {
+    // Non-blocking in restricted environments
+  }
+}
+
+function hydrateFallbackStore() {
+  try {
+    if (fs.existsSync(DB_CACHE_FILE)) {
+      const raw = fs.readFileSync(DB_CACHE_FILE, 'utf8');
+      const data = JSON.parse(raw);
+      if (data.checkout_attempts) {
+        data.checkout_attempts.forEach(([k, v]) => memoryStore.checkout_attempts.set(k, v));
+      }
+      if (data.orders) {
+        data.orders.forEach(([k, v]) => memoryStore.orders.set(k, v));
+      }
+      if (data.order_items) {
+        data.order_items.forEach(([k, v]) => memoryStore.order_items.set(k, v));
+      }
+      if (data.payment_transactions) {
+        data.payment_transactions.forEach(([k, v]) => memoryStore.payment_transactions.set(k, v));
+      }
+      if (data.payment_webhook_logs) {
+        data.payment_webhook_logs.forEach(([k, v]) => memoryStore.payment_webhook_logs.set(k, v));
+      }
+    }
+  } catch (e) {
+    // Ignore hydrate errors
+  }
+}
+
+// Hydrate on module load
+hydrateFallbackStore();
 
 export function getDbPool() {
   if (!pool && process.env.DATABASE_URL) {
@@ -203,6 +252,7 @@ export async function saveCheckoutAttempt(attempt) {
   }
 
   memoryStore.checkout_attempts.set(record.id, record);
+  persistFallbackStore();
   return record;
 }
 
@@ -223,6 +273,9 @@ export async function getCheckoutAttempt(id) {
     } catch (e) {
       console.error('[DB Error getCheckoutAttempt]:', e.message);
     }
+  }
+  if (!memoryStore.checkout_attempts.has(id)) {
+    hydrateFallbackStore();
   }
   return memoryStore.checkout_attempts.get(id) || null;
 }
@@ -246,6 +299,7 @@ export async function getCheckoutAttemptByInvoice(invoiceId) {
     }
   }
 
+  hydrateFallbackStore();
   for (const att of memoryStore.checkout_attempts.values()) {
     if (att.gateway_invoice_id === invoiceId) return att;
   }
@@ -284,6 +338,7 @@ export async function updateCheckoutAttempt(id, updates) {
   }
 
   memoryStore.checkout_attempts.set(id, updated);
+  persistFallbackStore();
   return updated;
 }
 
@@ -433,6 +488,7 @@ export async function createOrderFromVerifiedPayment({
   checkoutAttempt.order_id = orderId;
   checkoutAttempt.updated_at = now;
   memoryStore.checkout_attempts.set(checkoutAttempt.id, checkoutAttempt);
+  persistFallbackStore();
 
   return {
     order: orderRecord,
@@ -541,6 +597,7 @@ export async function createCodOrder({ checkoutAttempt }) {
   checkoutAttempt.order_id = orderId;
   checkoutAttempt.updated_at = now;
   memoryStore.checkout_attempts.set(checkoutAttempt.id, checkoutAttempt);
+  persistFallbackStore();
 
   return {
     order: orderRecord,
@@ -696,6 +753,7 @@ export async function createOrderWithManualTrx({
   checkoutAttempt.order_id = orderId;
   checkoutAttempt.updated_at = now;
   memoryStore.checkout_attempts.set(checkoutAttempt.id, checkoutAttempt);
+  persistFallbackStore();
 
   return {
     order: orderRecord,
@@ -717,6 +775,7 @@ export async function getAllOrders() {
       console.error('[DB Error getAllOrders]:', e.message);
     }
   }
+  hydrateFallbackStore();
   return Array.from(memoryStore.orders.values()).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 }
 
@@ -733,6 +792,7 @@ export async function getAllTransactions() {
       console.error('[DB Error getAllTransactions]:', e.message);
     }
   }
+  hydrateFallbackStore();
   return Array.from(memoryStore.payment_transactions.values()).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 }
 
@@ -755,6 +815,7 @@ export async function getOrderWithItems(orderId) {
     }
   }
 
+  hydrateFallbackStore();
   const order = memoryStore.orders.get(orderId);
   if (!order) return null;
   order.items = memoryStore.order_items.get(orderId) || [];

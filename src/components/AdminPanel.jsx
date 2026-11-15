@@ -49,12 +49,46 @@ export default function AdminPanel() {
   const [editPrice, setEditPrice] = useState('');
   const [editStock, setEditStock] = useState('');
 
+  // Admin authentication state
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return typeof window !== 'undefined' && sessionStorage.getItem('azraq_admin_auth') === 'true';
+  });
+  const [passcode, setPasscode] = useState('');
+  const [authError, setAuthError] = useState('');
+
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    if (passcode.trim() === 'azraq2026' || passcode.trim() === 'azraqadmin') {
+      sessionStorage.setItem('azraq_admin_auth', 'true');
+      setIsAuthenticated(true);
+      setAuthError('');
+      showToast(t("Admin access authenticated successfully", "অ্যাডমিন অ্যাক্সেস সফল"), 'success');
+    } else {
+      setAuthError(t("Invalid passcode. Please enter the authorized administrator key.", "ভুল পাসকোড। অনুমোদিত কি দিন।"));
+    }
+  };
+
+  const reloadAdminData = async () => {
+    setIsVerifyingTxn(true);
+    try {
+      const [txns, cfg] = await Promise.all([
+        fetchTransactions(),
+        fetchGatewayStatus()
+      ]);
+      setPaymentTransactions(txns || []);
+      setGatewayConfig(cfg);
+      showToast("Admin data refreshed", "info");
+    } finally {
+      setIsVerifyingTxn(false);
+    }
+  };
+
   React.useEffect(() => {
-    if (isAdminOpen) {
+    if (isAdminOpen && isAuthenticated) {
       fetchTransactions().then(txns => setPaymentTransactions(txns || []));
       fetchGatewayStatus().then(cfg => setGatewayConfig(cfg));
     }
-  }, [isAdminOpen]);
+  }, [isAdminOpen, isAuthenticated]);
 
   if (!isAdminOpen) return null;
 
@@ -132,9 +166,9 @@ export default function AdminPanel() {
       >
         
         {/* Header Bar */}
-        <div className="p-6 bg-azraq-navy text-white flex items-center justify-between border-b border-azraq-purple/20">
+        <div className="p-6 bg-[#062B4F] text-white flex items-center justify-between border-b border-[#0877C9]/20">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-azraq-charcoal border border-azraq-lime/40 flex items-center justify-center text-azraq-lime">
+            <div className="w-10 h-10 rounded-xl bg-white/10 border border-[#50DDF0]/40 flex items-center justify-center text-[#50DDF0]">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
@@ -142,7 +176,7 @@ export default function AdminPanel() {
                 <h2 className="text-xl font-black text-white tracking-tight">
                   AZRAQ Multi-Collection Operations & Dropship Portal
                 </h2>
-                <span className="px-2 py-0.5 rounded-full bg-azraq-lime text-azraq-navy text-[10px] font-black uppercase">
+                <span className="px-2 py-0.5 rounded-full bg-[#50DDF0] text-[#062B4F] text-[10px] font-black uppercase">
                   Admin System
                 </span>
               </div>
@@ -160,83 +194,130 @@ export default function AdminPanel() {
           </button>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex items-center gap-2 px-6 pt-3 border-b border-gray-200 bg-azraq-cloud overflow-x-auto no-scrollbar">
-          <button
-            onClick={() => setActiveTab('collections')}
-            className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'collections'
-                ? 'border-azraq-violet text-azraq-violet bg-white rounded-t-xl shadow-sm'
-                : 'border-transparent text-azraq-navy/60 hover:text-azraq-navy'
-            }`}
-          >
-            <Layers className="w-3.5 h-3.5" />
-            <span>Collection Management ({collections.length})</span>
-          </button>
+        {!isAuthenticated ? (
+          /* Admin Passcode Gate */
+          <div className="p-8 sm:p-14 text-center max-w-md mx-auto space-y-5 my-auto">
+            <div className="w-16 h-16 rounded-2xl bg-[#062B4F] text-[#50DDF0] flex items-center justify-center mx-auto shadow-md">
+              <ShieldCheck className="w-8 h-8" />
+            </div>
+            <div>
+              <h3 className="text-xl font-black text-[#062B4F]">Admin Authentication Required</h3>
+              <p className="text-xs text-[#062B4F]/60 mt-1 leading-relaxed">
+                Please enter the store administrator passcode to manage inventory, customer orders, and payment records.
+              </p>
+            </div>
+            <form onSubmit={handleAdminLogin} className="space-y-3 pt-2">
+              <input
+                type="password"
+                placeholder="Enter passcode (azraq2026)"
+                value={passcode}
+                onChange={(e) => {
+                  setPasscode(e.target.value);
+                  setAuthError('');
+                }}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-xs font-mono text-center focus:outline-none focus:border-[#0877C9] shadow-inner"
+                autoFocus
+              />
+              {authError && <p className="text-xs text-rose-600 font-semibold">{authError}</p>}
+              <button
+                type="submit"
+                className="w-full py-2.5 rounded-xl bg-[#062B4F] hover:bg-[#0877C9] text-white text-xs font-black shadow-md transition-all active:scale-95"
+              >
+                Unlock Operations Portal
+              </button>
+            </form>
+          </div>
+        ) : (
+          <>
+            {/* Tab Navigation */}
+            <div className="flex items-center justify-between px-6 pt-3 border-b border-gray-200 bg-[#F8FCFF] overflow-x-auto no-scrollbar">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setActiveTab('collections')}
+                  className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+                    activeTab === 'collections'
+                      ? 'border-[#0877C9] text-[#0877C9] bg-white rounded-t-xl shadow-xs'
+                      : 'border-transparent text-[#062B4F]/60 hover:text-[#062B4F]'
+                  }`}
+                >
+                  <Layers className="w-3.5 h-3.5" />
+                  <span>Collections ({collections.length})</span>
+                </button>
 
-          <button
-            onClick={() => setActiveTab('audit')}
-            className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'audit'
-                ? 'border-azraq-violet text-azraq-violet bg-white rounded-t-xl shadow-sm'
-                : 'border-transparent text-azraq-navy/60 hover:text-azraq-navy'
-            }`}
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span>Reconciliation & Sync Audit</span>
-          </button>
+                <button
+                  onClick={() => setActiveTab('audit')}
+                  className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+                    activeTab === 'audit'
+                      ? 'border-[#0877C9] text-[#0877C9] bg-white rounded-t-xl shadow-xs'
+                      : 'border-transparent text-[#062B4F]/60 hover:text-[#062B4F]'
+                  }`}
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Reconciliation Audit</span>
+                </button>
 
-          <button
-            onClick={() => setActiveTab('products')}
-            className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'products'
-                ? 'border-azraq-violet text-azraq-violet bg-white rounded-t-xl shadow-sm'
-                : 'border-transparent text-azraq-navy/60 hover:text-azraq-navy'
-            }`}
-          >
-            <Package className="w-3.5 h-3.5" />
-            <span>Master Products Catalog ({products.length})</span>
-          </button>
+                <button
+                  onClick={() => setActiveTab('products')}
+                  className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+                    activeTab === 'products'
+                      ? 'border-[#0877C9] text-[#0877C9] bg-white rounded-t-xl shadow-xs'
+                      : 'border-transparent text-[#062B4F]/60 hover:text-[#062B4F]'
+                  }`}
+                >
+                  <Package className="w-3.5 h-3.5" />
+                  <span>Catalog ({products.length})</span>
+                </button>
 
-          <button
-            onClick={() => setActiveTab('orders')}
-            className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'orders'
-                ? 'border-azraq-violet text-azraq-violet bg-white rounded-t-xl shadow-sm'
-                : 'border-transparent text-azraq-navy/60 hover:text-azraq-navy'
-            }`}
-          >
-            <ShoppingBag className="w-3.5 h-3.5" />
-            <span>Orders & Supplier Dispatch ({orders.length})</span>
-          </button>
+                <button
+                  onClick={() => setActiveTab('orders')}
+                  className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+                    activeTab === 'orders'
+                      ? 'border-[#0877C9] text-[#0877C9] bg-white rounded-t-xl shadow-xs'
+                      : 'border-transparent text-[#062B4F]/60 hover:text-[#062B4F]'
+                  }`}
+                >
+                  <ShoppingBag className="w-3.5 h-3.5" />
+                  <span>Orders ({orders.length})</span>
+                </button>
 
-          <button
-            onClick={() => setActiveTab('payments')}
-            className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'payments'
-                ? 'border-[#0877C9] text-[#0877C9] bg-white rounded-t-xl shadow-sm'
-                : 'border-transparent text-azraq-navy/60 hover:text-azraq-navy'
-            }`}
-          >
-            <CreditCard className="w-3.5 h-3.5 text-[#0877C9]" />
-            <span>Paymently & Transactions ({paymentTransactions.length})</span>
-          </button>
+                <button
+                  onClick={() => setActiveTab('payments')}
+                  className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+                    activeTab === 'payments'
+                      ? 'border-[#0877C9] text-[#0877C9] bg-white rounded-t-xl shadow-xs'
+                      : 'border-transparent text-[#062B4F]/60 hover:text-[#062B4F]'
+                  }`}
+                >
+                  <CreditCard className="w-3.5 h-3.5" />
+                  <span>Paymently Gateway</span>
+                </button>
 
-          <button
-            onClick={() => setActiveTab('analytics')}
-            className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'analytics'
-                ? 'border-azraq-violet text-azraq-violet bg-white rounded-t-xl shadow-sm'
-                : 'border-transparent text-azraq-navy/60 hover:text-azraq-navy'
-            }`}
-          >
-            <TrendingUp className="w-3.5 h-3.5" />
-            <span>Financials & Margin Overview</span>
-          </button>
-        </div>
+                <button
+                  onClick={() => setActiveTab('analytics')}
+                  className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+                    activeTab === 'analytics'
+                      ? 'border-[#0877C9] text-[#0877C9] bg-white rounded-t-xl shadow-xs'
+                      : 'border-transparent text-[#062B4F]/60 hover:text-[#062B4F]'
+                  }`}
+                >
+                  <TrendingUp className="w-3.5 h-3.5" />
+                  <span>Analytics</span>
+                </button>
+              </div>
 
-        {/* Tab Content Body */}
-        <div className="flex-1 overflow-y-auto p-6 bg-white">
+              <button
+                onClick={reloadAdminData}
+                disabled={isVerifyingTxn}
+                className="px-3 py-1.5 rounded-lg bg-white border border-[#D9F0FF] text-[#062B4F] text-xs font-bold hover:bg-[#F0F7FF] transition-all flex items-center gap-1.5 shadow-2xs mb-2 flex-shrink-0"
+                title="Reload live orders & transactions"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 text-[#0877C9] ${isVerifyingTxn ? 'animate-spin' : ''}`} />
+                <span>Refresh</span>
+              </button>
+            </div>
+
+            {/* Tab Content Body */}
+            <div className="flex-1 overflow-y-auto p-6 bg-white">
           
           {/* TAB 1: Collection Management */}
           {activeTab === 'collections' && (
@@ -543,21 +624,28 @@ export default function AdminPanel() {
                       </div>
                       <div className="flex items-center gap-2">
                         <select
-                          value={order.status}
-                          onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                          className="px-2.5 py-1 rounded-lg border text-xs font-bold"
+                          value={order.order_status || order.status || 'Processing'}
+                          onChange={(e) => {
+                            const next = e.target.value;
+                            if (window.confirm(`Are you sure you want to change order ${order.id} status to "${next}"?`)) {
+                              updateOrderStatus(order.id, next);
+                              showToast(`Order status updated to ${next}`, 'success');
+                            }
+                          }}
+                          className="px-2.5 py-1 rounded-lg border border-[#D9F0FF] text-xs font-bold text-[#062B4F] bg-white"
                         >
-                          <option value="Pending">Pending</option>
+                          <option value="Processing">Processing</option>
                           <option value="Confirmed">Confirmed</option>
                           <option value="Sent to EasyDrop">Sent to EasyDrop</option>
                           <option value="Dispatched">Dispatched</option>
                           <option value="Delivered">Delivered</option>
+                          <option value="Cancelled">Cancelled</option>
                         </select>
                         <button
                           onClick={() => copyEasyDropPayload(order)}
-                          className="px-3 py-1 rounded-lg bg-azraq-navy text-white text-xs font-bold flex items-center gap-1.5"
+                          className="px-3 py-1 rounded-lg bg-[#062B4F] text-white text-xs font-bold flex items-center gap-1.5 hover:bg-[#0877C9] transition-colors"
                         >
-                          <Copy className="w-3.5 h-3.5 text-azraq-lime" />
+                          <Copy className="w-3.5 h-3.5 text-[#50DDF0]" />
                           <span>Copy Payload</span>
                         </button>
                       </div>
@@ -758,6 +846,8 @@ export default function AdminPanel() {
           )}
 
         </div>
+        </>
+        )}
 
         {/* Modal Footer */}
         <div className="p-4 bg-azraq-cloud border-t border-gray-200 flex items-center justify-between text-xs text-gray-500">

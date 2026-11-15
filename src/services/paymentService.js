@@ -64,14 +64,15 @@ export async function createCheckoutSession({ customer, items, deliveryArea, pro
 /**
  * 2. Verify payment status directly with backend & Paymently
  */
-export async function verifyPaymentStatus({ invoiceId, checkoutId, manualTrxId = null }) {
+export async function verifyPaymentStatus({ invoiceId, checkoutId, manualTrxId = null, checkoutSnapshot = null }) {
   const response = await fetch(`${API_BASE}/api/payments/verify`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       invoiceId,
       checkoutId,
-      manualTrxId: manualTrxId ? String(manualTrxId).trim() : null
+      manualTrxId: manualTrxId ? String(manualTrxId).trim() : null,
+      checkoutSnapshot
     })
   });
 

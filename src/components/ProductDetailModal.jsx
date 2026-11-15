@@ -171,8 +171,40 @@ export default function ProductDetailModal() {
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#062B4F]/60">
                 {t("AUTHENTIC PRODUCT DETAILS & SPECIFICATIONS", "অনুমোদিত পণ্যের বিবরণ ও স্পেসিফিকেশন")}
               </span>
-              <div className="text-xs sm:text-sm text-[#062B4F]/80 leading-relaxed whitespace-pre-line bg-gray-50/80 p-4 rounded-xl border border-gray-100 max-h-60 overflow-y-auto">
+              <div className="text-xs sm:text-sm text-[#062B4F]/80 leading-relaxed whitespace-pre-line bg-gray-50/80 p-4 rounded-xl border border-gray-100 max-h-48 overflow-y-auto">
                 {selectedProduct.description || selectedProduct.description_en || t("Description details available upon request.", "বিস্তারিত বিবরণ শীঘ্রই যুক্ত হচ্ছে।")}
+              </div>
+            </div>
+
+            {/* Delivery & Return Policies Box */}
+            <div className="p-4 rounded-xl bg-[#F8FCFF] border border-[#D9F0FF] space-y-3 text-xs">
+              <div className="flex items-start gap-2.5">
+                <Truck className="w-4 h-4 text-[#0877C9] mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="font-bold text-[#062B4F]">
+                    {t("Delivery Timeline & Rates", "ডেলিভারি সময় ও খরচ")}
+                  </h4>
+                  <p className="text-[#062B4F]/70 text-[11px] mt-0.5 leading-relaxed">
+                    • {t("Inside Dhaka: ৳70 (24–48 hours)", "ঢাকার ভেতরে: ৭০৳ (২৪–৪৮ ঘণ্টা)")}<br />
+                    • {t("Outside Dhaka: ৳130 (2–4 business days)", "ঢাকার বাইরে: ১৩০৳ (২–৪ কার্যদিবস)")}<br />
+                    • <strong className="text-[#0877C9]">{t("FREE Nationwide Delivery on orders over ৳3,000", "৩০০০৳ এর অর্ডারে সারা দেশে ফ্রি হোম ডেলিভারি")}</strong>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5 pt-2 border-t border-[#D9F0FF]/60">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="font-bold text-[#062B4F]">
+                    {t("7-Day Return & Doorstep Inspection", "৭ দিনের রিপ্লেসমেন্ট ও পার্সেল চেক")}
+                  </h4>
+                  <p className="text-[#062B4F]/70 text-[11px] mt-0.5 leading-relaxed">
+                    {t(
+                      "Inspect your parcel in front of the courier rider. 7-day hassle-free replacement for defective or damaged products.",
+                      "কুরিয়ার রাইডারের সামনে পার্সেল দেখে নিন। ত্রুটিপূর্ণ বা ক্ষতিগ্রস্ত পণ্যে ৭ দিনের সহজ রিপ্লেসমেন্ট গ্যারান্টি।"
+                    )}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -231,20 +263,44 @@ export default function ProductDetailModal() {
           <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row gap-3">
             <button
               onClick={() => {
-                addToCart(selectedProduct, selectedVariant, quantity);
-                setSelectedProduct(null);
+                if (selectedProduct.in_stock !== false) {
+                  addToCart(selectedProduct, selectedVariant, quantity);
+                  setSelectedProduct(null);
+                }
               }}
-              className="flex-1 py-3 px-4 rounded-full border-2 border-[#062B4F] text-[#062B4F] font-bold text-xs sm:text-sm hover:bg-[#F0F7FF] transition-all text-center flex items-center justify-center gap-2"
+              disabled={selectedProduct.in_stock === false}
+              className={`flex-1 py-3 px-4 rounded-full font-bold text-xs sm:text-sm transition-all text-center flex items-center justify-center gap-2 ${
+                selectedProduct.in_stock !== false
+                  ? 'border-2 border-[#062B4F] text-[#062B4F] hover:bg-[#F0F7FF] active:scale-95'
+                  : 'bg-gray-100 text-gray-400 border-2 border-gray-200 cursor-not-allowed'
+              }`}
             >
               <ShoppingBag className="w-4 h-4" />
-              <span>{t("Add to Bag", "ব্যাগে রাখুন")}</span>
+              <span>
+                {selectedProduct.in_stock !== false 
+                  ? t("Add to Bag", "ব্যাগে রাখুন") 
+                  : t("Out of Stock", "স্টক নেই")}
+              </span>
             </button>
 
             <button
-              onClick={handleBuyNow}
-              className="flex-1 py-3 px-4 rounded-full bg-[#062B4F] hover:bg-[#0877C9] text-white font-black text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2"
+              onClick={() => {
+                if (selectedProduct.in_stock !== false) {
+                  handleBuyNow();
+                }
+              }}
+              disabled={selectedProduct.in_stock === false}
+              className={`flex-1 py-3 px-4 rounded-full font-black text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 ${
+                selectedProduct.in_stock !== false
+                  ? 'bg-[#062B4F] hover:bg-[#0877C9] text-white active:scale-95'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
             >
-              <span>{t("Buy Now", "সরাসরি অর্ডার করুন")}</span>
+              <span>
+                {selectedProduct.in_stock !== false 
+                  ? t("Buy Now", "সরাসরি অর্ডার করুন") 
+                  : t("Out of Stock", "স্টক শেষ")}
+              </span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

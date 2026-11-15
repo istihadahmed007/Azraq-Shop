@@ -218,11 +218,27 @@ export default function CheckoutModal() {
     setErrorMessage('');
     setPendingNotice('');
 
+    const checkoutSnapshot = {
+      customer: {
+        name: fullName.trim(),
+        phone: phone.trim(),
+        email: email.trim(),
+        address: address.trim(),
+        city,
+        thana
+      },
+      items: cart,
+      deliveryArea,
+      promoCode: appliedPromo?.code || null,
+      notes: notes.trim()
+    };
+
     try {
       const res = await verifyPaymentStatus({
         invoiceId: paymentSession.invoice_id,
         checkoutId: paymentSession.checkout_id,
-        manualTrxId: null
+        manualTrxId: null,
+        checkoutSnapshot
       });
 
       setIsSubmitting(false);
@@ -274,11 +290,27 @@ export default function CheckoutModal() {
     setErrorMessage('');
     setPendingNotice('');
 
+    const checkoutSnapshot = {
+      customer: {
+        name: fullName.trim(),
+        phone: phone.trim(),
+        email: email.trim(),
+        address: address.trim(),
+        city,
+        thana
+      },
+      items: cart,
+      deliveryArea,
+      promoCode: appliedPromo?.code || null,
+      notes: notes.trim()
+    };
+
     try {
       const res = await verifyPaymentStatus({
         invoiceId: paymentSession?.invoice_id,
         checkoutId: paymentSession?.checkout_id,
-        manualTrxId: cleanTrx
+        manualTrxId: cleanTrx,
+        checkoutSnapshot
       });
 
       setIsSubmitting(false);

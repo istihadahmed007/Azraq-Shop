@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       try { payload = JSON.parse(payload); } catch (e) {}
     }
 
-    const { invoiceId, checkoutId, manualTrxId } = payload || {};
+    const { invoiceId, checkoutId, manualTrxId, checkoutSnapshot } = payload || {};
 
     if (!invoiceId && !checkoutId) {
       return res.status(400).json({ success: false, error: 'Invoice ID or Checkout ID is required for verification.' });
@@ -29,7 +29,8 @@ export default async function handler(req, res) {
     const verification = await verifyPaymentlyPayment({
       invoiceId,
       checkoutId,
-      manualTrxId
+      manualTrxId,
+      checkoutSnapshot
     });
 
     if (verification.verified && verification.status === 'PAID') {
