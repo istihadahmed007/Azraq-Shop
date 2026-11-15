@@ -3,11 +3,11 @@ import { ShopProvider, useShop } from './context/ShopContext';
 import NavigationDock from './components/NavigationDock';
 import Header from './components/Header';
 import HeroSection from './components/HeroSection';
-import ShopByCollectionSection from './components/ShopByCollectionSection';
 import FeaturedCollectionsCarousel from './components/FeaturedCollectionsCarousel';
-import NewArrivalsSection from './components/NewArrivalsSection';
+import ShopByCollectionSection from './components/ShopByCollectionSection';
 import BestPicksSection from './components/BestPicksSection';
 import TrendingDiscoveriesSection from './components/TrendingDiscoveriesSection';
+import ProductGrid from './components/ProductGrid';
 import ProductDemonstrationSection from './components/ProductDemonstrationSection';
 import BrandValuePanel from './components/BrandValuePanel';
 import StatsRibbon from './components/StatsRibbon';
@@ -29,44 +29,38 @@ function StorefrontContent() {
   return (
     <div className="min-h-screen bg-azraq-cloud text-azraq-navy selection:bg-azraq-lime selection:text-azraq-navy relative font-sans">
       
-      {/* Floating Side Dock */}
+      {/* Floating Side Dock (Positioned cleanly without overlapping content) */}
       <NavigationDock />
 
-      {/* Minimal Navigation Header */}
+      {/* 1. Website Navigation Header */}
       <Header />
 
-      {/* Main View Router */}
-      <main className="lg:pl-8">
+      {/* Main View Router with Safe Dock Clearance (lg:pl-20 xl:pl-24 prevents any dock overlap) */}
+      <main className="lg:pl-20 xl:pl-24 transition-all duration-300">
         {currentView === 'home' && (
           <>
-            {/* Section 1: Hero */}
+            {/* 1. Brand Showcase / Hero Presentation */}
             <HeroSection />
 
-            {/* Section 2: Shop by Collection (The Primary Section) */}
-            <ShopByCollectionSection />
-
-            {/* Section 3: Featured Collections Carousel */}
+            {/* 2. Featured Collections Section */}
             <FeaturedCollectionsCarousel />
 
-            {/* Section 4: New Arrivals */}
-            <NewArrivalsSection />
+            {/* 3. Browse Categories Section (Shop by Collection) */}
+            <ShopByCollectionSection />
 
-            {/* Section 5: Best Picks */}
+            {/* 4. Popular Products Section (Best Customer Picks & Ratings) */}
             <BestPicksSection />
 
-            {/* Section 6: Trending Discoveries */}
+            {/* Trending Curated Goods */}
             <TrendingDiscoveriesSection />
 
-            {/* Section 7: Product Demonstrations */}
+            {/* 5. All Products Catalog (Full Filterable EasyDrop Inventory) */}
+            <ProductGrid />
+
+            {/* Supporting Brand Demonstrations & Value Panels */}
             <ProductDemonstrationSection />
-
-            {/* Section 8: Brand Value Panel */}
             <BrandValuePanel />
-
-            {/* Section 9: Stats Ribbon (Nexora Reference Match) */}
             <StatsRibbon />
-
-            {/* Section 10: Editorial CTA */}
             <EditorialCtaSection />
           </>
         )}
@@ -76,10 +70,10 @@ function StorefrontContent() {
         {currentView === 'collection-detail' && <CollectionDetailPage />}
       </main>
 
-      {/* Minimalist Dark Footer */}
+      {/* 6. Website Footer */}
       <Footer />
 
-      {/* Modals & Drawers */}
+      {/* Interactive Modals & Overlays */}
       <ProductDetailModal />
       <CartDrawer />
       <CheckoutModal />

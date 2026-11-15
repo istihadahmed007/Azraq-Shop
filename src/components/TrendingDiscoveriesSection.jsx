@@ -27,34 +27,34 @@ export default function TrendingDiscoveriesSection() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
         {trending.map(product => {
           const isFav = favorites.includes(product.id);
           return (
             <div
               key={product.id}
-              className="rounded-none bg-white border border-azraq-purple/20 p-3 sm:p-4 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between group relative overflow-hidden h-[490px] sm:h-[510px]"
+              className="rounded-none bg-white border border-azraq-purple/20 p-2 sm:p-4 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between group relative overflow-hidden h-[370px] sm:h-[490px] md:h-[510px]"
             >
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   toggleFavorite(product.id);
                 }}
-                className={`absolute top-4 right-4 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                className={`absolute top-2.5 right-2.5 sm:top-4 sm:right-4 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all ${
                   isFav ? 'bg-azraq-violet text-white shadow-md' : 'bg-white/80 text-azraq-navy/40 hover:text-azraq-violet'
                 }`}
               >
-                <Heart className={`w-4 h-4 ${isFav ? 'fill-white' : ''}`} />
+                <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isFav ? 'fill-white' : ''}`} />
               </button>
 
-              <span className="absolute top-4 left-4 z-10 px-2.5 py-0.5 rounded-none bg-azraq-lavender text-azraq-violet text-[10px] font-black uppercase">
+              <span className="absolute top-2.5 left-2.5 sm:top-4 sm:left-4 z-10 px-2 sm:px-2.5 py-0.5 rounded-none bg-azraq-lavender text-azraq-violet text-[9px] sm:text-[10px] font-black uppercase">
                 Trending
               </span>
 
               {/* Product Image - 75-80% visual area, completely square corners */}
               <div
                 onClick={() => setSelectedProduct(product)}
-                className="relative w-full h-[370px] sm:h-[390px] rounded-none bg-gradient-to-b from-[#F7F8FC] to-white flex items-center justify-center p-2 sm:p-3 cursor-pointer overflow-hidden"
+                className="relative w-full h-[250px] sm:h-[370px] md:h-[390px] rounded-none bg-gradient-to-b from-[#F7F8FC] to-white flex items-center justify-center p-1.5 sm:p-3 cursor-pointer overflow-hidden"
               >
                 <img
                   src={product.main_image}
@@ -64,29 +64,29 @@ export default function TrendingDiscoveriesSection() {
                 />
               </div>
 
-              <div className="mt-3 pt-2 border-t border-gray-100 flex flex-col justify-between flex-1">
+              <div className="mt-2 sm:mt-3 pt-1.5 sm:pt-2 border-t border-gray-100 flex flex-col justify-between flex-1">
                 <div>
-                  <span className="text-[10px] font-bold text-azraq-violet block truncate">
+                  <span className="text-[9px] sm:text-[10px] font-bold text-azraq-violet block truncate">
                     {product.primary_collection_name}
                   </span>
                   <h3
                     onClick={() => setSelectedProduct(product)}
-                    className="font-bold text-azraq-navy text-sm line-clamp-1 cursor-pointer hover:text-azraq-violet transition-colors mt-0.5"
+                    className="font-bold text-azraq-navy text-xs sm:text-sm line-clamp-1 cursor-pointer hover:text-azraq-violet transition-colors mt-0.5"
                   >
                     {product.name}
                   </h3>
                 </div>
 
-                <div className="flex items-center justify-between gap-2 pt-2">
-                  <span className="text-base sm:text-lg font-black text-azraq-navy">
+                <div className="flex items-center justify-between gap-1.5 sm:gap-2 pt-1.5 sm:pt-2">
+                  <span className="text-xs sm:text-base md:text-lg font-black text-azraq-navy truncate">
                     ৳{product.price.toLocaleString()}
                   </span>
                   <button
                     onClick={() => addToCart(product, product.variants[0] || 'Default', 1)}
-                    className="w-9 h-9 rounded-full bg-azraq-lime hover:bg-[#bbf035] text-azraq-navy flex items-center justify-center shadow-glow-lime transition-all transform hover:scale-110 flex-shrink-0"
+                    className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-azraq-lime hover:bg-[#bbf035] text-azraq-navy flex items-center justify-center shadow-glow-lime transition-all transform hover:scale-110 flex-shrink-0"
                     title="Add to bag"
                   >
-                    <ArrowRight className="w-4 h-4 text-azraq-navy" />
+                    <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-azraq-navy" />
                   </button>
                 </div>
               </div>
@@ -97,4 +97,3 @@ export default function TrendingDiscoveriesSection() {
     </section>
   );
 }
-

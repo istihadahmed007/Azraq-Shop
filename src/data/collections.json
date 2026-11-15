@@ -13,7 +13,9 @@
       "description_bn": "অনুমোদিত প্রস্তুতকারক থেকে সরাসরি সংগৃহীত আসল Gadgets & IT Accessories কালেকশন। দ্রুত হোম ডেলিভারি ও মান নিয়ন্ত্রিত।",
       "cover_image": "https://easydrop.asia/category/image-1721294464350-523600701.png",
       "publication_status": "published",
-      "product_count": 281
+      "product_count": 281,
+      "image_url": "https://easydrop.asia/category/image-1721294464350-523600701.png",
+      "fallback_image": "https://easydrop.asia/products/image-1794224164356-135288231.jpeg"
     },
     {
       "id": 3,
@@ -26,7 +28,9 @@
       "description_bn": "অনুমোদিত প্রস্তুতকারক থেকে সরাসরি সংগৃহীত আসল Health & Beauty কালেকশন। দ্রুত হোম ডেলিভারি ও মান নিয়ন্ত্রিত।",
       "cover_image": "https://easydrop.asia/category/image-1704651726678-434810988.png",
       "publication_status": "published",
-      "product_count": 330
+      "product_count": 330,
+      "image_url": "https://easydrop.asia/category/image-1704651726678-434810988.png",
+      "fallback_image": "https://easydrop.asia/products/image-1791720772813-951206600.jpeg"
     },
     {
       "id": 4,
@@ -39,7 +43,9 @@
       "description_bn": "অনুমোদিত প্রস্তুতকারক থেকে সরাসরি সংগৃহীত আসল Home & Lifestyle কালেকশন। দ্রুত হোম ডেলিভারি ও মান নিয়ন্ত্রিত।",
       "cover_image": "https://easydrop.asia/category/image-1704651740851-410226143.png",
       "publication_status": "published",
-      "product_count": 130
+      "product_count": 130,
+      "image_url": "https://easydrop.asia/category/image-1704651740851-410226143.png",
+      "fallback_image": "https://easydrop.asia/products/image-1792995442375-678891328.jpg"
     },
     {
       "id": 5,
@@ -52,7 +58,9 @@
       "description_bn": "অনুমোদিত প্রস্তুতকারক থেকে সরাসরি সংগৃহীত আসল Jewelries & Accessories কালেকশন। দ্রুত হোম ডেলিভারি ও মান নিয়ন্ত্রিত।",
       "cover_image": "https://easydrop.asia/category/image-1704651751963-240932262.png",
       "publication_status": "published",
-      "product_count": 95
+      "product_count": 95,
+      "image_url": "https://easydrop.asia/category/image-1704651751963-240932262.png",
+      "fallback_image": "https://easydrop.asia/products/image-1788073687788-382792069.jpg"
     },
     {
       "id": 6,
@@ -65,7 +73,9 @@
       "description_bn": "অনুমোদিত প্রস্তুতকারক থেকে সরাসরি সংগৃহীত আসল Kitchen Appliances কালেকশন। দ্রুত হোম ডেলিভারি ও মান নিয়ন্ত্রিত।",
       "cover_image": "https://easydrop.asia/category/image-1704651762473-983345475.png",
       "publication_status": "published",
-      "product_count": 81
+      "product_count": 81,
+      "image_url": "https://easydrop.asia/category/image-1704651762473-983345475.png",
+      "fallback_image": "https://easydrop.asia/products/image-1793709572888-96349451.jpg"
     },
     {
       "id": 9,
@@ -78,7 +88,9 @@
       "description_bn": "অনুমোদিত প্রস্তুতকারক থেকে সরাসরি সংগৃহীত আসল Sunglass Collection কালেকশন। দ্রুত হোম ডেলিভারি ও মান নিয়ন্ত্রিত।",
       "cover_image": "https://easydrop.asia/category/image-1704651795401-906194306.png",
       "publication_status": "published",
-      "product_count": 2
+      "product_count": 2,
+      "image_url": "https://easydrop.asia/category/image-1704651795401-906194306.png",
+      "fallback_image": "https://easydrop.asia/products/image-1697995450997-869915288.jpg"
     },
     {
       "id": 10,
@@ -91,7 +103,9 @@
       "description_bn": "অনুমোদিত প্রস্তুতকারক থেকে সরাসরি সংগৃহীত আসল Gifts কালেকশন। দ্রুত হোম ডেলিভারি ও মান নিয়ন্ত্রিত।",
       "cover_image": "https://easydrop.asia/category/image-1704651803304-632313545.png",
       "publication_status": "published",
-      "product_count": 16
+      "product_count": 16,
+      "image_url": "https://easydrop.asia/category/image-1704651803304-632313545.png",
+      "fallback_image": "https://easydrop.asia/products/image-1766491984160-512702375.jfif"
     },
     {
       "id": 11,
@@ -104,7 +118,9 @@
       "description_bn": "অনুমোদিত প্রস্তুতকারক থেকে সরাসরি সংগৃহীত আসল Men Clothing কালেকশন। দ্রুত হোম ডেলিভারি ও মান নিয়ন্ত্রিত।",
       "cover_image": "https://easydrop.asia/category/image-1721294760198-986383799.png",
       "publication_status": "published",
-      "product_count": 63
+      "product_count": 63,
+      "image_url": "https://easydrop.asia/category/image-1721294760198-986383799.png",
+      "fallback_image": "https://easydrop.asia/products/image-1793788431024-871806518.jpeg"
     },
     {
       "id": 12,
@@ -117,7 +133,9 @@
       "description_bn": "অনুমোদিত প্রস্তুতকারক থেকে সরাসরি সংগৃহীত আসল Men Accessories কালেকশন। দ্রুত হোম ডেলিভারি ও মান নিয়ন্ত্রিত।",
       "cover_image": "https://easydrop.asia/category/image-1721295004507-83813568.png",
       "publication_status": "published",
-      "product_count": 17
+      "product_count": 17,
+      "image_url": "https://easydrop.asia/category/image-1721295004507-83813568.png",
+      "fallback_image": "https://easydrop.asia/products/image-1758784361667-941649431.webp"
     },
     {
       "id": 13,
@@ -130,7 +148,9 @@
       "description_bn": "অনুমোদিত প্রস্তুতকারক থেকে সরাসরি সংগৃহীত আসল Consumer Electronics কালেকশন। দ্রুত হোম ডেলিভারি ও মান নিয়ন্ত্রিত।",
       "cover_image": "https://easydrop.asia/category/image-1721295245809-957502547.png",
       "publication_status": "published",
-      "product_count": 15
+      "product_count": 15,
+      "image_url": "https://easydrop.asia/category/image-1721295245809-957502547.png",
+      "fallback_image": "https://easydrop.asia/products/image-1769686171775-563922529.jpeg"
     },
     {
       "id": 14,
@@ -143,7 +163,9 @@
       "description_bn": "অনুমোদিত প্রস্তুতকারক থেকে সরাসরি সংগৃহীত আসল Drop Shoulder T-Shirt কালেকশন। দ্রুত হোম ডেলিভারি ও মান নিয়ন্ত্রিত।",
       "cover_image": "https://easydrop.asia/category/image-1721302958933-281859680.png",
       "publication_status": "published",
-      "product_count": 2
+      "product_count": 2,
+      "image_url": "https://easydrop.asia/category/image-1721302958933-281859680.png",
+      "fallback_image": "https://easydrop.asia/products/image-1742272455068-479948467.jpg"
     },
     {
       "id": 15,
@@ -156,7 +178,9 @@
       "description_bn": "অনুমোদিত প্রস্তুতকারক থেকে সরাসরি সংগৃহীত আসল Sports & Kids কালেকশন। দ্রুত হোম ডেলিভারি ও মান নিয়ন্ত্রিত।",
       "cover_image": "https://easydrop.asia/category/image-1724143558031-583738198.png",
       "publication_status": "published",
-      "product_count": 57
+      "product_count": 57,
+      "image_url": "https://easydrop.asia/category/image-1724143558031-583738198.png",
+      "fallback_image": "https://easydrop.asia/products/image-1793796430036-687433107.jpeg"
     },
     {
       "id": 16,
@@ -169,7 +193,9 @@
       "description_bn": "অনুমোদিত প্রস্তুতকারক থেকে সরাসরি সংগৃহীত আসল Winter Collection কালেকশন। দ্রুত হোম ডেলিভারি ও মান নিয়ন্ত্রিত।",
       "cover_image": "https://easydrop.asia/category/image-1728903027603-174802864.webp",
       "publication_status": "published",
-      "product_count": 11
+      "product_count": 11,
+      "image_url": "https://easydrop.asia/category/image-1728903027603-174802864.webp",
+      "fallback_image": "https://easydrop.asia/products/image-1764677606013-548032216.jpeg"
     },
     {
       "id": 17,
@@ -182,7 +208,9 @@
       "description_bn": "অনুমোদিত প্রস্তুতকারক থেকে সরাসরি সংগৃহীত আসল Baby & Mom কালেকশন। দ্রুত হোম ডেলিভারি ও মান নিয়ন্ত্রিত।",
       "cover_image": "https://easydrop.asia/category/image-1739009270098-447793113.png",
       "publication_status": "published",
-      "product_count": 49
+      "product_count": 49,
+      "image_url": "https://easydrop.asia/category/image-1739009270098-447793113.png",
+      "fallback_image": "https://easydrop.asia/products/image-1763269309836-595118305.jpg"
     },
     {
       "id": 19,
@@ -195,7 +223,9 @@
       "description_bn": "অনুমোদিত প্রস্তুতকারক থেকে সরাসরি সংগৃহীত আসল Soap & Fragrance কালেকশন। দ্রুত হোম ডেলিভারি ও মান নিয়ন্ত্রিত।",
       "cover_image": "https://easydrop.asia/category/image-1750919685813-614632166.png",
       "publication_status": "published",
-      "product_count": 12
+      "product_count": 12,
+      "image_url": "https://easydrop.asia/category/image-1750919685813-614632166.png",
+      "fallback_image": "https://easydrop.asia/products/image-1756036106847-790055028.webp"
     },
     {
       "id": 20,
@@ -208,7 +238,9 @@
       "description_bn": "অনুমোদিত প্রস্তুতকারক থেকে সরাসরি সংগৃহীত আসল Print on demand কালেকশন। দ্রুত হোম ডেলিভারি ও মান নিয়ন্ত্রিত।",
       "cover_image": "https://easydrop.asia/category/image-1751093089566-206554026.jpg",
       "publication_status": "published",
-      "product_count": 0
+      "product_count": 0,
+      "image_url": "https://easydrop.asia/category/image-1751093089566-206554026.jpg",
+      "fallback_image": "https://easydrop.asia/category/image-1751093089566-206554026.jpg"
     },
     {
       "id": 21,
@@ -221,7 +253,9 @@
       "description_bn": "অনুমোদিত প্রস্তুতকারক থেকে সরাসরি সংগৃহীত আসল Couple Combo কালেকশন। দ্রুত হোম ডেলিভারি ও মান নিয়ন্ত্রিত।",
       "cover_image": "https://easydrop.asia/category/image-1752572447382-244805033.jpg",
       "publication_status": "published",
-      "product_count": 26
+      "product_count": 26,
+      "image_url": "https://easydrop.asia/category/image-1752572447382-244805033.jpg",
+      "fallback_image": "https://easydrop.asia/products/image-1776495527774-877548560.jpg"
     },
     {
       "id": 22,
@@ -234,7 +268,9 @@
       "description_bn": "অনুমোদিত প্রস্তুতকারক থেকে সরাসরি সংগৃহীত আসল Personal Wellness কালেকশন। দ্রুত হোম ডেলিভারি ও মান নিয়ন্ত্রিত।",
       "cover_image": "https://easydrop.asia/category/image-1758107239862-879376280.png",
       "publication_status": "published",
-      "product_count": 19
+      "product_count": 19,
+      "image_url": "https://easydrop.asia/category/image-1758107239862-879376280.png",
+      "fallback_image": "https://easydrop.asia/products/image-1758181936000-891625058.jpeg"
     }
   ]
 }

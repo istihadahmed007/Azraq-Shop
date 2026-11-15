@@ -146,8 +146,13 @@ export default function CollectionsPage() {
 
               <div className="relative w-full h-[300px] sm:h-[310px] rounded-none bg-gradient-to-b from-[#F7F8FC] to-white flex items-center justify-center p-3 my-auto overflow-hidden">
                 <img
-                  src={col.cover_image || col.image_url}
+                  src={col.cover_image || col.image_url || col.fallback_image}
                   alt={col.name}
+                  onError={(e) => {
+                    if (col.fallback_image && e.target.src !== col.fallback_image) {
+                      e.target.src = col.fallback_image;
+                    }
+                  }}
                   className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                 />
@@ -182,8 +187,17 @@ export default function CollectionsPage() {
               className="p-4 sm:p-5 flex items-center justify-between gap-4 hover:bg-azraq-cloud/70 transition-colors cursor-pointer group"
             >
               <div className="flex items-center gap-4 min-w-0">
-                <div className="w-14 h-14 rounded-2xl bg-azraq-cloud flex items-center justify-center p-2 flex-shrink-0 border border-azraq-purple/15">
-                  <img src={col.cover_image || col.image_url} alt="" className="max-h-full max-w-full object-contain" />
+                <div className="w-14 h-14 rounded-none bg-azraq-cloud flex items-center justify-center p-2 flex-shrink-0 border border-azraq-purple/15">
+                  <img 
+                    src={col.cover_image || col.image_url || col.fallback_image} 
+                    alt="" 
+                    onError={(e) => {
+                      if (col.fallback_image && e.target.src !== col.fallback_image) {
+                        e.target.src = col.fallback_image;
+                      }
+                    }}
+                    className="max-h-full max-w-full object-contain" 
+                  />
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
