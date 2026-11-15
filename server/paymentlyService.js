@@ -37,6 +37,34 @@ function loadCatalog() {
   return catalogProducts;
 }
 
+/**
+ * Validate that a payment URL belongs strictly to trusted Paymently domains.
+ * Prevents phishing redirects and open-redirect vulnerabilities.
+ */
+export function isTrustedPaymentUrl(urlStr) {
+  if (!urlStr || typeof urlStr !== 'string') return false;
+  try {
+    const parsed = new URL(urlStr);
+    if (parsed.protocol !== 'https:') return false;
+    const hostname = parsed.hostname.toLowerCase();
+    
+    // Official Paymently hostnames
+    if (hostname === 'azraq.paymently.io' || hostname.endsWith('.paymently.io')) {
+      return true;
+    }
+
+    const configBaseUrl = process.env.PAYMENTLY_BASE_URL || 'https://azraq.paymently.io';
+    try {
+      const configHost = new URL(configBaseUrl).hostname.toLowerCase();
+      if (hostname === configHost) return true;
+    } catch (e) {}
+
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
+
 // Paymently Gateway Configuration
 export function getPaymentlyConfig() {
   return {
@@ -253,8 +281,20 @@ export async function createPaymentlyCheckoutSession({
   // Verify that the provider accepted the request and generated a dynamic payment URL
   if (gatewayResponse && (gatewayResponse.payment_url || gatewayResponse.status === true)) {
     const paymentUrl = gatewayResponse.payment_url;
+
+    // Security check: Validate returned URL against trusted Paymently hostnames
+    if (paymentUrl && !isTrustedPaymentUrl(paymentUrl)) {
+      console.error(`[Security Violation] Gateway returned untrusted payment URL: ${paymentUrl}`);
+      await updateCheckoutAttempt(checkoutId, { status: 'FAILED' });
+      return {
+        success: false,
+        error: 'Invalid or untrusted payment URL returned by provider. Payment aborted for safety.',
+        checkout_id: checkoutId
+      };
+    }
+
     // Extract invoice_id from payment_url if not in response
-    const invoiceId = gatewayResponse.invoice_id || (paymentUrl.match(/\/checkout\/([^/?#]+)/) ? paymentUrl.match(/\/checkout\/([^/?#]+)/)[1] : checkoutId);
+    const invoiceId = gatewayResponse.invoice_id || (paymentUrl && paymentUrl.match(/\/checkout\/([^/?#]+)/) ? paymentUrl.match(/\/checkout\/([^/?#]+)/)[1] : checkoutId);
 
     await updateCheckoutAttempt(checkoutId, {
       gateway_invoice_id: invoiceId,
@@ -547,12 +587,47 @@ export async function verifyPaymentlyPayment({ invoiceId = null, checkoutId = nu
  */
 export async function handlePaymentlyWebhook(payload, headers = {}) {
   await initDb();
-  console.log('[Paymently Webhook Inbound]:', payload);
+  const config = getPaymentlyConfig();
 
   const invoiceId = payload?.invoice_id || payload?.invoice;
   if (!invoiceId) {
     throw new Error('Invoice ID missing from webhook payload.');
   }
+
+  // 1. Webhook Authenticity Verification
+  // Check provider-documented authorization headers when API key or secret is configured
+  if (config.apiKey && config.apiKey.length > 5) {
+    const normHeaders = {};
+    for (const [k, v] of Object.entries(headers || {})) {
+      normHeaders[k.toLowerCase()] = v;
+    }
+
+    const incomingKey = (
+      normHeaders['rt-uddoktapay-api-key'] ||
+      normHeaders['paymently-api-key'] ||
+      normHeaders['x-api-key'] ||
+      (normHeaders['authorization'] ? normHeaders['authorization'].replace(/^Bearer\s+/i, '') : null)
+    );
+    const incomingSig = normHeaders['x-paymently-signature'] || normHeaders['signature'];
+
+    const keyMatches = incomingKey && incomingKey.trim() === config.apiKey.trim();
+    const sigMatches = config.webhookSecret && incomingSig && incomingSig.trim() === config.webhookSecret.trim();
+
+    if (!keyMatches && !sigMatches) {
+      console.warn('[Security Warning] Unauthorized webhook attempted for invoice:', invoiceId);
+      await recordWebhookLog({ invoiceId, eventType: 'UNAUTHORIZED_WEBHOOK', payload, isVerified: false });
+      return {
+        success: false,
+        error: 'Unauthorized webhook: Missing or invalid gateway authentication header.'
+      };
+    }
+  }
+
+  console.log('[Paymently Webhook Inbound Verified]:', {
+    invoice_id: invoiceId,
+    status: payload?.status,
+    amount: payload?.amount
+  });
 
   // Database-level idempotency
   const alreadyFulfilled = await isInvoiceFulfilled(invoiceId);

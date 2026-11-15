@@ -34,7 +34,13 @@ export default async function handler(req, res) {
 
     if (verification.verified && verification.status === 'PAID') {
       return res.status(200).json(verification);
-    } else if (verification.status === 'PENDING' || verification.status === 'PENDING_MANUAL_REVIEW') {
+    } else if (
+      verification.status === 'PENDING' || 
+      verification.status === 'PENDING_VERIFICATION' || 
+      verification.status === 'PENDING_MANUAL_REVIEW' ||
+      verification.status === 'AWAITING_PAYMENT' ||
+      verification.status === 'AWAITING_TRX_ID'
+    ) {
       return res.status(200).json(verification);
     } else {
       return res.status(400).json(verification);

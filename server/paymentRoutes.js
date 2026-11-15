@@ -140,7 +140,14 @@ export async function handlePaymentRoutes(req, res) {
           manualTrxId
         });
 
-        if (!verification.verified && verification.status !== 'PENDING' && verification.status !== 'PENDING_MANUAL_REVIEW') {
+        if (
+          !verification.verified && 
+          verification.status !== 'PENDING' && 
+          verification.status !== 'PENDING_VERIFICATION' &&
+          verification.status !== 'PENDING_MANUAL_REVIEW' &&
+          verification.status !== 'AWAITING_PAYMENT' &&
+          verification.status !== 'AWAITING_TRX_ID'
+        ) {
           res.statusCode = 400;
         }
 

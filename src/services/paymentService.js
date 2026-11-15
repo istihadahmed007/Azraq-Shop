@@ -5,6 +5,33 @@
 const API_BASE = ''; // Same origin
 
 /**
+ * Validate that a payment URL belongs strictly to trusted Paymently domains.
+ * Prevents phishing redirects and open-redirect vulnerabilities.
+ */
+export function isTrustedPaymentUrl(urlStr) {
+  if (!urlStr || typeof urlStr !== 'string') return false;
+  try {
+    const parsed = new URL(urlStr);
+    if (parsed.protocol !== 'https:') return false;
+    const hostname = parsed.hostname.toLowerCase();
+    return (
+      hostname === 'azraq.paymently.io' ||
+      hostname.endsWith('.paymently.io')
+    );
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * Consistent BDT amount formatter: "৳830 BDT"
+ */
+export function formatBdtAmount(amount) {
+  const num = Math.round(Number(amount || 0));
+  return `৳${num.toLocaleString('en-US')} BDT`;
+}
+
+/**
  * 1. Request dynamic checkout session from backend
  */
 export async function createCheckoutSession({ customer, items, deliveryArea, promoCode, paymentMethod = 'PAYMENTLY', notes = '' }) {
@@ -26,6 +53,11 @@ export async function createCheckoutSession({ customer, items, deliveryArea, pro
     throw new Error(data.error || 'Payment initiation failed. Please try again.');
   }
 
+  // Safety check on client side for returned payment URL
+  if (data.payment_url && !isTrustedPaymentUrl(data.payment_url)) {
+    throw new Error('Received an untrusted payment URL. Session rejected for security.');
+  }
+
   return data;
 }
 
@@ -39,16 +71,16 @@ export async function verifyPaymentStatus({ invoiceId, checkoutId, manualTrxId =
     body: JSON.stringify({
       invoiceId,
       checkoutId,
-      manualTrxId
+      manualTrxId: manualTrxId ? String(manualTrxId).trim() : null
     })
   });
 
   const data = await response.json();
-  if (!response.ok || !data.success) {
+  if (!response.ok && !data.status) {
     return {
       success: false,
       verified: false,
-      status: data.status || 'FAILED',
+      status: 'FAILED',
       error: data.error || 'Payment could not be verified by the provider.'
     };
   }
