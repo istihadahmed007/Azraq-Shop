@@ -401,7 +401,7 @@ export default function CheckoutModal() {
                       </p>
                     </div>
                     <span className="text-[10px] text-gray-500 font-mono">
-                      vartualtutor.paymently.io
+                      azraq.paymently.io
                     </span>
                   </div>
 

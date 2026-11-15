@@ -9,8 +9,8 @@ function azraqApiPlugin() {
     name: 'azraq-api-endpoints',
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
-        // 1. Paymently Gateway API Endpoints
-        if (req.url?.startsWith('/api/payments')) {
+        // 1. Paymently Gateway API & Checkout Session Endpoints
+        if (req.url?.startsWith('/api/payments') || req.url?.startsWith('/payment-checkout')) {
           const handled = await handlePaymentRoutes(req, res);
           if (handled) return;
         }

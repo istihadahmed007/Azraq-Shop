@@ -589,13 +589,13 @@ export default function AdminPanel() {
                     Merchant: <strong>AZRAQ</strong> • Provider: Paymently BD • Dynamic UddoktaPay-compatible API
                   </p>
                   <p className="text-[11px] font-mono text-white/50">
-                    Base URL: {gatewayConfig?.base_url || 'https://vartualtutor.paymently.io'}
+                    Base URL: {gatewayConfig?.base_url || 'https://azraq.paymently.io'}
                   </p>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <a
-                    href={gatewayConfig?.default_link || 'https://vartualtutor.paymently.io/paymentlink/default/BDT'}
+                    href={gatewayConfig?.default_link || 'https://azraq.paymently.io/paymentlink/default/BDT'}
                     target="_blank"
                     rel="noreferrer"
                     className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors"
@@ -717,7 +717,7 @@ export default function AdminPanel() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-700">
                   <div className="p-3 bg-white rounded-xl border border-gray-200 space-y-1">
                     <p className="font-bold text-[#062B4F]">1. Brand Display Name</p>
-                    <p className="text-gray-500">Change merchant title from <code>vartualtutor</code> to <strong>AZRAQ</strong> in Paymently Settings &gt; General.</p>
+                    <p className="text-gray-500">Ensure merchant display name is set to <strong>AZRAQ</strong> on <code>azraq.paymently.io</code> in Paymently Settings &gt; General.</p>
                   </div>
                   <div className="p-3 bg-white rounded-xl border border-gray-200 space-y-1">
                     <p className="font-bold text-[#062B4F]">2. Brand Logos & Favicon</p>

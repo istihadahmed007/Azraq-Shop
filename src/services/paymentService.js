@@ -1,7 +1,7 @@
 // AZRAQ Payment Gateway Client Service (Paymently Integration)
 // Supports dynamic API checkout session creation and server-side verification with offline fallback
 
-const DEFAULT_PAYMENT_LINK = 'https://vartualtutor.paymently.io/paymentlink/default/BDT';
+const DEFAULT_PAYMENT_LINK = 'https://azraq.paymently.io/paymentlink/default/BDT';
 
 /**
  * 1. Request dynamic checkout session from backend
@@ -104,7 +104,7 @@ export async function fetchGatewayStatus() {
   return {
     gateway_name: 'Paymently',
     merchant_name: 'AZRAQ',
-    base_url: 'https://vartualtutor.paymently.io',
+    base_url: 'https://azraq.paymently.io',
     default_link: DEFAULT_PAYMENT_LINK,
     currency: 'BDT',
     has_api_key: false,

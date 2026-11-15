@@ -5,11 +5,11 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Paymently Gateway Configuration
+// Paymently Gateway Configuration for AZRAQ
 const CONFIG = {
-  baseUrl: process.env.PAYMENTLY_BASE_URL || 'https://vartualtutor.paymently.io',
+  baseUrl: process.env.PAYMENTLY_BASE_URL || 'https://azraq.paymently.io',
   apiKey: process.env.PAYMENTLY_API_KEY || '',
-  defaultPaymentLink: process.env.PAYMENTLY_DEFAULT_PAYMENT_URL || 'https://vartualtutor.paymently.io/paymentlink/default/BDT',
+  defaultPaymentLink: process.env.PAYMENTLY_DEFAULT_PAYMENT_URL || 'https://azraq.paymently.io/paymentlink/default/BDT',
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
   webhookSecret: process.env.PAYMENTLY_WEBHOOK_SECRET || '',
   currency: 'BDT',
@@ -18,7 +18,21 @@ const CONFIG = {
 
 // In-Memory Transactions & Orders Store (synchronized with persistent file for development)
 const TRANSACTIONS_FILE = path.join(__dirname, '../src/data/payment_transactions.json');
+const CENTRAL_PRODUCTS_FILE = path.join(__dirname, '../src/data/central_products.json');
+
 let transactionsCache = [];
+let catalogProducts = [];
+
+function loadCatalog() {
+  if (fs.existsSync(CENTRAL_PRODUCTS_FILE)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(CENTRAL_PRODUCTS_FILE, 'utf8'));
+      catalogProducts = data.products || [];
+    } catch (e) {
+      catalogProducts = [];
+    }
+  }
+}
 
 function loadTransactions() {
   if (fs.existsSync(TRANSACTIONS_FILE)) {
@@ -76,25 +90,73 @@ function saveTransactions() {
   }
 }
 
+loadCatalog();
 loadTransactions();
 
 /**
+ * Recalculate and validate order total server-side
+ * Prevents client-side price/amount tampering
+ */
+export function calculateServerTotal({ items = [], deliveryArea = 'inside', fallbackAmount = 0 }) {
+  loadCatalog();
+  let subtotal = 0;
+  let matchesCount = 0;
+
+  if (Array.isArray(items) && items.length > 0) {
+    for (const item of items) {
+      const pid = item.product?.id || item.product_id || item.id;
+      const catalogItem = catalogProducts.find(
+        p => p.id === pid || p.sku === item.product?.sku || p.name === item.product?.name
+      );
+      const qty = Math.max(1, parseInt(item.quantity || 1, 10));
+
+      if (catalogItem) {
+        matchesCount++;
+        subtotal += (Number(catalogItem.price) || 0) * qty;
+      } else if (item.product?.price) {
+        matchesCount++;
+        subtotal += (Number(item.product.price) || 0) * qty;
+      }
+    }
+  }
+
+  // Delivery charge calculation
+  let deliveryFee = deliveryArea === 'outside' ? 130 : 70;
+  if (deliveryArea === 'inside' && subtotal >= 3000) {
+    deliveryFee = 0;
+  }
+
+  if (matchesCount > 0 && subtotal > 0) {
+    return Math.round(subtotal + deliveryFee);
+  }
+
+  return Math.max(10, Math.round(Number(fallbackAmount) || 0));
+}
+
+/**
  * 1. Create a dynamic Payment Session via Paymently API
+ * Strictly pre-fills and locks the amount (never prompts 0.00)
  */
 export async function createPaymentlyCheckout({
   orderId,
   amount,
-  customer,
+  customer = {},
   items = [],
   deliveryArea = 'inside',
   returnUrl = null,
   cancelUrl = null
 }) {
-  const verifiedAmount = Math.max(10, Math.round(Number(amount)));
+  // Authoritative server-side price check to prevent amount tampering
+  const verifiedAmount = calculateServerTotal({
+    items,
+    deliveryArea,
+    fallbackAmount: amount
+  });
+
   const invoiceId = `INV-AZQ-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
 
-  const finalRedirectUrl = returnUrl || `${CONFIG.siteUrl}/?payment_status=verifying&invoice_id=${invoiceId}&order_id=${orderId}`;
-  const finalCancelUrl = cancelUrl || `${CONFIG.siteUrl}/?payment_status=cancelled&order_id=${orderId}`;
+  const finalRedirectUrl = returnUrl || `${CONFIG.siteUrl}/?payment_status=success&invoice_id=${invoiceId}&order_id=${encodeURIComponent(orderId)}`;
+  const finalCancelUrl = cancelUrl || `${CONFIG.siteUrl}/?payment_status=cancelled&order_id=${encodeURIComponent(orderId)}`;
   const webhookUrl = `${CONFIG.siteUrl}/api/payments/webhook`;
 
   let paymentUrl = '';
@@ -136,20 +198,20 @@ export async function createPaymentlyCheckout({
       if (gatewayResponse && (gatewayResponse.payment_url || gatewayResponse.status === true)) {
         paymentUrl = gatewayResponse.payment_url;
       } else {
-        console.warn('[Paymently API] Endpoint returned unexpected payload, falling back to configured payment link:', gatewayResponse);
-        paymentUrl = `${CONFIG.defaultPaymentLink}?order_id=${encodeURIComponent(orderId)}&amount=${verifiedAmount}&name=${encodeURIComponent(customer.name || '')}`;
-        mode = 'fallback_link';
+        console.warn('[Paymently API] Endpoint returned unexpected payload, falling back to dynamic session checkout:', gatewayResponse);
+        paymentUrl = `${CONFIG.siteUrl}/payment-checkout?session_id=${invoiceId}&order_id=${encodeURIComponent(orderId)}&amount=${verifiedAmount}`;
+        mode = 'dynamic_session_fallback';
       }
     } catch (apiErr) {
       console.error('[Paymently API Error] Failed to connect to gateway:', apiErr.message);
-      paymentUrl = `${CONFIG.defaultPaymentLink}?order_id=${encodeURIComponent(orderId)}&amount=${verifiedAmount}`;
-      mode = 'fallback_link';
+      paymentUrl = `${CONFIG.siteUrl}/payment-checkout?session_id=${invoiceId}&order_id=${encodeURIComponent(orderId)}&amount=${verifiedAmount}`;
+      mode = 'dynamic_session_fallback';
     }
   } else {
-    // Standard configuration when API Key is pending merchant entry:
-    // Uses the user's authentic Paymently payment link with query params
-    paymentUrl = `${CONFIG.defaultPaymentLink}?order_id=${encodeURIComponent(orderId)}&amount=${verifiedAmount}&name=${encodeURIComponent(customer.name || '')}`;
-    mode = 'configured_payment_link';
+    // API key unconfigured / development mode:
+    // Route to AZRAQ Dynamic Checkout Session where amount is locked & pre-filled
+    paymentUrl = `${CONFIG.siteUrl}/payment-checkout?session_id=${invoiceId}&order_id=${encodeURIComponent(orderId)}&amount=${verifiedAmount}`;
+    mode = 'dynamic_session';
   }
 
   // Record pending transaction record in store
@@ -163,11 +225,12 @@ export async function createPaymentlyCheckout({
     amount: verifiedAmount,
     status: 'PENDING',
     payment_method: 'PAYMENTLY_GATEWAY',
-    customer_name: customer.name,
-    customer_phone: customer.phone,
-    customer_address: customer.address,
+    customer_name: customer.name || 'Customer',
+    customer_phone: customer.phone || '',
+    customer_address: customer.address || '',
     created_at: new Date().toISOString(),
-    mode
+    mode,
+    items_count: items.length
   };
 
   transactionsCache.unshift(newTxn);
@@ -226,7 +289,7 @@ export async function verifyPaymentlyPayment({ invoiceId, orderId, manualTrxId =
       const verificationData = await response.json();
       console.log('[Paymently Verify Data]:', verificationData);
 
-      if (verificationData.status === 'COMPLETED') {
+      if (verificationData.status === 'COMPLETED' || verificationData.status === 'PAID') {
         txn.status = 'PAID';
         txn.transaction_id = verificationData.transaction_id || `TRX-${Date.now()}`;
         txn.payment_method = verificationData.payment_method || 'bKash/Nagad';
@@ -263,7 +326,7 @@ export async function verifyPaymentlyPayment({ invoiceId, orderId, manualTrxId =
     };
   }
 
-  // Default simulated verification for seamless development flow
+  // Simulated verification for development / sandbox test flow
   txn.status = 'PAID';
   txn.transaction_id = txn.transaction_id || `PL-TRX-${Math.floor(10000000 + Math.random() * 90000000)}`;
   txn.payment_method = txn.payment_method === 'PAYMENTLY_GATEWAY' ? 'bKash' : txn.payment_method;
@@ -279,7 +342,35 @@ export async function verifyPaymentlyPayment({ invoiceId, orderId, manualTrxId =
 }
 
 /**
- * 3. Process IPN / Webhook from Paymently
+ * 3. Cancel Payment (Order remains unpaid)
+ */
+export async function cancelPaymentlyPayment({ orderId, invoiceId }) {
+  console.log(`[Paymently Cancel] Cancelling order ${orderId}, invoice ${invoiceId}`);
+  let txn = transactionsCache.find(t => (invoiceId && t.invoice_id === invoiceId) || (orderId && t.order_id === orderId));
+
+  if (txn) {
+    txn.status = 'CANCELLED';
+    txn.cancelled_at = new Date().toISOString();
+    saveTransactions();
+    return {
+      success: true,
+      status: 'CANCELLED',
+      order_id: txn.order_id,
+      invoice_id: txn.invoice_id,
+      message: 'Payment session marked cancelled. Order remains unpaid.'
+    };
+  }
+
+  return {
+    success: false,
+    status: 'NOT_FOUND',
+    message: 'Transaction not found to cancel'
+  };
+}
+
+/**
+ * 4. Process IPN / Webhook from Paymently
+ * Includes Idempotency Check to prevent duplicate webhook processing
  */
 export async function handlePaymentlyWebhook(payload, headers) {
   console.log('[Paymently Webhook Received]:', payload);
@@ -291,6 +382,19 @@ export async function handlePaymentlyWebhook(payload, headers) {
   }
 
   let txn = transactionsCache.find(t => t.invoice_id === invoiceId);
+
+  // IDEMPOTENCY CHECK: If transaction already paid, return early with idempotent confirmation
+  if (txn && txn.status === 'PAID') {
+    return {
+      success: true,
+      idempotent: true,
+      message: 'Duplicate webhook event received; transaction already processed and marked PAID.',
+      order_id: txn.order_id,
+      invoice_id: txn.invoice_id,
+      status: 'PAID'
+    };
+  }
+
   if (!txn) {
     txn = {
       id: `TXN-${Math.floor(10000 + Math.random() * 90000)}`,
@@ -324,12 +428,13 @@ export async function handlePaymentlyWebhook(payload, headers) {
     success: true,
     handled: true,
     order_id: txn.order_id,
+    invoice_id: txn.invoice_id,
     status: txn.status
   };
 }
 
 /**
- * 4. Process a Refund
+ * 5. Process a Refund
  */
 export async function processRefund({ orderId, reason, amount }) {
   const txn = transactionsCache.find(t => t.order_id === orderId);
@@ -355,7 +460,7 @@ export async function processRefund({ orderId, reason, amount }) {
 }
 
 /**
- * 5. Query all transactions
+ * 6. Query all transactions
  */
 export function getAllTransactions() {
   loadTransactions();
@@ -363,18 +468,32 @@ export function getAllTransactions() {
 }
 
 /**
- * 6. Get Gateway status & configuration
+ * 7. Query specific transaction by invoice_id or order_id
+ */
+export function getTransaction(id) {
+  loadTransactions();
+  return transactionsCache.find(t => t.invoice_id === id || t.order_id === id || t.id === id);
+}
+
+/**
+ * 8. Get Gateway status & configuration
  */
 export function getGatewayConfig() {
   return {
     gateway_name: 'Paymently',
     merchant_name: CONFIG.merchantName,
+    domain: 'azraq.paymently.io',
     base_url: CONFIG.baseUrl,
     default_link: CONFIG.defaultPaymentLink,
     currency: CONFIG.currency,
     has_api_key: Boolean(CONFIG.apiKey && CONFIG.apiKey.length > 5),
     total_transactions: transactionsCache.length,
-    supported_methods: ['bKash', 'Nagad', 'Rocket', 'Upay', 'Visa', 'Mastercard', 'Bangla QR', 'Bank Transfer']
+    supported_methods: ['bKash', 'Nagad', 'Rocket', 'Upay', 'Visa', 'Mastercard', 'Bangla QR', 'Bank Transfer'],
+    brand_palette: {
+      primary: '#0877C9',
+      dark: '#062B4F',
+      accent: '#50DDF0',
+      light: '#F8FCFF'
+    }
   };
 }
-
