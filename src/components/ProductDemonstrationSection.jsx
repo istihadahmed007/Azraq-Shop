@@ -20,14 +20,14 @@ export default function ProductDemonstrationSection() {
           
           {/* Left Column: Interactive Demonstration Screen */}
           <div className="lg:col-span-7">
-            <div className="relative aspect-video rounded-3xl bg-gradient-to-tr from-[#162644] to-[#0A1220] border-2 border-azraq-purple/30 overflow-hidden shadow-2xl flex items-center justify-center group">
+            <div className="relative aspect-video rounded-none bg-gradient-to-tr from-[#162644] to-[#0A1220] border-2 border-azraq-purple/30 overflow-hidden shadow-2xl flex items-center justify-center group">
               
               {!isPlaying ? (
                 <>
                   <img
                     src={demoProduct.main_image}
                     alt={demoProduct.name}
-                    className="w-full h-full object-contain p-8 filter drop-shadow-2xl transition-transform duration-700 group-hover:scale-105"
+                    className="w-full h-full object-contain p-4 sm:p-6 filter drop-shadow-2xl transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
                     <button
@@ -37,7 +37,7 @@ export default function ProductDemonstrationSection() {
                       <Play className="w-8 h-8 fill-azraq-navy ml-1 transition-transform group-hover/btn:scale-110" />
                     </button>
                   </div>
-                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-white/80 bg-black/50 px-4 py-2 rounded-xl backdrop-blur-md">
+                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-white/80 bg-black/50 px-4 py-2 rounded-none backdrop-blur-md">
                     <span>Authorized Supplier Demonstration (HD)</span>
                     <span className="text-azraq-lime font-mono">01:45</span>
                   </div>

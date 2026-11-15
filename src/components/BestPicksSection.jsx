@@ -35,26 +35,27 @@ export default function BestPicksSection() {
           {bestPicks.map(product => (
             <div
               key={product.id}
-              className="rounded-2xl bg-white border border-gray-200/80 p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
+              className="rounded-none bg-white border border-gray-200/80 p-3 sm:p-4 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between group relative overflow-hidden h-[490px] sm:h-[510px]"
             >
               <div 
                 onClick={() => setSelectedProduct(product)}
-                className="relative w-full h-44 rounded-xl bg-azraq-cloud flex items-center justify-center p-2 cursor-pointer overflow-hidden"
+                className="relative w-full h-[370px] sm:h-[390px] rounded-none bg-gradient-to-b from-[#F7F8FC] to-white flex items-center justify-center p-2 sm:p-3 cursor-pointer overflow-hidden"
               >
                 <img
                   src={product.main_image}
                   alt={product.name}
-                  className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                  className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
                 />
-                <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-azraq-navy text-white text-[9px] font-mono font-bold flex items-center gap-1">
+                <div className="absolute top-3 left-3 px-2 py-0.5 rounded-none bg-azraq-navy text-white text-[9px] font-mono font-bold flex items-center gap-1">
                   <Star className="w-3 h-3 text-azraq-lime fill-azraq-lime" />
                   <span>{product.rating}</span>
                 </div>
               </div>
 
-              <div className="mt-3 flex flex-col justify-between flex-1">
+              <div className="mt-3 pt-2 border-t border-gray-100 flex flex-col justify-between flex-1">
                 <div>
-                  <span className="text-[10px] font-bold text-azraq-violet block">
+                  <span className="text-[10px] font-bold text-azraq-violet block truncate">
                     {product.primary_collection_name}
                   </span>
                   <h4 
@@ -65,16 +66,16 @@ export default function BestPicksSection() {
                   </h4>
                 </div>
 
-                <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-3">
-                  <span className="text-sm font-black text-azraq-navy">
+                <div className="flex items-center justify-between pt-2 border-t border-gray-100 mt-2">
+                  <span className="text-base sm:text-lg font-black text-azraq-navy">
                     ৳{product.price.toLocaleString()}
                   </span>
                   <button
                     onClick={() => addToCart(product, product.variants[0] || 'Default', 1)}
-                    className="p-2 rounded-full bg-azraq-lime text-azraq-navy hover:bg-[#bbf035] transition-all transform hover:scale-110 shadow-sm"
+                    className="w-9 h-9 rounded-full bg-azraq-lime text-azraq-navy hover:bg-[#bbf035] transition-all transform hover:scale-110 shadow-sm flex items-center justify-center flex-shrink-0"
                     title="Add to Bag"
                   >
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>

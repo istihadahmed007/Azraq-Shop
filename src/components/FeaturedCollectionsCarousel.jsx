@@ -76,16 +76,16 @@ export default function FeaturedCollectionsCarousel() {
             onClick={() => navigateTo('collection-detail', col.slug)}
             className="flex-none w-[280px] sm:w-[320px] snap-start group cursor-pointer"
           >
-            <div className="rounded-3xl bg-white border border-azraq-purple/20 p-5 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between h-[360px] relative overflow-hidden">
-              <span className="absolute top-4 left-4 z-10 px-2.5 py-0.5 rounded-full bg-azraq-lavender text-azraq-violet text-[10px] font-black uppercase">
+            <div className="rounded-none bg-white border border-azraq-purple/20 p-4 sm:p-5 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between h-[430px] sm:h-[450px] relative overflow-hidden">
+              <span className="absolute top-4 left-4 z-10 px-2.5 py-0.5 rounded-none bg-azraq-lavender text-azraq-violet text-[10px] font-black uppercase">
                 {col.imported_product_count} {t("Verified Items", "পণ্য")}
               </span>
 
-              <div className="relative w-full h-44 rounded-2xl bg-gradient-to-b from-azraq-cloud to-white flex items-center justify-center p-3 overflow-hidden mt-6">
+              <div className="relative w-full h-[310px] sm:h-[330px] rounded-none bg-gradient-to-b from-[#F7F8FC] to-white flex items-center justify-center p-2 sm:p-3 overflow-hidden mt-6">
                 <img
                   src={col.image_url}
                   alt={col.name}
-                  className="max-h-full max-w-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-110"
+                  className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
 

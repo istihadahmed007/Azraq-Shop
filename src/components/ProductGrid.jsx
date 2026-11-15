@@ -171,7 +171,7 @@ export default function ProductGrid() {
             return (
               <div
                 key={product.id}
-                className="rounded-3xl bg-white border border-azraq-purple/20 p-5 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between group relative overflow-hidden h-[410px]"
+                className="rounded-none bg-white border border-azraq-purple/20 p-3 sm:p-4 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between group relative overflow-hidden h-[490px] sm:h-[510px]"
               >
                 {/* Wishlist Button */}
                 <button
@@ -196,20 +196,20 @@ export default function ProductGrid() {
                       {product.badge}
                     </span>
                   )}
-                  <span className="px-2 py-0.5 rounded-md bg-azraq-navy/80 text-white text-[9px] font-mono tracking-tight">
+                  <span className="px-2 py-0.5 rounded-none bg-azraq-navy/85 text-white text-[9px] font-mono tracking-tight">
                     {product.id}
                   </span>
                 </div>
 
-                {/* Image Area */}
+                {/* Image Area - 75-80% visual area dominance, completely square corners */}
                 <div 
                   onClick={() => setSelectedProduct(product)}
-                  className="relative w-full h-52 rounded-2xl bg-gradient-to-b from-[#F7F8FC] to-white flex items-center justify-center p-3 cursor-pointer overflow-hidden mt-6"
+                  className="relative w-full h-[370px] sm:h-[390px] rounded-none bg-gradient-to-b from-[#F7F8FC] to-white flex items-center justify-center p-2 sm:p-3 cursor-pointer overflow-hidden"
                 >
                   <img
                     src={product.main_image}
                     alt={product.name}
-                    className="max-h-full max-w-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-108"
+                    className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
                   />
                   
@@ -228,10 +228,10 @@ export default function ProductGrid() {
                   </div>
                 </div>
 
-                {/* Details Bottom Block */}
-                <div className="mt-4 pt-3 border-t border-gray-100 flex flex-col justify-between flex-1">
+                {/* Compact Details Bottom Block */}
+                <div className="mt-3 pt-2 border-t border-gray-100 flex flex-col justify-between flex-1">
                   <div>
-                    <span className="text-[11px] font-semibold text-azraq-violet block mb-0.5">
+                    <span className="text-[11px] font-semibold text-azraq-violet block mb-0.5 truncate">
                       {product.category}
                     </span>
                     <h3 
@@ -247,10 +247,10 @@ export default function ProductGrid() {
                   </div>
 
                   {/* Price & Action Row (Reference Styling) */}
-                  <div className="flex items-center justify-between gap-2 pt-3">
+                  <div className="flex items-center justify-between gap-2 pt-2">
                     <div>
                       <div className="flex items-baseline gap-1.5">
-                        <span className="text-base font-black text-azraq-navy">
+                        <span className="text-base sm:text-lg font-black text-azraq-navy">
                           ৳{product.price.toLocaleString()}
                         </span>
                       </div>

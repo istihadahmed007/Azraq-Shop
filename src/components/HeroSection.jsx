@@ -103,20 +103,20 @@ export default function HeroSection() {
               onClick={() => setSelectedProduct(heroPrimary)}
               className="relative z-20 group cursor-pointer transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-500 animate-float"
             >
-              <div className="w-72 sm:w-80 rounded-3xl bg-white/90 backdrop-blur-md p-5 border border-azraq-purple/20 shadow-float">
-                <div className="relative w-full h-56 sm:h-64 rounded-2xl bg-gradient-to-b from-azraq-cloud to-white flex items-center justify-center overflow-hidden p-2">
+              <div className="w-80 sm:w-96 rounded-none bg-white/95 backdrop-blur-md p-4 sm:p-5 border border-azraq-purple/20 shadow-float">
+                <div className="relative w-full h-64 sm:h-76 rounded-none bg-gradient-to-b from-azraq-cloud to-white flex items-center justify-center overflow-hidden p-2">
                   <img
                     src={heroPrimary.main_image}
                     alt={heroPrimary.name}
-                    className="max-h-full max-w-full object-contain filter drop-shadow-xl transition-transform duration-500 group-hover:scale-105"
+                    className="w-full h-full object-contain filter drop-shadow-xl transition-transform duration-500 group-hover:scale-105"
                   />
-                  <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-azraq-navy text-white text-[10px] font-bold tracking-wider uppercase">
+                  <span className="absolute top-3 left-3 px-2.5 py-1 rounded-none bg-azraq-navy text-white text-[10px] font-bold tracking-wider uppercase">
                     {heroPrimary.primary_collection_name}
                   </span>
                 </div>
                 
-                <div className="mt-4 flex items-center justify-between">
-                  <div className="max-w-[190px]">
+                <div className="mt-3 pt-2 border-t border-gray-100 flex items-center justify-between">
+                  <div className="max-w-[210px]">
                     <h3 className="font-extrabold text-azraq-navy text-sm sm:text-base truncate group-hover:text-azraq-violet transition-colors">
                       {heroPrimary.name}
                     </h3>
@@ -134,19 +134,19 @@ export default function HeroSection() {
             {/* Secondary Floating Card (Offset Bag / Accessory) */}
             <div 
               onClick={() => setSelectedProduct(heroSecondary)}
-              className="absolute -top-4 sm:top-2 -right-2 sm:right-4 z-10 cursor-pointer transform rotate-6 hover:rotate-0 hover:scale-110 transition-all duration-500 animate-float-delayed"
+              className="absolute -top-6 sm:top-0 -right-2 sm:right-2 z-10 cursor-pointer transform rotate-6 hover:rotate-0 hover:scale-110 transition-all duration-500 animate-float-delayed"
             >
-              <div className="w-48 sm:w-56 rounded-2xl bg-white/95 backdrop-blur-md p-3.5 border border-azraq-purple/25 shadow-xl">
-                <div className="relative w-full h-32 sm:h-36 rounded-xl bg-azraq-cloud flex items-center justify-center overflow-hidden">
+              <div className="w-52 sm:w-60 rounded-none bg-white/95 backdrop-blur-md p-3 border border-azraq-purple/25 shadow-xl">
+                <div className="relative w-full h-36 sm:h-44 rounded-none bg-azraq-cloud flex items-center justify-center overflow-hidden p-1.5">
                   <img
                     src={heroSecondary.main_image}
                     alt={heroSecondary.name}
-                    className="max-h-full max-w-full object-contain filter drop-shadow-md"
+                    className="w-full h-full object-contain filter drop-shadow-md"
                   />
                   <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-azraq-lime" />
                 </div>
-                <div className="mt-2.5 flex items-center justify-between">
-                  <p className="text-xs font-bold text-azraq-navy truncate max-w-[110px]">
+                <div className="mt-2 flex items-center justify-between">
+                  <p className="text-xs font-bold text-azraq-navy truncate max-w-[120px]">
                     {heroSecondary.name}
                   </p>
                   <span className="text-xs font-black text-azraq-violet">

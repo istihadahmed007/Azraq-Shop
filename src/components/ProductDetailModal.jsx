@@ -35,7 +35,7 @@ export default function ProductDetailModal() {
       
       {/* Modal Dialog Container */}
       <div 
-        className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-azraq-purple/20 overflow-hidden my-8 max-h-[90vh] flex flex-col md:flex-row"
+        className="relative w-full max-w-4xl bg-white rounded-none shadow-2xl border border-azraq-purple/20 overflow-hidden my-8 max-h-[90vh] flex flex-col md:flex-row"
         onClick={(e) => e.stopPropagation()}
       >
         
@@ -50,20 +50,20 @@ export default function ProductDetailModal() {
         {/* Left Column: Image Gallery with Thumbnails */}
         <div className="w-full md:w-1/2 p-6 sm:p-8 bg-gradient-to-b from-[#F7F8FC] to-white flex flex-col justify-between border-b md:border-b-0 md:border-r border-gray-100">
           
-          {/* Main Selected Image */}
-          <div className="relative w-full h-72 sm:h-84 flex items-center justify-center rounded-2xl bg-white p-4 shadow-sm border border-azraq-purple/15 overflow-hidden">
+          {/* Main Selected Image - Prominent, square corners, contain */}
+          <div className="relative w-full h-80 sm:h-96 flex items-center justify-center rounded-none bg-white p-3 shadow-sm border border-azraq-purple/15 overflow-hidden">
             <img
               src={images[activeImageIndex] || selectedProduct.main_image}
               alt={selectedProduct.name}
-              className="max-h-full max-w-full object-contain filter drop-shadow-lg transition-all duration-300"
+              className="w-full h-full object-contain filter drop-shadow-lg transition-all duration-300"
             />
             
             {/* Top Badges */}
             <div className="absolute top-3 left-3 flex flex-col gap-1">
-              <span className="px-2.5 py-1 rounded-full bg-azraq-navy text-white text-[10px] font-bold uppercase tracking-wider">
+              <span className="px-2.5 py-1 rounded-none bg-azraq-navy text-white text-[10px] font-bold uppercase tracking-wider">
                 {selectedProduct.badge || 'Curated'}
               </span>
-              <span className="px-2 py-0.5 rounded-md bg-azraq-purple/30 text-azraq-navy text-[9px] font-mono">
+              <span className="px-2 py-0.5 rounded-none bg-azraq-purple/30 text-azraq-navy text-[9px] font-mono">
                 SKU: {selectedProduct.id}
               </span>
             </div>
@@ -89,7 +89,7 @@ export default function ProductDetailModal() {
                 <button
                   key={idx}
                   onClick={() => setActiveImageIndex(idx)}
-                  className={`w-14 h-14 rounded-xl p-1 bg-white border flex-shrink-0 transition-all overflow-hidden ${
+                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-none p-1 bg-white border flex-shrink-0 transition-all overflow-hidden ${
                     activeImageIndex === idx
                       ? 'border-azraq-violet ring-2 ring-azraq-violet/30 shadow-md scale-105'
                       : 'border-gray-200 opacity-60 hover:opacity-100'

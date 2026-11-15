@@ -130,30 +130,30 @@ export default function CollectionsPage() {
             <div
               key={col.id}
               onClick={() => navigateTo('collection-detail', col.slug)}
-              className="group cursor-pointer rounded-3xl bg-white border border-azraq-purple/20 p-6 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between h-[360px] relative overflow-hidden"
+              className="group cursor-pointer rounded-none bg-white border border-azraq-purple/20 p-5 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between h-[450px] relative overflow-hidden"
             >
               <div className="flex items-center justify-between z-10">
-                <span className="px-3 py-1 rounded-full bg-azraq-cloud border border-azraq-purple/20 text-azraq-navy text-[10px] font-mono font-bold">
+                <span className="px-3 py-1 rounded-none bg-azraq-cloud border border-azraq-purple/20 text-azraq-navy text-[10px] font-mono font-bold">
                   {col.product_count ?? col.imported_product_count ?? 0} {t("Products", "পণ্য")}
                 </span>
                 {col.featured && (
-                  <span className="px-2.5 py-0.5 rounded-full bg-azraq-lavender text-azraq-violet text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+                  <span className="px-2.5 py-0.5 rounded-none bg-azraq-lavender text-azraq-violet text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1">
                     <Sparkles className="w-3 h-3" />
                     {col.badge || 'Featured'}
                   </span>
                 )}
               </div>
 
-              <div className="relative w-full h-44 flex items-center justify-center my-auto overflow-hidden">
+              <div className="relative w-full h-[300px] sm:h-[310px] rounded-none bg-gradient-to-b from-[#F7F8FC] to-white flex items-center justify-center p-3 my-auto overflow-hidden">
                 <img
                   src={col.cover_image || col.image_url}
                   alt={col.name}
-                  className="max-h-full max-w-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-110"
+                  className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                 />
               </div>
 
-              <div className="z-10 pt-4 border-t border-gray-100 flex items-end justify-between gap-3">
+              <div className="z-10 pt-3 border-t border-gray-100 flex items-end justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-extrabold text-base text-azraq-navy truncate group-hover:text-azraq-violet transition-colors">
                     {col.name}

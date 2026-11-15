@@ -56,18 +56,18 @@ export default function ShopByCollectionSection() {
             <div
               key={col.id}
               onClick={() => navigateTo('collection-detail', col.slug)}
-              className={`${colSpan} group cursor-pointer rounded-3xl bg-white border border-azraq-purple/20 p-6 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between relative overflow-hidden h-[340px]`}
+              className={`${colSpan} group cursor-pointer rounded-none bg-white border border-azraq-purple/20 p-5 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between relative overflow-hidden h-[420px]`}
             >
               {/* Subtle Ambient Hover Glow */}
               <div className="absolute -top-12 -right-12 w-36 h-36 bg-azraq-lavender/60 rounded-full blur-2xl group-hover:bg-azraq-purple/30 transition-all pointer-events-none" />
 
               {/* Top Tag Row */}
               <div className="flex items-center justify-between z-10">
-                <span className="px-3 py-1 rounded-full bg-azraq-cloud border border-azraq-purple/20 text-azraq-navy text-[10px] font-mono font-bold">
+                <span className="px-3 py-1 rounded-none bg-azraq-cloud border border-azraq-purple/20 text-azraq-navy text-[10px] font-mono font-bold">
                   {col.imported_product_count} {t("Products", "পণ্য")}
                 </span>
                 {col.featured && (
-                  <span className="px-2.5 py-0.5 rounded-full bg-azraq-lavender text-azraq-violet text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1">
+                  <span className="px-2.5 py-0.5 rounded-none bg-azraq-lavender text-azraq-violet text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1">
                     <Sparkles className="w-3 h-3" />
                     {col.badge || 'Featured'}
                   </span>
@@ -75,16 +75,16 @@ export default function ShopByCollectionSection() {
               </div>
 
               {/* Center Collection Art / Isolated Icon Area */}
-              <div className="relative w-full h-36 flex items-center justify-center my-auto overflow-hidden">
+              <div className="relative w-full h-[250px] sm:h-[270px] rounded-none bg-gradient-to-b from-[#F7F8FC] to-white flex items-center justify-center p-2 sm:p-3 my-auto overflow-hidden">
                 {col.image_url ? (
                   <img
                     src={col.image_url}
                     alt={col.name}
-                    className="max-h-full max-w-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-110"
+                    className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
                   />
                 ) : (
-                  <div className="w-20 h-20 rounded-2xl bg-azraq-cloud flex items-center justify-center text-azraq-violet">
+                  <div className="w-20 h-20 rounded-none bg-azraq-cloud flex items-center justify-center text-azraq-violet">
                     <Layers className="w-10 h-10" />
                   </div>
                 )}

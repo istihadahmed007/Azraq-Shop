@@ -126,10 +126,10 @@ export default function ProductCarouselSection() {
           return (
             <div
               key={product.id}
-              className="flex-none w-[270px] sm:w-[290px] snap-start group"
+              className="flex-none w-[280px] sm:w-[310px] snap-start group"
             >
               {/* Product Card (Nexora Reference Layout Recreated) */}
-              <div className="rounded-3xl bg-white border border-azraq-purple/20 p-5 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between h-[390px] relative overflow-hidden">
+              <div className="rounded-none bg-white border border-azraq-purple/20 p-3 sm:p-4 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between h-[490px] sm:h-[510px] relative overflow-hidden">
                 
                 {/* Floating Wishlist Heart */}
                 <button
@@ -149,20 +149,20 @@ export default function ProductCarouselSection() {
 
                 {/* Badge */}
                 {product.badge && (
-                  <span className="absolute top-4 left-4 z-10 px-2.5 py-0.5 rounded-full bg-azraq-lavender text-azraq-violet text-[10px] font-extrabold uppercase tracking-wider">
+                  <span className="absolute top-4 left-4 z-10 px-2.5 py-0.5 rounded-none bg-azraq-lavender text-azraq-violet text-[10px] font-extrabold uppercase tracking-wider">
                     {product.badge}
                   </span>
                 )}
 
-                {/* Product Image Area with Clean Minimal Backdrop */}
+                {/* Product Image Area - 75-80% visual area, completely square corners */}
                 <div 
                   onClick={() => setSelectedProduct(product)}
-                  className="relative w-full h-52 rounded-2xl bg-gradient-to-b from-[#F7F8FC] to-white flex items-center justify-center p-3 cursor-pointer overflow-hidden"
+                  className="relative w-full h-[370px] sm:h-[390px] rounded-none bg-gradient-to-b from-[#F7F8FC] to-white flex items-center justify-center p-2 sm:p-3 cursor-pointer overflow-hidden"
                 >
                   <img
                     src={product.main_image}
                     alt={product.name}
-                    className="max-h-full max-w-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-108"
+                    className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
                   />
                   
@@ -182,7 +182,7 @@ export default function ProductCarouselSection() {
                 </div>
 
                 {/* Bottom Details Row (Matching Reference) */}
-                <div className="mt-4 pt-2 border-t border-gray-100">
+                <div className="mt-3 pt-2 border-t border-gray-100 flex flex-col justify-between flex-1">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
                       {/* Name */}
@@ -195,7 +195,7 @@ export default function ProductCarouselSection() {
                       </h3>
                       {/* Price in BDT */}
                       <div className="flex items-baseline gap-2 mt-1">
-                        <span className="text-base font-extrabold text-azraq-navy">
+                        <span className="text-base sm:text-lg font-black text-azraq-navy">
                           ৳{product.price.toLocaleString()}
                         </span>
                       </div>
