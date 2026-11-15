@@ -377,3 +377,4 @@ export function getGatewayConfig() {
     supported_methods: ['bKash', 'Nagad', 'Rocket', 'Upay', 'Visa', 'Mastercard', 'Bangla QR', 'Bank Transfer']
   };
 }
+
