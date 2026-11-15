@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { ArrowUpRight, ShoppingBag, Globe, Sparkles, Shield, Search, Menu, X, Layers, ChevronDown } from 'lucide-react';
+import { 
+  Search, Heart, GitCompare, ShoppingBag, Headphones, 
+  Menu, X, ChevronDown, Sparkles, Shield, ArrowRight,
+  Globe, Package, Check, Layers
+} from 'lucide-react';
 import AzraqLogo from './AzraqLogo';
 import { useShop } from '../context/ShopContext';
 
@@ -7,10 +11,11 @@ export default function Header() {
   const { 
     collections,
     totalCartItems, 
+    cartSubtotal,
+    favorites,
     setIsCartOpen, 
     setIsTrackingOpen, 
     setIsAdminOpen, 
-    setIsBrandAssetsOpen,
     navigateTo,
     language, 
     setLanguage, 
@@ -20,209 +25,310 @@ export default function Header() {
   } = useShop();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showSearchInput, setShowSearchInput] = useState(false);
-  const [showCollectionsDropdown, setShowCollectionsDropdown] = useState(false);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [compareCount, setCompareCount] = useState(0);
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-azraq-cloud/90 backdrop-blur-xl border-b border-azraq-purple/15 transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-        
-        {/* Left: AZRAQ Brand Logo */}
-        <div className="flex items-center gap-6">
-          <button onClick={() => navigateTo('home')} className="flex items-center text-left group">
-            <AzraqLogo variant="dark" size="md" showDescriptor={true} />
-          </button>
-        </div>
+    <header className="sticky top-0 z-40 w-full transition-all">
+      {/* Top Utility Announcement Bar */}
+      <div className="bg-[#062B4F] text-white/80 text-[11px] font-medium py-1.5 px-4 sm:px-8 border-b border-white/10">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#50DDF0] inline-block animate-pulse" />
+            <span>{t("Free Delivery inside Dhaka over ৳1,500 • EasyDrop Verified Source", "ঢাকা সিটিতে ১৫০০৳ এর অর্ডারে ফ্রি ডেলিভারি • ইজিড্রপ অনুমোদিত ক্যাটালগ")}</span>
+          </div>
 
-        {/* Center: Minimal Navigation Links (Desktop) */}
-        <nav className="hidden md:flex items-center gap-7 text-xs sm:text-sm font-bold text-azraq-navy/80">
-          <button 
-            onClick={() => navigateTo('home')}
-            className="hover:text-azraq-violet transition-colors py-1 relative group"
-          >
-            {t("Home", "হোম")}
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-azraq-violet transition-all group-hover:w-full" />
-          </button>
-
-          {/* Collections Dropdown Trigger */}
-          <div className="relative">
+          <div className="flex items-center gap-4 text-[11px]">
             <button 
-              onClick={() => setShowCollectionsDropdown(!showCollectionsDropdown)}
-              onMouseEnter={() => setShowCollectionsDropdown(true)}
-              className="hover:text-azraq-violet transition-colors py-1 flex items-center gap-1 group"
+              onClick={() => setIsTrackingOpen(true)}
+              className="hover:text-white transition-colors flex items-center gap-1"
             >
-              <span>{t("All Collections (18)", "সকল ১৮টি কালেকশন")}</span>
-              <ChevronDown className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
+              <Package className="w-3.5 h-3.5 text-[#69C5F5]" />
+              <span>{t("Track Order", "ট্র্যাক করুন")}</span>
             </button>
 
-            {/* Collections Mega Menu Dropdown */}
-            {showCollectionsDropdown && (
-              <div 
-                onMouseLeave={() => setShowCollectionsDropdown(false)}
-                className="absolute top-8 -left-12 w-[460px] bg-white rounded-2xl shadow-2xl border border-azraq-purple/20 p-4 grid grid-cols-2 gap-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
-              >
-                {collections.slice(0, 12).map(c => (
-                  <button
-                    key={c.id}
-                    onClick={() => {
-                      setShowCollectionsDropdown(false);
-                      navigateTo('collection-detail', c.slug);
-                    }}
-                    className="p-2 rounded-xl hover:bg-azraq-cloud text-left flex items-center gap-2.5 transition-colors group/item"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center p-1 flex-shrink-0">
-                      <img src={c.image_url} alt="" className="max-h-full max-w-full object-contain" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-azraq-navy truncate group-hover/item:text-azraq-violet">
-                        {c.name}
-                      </p>
-                      <span className="text-[10px] text-gray-400 font-mono">
-                        {c.imported_product_count} items
-                      </span>
-                    </div>
-                  </button>
-                ))}
-                <div className="col-span-2 pt-2 border-t border-gray-100 flex items-center justify-between text-xs">
-                  <span className="text-gray-400">Showing 12 of 18 Collections</span>
-                  <button
-                    onClick={() => {
-                      setShowCollectionsDropdown(false);
-                      navigateTo('collections');
-                    }}
-                    className="font-bold text-azraq-violet hover:underline flex items-center gap-1"
-                  >
-                    <span>View All Collections</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            )}
+            <span className="text-white/20">|</span>
+
+            {/* Language Switcher */}
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'bn' : 'en')}
+              className="hover:text-white transition-colors flex items-center gap-1 font-bold"
+            >
+              <Globe className="w-3.5 h-3.5 text-[#50DDF0]" />
+              <span>{language === 'en' ? 'বাংলা' : 'English'}</span>
+            </button>
+
+            <span className="hidden sm:inline text-white/20">|</span>
+
+            {/* Admin Portal Link */}
+            <button
+              onClick={() => setIsAdminOpen(true)}
+              className="hidden sm:flex items-center gap-1 text-[#50DDF0] hover:text-white transition-colors font-semibold"
+            >
+              <Shield className="w-3.5 h-3.5" />
+              <span>{t("Admin", "অ্যাডমিন")}</span>
+            </button>
           </div>
-
-          <button 
-            onClick={() => navigateTo('collection-detail', 'gadgets-it-accessories')}
-            className="hover:text-azraq-violet transition-colors py-1 relative group"
-          >
-            {t("Gadgets & IT", "গ্যাজেটস")}
-          </button>
-
-          <button 
-            onClick={() => navigateTo('collection-detail', 'jewelries-accessories')}
-            className="hover:text-azraq-violet transition-colors py-1 relative group"
-          >
-            {t("Bags & Carry", "ব্যাগস")}
-          </button>
-
-          <button 
-            onClick={() => setIsTrackingOpen(true)}
-            className="hover:text-azraq-violet transition-colors py-1 relative group"
-          >
-            {t("Track Order", "অর্ডার ট্র্যাকিং")}
-          </button>
-        </nav>
-
-        {/* Right Action Cluster */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          
-          {/* Search Toggle */}
-          <div className="relative flex items-center">
-            {showSearchInput ? (
-              <div className="flex items-center bg-white border border-azraq-purple/30 rounded-full px-3 py-1.5 shadow-sm transition-all">
-                <Search className="w-4 h-4 text-azraq-navy/50 mr-2" />
-                <input
-                  type="text"
-                  placeholder={t("Search 257 products...", "পণ্য খুঁজুন...")}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-32 sm:w-48 bg-transparent text-xs text-azraq-navy focus:outline-none"
-                  autoFocus
-                />
-                <button 
-                  onClick={() => {
-                    setShowSearchInput(false);
-                    setSearchQuery('');
-                  }}
-                  className="text-azraq-navy/40 hover:text-azraq-navy ml-1"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ) : (
-              <button 
-                onClick={() => setShowSearchInput(true)}
-                className="p-2 text-azraq-navy/70 hover:text-azraq-navy hover:bg-azraq-lavender/50 rounded-full transition-colors"
-                title={t("Search Catalog", "অনুসন্ধান")}
-              >
-                <Search className="w-5 h-5" />
-              </button>
-            )}
-          </div>
-
-          {/* Language Switcher */}
-          <button
-            onClick={() => setLanguage(language === 'en' ? 'bn' : 'en')}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border border-azraq-purple/20 bg-white/70 hover:bg-white text-azraq-navy transition-colors shadow-sm"
-          >
-            <Globe className="w-3.5 h-3.5 text-azraq-azure" />
-            <span>{language === 'en' ? 'বাংলা' : 'EN'}</span>
-          </button>
-
-          {/* Admin Collections Portal Button */}
-          <button
-            onClick={() => setIsAdminOpen(true)}
-            className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-azraq-navy text-white hover:bg-azraq-charcoal transition-colors shadow-sm"
-            title="Open Admin Operations & Dropship Portal"
-          >
-            <Shield className="w-3.5 h-3.5 text-azraq-lime" />
-            <span>{t("Admin Portal", "অ্যাডমিন")}</span>
-          </button>
-
-          {/* Shopping Bag Button */}
-          <button
-            onClick={() => setIsCartOpen(true)}
-            className="relative p-2.5 text-azraq-navy hover:text-azraq-violet bg-white border border-azraq-purple/20 rounded-full shadow-sm hover:shadow transition-all group"
-            title={t("View Cart", "ব্যাগ দেখুন")}
-          >
-            <ShoppingBag className="w-5 h-5 transition-transform group-hover:scale-110" />
-            {totalCartItems > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-azraq-lime text-[11px] font-black text-azraq-navy flex items-center justify-center shadow-md animate-pulse">
-                {totalCartItems}
-              </span>
-            )}
-          </button>
-
-          {/* Explore Collections CTA Button */}
-          <button
-            onClick={() => navigateTo('collections')}
-            className="flex items-center gap-2 pl-3.5 pr-1.5 py-1.5 rounded-full bg-azraq-lime hover:bg-[#bbf035] text-azraq-navy text-xs font-bold shadow-glow-lime transition-all transform hover:-translate-y-0.5"
-          >
-            <span>{t("Collections", "কালেকশন")}</span>
-            <span className="w-7 h-7 rounded-full bg-azraq-navy text-white flex items-center justify-center">
-              <ArrowUpRight className="w-4 h-4" />
-            </span>
-          </button>
-
-          {/* Mobile Menu Toggle Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 text-azraq-navy hover:bg-azraq-lavender/50 rounded-lg transition-colors"
-          >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Main Glassy Header Bar (Reference Screenshot Exact Match) */}
+      <div className="bg-white/85 backdrop-blur-xl border-b border-[#D9F0FF] shadow-[0_4px_20px_0_rgba(6,43,79,0.04)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4 sm:gap-8">
+          
+          {/* 1. Left: Brand Wordmark & Monogram */}
+          <button 
+            onClick={() => navigateTo('home')} 
+            className="flex items-center text-left group flex-shrink-0"
+          >
+            <AzraqLogo variant="dark" size="md" showDescriptor={true} />
+          </button>
+
+          {/* 2. Center: Large Glassy Search Bar (Matching Reference) */}
+          <div className="hidden md:flex flex-1 max-w-2xl relative">
+            <div className="w-full relative flex items-center">
+              <input
+                type="text"
+                placeholder={t("Search for products, brands and collections...", "পণ্য, ব্র্যান্ড বা কালেকশন খুঁজুন...")}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-5 pr-12 py-2.5 rounded-full bg-[#F0F7FF]/80 backdrop-blur-md border border-[#D9F0FF] text-xs sm:text-sm text-[#062B4F] placeholder-[#062B4F]/45 focus:outline-none focus:border-[#0877C9] focus:bg-white focus:ring-2 focus:ring-[#0877C9]/15 shadow-sm transition-all"
+              />
+              <button 
+                onClick={() => {
+                  const el = document.getElementById('all-products') || document.getElementById('shop-by-collection');
+                  el?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="absolute right-1.5 w-9 h-9 rounded-full bg-[#062B4F] hover:bg-[#0877C9] text-white flex items-center justify-center transition-all shadow-sm group/btn"
+                title="Search"
+              >
+                <Search className="w-4 h-4 transition-transform group-hover/btn:scale-110" />
+              </button>
+            </div>
+          </div>
+
+          {/* 3. Right: Quick Actions (Wishlist, Compare, Cart) */}
+          <div className="flex items-center gap-4 sm:gap-6">
+            
+            {/* Wishlist */}
+            <button
+              onClick={() => {
+                const el = document.getElementById('popular-products') || document.getElementById('all-products');
+                el?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="flex flex-col items-center text-[#062B4F] hover:text-[#0877C9] transition-colors relative group"
+              title="Wishlist"
+            >
+              <div className="relative">
+                <Heart className={`w-5 h-5 ${favorites.length > 0 ? 'text-[#0877C9] fill-[#0877C9]' : 'text-[#062B4F]/70'}`} />
+                {favorites.length > 0 && (
+                  <span className="absolute -top-1.5 -right-2 w-4 h-4 rounded-full bg-[#0877C9] text-white text-[9px] font-bold flex items-center justify-center shadow-sm">
+                    {favorites.length}
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] font-bold mt-1 text-[#062B4F]/70 group-hover:text-[#0877C9] hidden sm:block">
+                {t("Wishlist", "উইশলিস্ট")}
+              </span>
+            </button>
+
+            {/* Compare */}
+            <button
+              onClick={() => setCompareCount(prev => (prev > 0 ? 0 : 2))}
+              className="flex flex-col items-center text-[#062B4F] hover:text-[#0877C9] transition-colors relative group"
+              title="Compare Products"
+            >
+              <div className="relative">
+                <GitCompare className="w-5 h-5 text-[#062B4F]/70 group-hover:text-[#0877C9]" />
+                {compareCount > 0 && (
+                  <span className="absolute -top-1.5 -right-2 w-4 h-4 rounded-full bg-[#50DDF0] text-[#062B4F] text-[9px] font-black flex items-center justify-center shadow-sm">
+                    {compareCount}
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] font-bold mt-1 text-[#062B4F]/70 group-hover:text-[#0877C9] hidden sm:block">
+                {t("Compare", "তুলনা")}
+              </span>
+            </button>
+
+            {/* Shopping Cart (Matching Reference with badge and total) */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="flex items-center gap-2.5 pl-2 sm:pl-3 pr-3.5 py-1.5 rounded-full bg-white border border-[#D9F0FF] hover:border-[#69C5F5] shadow-sm hover:shadow transition-all group"
+              title="Shopping Cart"
+            >
+              <div className="relative">
+                <ShoppingBag className="w-5 h-5 text-[#0877C9] transition-transform group-hover:scale-110" />
+                <span className="absolute -top-1.5 -right-2 w-4 h-4 rounded-full bg-[#062B4F] text-white text-[9px] font-black flex items-center justify-center shadow-sm">
+                  {totalCartItems}
+                </span>
+              </div>
+              <div className="text-left hidden sm:block">
+                <span className="text-[10px] font-semibold text-[#062B4F]/60 block leading-tight">
+                  {t("Cart", "ব্যাগ")}
+                </span>
+                <span className="text-xs font-black text-[#062B4F]">
+                  ৳{(cartSubtotal || 0).toLocaleString()}
+                </span>
+              </div>
+            </button>
+
+            {/* Mobile Menu Hamburger */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-2 rounded-lg text-[#062B4F] hover:bg-[#F0F7FF] transition-colors"
+            >
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+
+          </div>
+
+        </div>
+      </div>
+
+      {/* Secondary Navigation Ribbon (Matching Reference Screenshot) */}
+      <div className="bg-white/95 backdrop-blur-md border-b border-[#D9F0FF] hidden md:block">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between">
+          
+          <div className="flex items-center gap-6">
+            {/* Shop by Categories Dropdown Pill */}
+            <div className="relative">
+              <button
+                onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                className="bg-[#062B4F] hover:bg-[#0877C9] text-white px-4 py-2 rounded-lg flex items-center gap-2.5 font-bold text-xs shadow-sm transition-all"
+              >
+                <Menu className="w-4 h-4" />
+                <span>{t("Shop by Categories", "ক্যাটাগরি ব্রাউজ করুন")}</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showCategoryDropdown ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Mega Dropdown */}
+              {showCategoryDropdown && (
+                <div 
+                  onMouseLeave={() => setShowCategoryDropdown(false)}
+                  className="absolute top-11 left-0 w-72 bg-white rounded-xl shadow-2xl border border-[#D9F0FF] py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150 divide-y divide-gray-50"
+                >
+                  <div className="max-h-80 overflow-y-auto no-scrollbar py-1">
+                    {collections.map(c => (
+                      <button
+                        key={c.id}
+                        onClick={() => {
+                          setShowCategoryDropdown(false);
+                          navigateTo('collection-detail', c.slug);
+                        }}
+                        className="w-full px-4 py-2 text-left text-xs font-semibold text-[#062B4F] hover:bg-[#F0F7FF] hover:text-[#0877C9] flex items-center justify-between transition-colors group"
+                      >
+                        <span className="truncate">{c.name}</span>
+                        <span className="text-[10px] text-gray-400 font-mono group-hover:text-[#0877C9]">
+                          ({c.imported_product_count})
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="p-2 bg-[#F8FCFF]">
+                    <button
+                      onClick={() => {
+                        setShowCategoryDropdown(false);
+                        navigateTo('collections');
+                      }}
+                      className="w-full py-1.5 px-3 rounded-lg bg-[#062B4F] text-white text-xs font-bold hover:bg-[#0877C9] transition-colors text-center"
+                    >
+                      {t("View All 18 Collections", "সকল ১৮টি কালেকশন দেখুন")}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Menu Links (Matching Reference: Shop, Deals, New Arrivals, Brands, Inspiration) */}
+            <nav className="flex items-center gap-7 text-xs font-bold text-[#062B4F]/80">
+              <button 
+                onClick={() => navigateTo('home')}
+                className="hover:text-[#0877C9] transition-colors py-1 relative group"
+              >
+                {t("Shop", "শপ")}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#0877C9] transition-all group-hover:w-full" />
+              </button>
+              
+              <button 
+                onClick={() => {
+                  const el = document.getElementById('popular-products');
+                  el?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="hover:text-[#0877C9] transition-colors py-1 relative group"
+              >
+                {t("Deals", "ডিলস")}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#0877C9] transition-all group-hover:w-full" />
+              </button>
+
+              <button 
+                onClick={() => {
+                  const el = document.getElementById('trending-now') || document.getElementById('all-products');
+                  el?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="hover:text-[#0877C9] transition-colors py-1 relative group"
+              >
+                {t("New Arrivals", "নতুন কালেকশন")}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#0877C9] transition-all group-hover:w-full" />
+              </button>
+
+              <button 
+                onClick={() => navigateTo('collections')}
+                className="hover:text-[#0877C9] transition-colors py-1 relative group"
+              >
+                {t("Brands & Collections", "ব্র্যান্ডস")}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#0877C9] transition-all group-hover:w-full" />
+              </button>
+
+              <button 
+                onClick={() => {
+                  const el = document.getElementById('featured-collections');
+                  el?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="hover:text-[#0877C9] transition-colors py-1 relative group"
+              >
+                {t("Inspiration", "ইনস্পিরেশন")}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#0877C9] transition-all group-hover:w-full" />
+              </button>
+            </nav>
+
+          </div>
+
+          {/* Right: Support Contact */}
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#062B4F]/80">
+            <Headphones className="w-4 h-4 text-[#0877C9]" />
+            <span>Support:</span>
+            <a href="tel:+8801711223344" className="font-bold text-[#062B4F] hover:text-[#0877C9] transition-colors">
+              +880 1711-223344
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white/95 backdrop-blur-2xl border-b border-azraq-purple/20 px-6 py-6 space-y-4 shadow-xl">
-          <div className="flex flex-col space-y-3 font-semibold text-azraq-navy text-base">
+        <div className="md:hidden bg-white/95 backdrop-blur-2xl border-b border-[#D9F0FF] p-5 space-y-4 shadow-xl">
+          {/* Mobile Search */}
+          <div className="relative">
+            <input
+              type="text"
+              placeholder={t("Search catalog...", "পণ্য খুঁজুন...")}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-4 pr-10 py-2.5 rounded-full bg-[#F0F7FF] border border-[#D9F0FF] text-xs text-[#062B4F] focus:outline-none"
+            />
+            <Search className="w-4 h-4 text-[#062B4F]/40 absolute right-3.5 top-1/2 -translate-y-1/2" />
+          </div>
+
+          <div className="flex flex-col space-y-2 text-sm font-semibold text-[#062B4F]">
             <button 
               onClick={() => {
                 setIsMobileMenuOpen(false);
                 navigateTo('home');
-              }} 
-              className="text-left py-2 hover:text-azraq-violet border-b border-gray-100"
+              }}
+              className="text-left py-2 hover:text-[#0877C9] border-b border-gray-100"
             >
               {t("Home", "হোম")}
             </button>
@@ -230,8 +336,8 @@ export default function Header() {
               onClick={() => {
                 setIsMobileMenuOpen(false);
                 navigateTo('collections');
-              }} 
-              className="text-left py-2 hover:text-azraq-violet border-b border-gray-100 font-bold text-azraq-violet"
+              }}
+              className="text-left py-2 text-[#0877C9] font-bold border-b border-gray-100"
             >
               {t("Browse All 18 Collections", "সকল ১৮টি কালেকশন")}
             </button>
@@ -239,20 +345,20 @@ export default function Header() {
               onClick={() => {
                 setIsMobileMenuOpen(false);
                 setIsTrackingOpen(true);
-              }} 
-              className="text-left py-2 hover:text-azraq-violet border-b border-gray-100"
+              }}
+              className="text-left py-2 hover:text-[#0877C9] border-b border-gray-100"
             >
-              {t("Track Your Order", "অর্ডার ট্র্যাকিং")}
+              {t("Track Order", "অর্ডার ট্র্যাকিং")}
             </button>
             <button 
               onClick={() => {
                 setIsMobileMenuOpen(false);
                 setIsAdminOpen(true);
-              }} 
-              className="text-left py-2 text-azraq-navy hover:text-azraq-lime flex items-center justify-between font-bold"
+              }}
+              className="text-left py-2 hover:text-[#0877C9] flex items-center justify-between"
             >
-              <span>{t("Admin Collections Portal", "অ্যাডমিন পোর্টাল")}</span>
-              <Shield className="w-4 h-4 text-azraq-lime" />
+              <span>{t("Admin Portal", "অ্যাডমিন পোর্টাল")}</span>
+              <Shield className="w-4 h-4 text-[#0877C9]" />
             </button>
           </div>
         </div>

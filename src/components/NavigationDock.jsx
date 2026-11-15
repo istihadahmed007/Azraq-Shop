@@ -15,7 +15,7 @@ export default function NavigationDock() {
 
   return (
     <aside 
-      className="fixed left-4 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center py-4 px-2.5 rounded-full bg-azraq-navy/90 backdrop-blur-xl border border-azraq-purple/20 shadow-2xl transition-all hover:border-azraq-lime/40"
+      className="fixed left-4 top-1/2 -translate-y-1/2 z-40 hidden 2xl:flex flex-col items-center py-4 px-2.5 rounded-full bg-[#062B4F]/90 backdrop-blur-xl border border-[#69C5F5]/30 shadow-2xl transition-all hover:border-[#50DDF0]/60"
       aria-label="Quick Navigation Dock"
     >
       <div className="flex flex-col items-center gap-5">
