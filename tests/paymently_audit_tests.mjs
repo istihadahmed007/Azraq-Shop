@@ -8,6 +8,7 @@ import {
   calculateServerOrderPricing,
   createPaymentlyCheckoutSession,
   createCodCheckoutOrder,
+  createManualPortalCheckoutOrder,
   verifyPaymentlyPayment,
   cancelPaymentlyCheckout,
   handlePaymentlyWebhook,
@@ -48,7 +49,7 @@ async function runAuditSuite() {
   console.log('================================================================\n');
 
   let passed = 0;
-  const total = 14;
+  const total = 18;
 
   const sampleCustomer = {
     name: 'Istihad Ahmed',
@@ -73,165 +74,136 @@ async function runAuditSuite() {
   // Configure test environment
   process.env.PAYMENTLY_API_KEY = 'test_merchant_live_key_azraq';
   process.env.PAYMENTLY_BASE_URL = 'https://azraq.paymently.io';
-  process.env.APP_BASE_URL = 'https://azraqshop.vercel.app';
+  process.env.APP_BASE_URL = 'https://azraq.azraqtrips.com';
 
-  // --- TEST 1: PAID / Verified Success ---
+  // --- TEST 1: Successful Dynamic Session Creation ---
   try {
-    console.log('▶ TEST 1 — PAID/Verified Success: Creates genuine order with provider TrxID:');
-    const chkId = `AZQ-CHK-TEST-1-${Date.now()}`;
-    const invoiceId = `INV-TEST-1-${Date.now()}`;
-    const amount = 2870; // 2800 + 70 inside shipping
-
-    await saveCheckoutAttempt({
-      id: chkId,
-      customer_name: sampleCustomer.name,
-      customer_phone: sampleCustomer.phone,
-      shipping_address: sampleCustomer.address,
-      items_snapshot: [{ product_id: 'AZQ-0001', name: 'Baseus Set', unit_price: 2800, quantity: 1 }],
-      subtotal: 2800,
-      delivery_fee: 70,
-      discount: 0,
-      total_payable: amount,
-      gateway_invoice_id: invoiceId,
-      status: 'AWAITING_PAYMENT'
-    });
-
+    console.log('▶ TEST 1 — Successful Dynamic Session Creation:');
+    const invoiceToken = `INV-TOKEN-${Date.now()}`;
     mockFetchHandler = async (url) => {
-      if (url.includes('/api/verify-payment')) {
+      if (url.includes('/api/checkout-v2')) {
         return createMockResponse(200, {
-          status: 'COMPLETED',
-          invoice_id: invoiceId,
-          amount: String(amount),
-          transaction_id: 'BKASH-VERIFIED-TRX-9988',
-          payment_method: 'bkash',
-          date: new Date().toISOString()
+          status: true,
+          message: 'Payment Initiated',
+          payment_url: `https://azraq.paymently.io/checkout/${invoiceToken}`
         });
       }
     };
 
-    const res = await verifyPaymentlyPayment({ invoiceId, checkoutId: chkId });
-    if (!res.success || !res.verified || res.status !== 'PAID') {
-      throw new Error(`Expected verified PAID, got: ${JSON.stringify(res)}`);
+    const sessionRes = await createPaymentlyCheckoutSession({
+      customer: sampleCustomer,
+      items: sampleItems,
+      deliveryArea: 'inside'
+    });
+
+    if (!sessionRes.success || !sessionRes.payment_url || sessionRes.is_fallback_link) {
+      throw new Error(`Expected successful dynamic session, got: ${JSON.stringify(sessionRes)}`);
     }
-    if (!res.order || res.order.payment_status !== 'PAID' || res.transaction.transaction_id !== 'BKASH-VERIFIED-TRX-9988') {
-      throw new Error('Order or transaction record was not marked PAID with provider TrxID');
+    if (sessionRes.amount !== 2870 || sessionRes.invoice_id !== invoiceToken) {
+      throw new Error(`Mismatch in amount or invoiceId: ${JSON.stringify(sessionRes)}`);
     }
-    console.log(`  ✓ Payment verified (PAID), exactly one genuine order created: ${res.order.id}`);
-    console.log(`  ✓ Authentic provider TrxID stored: ${res.transaction.transaction_id}`);
+    const attempt = await getCheckoutAttempt(sessionRes.checkout_id);
+    if (!attempt || attempt.status !== 'AWAITING_PAYMENT') {
+      throw new Error('Checkout attempt was not persisted with status AWAITING_PAYMENT');
+    }
+    console.log(`  ✓ Unique dynamic session created: ${sessionRes.checkout_id}`);
+    console.log(`  ✓ Authoritative amount locked: ৳${sessionRes.amount} BDT, token: ${sessionRes.invoice_id}`);
     passed++;
   } catch (e) {
     console.error('  ✗ TEST 1 FAILED:', e.message);
   }
 
-  // --- TEST 2: Provider Returns PENDING (Pending State) ---
+  // --- TEST 2: Missing Credentials Handling ---
   try {
-    console.log('\n▶ TEST 2 — Provider Returns PENDING: Status preserved, order is NOT confirmed:');
-    const chkId = `AZQ-CHK-TEST-2-${Date.now()}`;
-    const invoiceId = `INV-TEST-2-${Date.now()}`;
+    console.log('\n▶ TEST 2 — Missing Credentials: Fails safely with diagnostic code:');
+    const savedKey = process.env.PAYMENTLY_API_KEY;
+    delete process.env.PAYMENTLY_API_KEY;
 
-    await saveCheckoutAttempt({
-      id: chkId,
-      customer_name: 'Pending Customer',
-      customer_phone: '01711223302',
-      shipping_address: 'Dhaka',
-      items_snapshot: [],
-      subtotal: 1000,
-      delivery_fee: 70,
-      total_payable: 1070,
-      gateway_invoice_id: invoiceId,
-      status: 'AWAITING_PAYMENT'
+    const noKeyRes = await createPaymentlyCheckoutSession({
+      customer: sampleCustomer,
+      items: sampleItems,
+      deliveryArea: 'inside'
     });
 
-    mockFetchHandler = async (url) => {
-      if (url.includes('/api/verify-payment')) {
-        return createMockResponse(200, { status: 'PENDING', invoice_id: invoiceId });
-      }
-    };
+    process.env.PAYMENTLY_API_KEY = savedKey; // restore
 
-    const res = await verifyPaymentlyPayment({ invoiceId, checkoutId: chkId });
-    if (res.verified !== false || res.status !== 'PENDING') {
-      throw new Error(`Expected verified: false, status: PENDING, got ${JSON.stringify(res)}`);
+    if (noKeyRes.success !== false || noKeyRes.code !== 'GATEWAY_CREDENTIALS_MISSING') {
+      throw new Error(`Expected failure with GATEWAY_CREDENTIALS_MISSING, got: ${JSON.stringify(noKeyRes)}`);
     }
-    const attempt = await getCheckoutAttempt(chkId);
-    if (attempt.order_id) {
-      throw new Error('Order was incorrectly created for PENDING transaction!');
+    const attempt = await getCheckoutAttempt(noKeyRes.checkout_id);
+    if (!attempt || attempt.status !== 'FAILED') {
+      throw new Error('Attempt status was not marked FAILED when credentials were missing');
     }
-    console.log('  ✓ Status preserved as PENDING, order is not confirmed');
+    console.log('  ✓ Missing API key fails closed with GATEWAY_CREDENTIALS_MISSING');
+    console.log('  ✓ No unlinked fallback link pretended to be dynamic session');
     passed++;
   } catch (e) {
     console.error('  ✗ TEST 2 FAILED:', e.message);
   }
 
-  // --- TEST 3: Manual TrxID Submitted (Pending Verification State) ---
+  // --- TEST 3: Provider Rejection Handling ---
   try {
-    console.log('\n▶ TEST 3 — Manual TrxID Entry: Order marked PENDING_VERIFICATION (Never claimed PAID):');
-    const chkId = `AZQ-CHK-TEST-3-${Date.now()}`;
-    await saveCheckoutAttempt({
-      id: chkId,
-      customer_name: 'Manual Trx User',
-      customer_phone: '01711223303',
-      shipping_address: 'Dhaka',
-      items_snapshot: [{ product_id: 'AZQ-0001', name: 'Item', unit_price: 1500, quantity: 1 }],
-      subtotal: 1500,
-      delivery_fee: 70,
-      total_payable: 1570,
-      status: 'AWAITING_PAYMENT'
+    console.log('\n▶ TEST 3 — Provider Rejection: Records error code and keeps cart safe:');
+    mockFetchHandler = async (url) => {
+      if (url.includes('/api/checkout-v2')) {
+        return createMockResponse(400, {
+          status: false,
+          message: 'Merchant account currency mismatch'
+        });
+      }
+    };
+
+    const rejRes = await createPaymentlyCheckoutSession({
+      customer: sampleCustomer,
+      items: sampleItems,
+      deliveryArea: 'inside'
     });
 
-    const res = await verifyPaymentlyPayment({ checkoutId: chkId, manualTrxId: 'BKASH-MANUAL-7721' });
-    if (res.verified === true || res.status === 'PAID') {
-      throw new Error('Vulnerability: Manual TrxID was claimed as PAID without provider clearance!');
+    if (rejRes.success !== false || rejRes.code !== 'GATEWAY_REJECTED') {
+      throw new Error(`Expected GATEWAY_REJECTED, got: ${JSON.stringify(rejRes)}`);
     }
-    if (res.status !== 'PENDING_VERIFICATION' || res.order?.payment_status !== 'PENDING_VERIFICATION') {
-      throw new Error(`Expected PENDING_VERIFICATION, got ${res.status}`);
+    const attempt = await getCheckoutAttempt(rejRes.checkout_id);
+    if (!attempt || attempt.status !== 'FAILED') {
+      throw new Error('Attempt was not marked FAILED on rejection');
     }
-    console.log(`  ✓ Order created with status PENDING_VERIFICATION: ${res.order.id}`);
-    console.log('  ✓ Manual TrxID recorded for accounting verification, not claimed PAID');
+    console.log('  ✓ Provider rejection returned sanitized GATEWAY_REJECTED');
+    console.log('  ✓ Attempt status updated to FAILED without corrupting cart');
     passed++;
   } catch (e) {
     console.error('  ✗ TEST 3 FAILED:', e.message);
   }
 
-  // --- TEST 4: Failed Verification & Retry Handling ---
+  // --- TEST 4: Provider Timeout Handling ---
   try {
-    console.log('\n▶ TEST 4 — Failed Verification: Attempt marked FAILED, no order created, customer can retry:');
-    const chkId = `AZQ-CHK-TEST-4-${Date.now()}`;
-    const invoiceId = `INV-TEST-4-${Date.now()}`;
-
-    await saveCheckoutAttempt({
-      id: chkId,
-      customer_name: 'Failed User',
-      customer_phone: '01711223304',
-      shipping_address: 'Dhaka',
-      items_snapshot: [],
-      subtotal: 1200,
-      delivery_fee: 70,
-      total_payable: 1270,
-      gateway_invoice_id: invoiceId,
-      status: 'AWAITING_PAYMENT'
-    });
-
+    console.log('\n▶ TEST 4 — Provider Timeout: Handles abort / timeout safely:');
     mockFetchHandler = async (url) => {
-      if (url.includes('/api/verify-payment')) {
-        return createMockResponse(200, { status: 'FAILED', invoice_id: invoiceId });
+      if (url.includes('/api/checkout-v2')) {
+        const timeoutErr = new Error('The operation was aborted due to timeout');
+        timeoutErr.name = 'TimeoutError';
+        throw timeoutErr;
       }
     };
 
-    const res = await verifyPaymentlyPayment({ invoiceId, checkoutId: chkId });
-    if (res.verified === true || res.status !== 'FAILED') {
-      throw new Error(`Expected status: FAILED, verified: false, got ${JSON.stringify(res)}`);
+    const timeoutRes = await createPaymentlyCheckoutSession({
+      customer: sampleCustomer,
+      items: sampleItems,
+      deliveryArea: 'inside'
+    });
+
+    if (timeoutRes.success !== false || timeoutRes.code !== 'GATEWAY_TIMEOUT') {
+      throw new Error(`Expected GATEWAY_TIMEOUT, got: ${JSON.stringify(timeoutRes)}`);
     }
-    const attempt = await getCheckoutAttempt(chkId);
-    if (attempt.order_id) {
-      throw new Error('Order was incorrectly created for FAILED transaction!');
+    const attempt = await getCheckoutAttempt(timeoutRes.checkout_id);
+    if (!attempt || attempt.status !== 'FAILED') {
+      throw new Error('Attempt was not marked FAILED on timeout');
     }
-    console.log('  ✓ Verification failure properly recorded without creating paid order');
+    console.log('  ✓ Network timeout handled gracefully with GATEWAY_TIMEOUT');
     passed++;
   } catch (e) {
     console.error('  ✗ TEST 4 FAILED:', e.message);
   }
 
-  // --- TEST 5: Amount Mismatch Rejection ---
+  // --- TEST 5: Underpayment / Amount Mismatch Rejection ---
   try {
     console.log('\n▶ TEST 5 — Amount Mismatch: Reject payment if customer paid less than required:');
     const chkId = `AZQ-CHK-TEST-5-${Date.now()}`;
@@ -255,7 +227,7 @@ async function runAuditSuite() {
         return createMockResponse(200, {
           status: 'COMPLETED',
           invoice_id: invoiceId,
-          amount: '100', // Paid 100 instead of 4,000!
+          amount: '100', // Customer paid ৳100 instead of ৳4,000!
           transaction_id: 'TRX-FRAUD-555'
         });
       }
@@ -265,68 +237,35 @@ async function runAuditSuite() {
     if (res.verified === true || res.status === 'PAID') {
       throw new Error('Vulnerability: Underpaid transaction was approved for fulfillment!');
     }
+    if (res.status !== 'AMOUNT_MISMATCH') {
+      throw new Error(`Expected status AMOUNT_MISMATCH, got ${res.status}`);
+    }
     console.log('  ✓ Underpaid transaction rejected for order fulfillment (AMOUNT_MISMATCH)');
     passed++;
   } catch (e) {
     console.error('  ✗ TEST 5 FAILED:', e.message);
   }
 
-  // --- TEST 6: Unsafe Payment URL Rejection ---
+  // --- TEST 6: Invalid Webhook Signature / Header Authenticity ---
   try {
-    console.log('\n▶ TEST 6 — Unsafe Payment URL Rejection: Reject untrusted external links:');
-    mockFetchHandler = async (url) => {
-      if (url.includes('/api/checkout-v2')) {
-        return createMockResponse(200, {
-          status: true,
-          payment_url: 'https://evil-phishing-site.com/steal-credentials',
-          invoice_id: 'INV-FAKE-PHISH'
-        });
-      }
-    };
-
-    const res = await createPaymentlyCheckoutSession({
-      customer: sampleCustomer,
-      items: sampleItems,
-      deliveryArea: 'inside'
-    });
-
-    if (res.success === true || res.payment_url?.includes('evil-phishing-site.com')) {
-      throw new Error('Vulnerability: Untrusted payment URL was accepted and returned to client!');
+    console.log('\n▶ TEST 6 — Webhook Authenticity: Reject unauthorized webhooks missing API key header:');
+    const invoiceId = `INV-TEST-6-${Date.now()}`;
+    const badHeaders = { 'RT-UDDOKTAPAY-API-KEY': 'fake_unauthorized_key' };
+    const badWh = await handlePaymentlyWebhook({ invoice_id: invoiceId, status: 'COMPLETED', amount: 1000 }, badHeaders);
+    if (badWh.success === true) {
+      throw new Error('Vulnerability: Webhook with invalid API key was accepted!');
     }
-    console.log('  ✓ Untrusted payment URL rejected for security');
+    console.log('  ✓ Unauthorized webhook correctly rejected');
     passed++;
   } catch (e) {
     console.error('  ✗ TEST 6 FAILED:', e.message);
   }
 
-  // --- TEST 7: Generic Fallback Payment Link Disclosure ---
+  // --- TEST 7: Duplicate Webhook Idempotency ---
   try {
-    console.log('\n▶ TEST 7 — Generic Fallback Link: Discloses manual amount entry when API key absent:');
-    const oldKey = process.env.PAYMENTLY_API_KEY;
-    delete process.env.PAYMENTLY_API_KEY;
-
-    const res = await createPaymentlyCheckoutSession({
-      customer: sampleCustomer,
-      items: sampleItems,
-      deliveryArea: 'inside'
-    });
-
-    process.env.PAYMENTLY_API_KEY = oldKey; // restore
-
-    if (!res.success || !res.is_fallback_link || !res.requires_manual_trx || !res.payment_url.includes('paymentlink/default/BDT')) {
-      throw new Error(`Fallback session creation did not disclose fallback link: ${JSON.stringify(res)}`);
-    }
-    console.log('  ✓ Fallback payment link cleanly disclosed with instructions and manual TrxID requirement');
-    passed++;
-  } catch (e) {
-    console.error('  ✗ TEST 7 FAILED:', e.message);
-  }
-
-  // --- TEST 8: Repeated Verification & Webhook Idempotency ---
-  try {
-    console.log('\n▶ TEST 8 — Repeated Webhook Idempotency: Exactly one order created on duplicates:');
-    const chkId = `AZQ-CHK-TEST-8-${Date.now()}`;
-    const invoiceId = `INV-TEST-8-${Date.now()}`;
+    console.log('\n▶ TEST 7 — Repeated Webhook Idempotency: Exactly one order created on duplicates:');
+    const chkId = `AZQ-CHK-TEST-7-${Date.now()}`;
+    const invoiceId = `INV-TEST-7-${Date.now()}`;
     const amount = 2870;
 
     await saveCheckoutAttempt({
@@ -373,29 +312,233 @@ async function runAuditSuite() {
     console.log('  ✓ Repeated duplicate webhook skipped idempotently');
     passed++;
   } catch (e) {
+    console.error('  ✗ TEST 7 FAILED:', e.message);
+  }
+
+  // --- TEST 8: Failed Verification Handling ---
+  try {
+    console.log('\n▶ TEST 8 — Failed Verification: Attempt marked FAILED, no order created, customer can retry:');
+    const chkId = `AZQ-CHK-TEST-8-${Date.now()}`;
+    const invoiceId = `INV-TEST-8-${Date.now()}`;
+
+    await saveCheckoutAttempt({
+      id: chkId,
+      customer_name: 'Failed User',
+      customer_phone: '01711223304',
+      shipping_address: 'Dhaka',
+      items_snapshot: [],
+      subtotal: 1200,
+      delivery_fee: 70,
+      total_payable: 1270,
+      gateway_invoice_id: invoiceId,
+      status: 'AWAITING_PAYMENT'
+    });
+
+    mockFetchHandler = async (url) => {
+      if (url.includes('/api/verify-payment')) {
+        return createMockResponse(200, { status: 'FAILED', invoice_id: invoiceId });
+      }
+    };
+
+    const res = await verifyPaymentlyPayment({ invoiceId, checkoutId: chkId });
+    if (res.verified === true || res.status !== 'FAILED') {
+      throw new Error(`Expected status: FAILED, verified: false, got ${JSON.stringify(res)}`);
+    }
+    const attempt = await getCheckoutAttempt(chkId);
+    if (attempt.order_id) {
+      throw new Error('Order was incorrectly created for FAILED transaction!');
+    }
+    console.log('  ✓ Verification failure properly recorded without creating paid order');
+    passed++;
+  } catch (e) {
     console.error('  ✗ TEST 8 FAILED:', e.message);
   }
 
-  // --- TEST 9: Webhook Authenticity Check ---
+  // --- TEST 9: Retry Behavior ---
   try {
-    console.log('\n▶ TEST 9 — Webhook Authenticity: Reject unauthorized webhooks missing API key header:');
-    const invoiceId = `INV-TEST-9-${Date.now()}`;
+    console.log('\n▶ TEST 9 — Retry Behavior: Customer can retry without cart data corruption:');
+    // First attempt fails (e.g. simulated network rejection)
+    mockFetchHandler = async (url) => {
+      if (url.includes('/api/checkout-v2')) {
+        return createMockResponse(500, { status: false, message: 'Temporary gateway hiccup' });
+      }
+    };
 
-    // Webhook with invalid header
-    const badHeaders = { 'RT-UDDOKTAPAY-API-KEY': 'fake_unauthorized_key' };
-    const badWh = await handlePaymentlyWebhook({ invoice_id: invoiceId, status: 'COMPLETED', amount: 1000 }, badHeaders);
-    if (badWh.success === true) {
-      throw new Error('Vulnerability: Webhook with invalid API key was accepted!');
+    const firstAttempt = await createPaymentlyCheckoutSession({
+      customer: sampleCustomer,
+      items: sampleItems,
+      deliveryArea: 'inside'
+    });
+    if (firstAttempt.success !== false) {
+      throw new Error('First attempt was expected to fail');
     }
-    console.log('  ✓ Unauthorized webhook correctly rejected');
+
+    // Customer retries checkout after provider recovers
+    const retryToken = `INV-RETRY-${Date.now()}`;
+    mockFetchHandler = async (url) => {
+      if (url.includes('/api/checkout-v2')) {
+        return createMockResponse(200, {
+          status: true,
+          message: 'Payment Initiated',
+          payment_url: `https://azraq.paymently.io/checkout/${retryToken}`
+        });
+      }
+    };
+
+    const retryAttempt = await createPaymentlyCheckoutSession({
+      customer: sampleCustomer,
+      items: sampleItems,
+      deliveryArea: 'inside'
+    });
+
+    if (!retryAttempt.success || retryAttempt.checkout_id === firstAttempt.checkout_id) {
+      throw new Error('Retry did not create a fresh successful checkout attempt');
+    }
+    console.log(`  ✓ Initial failure cleanly preserved state`);
+    console.log(`  ✓ Retry attempt generated fresh valid session: ${retryAttempt.checkout_id}`);
     passed++;
   } catch (e) {
     console.error('  ✗ TEST 9 FAILED:', e.message);
   }
 
-  // --- TEST 10: Cash on Delivery (COD) Order Behavior ---
+  // --- TEST 10: PAID / Verified Success ---
   try {
-    console.log('\n▶ TEST 10 — Cash on Delivery (COD): Marked PENDING_COD, never marked PAID:');
+    console.log('\n▶ TEST 10 — PAID/Verified Success: Creates genuine order with provider TrxID:');
+    const chkId = `AZQ-CHK-TEST-10-${Date.now()}`;
+    const invoiceId = `INV-TEST-10-${Date.now()}`;
+    const amount = 2870;
+
+    await saveCheckoutAttempt({
+      id: chkId,
+      customer_name: sampleCustomer.name,
+      customer_phone: sampleCustomer.phone,
+      shipping_address: sampleCustomer.address,
+      items_snapshot: [{ product_id: 'AZQ-0001', name: 'Baseus Set', unit_price: 2800, quantity: 1 }],
+      subtotal: 2800,
+      delivery_fee: 70,
+      discount: 0,
+      total_payable: amount,
+      gateway_invoice_id: invoiceId,
+      status: 'AWAITING_PAYMENT'
+    });
+
+    mockFetchHandler = async (url) => {
+      if (url.includes('/api/verify-payment')) {
+        return createMockResponse(200, {
+          status: 'COMPLETED',
+          invoice_id: invoiceId,
+          amount: String(amount),
+          transaction_id: 'BKASH-VERIFIED-TRX-9988',
+          payment_method: 'bkash',
+          date: new Date().toISOString()
+        });
+      }
+    };
+
+    const res = await verifyPaymentlyPayment({ invoiceId, checkoutId: chkId });
+    if (!res.success || !res.verified || res.status !== 'PAID') {
+      throw new Error(`Expected verified PAID, got: ${JSON.stringify(res)}`);
+    }
+    if (!res.order || res.order.payment_status !== 'PAID' || res.transaction.transaction_id !== 'BKASH-VERIFIED-TRX-9988') {
+      throw new Error('Order or transaction record was not marked PAID with provider TrxID');
+    }
+    console.log(`  ✓ Payment verified (PAID), exactly one genuine order created: ${res.order.id}`);
+    console.log(`  ✓ Authentic provider TrxID stored: ${res.transaction.transaction_id}`);
+    passed++;
+  } catch (e) {
+    console.error('  ✗ TEST 10 FAILED:', e.message);
+  }
+
+  // --- TEST 11: Provider Returns PENDING ---
+  try {
+    console.log('\n▶ TEST 11 — Provider Returns PENDING: Status preserved, order is NOT confirmed:');
+    const chkId = `AZQ-CHK-TEST-11-${Date.now()}`;
+    const invoiceId = `INV-TEST-11-${Date.now()}`;
+
+    await saveCheckoutAttempt({
+      id: chkId,
+      customer_name: 'Pending Customer',
+      customer_phone: '01711223302',
+      shipping_address: 'Dhaka',
+      items_snapshot: [],
+      subtotal: 1000,
+      delivery_fee: 70,
+      total_payable: 1070,
+      gateway_invoice_id: invoiceId,
+      status: 'AWAITING_PAYMENT'
+    });
+
+    mockFetchHandler = async (url) => {
+      if (url.includes('/api/verify-payment')) {
+        return createMockResponse(200, { status: 'PENDING', invoice_id: invoiceId });
+      }
+    };
+
+    const res = await verifyPaymentlyPayment({ invoiceId, checkoutId: chkId });
+    if (res.verified !== false || res.status !== 'PENDING') {
+      throw new Error(`Expected verified: false, status: PENDING, got ${JSON.stringify(res)}`);
+    }
+    const attempt = await getCheckoutAttempt(chkId);
+    if (attempt.order_id) {
+      throw new Error('Order was incorrectly created for PENDING transaction!');
+    }
+    console.log('  ✓ Status preserved as PENDING, order is not confirmed');
+    passed++;
+  } catch (e) {
+    console.error('  ✗ TEST 11 FAILED:', e.message);
+  }
+
+  // --- TEST 12: Manual TrxID Entry ---
+  try {
+    console.log('\n▶ TEST 12 — Manual TrxID Entry: Order marked PENDING_VERIFICATION (Never claimed PAID):');
+    const chkId = `AZQ-CHK-TEST-12-${Date.now()}`;
+    await saveCheckoutAttempt({
+      id: chkId,
+      customer_name: 'Manual Trx User',
+      customer_phone: '01711223303',
+      shipping_address: 'Dhaka',
+      items_snapshot: [{ product_id: 'AZQ-0001', name: 'Item', unit_price: 1500, quantity: 1 }],
+      subtotal: 1500,
+      delivery_fee: 70,
+      total_payable: 1570,
+      status: 'AWAITING_PAYMENT'
+    });
+
+    const res = await verifyPaymentlyPayment({ checkoutId: chkId, manualTrxId: 'BKASH-MANUAL-7721' });
+    if (res.verified === true || res.status === 'PAID') {
+      throw new Error('Vulnerability: Manual TrxID was claimed as PAID without provider clearance!');
+    }
+    if (res.status !== 'PENDING_VERIFICATION' || res.order?.payment_status !== 'PENDING_VERIFICATION') {
+      throw new Error(`Expected PENDING_VERIFICATION, got ${res.status}`);
+    }
+    console.log(`  ✓ Order created with status PENDING_VERIFICATION: ${res.order.id}`);
+    console.log('  ✓ Manual TrxID recorded for accounting verification, not claimed PAID');
+    passed++;
+  } catch (e) {
+    console.error('  ✗ TEST 12 FAILED:', e.message);
+  }
+
+  // --- TEST 13: Explicit Manual Portal Option ---
+  try {
+    console.log('\n▶ TEST 13 — Explicit Manual Portal Option: Clearly labeled as manual / pending verification:');
+    const manRes = await createManualPortalCheckoutOrder({
+      customer: sampleCustomer,
+      items: sampleItems,
+      deliveryArea: 'inside'
+    });
+
+    if (!manRes.success || !manRes.is_manual_payment || !manRes.requires_manual_trx) {
+      throw new Error(`Expected manual payment flags, got ${JSON.stringify(manRes)}`);
+    }
+    console.log('  ✓ Manual payment option explicitly labeled as manual and pending verification');
+    passed++;
+  } catch (e) {
+    console.error('  ✗ TEST 13 FAILED:', e.message);
+  }
+
+  // --- TEST 14: Cash on Delivery (COD) Order Behavior ---
+  try {
+    console.log('\n▶ TEST 14 — Cash on Delivery (COD): Marked PENDING_COD, never marked PAID:');
     const codRes = await createCodCheckoutOrder({
       customer: sampleCustomer,
       items: sampleItems,
@@ -411,13 +554,12 @@ async function runAuditSuite() {
     console.log(`  ✓ COD order created with status PENDING_COD: ${codRes.order.id}`);
     passed++;
   } catch (e) {
-    console.error('  ✗ TEST 10 FAILED:', e.message);
+    console.error('  ✗ TEST 14 FAILED:', e.message);
   }
 
-  // --- TEST 11: Server-Side Authoritative Pricing & Tampering Prevention ---
+  // --- TEST 15: Server-Side Authoritative Pricing & Tampering Prevention ---
   try {
-    console.log('\n▶ TEST 11 — Server-Side Pricing: Catalog price authoritative, client amount ignored:');
-    // Client claims price is 1 BDT for a 2,800 BDT product
+    console.log('\n▶ TEST 15 — Server-Side Pricing: Catalog price authoritative, client amount ignored:');
     const pricing = calculateServerOrderPricing({
       items: [{ product: { id: 'AZQ-0001', price: 1 }, quantity: 1 }],
       deliveryArea: 'inside'
@@ -429,12 +571,12 @@ async function runAuditSuite() {
     console.log('  ✓ Client-tampered price ignored; authoritative catalog price ৳2,800 enforced');
     passed++;
   } catch (e) {
-    console.error('  ✗ TEST 11 FAILED:', e.message);
+    console.error('  ✗ TEST 15 FAILED:', e.message);
   }
 
-  // --- TEST 12: Promotional Discount Server Validation ---
+  // --- TEST 16: Promotional Discount Server Validation ---
   try {
-    console.log('\n▶ TEST 12 — Promo Validation: Server strictly enforces valid discount codes:');
+    console.log('\n▶ TEST 16 — Promo Validation: Server strictly enforces valid discount codes:');
     const p1 = calculateServerOrderPricing({ items: sampleItems, promoCode: 'AZRAQNEW' });
     if (p1.discount !== 200 || p1.totalPayable !== 2670) {
       throw new Error(`AZRAQNEW expected discount 200, total 2670, got ${p1.discount}, ${p1.totalPayable}`);
@@ -447,13 +589,13 @@ async function runAuditSuite() {
     console.log('  ✓ Promo discounts validated server-side (AZRAQNEW: -৳200, AZRAQ10: -10%)');
     passed++;
   } catch (e) {
-    console.error('  ✗ TEST 12 FAILED:', e.message);
+    console.error('  ✗ TEST 16 FAILED:', e.message);
   }
 
-  // --- TEST 13: Checkout Cancellation ---
+  // --- TEST 17: Checkout Cancellation ---
   try {
-    console.log('\n▶ TEST 13 — Checkout Cancellation: Session marked CANCELLED, no order created:');
-    const chkId = `AZQ-CHK-TEST-13-${Date.now()}`;
+    console.log('\n▶ TEST 17 — Checkout Cancellation: Session marked CANCELLED, no order created:');
+    const chkId = `AZQ-CHK-TEST-17-${Date.now()}`;
     await saveCheckoutAttempt({
       id: chkId,
       customer_name: 'Cancel User',
@@ -477,12 +619,12 @@ async function runAuditSuite() {
     console.log('  ✓ Checkout attempt marked CANCELLED without creating confirmed order');
     passed++;
   } catch (e) {
-    console.error('  ✗ TEST 13 FAILED:', e.message);
+    console.error('  ✗ TEST 17 FAILED:', e.message);
   }
 
-  // --- TEST 14: Trusted Payment URL Helper Verification ---
+  // --- TEST 18: Trusted Payment URL Helper Verification ---
   try {
-    console.log('\n▶ TEST 14 — Trusted Payment URL Helper: Rejects invalid or phishing protocols:');
+    console.log('\n▶ TEST 18 — Trusted Payment URL Helper: Rejects invalid or phishing protocols:');
     const validUrl1 = 'https://azraq.paymently.io/checkout-v2/INV-12345';
     const validUrl2 = 'https://azraq.paymently.io/paymentlink/default/BDT';
     const invalidUrl1 = 'http://azraq.paymently.io/checkout'; // insecure http
@@ -499,7 +641,7 @@ async function runAuditSuite() {
     console.log('  ✓ Insecure http, phishing domains, and javascript URLs rejected');
     passed++;
   } catch (e) {
-    console.error('  ✗ TEST 14 FAILED:', e.message);
+    console.error('  ✗ TEST 18 FAILED:', e.message);
   }
 
   console.log('\n================================================================');

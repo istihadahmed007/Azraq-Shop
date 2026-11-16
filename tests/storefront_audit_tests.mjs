@@ -3,6 +3,7 @@
 // COD invariants, Paymently resilience & rehydration, Admin safeguards.
 
 import assert from 'assert';
+import fs from 'fs';
 import { 
   calculateServerOrderPricing,
   createPaymentlyCheckoutSession,
@@ -127,7 +128,7 @@ await runAsyncTest('Cash on Delivery (COD) marked strictly PENDING_COD (Never PA
 });
 
 // 4. Paymently Fallback Resilience
-await runAsyncTest('Paymently checkout activates official merchant link when API key absent', async () => {
+await runAsyncTest('Paymently checkout activates official merchant link when API key absent and manual fallback requested', async () => {
   const session = await createPaymentlyCheckoutSession({
     customer: {
       name: 'Fatima Begum',
@@ -135,7 +136,8 @@ await runAsyncTest('Paymently checkout activates official merchant link when API
       address: 'Gulshan 2, Dhaka'
     },
     items: [{ id: 'TEST-PROD-2', name: 'Ceramic Vase', price: 1800, quantity: 1 }],
-    deliveryArea: 'inside'
+    deliveryArea: 'inside',
+    allowManualFallback: true
   });
   assert.strictEqual(session.success, true);
   assert.strictEqual(session.payment_url, 'https://azraq.paymently.io/paymentlink/default/BDT');
@@ -181,6 +183,30 @@ runTest('Format BDT Amount handles decimal rounding and formatting', () => {
   assert.strictEqual(formatBdtAmount(830), '৳830 BDT');
   assert.strictEqual(formatBdtAmount(1450.75), '৳1,451 BDT');
   assert.strictEqual(formatBdtAmount(3000), '৳3,000 BDT');
+});
+
+// 8. Module Architecture & Component Barrel Exports
+runTest('Component barrel index defines all active storefront modules', () => {
+  const content = fs.readFileSync('src/components/index.js', 'utf-8');
+  assert.ok(content.includes('export { default as Header }'), 'Header should be exported');
+  assert.ok(content.includes('export { default as Footer }'), 'Footer should be exported');
+  assert.ok(content.includes('export { default as ProductGrid }'), 'ProductGrid should be exported');
+  assert.ok(content.includes('export { default as TrendingRightNowSection }'), 'TrendingRightNowSection should be exported');
+  assert.ok(content.includes('export { default as CartDrawer }'), 'CartDrawer should be exported');
+  assert.ok(content.includes('export { default as CheckoutModal }'), 'CheckoutModal should be exported');
+  assert.ok(content.includes('export { default as AzraqLogo'), 'AzraqLogo should be exported');
+});
+
+// 9. Initial Catalog & Central Catalog Durability
+await runAsyncTest('Initial fast-boot catalog matches schema requirements', async () => {
+  const initialCatalog = (await import('../src/data/initial_catalog.json', { with: { type: 'json' } })).default;
+  assert.ok(Array.isArray(initialCatalog.products), 'Initial catalog products must be an array');
+  assert.ok(initialCatalog.products.length >= 8, 'Initial catalog should have at least 8 above-the-fold items');
+  for (const item of initialCatalog.products) {
+    assert.ok(item.id, 'Every catalog item must have an id');
+    assert.ok(typeof item.price === 'number', 'Price must be a number');
+    assert.ok(item.main_image, 'Every item must have a main_image');
+  }
 });
 
 console.log('='.repeat(64));

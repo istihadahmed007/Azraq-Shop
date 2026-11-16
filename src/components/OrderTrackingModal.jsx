@@ -120,8 +120,9 @@ export default function OrderTrackingModal() {
         </button>
 
         {/* Header */}
-        <div className="p-6 bg-[#062B4F] text-white">
-          <div className="flex items-center gap-2">
+        <div className="p-6 bg-[#101C35] text-white border-b border-[#183B70]">
+          <div className="flex items-center gap-2.5">
+            <img src="/branding/azraq-icon.png" alt="AZRAQ Shop" className="w-5 h-5 object-contain shrink-0" />
             <span className="text-[10px] font-mono tracking-widest text-[#50DDF0] uppercase font-bold">
               {t("AZRAQ CONCIERGE & LOGISTICS", "আজরাক লজিস্টিকস ও সিকিউর ট্র্যাকিং")}
             </span>

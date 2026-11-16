@@ -1,81 +1,91 @@
 import React from 'react';
 
+/**
+ * AZRAQ Official Brand Logo Component
+ * Incorporates authentic logo asset (/branding/azraq-logo.png)
+ * Strictly preserves aspect ratio (3:1), original colors, and crisp rendering using object-fit: contain
+ */
 export default function AzraqLogo({ 
   variant = 'dark', 
   size = 'md', 
   showDescriptor = true,
-  className = '' 
+  className = '',
+  imgClassName = ''
 }) {
-  const isLight = variant === 'light'; // Light text on dark background
-  const textColor = isLight ? '#FFFFFF' : '#062B4F';
-  const subColor = isLight ? '#69C5F5' : '#0877C9';
+  const isLight = variant === 'light'; // For dark backgrounds
 
-  const sizes = {
-    sm: { icon: 32, text: 'text-xl', desc: 'text-[9px]' },
-    md: { icon: 40, text: 'text-2xl', desc: 'text-[10px]' },
-    lg: { icon: 52, text: 'text-3xl', desc: 'text-xs' }
+  // Responsive height presets preserving 3:1 aspect ratio without layout shift
+  // xs: ~24px height (~72px width)
+  // sm: ~32px height (~96px width)
+  // md: ~38-42px height (~114-126px width)
+  // lg: ~48-52px height (~144-156px width)
+  // xl: ~60-64px height (~180-192px width)
+  const sizeClasses = {
+    xs: 'h-6 sm:h-7',
+    sm: 'h-8 sm:h-9',
+    md: 'h-9 sm:h-10 md:h-11',
+    lg: 'h-11 sm:h-12 md:h-14',
+    xl: 'h-14 sm:h-16 md:h-20'
   };
 
-  const currentSize = sizes[size] || sizes.md;
+  const heightClass = sizeClasses[size] || sizeClasses.md;
 
-  return (
-    <div className={`flex items-center gap-3 select-none ${className}`}>
-      {/* Geometric AZ Monogram Symbol - Glassy Azraq Azure */}
+  if (isLight) {
+    // When rendered on a dark background (such as Midnight Navy #101C35):
+    // Wrap inside a refined, frosted white pill so the navy wordmark remains 100% legible,
+    // authentic, and with crisp contrast, strictly preserving the original artwork.
+    return (
       <div 
-        className="relative flex items-center justify-center rounded-xl overflow-hidden shadow-sm transition-transform hover:scale-105"
-        style={{
-          width: currentSize.icon,
-          height: currentSize.icon,
-          background: isLight 
-            ? 'linear-gradient(135deg, #0877C9 0%, #062B4F 100%)' 
-            : 'linear-gradient(135deg, #062B4F 0%, #0877C9 100%)',
-          border: isLight ? '1px solid rgba(105, 197, 245, 0.4)' : '1px solid rgba(8, 119, 201, 0.25)',
-          boxShadow: '0 4px 15px rgba(8, 119, 201, 0.15)'
-        }}
+        className={`inline-flex items-center bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/20 shadow-sm transition-transform duration-200 hover:scale-[1.02] ${className}`}
       >
-        <svg 
-          viewBox="0 0 64 64" 
-          width={currentSize.icon * 0.82} 
-          height={currentSize.icon * 0.82} 
-          fill="none"
-        >
-          {/* Main A Character Geometry */}
-          <path 
-            d="M15 47L27 17H34L46 47H39.2L36.3 39.5H23.7L20.8 47H15ZM25.7 34.2H34.3L30 23.5L25.7 34.2Z" 
-            fill="#FFFFFF"
-          />
-          {/* Glass Cyan Dynamic Z Band Cutting Across */}
-          <path 
-            d="M23 29.5L44 18V23.5L31.5 31H44V36L23 47.5V42L35.5 34.5H23V29.5Z" 
-            fill="#50DDF0" 
-            fillOpacity="0.95"
-          />
-          {/* Azure Blue Accent Pip */}
-          <circle cx="48.5" cy="15.5" r="3.2" fill="#69C5F5" />
-        </svg>
+        <img
+          src="/branding/azraq-logo.png"
+          alt="AZRAQ Shop"
+          className={`${heightClass} w-auto object-contain select-none ${imgClassName}`}
+          loading="eager"
+          decoding="async"
+        />
       </div>
+    );
+  }
 
-      {/* Brand Wordmark & Descriptor */}
-      <div className="flex flex-col leading-none">
-        <div className="flex items-center gap-1.5">
-          <span 
-            className={`font-black tracking-tight font-sans ${currentSize.text}`}
-            style={{ color: textColor, letterSpacing: '-0.02em' }}
-          >
-            AZRAQ
-          </span>
-          <span className="w-1.5 h-1.5 rounded-full bg-azraq-cyan inline-block mb-1 shadow-glow-cyan"></span>
-        </div>
-        {showDescriptor && (
-          <span 
-            className={`font-bold tracking-[0.22em] uppercase ${currentSize.desc}`}
-            style={{ color: subColor }}
-          >
-            Curated Everyday Goods
-          </span>
-        )}
-      </div>
+  // Standard display on white / soft-gray surfaces
+  return (
+    <div className={`inline-flex items-center shrink-0 ${className}`}>
+      <img
+        src="/branding/azraq-logo.png"
+        alt="AZRAQ Shop"
+        className={`${heightClass} w-auto object-contain select-none transition-transform duration-200 hover:scale-[1.02] ${imgClassName}`}
+        loading="eager"
+        decoding="async"
+      />
     </div>
   );
 }
 
+/**
+ * Isolated Brand Symbol Component
+ * Uses /branding/azraq-icon.png for compact icon contexts (mobile ribbons, badges, avatars)
+ */
+export function AzraqBrandSymbol({ 
+  size = 'md', 
+  className = '' 
+}) {
+  const sizeClasses = {
+    xs: 'w-6 h-6',
+    sm: 'w-8 h-8',
+    md: 'w-10 h-10',
+    lg: 'w-12 h-12',
+    xl: 'w-16 h-16'
+  };
+
+  return (
+    <img
+      src="/branding/azraq-icon.png"
+      alt="AZRAQ Shop"
+      className={`${sizeClasses[size] || sizeClasses.md} object-contain select-none shrink-0 ${className}`}
+      loading="eager"
+      decoding="async"
+    />
+  );
+}

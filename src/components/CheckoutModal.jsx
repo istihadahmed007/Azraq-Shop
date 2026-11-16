@@ -64,6 +64,47 @@ export default function CheckoutModal() {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [formErrors, setFormErrors] = useState({});
 
+  // Auto-verify when redirected back from payment gateway
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const paymentStatus = params.get('payment_status');
+      const checkoutId = params.get('checkout_id');
+      if (checkoutId) {
+        if (paymentStatus === 'cancelled') {
+          setErrorCode('CANCELLED');
+          setErrorMessage(t("You cancelled the payment on Paymently. Your cart items are preserved.", "পেমেন্ট বাতিল করা হয়েছে। আপনার কার্টের পণ্যগুলো সংরক্ষিত আছে।"));
+          setCheckoutStep('failed');
+          window.history.replaceState({}, '', window.location.pathname);
+        } else if (paymentStatus === 'verifying') {
+          setCheckoutStep('verifying');
+          verifyPaymentStatus({ checkoutId }).then(res => {
+            if (res.verified === true && res.status === 'PAID' && res.order) {
+              recordConfirmedOrder(res.order);
+              setConfirmedOrder(res.order);
+              setVerifiedTransaction(res.transaction);
+              setCheckoutStep('paid_success');
+              try { confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
+              showToast(t("Payment verified successfully via Paymently!", "পেমেন্ট সফলভাবে ভেরিফাই হয়েছে!"), 'success');
+            } else if (res.status === 'PENDING' || res.status === 'AWAITING_PAYMENT') {
+              setPendingNotice(t("Payment has not yet cleared on Paymently. If you completed payment in your mobile wallet, please wait 30 seconds and click Check Again, or submit your TrxID below.", "পেমেন্টলি থেকে পেমেন্ট এখনো ক্লিয়ার হয়নি। অনুগ্রহ করে অপেক্ষা করে পুনরায় চেক করুন বা নিচে TrxID দিন।"));
+              setPaymentSession({ checkout_id: checkoutId, invoice_id: res.gateway_invoice_id || checkoutId, amount: res.total_payable });
+              setCheckoutStep('handoff');
+            } else {
+              setErrorMessage(res.error || res.message || t("Payment could not be verified by the provider.", "পেমেন্ট ভেরিফাই করা যায়নি।"));
+              setCheckoutStep('failed');
+            }
+            window.history.replaceState({}, '', window.location.pathname);
+          }).catch(err => {
+            setErrorMessage(err.message || t("Could not reach verification service. Please try clicking 'Check payment status' again.", "ভেরিফিকেশন সার্ভিসের সাথে যোগাযোগ করা যায়নি।"));
+            setCheckoutStep('failed');
+          });
+        }
+      }
+    } catch (e) {}
+  }, []);
+
   if (!isCheckoutOpen) return null;
 
   const handleClose = () => {
@@ -191,7 +232,19 @@ export default function CheckoutModal() {
 
       if (session.success) {
         setPaymentSession(session);
-        setCheckoutStep('handoff'); // Show dedicated, trustworthy payment handoff screen
+        if (session.payment_url && isTrustedPaymentUrl(session.payment_url)) {
+          showToast(t("Redirecting to Paymently secure checkout...", "পেমেন্টলি পেমেন্ট পেইজে নিয়ে যাওয়া হচ্ছে..."), 'info');
+          try {
+            sessionStorage.setItem('azraq_active_checkout_id', session.checkout_id);
+            if (session.invoice_id) sessionStorage.setItem('azraq_active_invoice_id', session.invoice_id);
+          } catch (e) {}
+
+          // Immediately transfer directly to the gateway payment link
+          window.location.href = session.payment_url;
+          return;
+        }
+
+        setCheckoutStep('handoff'); // Fallback only if no direct URL returned
       } else {
         setErrorCode(session.code || 'GATEWAY_ERROR');
         setErrorMessage(session.error || t("Unable to initiate payment session. Please retry or choose Cash on Delivery.", "পেমেন্ট সেশন শুরু করা যায়নি।"));
@@ -221,7 +274,7 @@ export default function CheckoutModal() {
       showToast(t("Untrusted payment URL detected. Link blocked for security.", "নিরাপত্তাজনিত কারণে লিংকটি ব্লক করা হয়েছে।"), 'error');
       return;
     }
-    window.open(paymentSession.payment_url, '_blank', 'noopener,noreferrer');
+    window.location.href = paymentSession.payment_url;
   };
 
   // Check payment status with backend & Paymently
@@ -442,9 +495,9 @@ export default function CheckoutModal() {
         </div>
 
         {/* Modal Top Bar */}
-        <div className="flex items-center justify-between px-5 py-3.5 bg-[#062B4F] text-white border-b border-[#0877C9]/30">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#50DDF0]" />
+        <div className="flex items-center justify-between px-5 py-3.5 bg-[#101C35] text-white border-b border-[#183B70]">
+          <div className="flex items-center gap-2.5">
+            <img src="/branding/azraq-icon.png" alt="AZRAQ Shop" className="w-5 h-5 object-contain shrink-0" />
             <h2 id="checkout-modal-title" className="text-xs font-mono font-bold tracking-wider text-[#D9F0FF] uppercase">
               AZRAQ • {t("SECURE CHECKOUT", "নিরাপদ চেকআউট")}
             </h2>
@@ -452,7 +505,7 @@ export default function CheckoutModal() {
           <button
             onClick={handleClose}
             aria-label={t("Close checkout", "বন্ধ করুন")}
-            className="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-[#50DDF0]"
+            className="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
           >
             <X className="w-4 h-4" />
           </button>

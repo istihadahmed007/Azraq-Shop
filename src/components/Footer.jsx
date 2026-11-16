@@ -22,17 +22,17 @@ export default function Footer() {
       {/* ======================================================== */}
       {/* TOP FEATURE BAR (Reference Screenshot Exact Match) */}
       {/* ======================================================== */}
-      <div className="bg-[#062B4F] text-white py-6 border-b border-white/10 relative overflow-hidden">
+      <div className="bg-[#101C35] text-white py-6 border-b border-white/10 relative overflow-hidden">
         {/* Subtle Ambient Azure Glow */}
-        <div className="absolute top-0 right-1/4 w-80 h-80 bg-[#0877C9]/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-80 h-80 bg-[#183B70]/30 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
             
             {/* 1. Free Shipping */}
             <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-center flex-shrink-0 text-[#50DDF0] shadow-sm">
-                <Truck className="w-5 h-5" />
+              <div className="w-11 h-11 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-center flex-shrink-0 text-[#2563EB] shadow-sm">
+                <Truck className="w-5 h-5 text-[#50DDF0]" />
               </div>
               <div>
                 <h4 className="text-xs sm:text-sm font-black text-white tracking-tight">
@@ -46,8 +46,8 @@ export default function Footer() {
 
             {/* 2. Easy Returns */}
             <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-center flex-shrink-0 text-[#50DDF0] shadow-sm">
-                <RotateCcw className="w-5 h-5" />
+              <div className="w-11 h-11 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-center flex-shrink-0 text-[#2563EB] shadow-sm">
+                <RotateCcw className="w-5 h-5 text-[#50DDF0]" />
               </div>
               <div>
                 <h4 className="text-xs sm:text-sm font-black text-white tracking-tight">
@@ -61,8 +61,8 @@ export default function Footer() {
 
             {/* 3. Secure Payments */}
             <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-center flex-shrink-0 text-[#50DDF0] shadow-sm">
-                <ShieldCheck className="w-5 h-5" />
+              <div className="w-11 h-11 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-center flex-shrink-0 text-[#2563EB] shadow-sm">
+                <ShieldCheck className="w-5 h-5 text-[#50DDF0]" />
               </div>
               <div>
                 <h4 className="text-xs sm:text-sm font-black text-white tracking-tight">
@@ -76,8 +76,8 @@ export default function Footer() {
 
             {/* 4. 24/7 Support */}
             <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-center flex-shrink-0 text-[#50DDF0] shadow-sm">
-                <Headphones className="w-5 h-5" />
+              <div className="w-11 h-11 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-center flex-shrink-0 text-[#2563EB] shadow-sm">
+                <Headphones className="w-5 h-5 text-[#50DDF0]" />
               </div>
               <div>
                 <h4 className="text-xs sm:text-sm font-black text-white tracking-tight">
@@ -94,11 +94,11 @@ export default function Footer() {
       </div>
 
       {/* ======================================================== */}
-      {/* MAIN FOOTER (Deep Azraq Navy with Glassy Refinement) */}
+      {/* MAIN FOOTER (Midnight Navy #101C35)                       */}
       {/* ======================================================== */}
-      <div className="bg-[#041E38] text-white pt-16 pb-12 relative overflow-hidden">
+      <div className="bg-[#101C35] text-white pt-16 pb-12 relative overflow-hidden">
         {/* Soft Background Radial Light */}
-        <div className="absolute -top-20 left-10 w-96 h-96 bg-[#0877C9]/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-20 left-10 w-96 h-96 bg-[#183B70]/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
@@ -201,7 +201,7 @@ export default function Footer() {
                 />
                 <button 
                   onClick={() => alert('Thank you for subscribing to AZRAQ updates!')}
-                  className="px-3.5 py-1.5 rounded-lg bg-[#0877C9] hover:bg-[#50DDF0] hover:text-[#062B4F] text-white text-xs font-bold transition-all shadow-sm flex-shrink-0"
+                  className="px-3.5 py-1.5 rounded-lg bg-[#2563EB] hover:bg-[#183B70] text-white text-xs font-bold transition-all shadow-sm flex-shrink-0"
                 >
                   Join
                 </button>
@@ -218,7 +218,7 @@ export default function Footer() {
           {/* Bottom Copyright Row */}
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/50">
             <div>
-              © 2026 AZRAQ (CURATED EVERYDAY GOODS). All rights reserved.
+              © 2026 AZRAQ Shop (Curated Everyday Goods). All rights reserved.
             </div>
             <div className="flex items-center gap-6">
               <button onClick={() => setIsTrackingOpen(true)} className="hover:text-white transition-colors">
@@ -228,7 +228,7 @@ export default function Footer() {
                 Brand Assets
               </button>
               <span className="text-[#50DDF0] font-mono text-[11px]">
-                GLASSY AZRAQ SYSTEM
+                AZRAQ BRAND SYSTEM
               </span>
             </div>
           </div>

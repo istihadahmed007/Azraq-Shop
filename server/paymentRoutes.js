@@ -1,6 +1,7 @@
 import { 
   createPaymentlyCheckoutSession, 
   createCodCheckoutOrder,
+  createManualPortalCheckoutOrder,
   verifyPaymentlyPayment, 
   cancelPaymentlyCheckout,
   handlePaymentlyWebhook, 
@@ -262,6 +263,19 @@ export async function handlePaymentRoutes(req, res) {
           return;
         }
 
+        if (paymentMethod === 'MANUAL_PORTAL') {
+          const manualResult = await createManualPortalCheckoutOrder({
+            customer,
+            items,
+            deliveryArea: deliveryArea || 'inside',
+            promoCode: promoCode || null,
+            notes: notes || ''
+          });
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify(manualResult));
+          return;
+        }
+
         const session = await createPaymentlyCheckoutSession({
           customer,
           items,
@@ -271,7 +285,14 @@ export async function handlePaymentRoutes(req, res) {
         });
 
         if (!session.success) {
-          res.statusCode = 400;
+          const statusMap = {
+            'GATEWAY_CREDENTIALS_MISSING': 503,
+            'GATEWAY_TIMEOUT': 504,
+            'GATEWAY_CONNECTION_FAILED': 502,
+            'GATEWAY_UNTRUSTED_URL': 502,
+            'GATEWAY_REJECTED': 400
+          };
+          res.statusCode = statusMap[session.code] || 400;
         }
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(session));

@@ -8,21 +8,28 @@ export default {
     extend: {
       colors: {
         azraq: {
-          navy: '#062B4F',       // Deep Azraq Navy (Reference Dark)
-          azure: '#0877C9',      // Royal Azure
-          glass: '#69C5F5',      // Glass Azure
+          // Brand Color System (Official Palette)
+          midnight: '#101C35',   // Midnight Navy (Primary)
+          deepBlue: '#183B70',   // Deep Blue (Secondary)
+          cobalt: '#2563EB',     // Cobalt Blue (Brand Accent)
+          white: '#FFFFFF',      // Pure White
+          softGray: '#F5F7FA',   // Soft Gray Background
+
+          // Semantic Theme Mappings
+          navy: '#101C35',       // Primary Brand Midnight Navy
+          azure: '#183B70',      // Deep Blue
+          glass: '#69C5F5',      // Glass Azure Accent
           sky: '#D9F0FF',        // Soft Sky Blue
-          ice: '#F8FCFF',        // Ice White
+          ice: '#F5F7FA',        // Soft Gray Surface
           cyan: '#50DDF0',       // Subtle Cyan Accent
           lime: '#C9F34A',       // Neon Highlight Accent
-          cloud: '#F4F9FD',      // Subtle Ice Blue Background
-          charcoal: '#041E38',   // Deepest Navy
-          white: '#FFFFFF',
-          dark: '#03172C',
-          card: '#082544',
-          purple: '#69C5F5',     // mapped to glass azure for backwards compatibility
-          violet: '#0877C9',     // mapped to royal azure for backwards compatibility
-          lavender: '#D9F0FF',   // mapped to soft sky for backwards compatibility
+          cloud: '#F5F7FA',      // Soft Gray Background
+          charcoal: '#0D172A',   // Deepest Midnight Surface
+          dark: '#0A1324',
+          card: '#101C35',
+          purple: '#2563EB',     // Cobalt Blue
+          violet: '#183B70',     // Deep Blue
+          lavender: '#E2E8F0',   // Slate Soft
         }
       },
       fontFamily: {

@@ -7,17 +7,19 @@ export default function TrendingRightNowSection() {
 
   // Pick 6 authentic trending products from the database matching the reference items
   // (Speaker, Smartwatch, Backpack, Earbuds, Bottle/Mug, Sunglasses)
+  const fallback = products[0] || {};
   const trendingItems = [
-    products.find(p => p.name.toLowerCase().includes('speaker')) || products[4],
-    products.find(p => p.name.toLowerCase().includes('watch')) || products[1],
-    products.find(p => p.name.toLowerCase().includes('bag') && p.primary_collection_id === 5) || products[3],
-    products.find(p => p.name.toLowerCase().includes('wireless') || p.name.toLowerCase().includes('earbud')) || products[8],
-    products.find(p => p.name.toLowerCase().includes('bottle') || p.name.toLowerCase().includes('mug')) || products[6],
-    products.find(p => p.name.toLowerCase().includes('sunglass')) || products[5],
-  ].filter(Boolean);
+    products.find(p => p.name?.toLowerCase().includes('speaker')) || products[4] || fallback,
+    products.find(p => p.name?.toLowerCase().includes('watch')) || products[1] || fallback,
+    products.find(p => p.name?.toLowerCase().includes('bag') && p.primary_collection_id === 5) || products[3] || fallback,
+    products.find(p => p.name?.toLowerCase().includes('wireless') || p.name?.toLowerCase().includes('earbud')) || products[8] || fallback,
+    products.find(p => p.name?.toLowerCase().includes('bottle') || p.name?.toLowerCase().includes('mug')) || products[6] || fallback,
+    products.find(p => p.name?.toLowerCase().includes('sunglass')) || products[5] || fallback,
+  ].filter(p => p && p.id);
 
   return (
-    <section id="trending-now" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <section id="popular-products" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative">
+      <span id="trending-now" className="absolute -top-10 left-0 pointer-events-none" />
       
       {/* Section Header (Reference Screenshot Exact Match) */}
       <div className="flex items-end justify-between gap-4 mb-6">

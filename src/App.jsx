@@ -1,21 +1,23 @@
 import React, { Suspense, lazy } from 'react';
 import { ShopProvider, useShop } from './context/ShopContext';
-import NavigationDock from './components/NavigationDock';
-import Header from './components/Header';
-import HeroSection from './components/HeroSection';
-import BrowseByCategoriesSection from './components/BrowseByCategoriesSection';
-import TrendingRightNowSection from './components/TrendingRightNowSection';
-import PromotionalBannersSection from './components/PromotionalBannersSection';
-import FeaturedCollectionsSection from './components/FeaturedCollectionsSection';
-import ShopByCollectionSection from './components/ShopByCollectionSection';
-import ProductGrid from './components/ProductGrid';
-import ProductDemonstrationSection from './components/ProductDemonstrationSection';
-import BrandValuePanel from './components/BrandValuePanel';
-import StatsRibbon from './components/StatsRibbon';
-import EditorialCtaSection from './components/EditorialCtaSection';
-import Footer from './components/Footer';
-import CartDrawer from './components/CartDrawer';
-import Toast from './components/Toast';
+import {
+  NavigationDock,
+  Header,
+  HeroSection,
+  BrowseByCategoriesSection,
+  TrendingRightNowSection,
+  PromotionalBannersSection,
+  FeaturedCollectionsSection,
+  ShopByCollectionSection,
+  ProductGrid,
+  ProductDemonstrationSection,
+  BrandValuePanel,
+  StatsRibbon,
+  EditorialCtaSection,
+  Footer,
+  CartDrawer,
+  Toast
+} from './components';
 
 // Lazy-loaded routes & secondary overlays to optimize initial bundle size & TTI
 const CollectionsPage = lazy(() => import('./components/CollectionsPage'));

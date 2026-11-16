@@ -1,10 +1,11 @@
-// AZRAQ Payment Gateway Client Service (Paymently Integration)
-// Real dynamic checkout session creation and independent server verification
-// STRICT: No simulated confirmations, no fake IDs, no unverified fallbacks.
+// AZRAQ Payment Gateway Client Service
+// Authoritative dynamic checkout session creation and independent server verification
+// STRICT: No client-side gateway API calls, no exposed secrets, no forged prices or sessions.
 
-const API_BASE = ''; // Same origin
-const PAYMENTLY_MERCHANT_KEY = 'uMTSZ8bM6SMrj6eljYGGpfGEkXYZjSQkQ4k27qs2';
-const PAYMENTLY_BASE_URL = 'https://azraq.paymently.io';
+const API_BASE = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL
+  ? import.meta.env.VITE_API_BASE_URL
+  : ''
+).replace(/\/+$/, '');
 
 /**
  * Validate that a payment URL belongs strictly to trusted Paymently domains.
@@ -55,11 +56,13 @@ export function isStoreMaintenanceError(err) {
 }
 
 /**
- * 1. Request dynamic checkout session from backend (with safe fallback for static hosting)
+ * 1. Request dynamic checkout session from backend API
+ * Never creates dynamic sessions from browser or accepts client prices.
  */
 export async function createCheckoutSession({ customer, items, deliveryArea, promoCode, paymentMethod = 'PAYMENTLY', notes = '' }) {
+  let response;
   try {
-    const response = await fetch(`${API_BASE}/api/payments/create`, {
+    response = await fetch(`${API_BASE}/api/payments/create`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -71,128 +74,41 @@ export async function createCheckoutSession({ customer, items, deliveryArea, pro
         notes
       })
     });
+  } catch (netErr) {
+    const err = new Error('Unable to connect to the checkout server. Please check your internet connection or choose Cash on Delivery.');
+    err.code = 'NETWORK_ERROR';
+    throw err;
+  }
 
-    const contentType = response.headers.get('content-type') || '';
-    if (contentType.includes('application/json')) {
-      const data = await response.json().catch(() => ({}));
-      if (response.ok && data.success) {
-        if (data.payment_url && !isTrustedPaymentUrl(data.payment_url)) {
-          throw new Error('Received an untrusted payment URL. Session rejected for security.');
-        }
-        return data;
-      }
-      if (!data.success && data.error) {
-        const err = new Error(data.error);
-        err.code = data.code || 'CHECKOUT_FAILED';
-        err.status = response.status;
-        throw err;
-      }
-    }
-  } catch (err) {
-    if (err.code || isStoreMaintenanceError(err)) {
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    const err = new Error('Checkout service is temporarily unreachable. Please try again or choose Cash on Delivery.');
+    err.code = 'ENDPOINT_UNREACHABLE';
+    err.status = response.status;
+    throw err;
+  }
+
+  const data = await response.json().catch(() => ({}));
+
+  if (response.ok && data.success) {
+    if (data.payment_url && !isTrustedPaymentUrl(data.payment_url)) {
+      const err = new Error('Received an untrusted payment URL. Session rejected for security.');
+      err.code = 'UNTRUSTED_GATEWAY_URL';
       throw err;
     }
-    console.warn('[Checkout API]: Endpoint returning non-JSON or unreachable. Activating storefront fallback handler.');
+    return data;
   }
 
-  // Fallback handler for static web hosting environments (Hostinger Static / CDN)
-  const subtotal = (items || []).reduce((acc, it) => acc + (Number(it.product?.price || it.price || 0) * (it.quantity || 1)), 0);
-  const deliveryFee = subtotal >= 3000 ? 0 : (deliveryArea === 'outside' ? 130 : 70);
-  const discount = promoCode === 'AZRAQNEW' ? 200 : (promoCode === 'AZRAQ10' ? Math.round(subtotal * 0.1) : 0);
-  const totalPayable = Math.max(0, subtotal + deliveryFee - discount);
-
-  const orderId = `AZQ-ORD-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
-  const checkoutId = `AZQ-CHK-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
-
-  if (paymentMethod === 'COD') {
-    return {
-      success: true,
-      mode: 'COD',
-      order: {
-        id: orderId,
-        customer_name: customer?.name || 'Valued Customer',
-        customer_phone: customer?.phone || '',
-        shipping_address: customer?.address || '',
-        city: customer?.city || 'Dhaka',
-        delivery_area: deliveryArea || 'inside',
-        total: totalPayable,
-        subtotal,
-        delivery_fee: deliveryFee,
-        discount,
-        promo_code: promoCode,
-        payment_method: 'COD',
-        payment_status: 'PENDING_COD',
-        fulfillment_status: 'Processing',
-        created_at: new Date().toISOString()
-      },
-      items
-    };
-  }
-
-  // Dynamic session creation via Paymently Gateway API
-  try {
-    const payRes = await fetch(`${PAYMENTLY_BASE_URL}/api/checkout-v2`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'RT-UDDOKTAPAY-API-KEY': PAYMENTLY_MERCHANT_KEY,
-        'PAYMENTLY-API-KEY': PAYMENTLY_MERCHANT_KEY
-      },
-      body: JSON.stringify({
-        full_name: customer?.name ? customer.name.trim() : 'Valued Customer',
-        email: customer?.email ? customer.email.trim() : `${(customer?.phone || '01700000000').trim()}@azraqshop.com`,
-        amount: String(totalPayable),
-        metadata: {
-          checkout_id: checkoutId,
-          customer_phone: customer?.phone || '',
-          shipping_address: customer?.address || '',
-          delivery_area: deliveryArea
-        },
-        redirect_url: `https://azraq.azraqtrips.com/?payment_status=verifying&checkout_id=${checkoutId}`,
-        cancel_url: `https://azraq.azraqtrips.com/?payment_status=cancelled&checkout_id=${checkoutId}`
-      })
-    });
-
-    const payData = await payRes.json().catch(() => ({}));
-    if (payRes.ok && payData.status && payData.payment_url) {
-      if (!isTrustedPaymentUrl(payData.payment_url)) {
-        throw new Error('Received an untrusted payment URL. Session rejected for security.');
-      }
-      return {
-        success: true,
-        checkout_id: checkoutId,
-        invoice_id: payData.invoice_id || checkoutId,
-        amount: totalPayable,
-        currency: 'BDT',
-        payment_url: payData.payment_url,
-        merchant_name: 'AZRAQ',
-        is_fallback_link: false,
-        requires_manual_trx: false,
-        instructions: `Your payment of ৳${totalPayable} BDT is pre-filled and locked on Paymently. Click below to complete your payment.`
-      };
-    }
-  } catch (directErr) {
-    console.warn('[Direct Paymently API Notice]:', directErr.message);
-  }
-
-  // Fallback to official Paymently portal link only if dynamic API call is unreachable
-  return {
-    success: true,
-    checkout_id: checkoutId,
-    invoice_id: checkoutId,
-    amount: totalPayable,
-    currency: 'BDT',
-    payment_url: 'https://azraq.paymently.io/paymentlink/default/BDT',
-    merchant_name: 'AZRAQ',
-    is_fallback_link: true,
-    requires_manual_trx: true,
-    instructions: `Please complete payment of ৳${totalPayable} BDT on the official AZRAQ Paymently portal, then enter your TrxID below to confirm your order.`
-  };
+  // Server returned an error code or validation issue
+  const err = new Error(data.error || 'Unable to initiate payment session. Please try again or choose Cash on Delivery.');
+  err.code = data.code || 'CHECKOUT_FAILED';
+  err.status = response.status;
+  throw err;
 }
 
 /**
- * 2. Verify payment status directly with backend & Paymently
+ * 2. Verify payment status directly with backend server
+ * Backend performs authoritative server-to-server verification with Paymently.
  */
 export async function verifyPaymentStatus({ invoiceId, checkoutId, manualTrxId = null, checkoutSnapshot = null }) {
   try {
@@ -210,93 +126,23 @@ export async function verifyPaymentStatus({ invoiceId, checkoutId, manualTrxId =
     const contentType = response.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {
       const data = await response.json();
-      if (!response.ok && !data.status) {
-        return {
-          success: false,
-          verified: false,
-          status: 'FAILED',
-          error: data.error || 'Payment could not be verified by the provider.'
-        };
-      }
       return data;
     }
-  } catch (e) {
-    console.warn('[Verify Payment Notice]: Server endpoint non-JSON response.', e.message);
-  }
 
-  // Direct verification via Paymently verify-payment API
-  if (invoiceId) {
-    try {
-      const verifyRes = await fetch(`${PAYMENTLY_BASE_URL}/api/verify-payment`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'RT-UDDOKTAPAY-API-KEY': PAYMENTLY_MERCHANT_KEY,
-          'PAYMENTLY-API-KEY': PAYMENTLY_MERCHANT_KEY
-        },
-        body: JSON.stringify({
-          invoice_id: invoiceId
-        })
-      });
-
-      const verifyData = await verifyRes.json().catch(() => ({}));
-      if (verifyRes.ok && (verifyData.status === 'COMPLETED' || verifyData.status === 'PAID')) {
-        const orderId = `AZQ-ORD-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
-        return {
-          success: true,
-          verified: true,
-          status: 'PAID',
-          transaction: {
-            transaction_id: verifyData.transaction_id || verifyData.trx_id,
-            payment_method: verifyData.payment_method || 'Paymently'
-          },
-          order: {
-            id: orderId,
-            customer_name: checkoutSnapshot?.customer?.name || 'Customer',
-            customer_phone: checkoutSnapshot?.customer?.phone || '',
-            shipping_address: checkoutSnapshot?.customer?.address || '',
-            total: Number(verifyData.amount || 0),
-            payment_method: verifyData.payment_method || 'Paymently',
-            payment_status: 'PAID',
-            fulfillment_status: 'Processing',
-            created_at: new Date().toISOString()
-          }
-        };
-      }
-    } catch (vErr) {
-      console.warn('[Direct Paymently Verify Notice]:', vErr.message);
-    }
-  }
-
-  // Client reconciliation fallback when manual TrxID is provided
-  if (manualTrxId && String(manualTrxId).trim().length >= 4) {
-    const orderId = `AZQ-ORD-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
     return {
-      success: true,
+      success: false,
       verified: false,
-      status: 'PENDING_VERIFICATION',
-      manual_trx_id: String(manualTrxId).trim(),
-      message: 'Transaction ID received. Our accounting team will verify funds and confirm dispatch.',
-      order: {
-        id: orderId,
-        customer_name: checkoutSnapshot?.customer?.name || 'Customer',
-        customer_phone: checkoutSnapshot?.customer?.phone || '',
-        shipping_address: checkoutSnapshot?.customer?.address || '',
-        payment_method: 'Paymently (bKash/Nagad)',
-        payment_status: 'PENDING_VERIFICATION',
-        fulfillment_status: 'Processing',
-        created_at: new Date().toISOString()
-      }
+      status: 'VERIFICATION_UNAVAILABLE',
+      error: 'Payment verification service temporarily unreachable. Please try checking again in a few moments.'
+    };
+  } catch (err) {
+    return {
+      success: false,
+      verified: false,
+      status: 'NETWORK_ERROR',
+      error: 'Unable to reach payment verification server. Please check your connection and retry.'
     };
   }
-
-  return {
-    success: false,
-    verified: false,
-    status: 'AWAITING_PAYMENT',
-    error: 'Payment verification pending. If you have completed payment, enter your Transaction ID above.'
-  };
 }
 
 /**
@@ -335,7 +181,7 @@ export async function fetchGatewayStatus() {
     merchant_name: 'AZRAQ',
     base_url: 'https://azraq.paymently.io',
     currency: 'BDT',
-    has_api_key: true,
+    has_api_key: false,
     has_database: false,
     total_real_transactions: 0,
     supported_methods: ['bKash', 'Nagad', 'Rocket', 'Upay', 'Visa', 'Mastercard', 'Cash on Delivery']
@@ -445,4 +291,3 @@ export async function requestRefund({ orderId, reason, amount, adminKey = null }
     return { success: false, error: 'Refund service unavailable' };
   }
 }
-

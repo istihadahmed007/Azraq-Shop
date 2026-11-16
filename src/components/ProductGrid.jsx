@@ -115,11 +115,11 @@ export default function ProductGrid() {
               onClick={() => setActiveCategory(cat)}
               className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
                 activeCategory === cat
-                  ? 'bg-[#062B4F] text-white shadow-md'
-                  : 'bg-white hover:bg-[#F0F7FF] text-[#062B4F]/75 border border-[#D9F0FF]'
+                  ? 'bg-[#101C35] text-white shadow-md'
+                  : 'bg-white hover:bg-[#F5F7FA] text-[#101C35]/75 border border-[#E2E8F0]'
               }`}
             >
-              {cat === 'All' ? t('All (1,206)', 'সকল (১২০৬)') : cat}
+              {cat === 'All' ? `${t('All', 'সকল')} (${products.length})` : cat}
             </button>
           ))}
         </div>

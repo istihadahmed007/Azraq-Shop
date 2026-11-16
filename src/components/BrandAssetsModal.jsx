@@ -17,15 +17,11 @@ export default function BrandAssetsModal() {
   };
 
   const colors = [
-    { name: 'Primary Navy', hex: '#12233F', role: 'Main Brand & Foundation' },
-    { name: 'Azure Blue', hex: '#2677D9', role: 'Heritage Accent' },
-    { name: 'Lavender', hex: '#EAE5FF', role: 'Soft Premium Base' },
-    { name: 'Soft Purple', hex: '#A78BFA', role: 'Glows & Gradients' },
-    { name: 'Violet', hex: '#7955E8', role: 'Key Action & Highlights' },
-    { name: 'Lime Accent', hex: '#C9F34A', role: 'High-Impact Action & Buttons' },
-    { name: 'Cloud White', hex: '#F7F8FC', role: 'Subtle Backgrounds' },
-    { name: 'Charcoal', hex: '#202B3A', role: 'Dark Surface Panels' },
-    { name: 'Pure White', hex: '#FFFFFF', role: 'Card Surfaces' }
+    { name: 'Midnight Navy', hex: '#101C35', role: 'Main Brand & Foundation' },
+    { name: 'Deep Blue', hex: '#183B70', role: 'Secondary Brand Depth' },
+    { name: 'Cobalt Blue', hex: '#2563EB', role: 'Primary Action & Accent' },
+    { name: 'Pure White', hex: '#FFFFFF', role: 'Card Surfaces & Contrast' },
+    { name: 'Soft Gray', hex: '#F5F7FA', role: 'Subtle Backgrounds' }
   ];
 
   return (
@@ -106,34 +102,32 @@ export default function BrandAssetsModal() {
               </div>
             </div>
 
-            {/* Geometric Monogram & Mobile App Icon */}
+            {/* Brand Symbol & App Icon */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
               
               {/* Monogram Isolated */}
-              <div className="p-5 rounded-2xl bg-azraq-cloud border border-gray-200 flex flex-col items-center justify-center gap-3 text-center">
-                <span className="text-[10px] font-mono uppercase text-gray-500">Geometric AZ Monogram</span>
-                <div className="w-16 h-16 rounded-2xl bg-azraq-navy flex items-center justify-center shadow-md">
-                  <svg viewBox="0 0 64 64" width="48" height="48" fill="none">
-                    <path d="M15 47L27 17H34L46 47H39.2L36.3 39.5H23.7L20.8 47H15ZM25.7 34.2H34.3L30 23.5L25.7 34.2Z" fill="#FFFFFF"/>
-                    <path d="M23 29.5L44 18V23.5L31.5 31H44V36L23 47.5V42L35.5 34.5H23V29.5Z" fill="#C9F34A"/>
-                    <circle cx="48.5" cy="15.5" r="3.2" fill="#2677D9" />
-                  </svg>
+              <div className="p-5 rounded-2xl bg-[#F5F7FA] border border-gray-200 flex flex-col items-center justify-center gap-3 text-center">
+                <span className="text-[10px] font-mono uppercase text-gray-500">Official Brand Symbol</span>
+                <div className="w-16 h-16 rounded-2xl bg-white border border-gray-200 flex items-center justify-center shadow-md p-2">
+                  <img src="/branding/azraq-icon.png" alt="AZRAQ Symbol" className="w-full h-full object-contain" />
                 </div>
-                <span className="text-[11px] text-gray-500">Dynamic interlocking geometry</span>
+                <span className="text-[11px] text-gray-500">Curated Everyday Goods Bag</span>
               </div>
 
               {/* Mobile App Icon */}
-              <div className="p-5 rounded-2xl bg-azraq-cloud border border-gray-200 flex flex-col items-center justify-center gap-3 text-center">
-                <span className="text-[10px] font-mono uppercase text-gray-500">Mobile App Icon (iOS/Android)</span>
-                <img src="/azraq-app-icon.svg" alt="App Icon" className="w-16 h-16 rounded-2xl shadow-lg border border-azraq-purple/40" />
-                <span className="text-[11px] text-gray-500">512x512 with squircle mask</span>
+              <div className="p-5 rounded-2xl bg-[#F5F7FA] border border-gray-200 flex flex-col items-center justify-center gap-3 text-center">
+                <span className="text-[10px] font-mono uppercase text-gray-500">Apple Touch Icon</span>
+                <img src="/branding/apple-touch-icon.png" alt="Apple Touch Icon" className="w-16 h-16 rounded-2xl shadow-lg border border-gray-200" />
+                <span className="text-[11px] text-gray-500">192x192 Touch Icon</span>
               </div>
 
               {/* Favicon */}
-              <div className="p-5 rounded-2xl bg-azraq-cloud border border-gray-200 flex flex-col items-center justify-center gap-3 text-center">
-                <span className="text-[10px] font-mono uppercase text-gray-500">Website Favicon</span>
-                <img src="/favicon.svg" alt="Favicon" className="w-16 h-16 rounded-xl shadow-md" />
-                <span className="text-[11px] text-gray-500">64x64 SVG vector</span>
+              <div className="p-5 rounded-2xl bg-[#F5F7FA] border border-gray-200 flex flex-col items-center justify-center gap-3 text-center">
+                <span className="text-[10px] font-mono uppercase text-gray-500">Browser Favicon</span>
+                <div className="w-16 h-16 rounded-xl bg-white border border-gray-200 flex items-center justify-center shadow-md p-2">
+                  <img src="/favicon-32x32.png" alt="Favicon" className="w-8 h-8 object-contain" />
+                </div>
+                <span className="text-[11px] text-gray-500">Crisp multi-resolution icon</span>
               </div>
 
             </div>

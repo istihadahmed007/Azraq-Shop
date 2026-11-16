@@ -31,6 +31,7 @@ export function ShopProvider({ children }) {
   // Routing / View State
   const [currentView, setCurrentView] = useState('home'); // 'home' | 'collections' | 'collection-detail'
   const [activeCollectionSlug, setActiveCollectionSlug] = useState('gadgets-it-accessories');
+  const [activeCategory, setActiveCategory] = useState('All');
 
   // Sync Status
   const [syncStatus, setSyncStatus] = useState({
@@ -83,7 +84,17 @@ export function ShopProvider({ children }) {
   const [language, setLanguage] = useState('en'); // 'en' | 'bn'
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        return Boolean(params.get('payment_status') && params.get('checkout_id'));
+      } catch (e) {
+        return false;
+      }
+    }
+    return false;
+  });
   const [isTrackingOpen, setIsTrackingOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isBrandAssetsOpen, setIsBrandAssetsOpen] = useState(false);
@@ -354,6 +365,8 @@ export function ShopProvider({ children }) {
         setIsVisualSearchOpen,
         searchQuery,
         setSearchQuery,
+        activeCategory,
+        setActiveCategory,
         toast,
         showToast
       }}

@@ -1,6 +1,7 @@
 import { 
   createPaymentlyCheckoutSession, 
-  createCodCheckoutOrder 
+  createCodCheckoutOrder,
+  createManualPortalCheckoutOrder
 } from '../../server/paymentlyService.js';
 
 export default async function handler(req, res) {
@@ -46,6 +47,18 @@ export default async function handler(req, res) {
       });
     }
 
+    // 1b. If Manual Payment Portal explicitly selected
+    if (paymentMethod === 'MANUAL_PORTAL') {
+      const manualResult = await createManualPortalCheckoutOrder({
+        customer,
+        items,
+        deliveryArea: deliveryArea || 'inside',
+        promoCode: promoCode || null,
+        notes: notes || ''
+      });
+      return res.status(200).json(manualResult);
+    }
+
     // 2. Real Paymently Dynamic Session Creation
     const session = await createPaymentlyCheckoutSession({
       customer,
@@ -56,7 +69,15 @@ export default async function handler(req, res) {
     });
 
     if (!session.success) {
-      return res.status(400).json(session);
+      const statusMap = {
+        'GATEWAY_CREDENTIALS_MISSING': 503,
+        'GATEWAY_TIMEOUT': 504,
+        'GATEWAY_CONNECTION_FAILED': 502,
+        'GATEWAY_UNTRUSTED_URL': 502,
+        'GATEWAY_REJECTED': 400
+      };
+      const statusCode = statusMap[session.code] || 400;
+      return res.status(statusCode).json(session);
     }
 
     return res.status(200).json(session);
