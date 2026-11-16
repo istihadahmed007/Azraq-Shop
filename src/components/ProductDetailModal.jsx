@@ -50,8 +50,8 @@ export default function ProductDetailModal() {
         {/* Left Column: Image Gallery with Thumbnails */}
         <div className="w-full md:w-1/2 p-6 sm:p-8 bg-gradient-to-b from-[#F8FCFF] to-white flex flex-col justify-between border-b md:border-b-0 md:border-r border-gray-100">
           
-          {/* Main Selected Image - Prominent, square corners, contain */}
-          <div className="relative w-full h-80 sm:h-96 flex items-center justify-center rounded-xl bg-white p-3 shadow-sm border border-[#D9F0FF] overflow-hidden">
+          {/* Main Selected Image - Prominent, square ratio, contain */}
+          <div className="relative w-full aspect-square flex items-center justify-center rounded-2xl bg-gradient-to-b from-[#F5F7FA]/90 to-white/70 p-4 shadow-sm border border-white/80 overflow-hidden">
             <img
               src={images[activeImageIndex] || selectedProduct.main_image}
               alt={selectedProduct.name}
@@ -62,16 +62,16 @@ export default function ProductDetailModal() {
                   e.target.src = selectedProduct.main_image;
                 }
               }}
-              className="w-full h-full object-contain filter drop-shadow-md transition-all duration-300"
+              className="w-full h-full object-contain filter drop-shadow-sm transition-all duration-300"
             />
             
             {/* Top Badges */}
             <div className="absolute top-3 left-3 flex flex-col gap-1 pointer-events-none">
-              <span className="px-2.5 py-1 rounded bg-[#062B4F] text-white text-[10px] font-bold uppercase tracking-wider">
+              <span className="px-2.5 py-1 rounded-md bg-[#101C35]/90 backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-wider shadow-sm border border-white/20">
                 {selectedProduct.badge || 'Curated'}
               </span>
-              <span className="px-2 py-0.5 rounded bg-[#D9F0FF] text-[#0877C9] text-[9px] font-mono font-bold">
-                SKU: {selectedProduct.id}
+              <span className="px-2 py-0.5 rounded-md bg-[#D9F0FF]/90 backdrop-blur-sm text-[#183B70] text-[9px] font-mono font-bold border border-white/50">
+                SKU: #{selectedProduct.id}
               </span>
             </div>
 
@@ -79,16 +79,16 @@ export default function ProductDetailModal() {
             <button
               onClick={() => toggleFavorite(selectedProduct.id)}
               className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-all ${
-                isFav ? 'bg-[#0877C9] text-white' : 'bg-white/90 text-[#062B4F]/50 hover:text-[#0877C9]'
+                isFav ? 'bg-[#2563EB] text-white' : 'bg-white/90 backdrop-blur-sm text-[#101C35]/50 hover:text-[#2563EB] border border-white/60'
               }`}
             >
-              <Heart className={`w-4 h-4 ${isFav ? 'fill-white' : ''}`} />
+              <Heart className={`w-4 h-4 ${isFav ? 'fill-white stroke-white' : ''}`} />
             </button>
           </div>
 
           {/* Thumbnail Carousel / Grid */}
           <div className="mt-4">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#062B4F]/50 mb-2">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#101C35]/50 mb-2">
               {t("AUTHENTIC PRODUCT VIEWS", "পণ্যের ছবিসমূহ")} ({images.length})
             </p>
             <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
@@ -96,10 +96,10 @@ export default function ProductDetailModal() {
                 <button
                   key={idx}
                   onClick={() => setActiveImageIndex(idx)}
-                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg p-1 bg-white border flex-shrink-0 transition-all overflow-hidden ${
+                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl p-1.5 bg-white/90 backdrop-blur-sm border flex-shrink-0 transition-all overflow-hidden flex items-center justify-center ${
                     activeImageIndex === idx
-                      ? 'border-[#0877C9] ring-2 ring-[#69C5F5]/40 shadow-md scale-105'
-                      : 'border-gray-200 opacity-60 hover:opacity-100'
+                      ? 'border-[#2563EB] ring-2 ring-[#2563EB]/30 shadow-md scale-105'
+                      : 'border-gray-200/80 opacity-70 hover:opacity-100 hover:border-gray-300'
                   }`}
                 >
                   <img

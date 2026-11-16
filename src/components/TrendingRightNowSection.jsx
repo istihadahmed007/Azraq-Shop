@@ -1,6 +1,7 @@
 import React from 'react';
-import { Star, ShoppingCart, ArrowRight, Sparkles, Heart } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
+import ProductCard from './common/ProductCard';
 
 export default function TrendingRightNowSection() {
   const { products, setSelectedProduct, addToCart, favorites, toggleFavorite, navigateTo, t } = useShop();
@@ -49,89 +50,20 @@ export default function TrendingRightNowSection() {
 
       {/* 6-Card Horizontal Grid (Reference Match: 2 cols on mobile, 3 on tablet, 6 on desktop) */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
-        {trendingItems.map((product, idx) => {
-          const isFav = favorites.includes(product.id);
-          const shortName = product.name.split('—')[1] || product.name.split('(')[0] || product.name;
-
-          return (
-            <div
-              key={product.id || idx}
-              className="bg-white/95 backdrop-blur-md rounded-xl border border-[#D9F0FF] p-3 shadow-sm hover:shadow-[0_10px_30px_rgba(8,119,201,0.12)] hover:border-[#69C5F5]/60 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden h-[340px] sm:h-[360px]"
-            >
-              {/* Wishlist Button */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleFavorite(product.id);
-                }}
-                className={`absolute top-2.5 right-2.5 z-10 w-7 h-7 rounded-full flex items-center justify-center transition-all ${
-                  isFav ? 'bg-[#0877C9] text-white shadow-sm' : 'bg-white/80 text-[#062B4F]/40 hover:text-[#0877C9]'
-                }`}
-                title="Wishlist"
-              >
-                <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-white' : ''}`} />
-              </button>
-
-              {/* Product Photograph Container */}
-              <div
-                onClick={() => setSelectedProduct(product)}
-                className="relative w-full h-44 sm:h-48 rounded-lg bg-gradient-to-b from-[#F8FCFF] to-white flex items-center justify-center p-2 cursor-pointer overflow-hidden"
-              >
-                <img
-                  src={product.main_image}
-                  alt={product.name}
-                  loading="lazy"
-                  decoding="async"
-                  onError={(e) => {
-                    if (!e.target.dataset.failed) {
-                      e.target.dataset.failed = 'true';
-                      e.target.src = 'https://easydrop.asia/products/image-1794224164356-135288231.jpeg';
-                    }
-                  }}
-                  className="w-full h-full object-contain filter drop-shadow-sm transition-transform duration-500 group-hover:scale-108"
-                />
-              </div>
-
-              {/* Info & Bottom Action (Reference Match) */}
-              <div className="pt-2 border-t border-gray-100 flex flex-col justify-between flex-1">
-                <div>
-                  <h3
-                    onClick={() => setSelectedProduct(product)}
-                    className="font-bold text-xs sm:text-sm text-[#062B4F] line-clamp-1 cursor-pointer hover:text-[#0877C9] transition-colors"
-                    title={product.name}
-                  >
-                    {shortName}
-                  </h3>
-                  
-                  {/* Retail Price strictly in BDT */}
-                  <div className="mt-1">
-                    <span className="text-sm sm:text-base font-black text-[#062B4F]">
-                      ৳{product.price.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Rating & Add-to-Cart Action (Reference Match: Star + Cart Button) */}
-                <div className="flex items-center justify-between pt-2 border-t border-gray-50 mt-1">
-                  <div className="flex items-center gap-1 text-[11px] font-bold text-amber-500">
-                    <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                    <span>{product.rating || '4.8'}</span>
-                  </div>
-
-                  <button
-                    onClick={() => addToCart(product, product.variants[0] || 'Default', 1)}
-                    className="w-8 h-8 rounded-lg border border-[#D9F0FF] hover:border-[#0877C9] hover:bg-[#0877C9] hover:text-white text-[#062B4F] flex items-center justify-center transition-all shadow-sm"
-                    title="Add to cart"
-                  >
-                    <ShoppingCart className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-
-              </div>
-
-            </div>
-          );
-        })}
+        {trendingItems.map((product, idx) => (
+          <ProductCard
+            key={product.id || idx}
+            product={product}
+            isFav={favorites.includes(product.id)}
+            onToggleFavorite={toggleFavorite}
+            onSelectProduct={setSelectedProduct}
+            onAddToCart={(p, v, q) => addToCart(p, v, q)}
+            showRating={true}
+            showSku={false}
+            showCategory={false}
+            compact={true}
+          />
+        ))}
       </div>
 
     </section>

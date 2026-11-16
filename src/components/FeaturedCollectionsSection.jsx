@@ -78,7 +78,7 @@ export default function FeaturedCollectionsSection() {
           <div
             key={idx}
             onClick={() => navigateTo('collection-detail', item.slug)}
-            className={`rounded-2xl p-5 bg-gradient-to-br ${item.bgGradient} border ${item.border} shadow-sm hover:shadow-[0_12px_35px_rgba(8,119,201,0.12)] transition-all duration-300 flex flex-col justify-between cursor-pointer group relative overflow-hidden h-[280px] sm:h-[300px]`}
+            className={`rounded-2xl p-5 bg-gradient-to-br ${item.bgGradient} border ${item.border} shadow-[0_4px_20px_-4px_rgba(16,28,53,0.06)] hover:shadow-[0_16px_36px_-6px_rgba(37,99,235,0.12)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between cursor-pointer group relative overflow-hidden h-[280px] sm:h-[300px]`}
           >
             {/* Subtle Glass Reflection */}
             <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />

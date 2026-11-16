@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Search, ArrowUpDown, Heart, ShoppingBag, Eye, RefreshCw } from 'lucide-react';
+import { Search, ArrowUpDown, RefreshCw } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
+import ProductCard from './common/ProductCard';
 
 export default function ProductGrid() {
   const { 
@@ -204,124 +205,18 @@ export default function ProductGrid() {
       ) : (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-            {filteredAndSortedProducts.slice(0, visibleCount).map(product => {
-              const isFav = favorites.includes(product.id);
-              const shortName = product.name.split('—')[1] || product.name.split('(')[0] || product.name;
-              const isAvailable = product.in_stock !== false;
-
-              return (
-                <div
-                  key={product.id}
-                  className="bg-white/95 backdrop-blur-md rounded-xl border border-[#D9F0FF] p-2.5 sm:p-4 shadow-sm hover:shadow-[0_12px_32px_rgba(8,119,201,0.12)] hover:border-[#69C5F5]/60 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden"
-                >
-                  {/* Wishlist Button */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleFavorite(product.id);
-                    }}
-                    className={`absolute top-2.5 right-2.5 sm:top-4 sm:right-4 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all ${
-                      isFav 
-                        ? 'bg-[#0877C9] text-white shadow-md' 
-                        : 'bg-white/90 text-[#062B4F]/40 hover:text-[#0877C9] hover:bg-white'
-                    }`}
-                    title={isFav ? "Remove from Wishlist" : "Add to Wishlist"}
-                    aria-label={`Wishlist ${product.name}`}
-                  >
-                    <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isFav ? 'fill-white' : ''}`} />
-                  </button>
-
-                  {/* SKU Tag */}
-                  <div className="absolute top-2.5 left-2.5 sm:top-4 sm:left-4 z-10 flex flex-col gap-1 pointer-events-none">
-                    <span className="px-2 py-0.5 rounded bg-[#062B4F]/85 text-white text-[8px] sm:text-[9px] font-mono tracking-tight w-max backdrop-blur-sm">
-                      {product.id}
-                    </span>
-                  </div>
-
-                  {/* Image Area - Responsive Aspect Square, Square corners */}
-                  <div 
-                    onClick={() => setSelectedProduct(product)}
-                    className="relative w-full aspect-square bg-gradient-to-b from-[#F8FCFF] to-white rounded-lg flex items-center justify-center p-2 sm:p-3 cursor-pointer overflow-hidden border border-[#D9F0FF]/40"
-                  >
-                    <img
-                      src={product.main_image}
-                      alt={product.name}
-                      loading="lazy"
-                      decoding="async"
-                      onError={(e) => {
-                        if (!e.target.dataset.failed) {
-                          e.target.dataset.failed = 'true';
-                          e.target.src = 'https://easydrop.asia/products/image-1794224164356-135288231.jpeg';
-                        }
-                      }}
-                      className="w-full h-full object-contain filter drop-shadow-xs transition-transform duration-500 group-hover:scale-105"
-                    />
-                    
-                    {/* Quick View Overlay Pill */}
-                    <div className="absolute inset-0 bg-[#062B4F]/15 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedProduct(product);
-                        }}
-                        className="px-3 py-1.5 rounded-full bg-white text-[#062B4F] text-xs font-bold shadow-lg flex items-center gap-1.5 hover:bg-[#0877C9] hover:text-white transition-colors"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>{t("Quick View", "বিস্তারিত")}</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Details Bottom Block */}
-                  <div className="mt-2.5 pt-2 border-t border-gray-100 flex flex-col justify-between flex-1">
-                    <div>
-                      <span className="text-[10px] sm:text-xs font-semibold text-[#0877C9] block mb-0.5 truncate">
-                        {product.category || product.primary_collection_name}
-                      </span>
-                      <h3 
-                        onClick={() => setSelectedProduct(product)}
-                        className="font-bold text-[#062B4F] text-xs sm:text-sm line-clamp-2 min-h-[2.25rem] sm:min-h-[2.5rem] cursor-pointer hover:text-[#0877C9] transition-colors leading-snug"
-                        title={product.name}
-                      >
-                        {shortName}
-                      </h3>
-                    </div>
-
-                    {/* Price & Action Row */}
-                    <div className="flex items-center justify-between gap-1.5 sm:gap-2 pt-2.5">
-                      <div className="min-w-0">
-                        <div className="text-sm sm:text-base md:text-lg font-black text-[#062B4F] truncate">
-                          ৳{product.price.toLocaleString()}
-                        </div>
-                        <span className={`text-[9px] sm:text-[10px] font-bold block truncate ${isAvailable ? 'text-emerald-600' : 'text-rose-600'}`}>
-                          {isAvailable ? t("In Stock", "স্টকে রয়েছে") : t("Out of Stock", "স্টক শেষ")}
-                        </span>
-                      </div>
-
-                      {/* Cart Action Button */}
-                      <button
-                        onClick={() => {
-                          if (isAvailable) {
-                            addToCart(product, product.variants?.[0] || 'Standard', 1);
-                          }
-                        }}
-                        disabled={!isAvailable}
-                        className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shadow-md transition-all flex-shrink-0 ${
-                          isAvailable
-                            ? 'bg-[#062B4F] hover:bg-[#0877C9] text-white transform hover:scale-110 active:scale-95'
-                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        }`}
-                        title={isAvailable ? t("Add to Cart", "ব্যাগে যোগ করুন") : t("Out of Stock", "স্টক নেই")}
-                        aria-label={`Add ${product.name} to bag`}
-                      >
-                        <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                </div>
-              );
-            })}
+            {filteredAndSortedProducts.slice(0, visibleCount).map(product => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                isFav={favorites.includes(product.id)}
+                onToggleFavorite={toggleFavorite}
+                onSelectProduct={setSelectedProduct}
+                onAddToCart={(p, v, q) => addToCart(p, v, q)}
+                showSku={true}
+                showCategory={true}
+              />
+            ))}
           </div>
 
           {/* Pagination / Load More */}

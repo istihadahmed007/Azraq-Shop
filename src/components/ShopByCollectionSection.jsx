@@ -46,26 +46,26 @@ export default function ShopByCollectionSection() {
             <div
               key={col.id}
               onClick={() => navigateTo('collection-detail', col.slug)}
-              className="group cursor-pointer rounded-2xl bg-white/95 backdrop-blur-md border border-[#D9F0FF] shadow-sm hover:shadow-[0_12px_35px_rgba(8,119,201,0.12)] hover:border-[#69C5F5]/60 transition-all duration-300 flex flex-col justify-between overflow-hidden relative h-[420px] sm:h-[450px]"
+              className="group cursor-pointer rounded-2xl bg-white/85 backdrop-blur-md border border-[#D9F0FF]/80 shadow-[0_4px_20px_-4px_rgba(16,28,53,0.06)] hover:bg-white hover:border-[#2563EB]/40 hover:shadow-[0_16px_36px_-6px_rgba(37,99,235,0.12)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between overflow-hidden relative h-[390px] sm:h-[420px]"
             >
               {/* Subtle Ambient Hover Glow */}
-              <div className="absolute -top-12 -right-12 w-40 h-40 bg-[#D9F0FF]/50 rounded-full blur-2xl group-hover:bg-[#69C5F5]/25 transition-all pointer-events-none" />
+              <div className="absolute -top-12 -right-12 w-40 h-40 bg-[#D9F0FF]/50 rounded-full blur-2xl group-hover:bg-[#2563EB]/15 transition-all pointer-events-none" />
 
               {/* Top Meta Badges Overlay */}
-              <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
-                <span className="px-3 py-1 rounded-full bg-[#062B4F]/90 text-white text-[10px] font-mono font-bold tracking-tight shadow-sm backdrop-blur-sm">
+              <div className="absolute top-3.5 left-3.5 z-20 flex items-center gap-2">
+                <span className="px-2.5 py-1 rounded-md bg-[#101C35]/90 backdrop-blur-sm text-white text-[10px] font-mono font-bold tracking-tight shadow-sm border border-white/20">
                   {col.imported_product_count ?? col.product_count ?? 0} {t("Products", "পণ্য")}
                 </span>
                 {col.featured && (
-                  <span className="px-2.5 py-1 rounded-full bg-[#50DDF0] text-[#062B4F] text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-[#062B4F] fill-[#062B4F]" />
+                  <span className="px-2.5 py-1 rounded-md bg-[#2563EB] text-white text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1 border border-white/20">
+                    <Sparkles className="w-3 h-3 text-[#50DDF0] fill-[#50DDF0]" />
                     {col.badge || 'Featured'}
                   </span>
                 )}
               </div>
 
               {/* Large Collection Photograph Container */}
-              <div className="relative w-full h-[280px] sm:h-[310px] bg-gradient-to-b from-[#F8FCFF] to-white flex items-center justify-center p-4 overflow-hidden border-b border-gray-100">
+              <div className="relative w-full h-[250px] sm:h-[280px] bg-gradient-to-b from-[#F5F7FA]/90 to-white/70 flex items-center justify-center p-4 sm:p-6 overflow-hidden border-b border-[#D9F0FF]/40">
                 <img
                   src={displayImage}
                   alt={col.name}
@@ -74,7 +74,7 @@ export default function ShopByCollectionSection() {
                       e.target.src = col.fallback_image;
                     }
                   }}
-                  className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-700 group-hover:scale-108"
+                  className="w-full h-full object-contain filter drop-shadow-sm transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
                 />
               </div>

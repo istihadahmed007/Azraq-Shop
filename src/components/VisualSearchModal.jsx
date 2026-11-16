@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import { performVisualSearch } from '../services/visualSearchService';
+import ProductCard from './common/ProductCard';
 
 export default function VisualSearchModal() {
   const { 
@@ -689,108 +690,26 @@ export default function VisualSearchModal() {
 
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                     {processedResults.bestMatches.map(product => {
-                      const isFav = favorites.includes(product.id);
                       const fullProduct = products.find(p => p.id === product.id) || product;
-
                       return (
-                        <div
+                        <ProductCard
                           key={product.id}
-                          className="bg-white/95 rounded-xl border border-[#D9F0FF] hover:border-[#69C5F5] p-2.5 sm:p-3 shadow-sm hover:shadow-[0_8px_25px_rgba(8,119,201,0.12)] transition-all flex flex-col justify-between group relative h-[360px] sm:h-[400px]"
-                        >
-                          {/* Similarity Badge */}
-                          <div className="absolute top-2 left-2 z-10">
-                            <span className="px-2 py-0.5 rounded bg-[#062B4F]/90 text-white text-[9px] font-black uppercase tracking-wider backdrop-blur-sm shadow-sm flex items-center gap-1">
-                              <Sparkles className="w-2.5 h-2.5 text-[#50DDF0]" />
-                              <span>{product.similarity}% {t("Match", "মিল")}</span>
-                            </span>
-                          </div>
-
-                          {/* Wishlist Button */}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleFavorite(product.id);
-                            }}
-                            className={`absolute top-2 right-2 z-10 w-7 h-7 rounded-full flex items-center justify-center transition-all ${
-                              isFav ? 'bg-[#0877C9] text-white' : 'bg-white/80 text-[#062B4F]/40 hover:text-[#0877C9]'
-                            }`}
-                          >
-                            <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-white' : ''}`} />
-                          </button>
-
-                          {/* Image Container */}
-                          <div 
-                            onClick={() => {
-                              setSelectedProduct(fullProduct);
-                              setIsVisualSearchOpen(false);
-                            }}
-                            className="relative w-full h-44 sm:h-52 bg-gradient-to-b from-[#F8FCFF] to-white rounded-lg p-2 flex items-center justify-center cursor-pointer overflow-hidden"
-                          >
-                            <img
-                              src={product.main_image}
-                              alt={product.name}
-                              loading="lazy"
-                              className="w-full h-full object-contain filter drop-shadow-sm transition-transform duration-500 group-hover:scale-108"
-                            />
-                            
-                            {/* Hover Quick View */}
-                            <div className="absolute inset-0 bg-[#062B4F]/15 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedProduct(fullProduct);
-                                  setIsVisualSearchOpen(false);
-                                }}
-                                className="px-3 py-1 rounded-full bg-white text-[#062B4F] text-[10px] font-bold shadow-md hover:bg-[#0877C9] hover:text-white transition-colors flex items-center gap-1"
-                              >
-                                <Eye className="w-3 h-3" />
-                                <span>{t("View Details", "বিস্তারিত")}</span>
-                              </button>
-                            </div>
-                          </div>
-
-                          {/* Info & Bottom Cart Action */}
-                          <div className="pt-2 border-t border-gray-100 flex flex-col justify-between flex-1">
-                            <div>
-                              <span className="text-[10px] text-[#0877C9] font-semibold block truncate">
-                                {product.category}
-                              </span>
-                              <h5 
-                                onClick={() => {
-                                  setSelectedProduct(fullProduct);
-                                  setIsVisualSearchOpen(false);
-                                }}
-                                className="font-bold text-xs sm:text-sm text-[#062B4F] line-clamp-1 cursor-pointer hover:text-[#0877C9] transition-colors"
-                                title={product.name}
-                              >
-                                {product.name}
-                              </h5>
-                            </div>
-
-                            <div className="flex items-center justify-between pt-2">
-                              <div>
-                                <div className="text-xs sm:text-sm font-black text-[#062B4F]">
-                                  ৳{product.price.toLocaleString()}
-                                </div>
-                                <span className="text-[9px] text-emerald-600 font-bold block">
-                                  {t("In Stock", "স্টকে আছে")}
-                                </span>
-                              </div>
-
-                              <button
-                                onClick={() => {
-                                  addToCart(fullProduct, fullProduct.variants?.[0] || 'Standard', 1);
-                                  showToast(t("Added to your shopping bag!", "ব্যাগে যোগ করা হয়েছে!"), 'success');
-                                }}
-                                className="w-8 h-8 rounded-full bg-[#062B4F] hover:bg-[#0877C9] text-white flex items-center justify-center shadow-sm transition-all transform hover:scale-110 active:scale-95 flex-shrink-0"
-                                title={t("Add to Cart", "ব্যাগে রাখুন")}
-                              >
-                                <ShoppingBag className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </div>
-
-                        </div>
+                          product={fullProduct}
+                          isFav={favorites.includes(product.id)}
+                          onToggleFavorite={toggleFavorite}
+                          onSelectProduct={(p) => {
+                            setSelectedProduct(p);
+                            setIsVisualSearchOpen(false);
+                          }}
+                          onAddToCart={(p, v, q) => {
+                            addToCart(p, v, q);
+                            showToast(t("Added to your shopping bag!", "ব্যাগে যোগ করা হয়েছে!"), 'success');
+                          }}
+                          similarityBadge={product.similarity}
+                          showSku={false}
+                          showCategory={true}
+                          compact={true}
+                        />
                       );
                     })}
                   </div>
@@ -812,107 +731,26 @@ export default function VisualSearchModal() {
 
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                     {processedResults.similarProducts.map(product => {
-                      const isFav = favorites.includes(product.id);
                       const fullProduct = products.find(p => p.id === product.id) || product;
-
                       return (
-                        <div
+                        <ProductCard
                           key={product.id}
-                          className="bg-white/95 rounded-xl border border-[#D9F0FF] hover:border-[#69C5F5] p-2.5 sm:p-3 shadow-sm hover:shadow-[0_8px_25px_rgba(8,119,201,0.1)] transition-all flex flex-col justify-between group relative h-[360px] sm:h-[400px]"
-                        >
-                          {/* Similarity Badge */}
-                          <div className="absolute top-2 left-2 z-10">
-                            <span className="px-2 py-0.5 rounded bg-gray-100 text-[#062B4F] text-[9px] font-bold border border-gray-200">
-                              {product.similarity}% {t("Similar", "অনুরূপ")}
-                            </span>
-                          </div>
-
-                          {/* Wishlist Button */}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleFavorite(product.id);
-                            }}
-                            className={`absolute top-2 right-2 z-10 w-7 h-7 rounded-full flex items-center justify-center transition-all ${
-                              isFav ? 'bg-[#0877C9] text-white' : 'bg-white/80 text-[#062B4F]/40 hover:text-[#0877C9]'
-                            }`}
-                          >
-                            <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-white' : ''}`} />
-                          </button>
-
-                          {/* Image Container */}
-                          <div 
-                            onClick={() => {
-                              setSelectedProduct(fullProduct);
-                              setIsVisualSearchOpen(false);
-                            }}
-                            className="relative w-full h-44 sm:h-52 bg-gradient-to-b from-[#F8FCFF] to-white rounded-lg p-2 flex items-center justify-center cursor-pointer overflow-hidden"
-                          >
-                            <img
-                              src={product.main_image}
-                              alt={product.name}
-                              loading="lazy"
-                              className="w-full h-full object-contain filter drop-shadow-sm transition-transform duration-500 group-hover:scale-108"
-                            />
-
-                            {/* Hover Quick View */}
-                            <div className="absolute inset-0 bg-[#062B4F]/15 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedProduct(fullProduct);
-                                  setIsVisualSearchOpen(false);
-                                }}
-                                className="px-3 py-1 rounded-full bg-white text-[#062B4F] text-[10px] font-bold shadow-md hover:bg-[#0877C9] hover:text-white transition-colors flex items-center gap-1"
-                              >
-                                <Eye className="w-3 h-3" />
-                                <span>{t("View Details", "বিস্তারিত")}</span>
-                              </button>
-                            </div>
-                          </div>
-
-                          {/* Info & Bottom Cart Action */}
-                          <div className="pt-2 border-t border-gray-100 flex flex-col justify-between flex-1">
-                            <div>
-                              <span className="text-[10px] text-[#0877C9] font-semibold block truncate">
-                                {product.category}
-                              </span>
-                              <h5 
-                                onClick={() => {
-                                  setSelectedProduct(fullProduct);
-                                  setIsVisualSearchOpen(false);
-                                }}
-                                className="font-bold text-xs sm:text-sm text-[#062B4F] line-clamp-1 cursor-pointer hover:text-[#0877C9] transition-colors"
-                                title={product.name}
-                              >
-                                {product.name}
-                              </h5>
-                            </div>
-
-                            <div className="flex items-center justify-between pt-2">
-                              <div>
-                                <div className="text-xs sm:text-sm font-black text-[#062B4F]">
-                                  ৳{product.price.toLocaleString()}
-                                </div>
-                                <span className="text-[9px] text-emerald-600 font-bold block">
-                                  {t("In Stock", "স্টকে আছে")}
-                                </span>
-                              </div>
-
-                              <button
-                                onClick={() => {
-                                  addToCart(fullProduct, fullProduct.variants?.[0] || 'Standard', 1);
-                                  showToast(t("Added to your shopping bag!", "ব্যাগে যোগ করা হয়েছে!"), 'success');
-                                }}
-                                className="w-8 h-8 rounded-full bg-[#062B4F] hover:bg-[#0877C9] text-white flex items-center justify-center shadow-sm transition-all transform hover:scale-110 active:scale-95 flex-shrink-0"
-                                title={t("Add to Cart", "ব্যাগে রাখুন")}
-                              >
-                                <ShoppingBag className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </div>
-
-                        </div>
+                          product={fullProduct}
+                          isFav={favorites.includes(product.id)}
+                          onToggleFavorite={toggleFavorite}
+                          onSelectProduct={(p) => {
+                            setSelectedProduct(p);
+                            setIsVisualSearchOpen(false);
+                          }}
+                          onAddToCart={(p, v, q) => {
+                            addToCart(p, v, q);
+                            showToast(t("Added to your shopping bag!", "ব্যাগে যোগ করা হয়েছে!"), 'success');
+                          }}
+                          similarityBadge={product.similarity}
+                          showSku={false}
+                          showCategory={true}
+                          compact={true}
+                        />
                       );
                     })}
                   </div>
