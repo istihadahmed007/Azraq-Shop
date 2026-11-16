@@ -77,7 +77,7 @@ export function getPaymentlyConfig() {
     apiKey: (process.env.PAYMENTLY_API_KEY || '').trim(),
     defaultPaymentLink: process.env.PAYMENTLY_DEFAULT_PAYMENT_URL || 'https://azraq.paymently.io/paymentlink/default/BDT',
     webhookSecret: (process.env.PAYMENTLY_WEBHOOK_SECRET || '').trim(),
-    appBaseUrl: (process.env.APP_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://shop.azraqtrips.com').replace(/\/+$/, ''),
+    appBaseUrl: (process.env.APP_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://azraq.azraqtrips.com').replace(/\/+$/, ''),
     currency: 'BDT',
     merchantName: 'AZRAQ'
   };

@@ -4,10 +4,10 @@
  *
  * Usage:
  *   node scripts/smoke_test_api.mjs
- *   TARGET_URL=https://shop.azraqtrips.com node scripts/smoke_test_api.mjs
+ *   TARGET_URL=https://azraq.azraqtrips.com node scripts/smoke_test_api.mjs
  */
 
-const TARGET_URL = process.env.TARGET_URL || 'https://shop.azraqtrips.com';
+const TARGET_URL = process.env.TARGET_URL || 'https://azraq.azraqtrips.com';
 
 console.log('='.repeat(64));
 console.log(`🚀 AZRAQ DEPLOYMENT API SMOKE TEST`);

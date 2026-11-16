@@ -842,7 +842,7 @@ export default function AdminPanel() {
                         </div>
                         <div className="p-3 bg-white rounded-xl border border-gray-200 space-y-1">
                             <p className="font-bold text-[#062B4F]">4. Instant Webhook URL</p>
-                            <p className="text-gray-500">Set Webhook to: <code>https://shop.azraqtrips.com/api/payments/webhook</code></p>
+                            <p className="text-gray-500">Set Webhook to: <code>https://azraq.azraqtrips.com/api/payments/webhook</code></p>
                         </div>
                     </div>
                 </div>

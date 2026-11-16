@@ -82,5 +82,5 @@ jobs:
       - name: Run API Smoke Test
         run: node scripts/smoke_test_api.mjs
         env:
-          TARGET_URL: "https://shop.azraqtrips.com"
+          TARGET_URL: "https://azraq.azraqtrips.com"
         continue-on-error: true

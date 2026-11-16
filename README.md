@@ -4,7 +4,7 @@
 > **Descriptor:** CURATED EVERYDAY GOODS  
 > **Market:** Bangladesh  
 > **Currency:** BDT (৳)  
-> **Production Store:** [https://shop.azraqtrips.com](https://shop.azraqtrips.com)  
+> **Production Store:** [https://azraq.azraqtrips.com](https://azraq.azraqtrips.com)  
 > **Vercel Mirror:** [https://azraqshop.vercel.app](https://azraqshop.vercel.app)  
 > **Repository:** [https://github.com/istihadahmed007/Azraq-Shop](https://github.com/istihadahmed007/Azraq-Shop)  
 
