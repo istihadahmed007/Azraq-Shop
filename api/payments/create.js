@@ -62,6 +62,41 @@ export default async function handler(req, res) {
     return res.status(200).json(session);
   } catch (err) {
     console.error('[API /api/payments/create Error]:', err.message);
-    return res.status(500).json({ success: false, error: err.message });
+
+    const isDbOrStorage = 
+      err.code === 'MISSING_DATABASE_CONFIG' ||
+      err.code === 'DURABLE_STORAGE_FAILED' ||
+      err.code === 'DURABLE_STORAGE_UNAVAILABLE' ||
+      err.code === 'DB_CONNECTION_FAILED' ||
+      err.message.includes('DATABASE_CONFIGURATION_REQUIRED') ||
+      err.message.includes('PostgreSQL') ||
+      err.message.includes('DURABLE_STORAGE');
+
+    if (isDbOrStorage) {
+      return res.status(503).json({
+        success: false,
+        code: 'STORE_CHECKOUT_UNAVAILABLE',
+        error: 'Our checkout system is temporarily unavailable due to scheduled database maintenance. Your cart items are safe. Please try again shortly or contact our store concierge.'
+      });
+    }
+
+    const isClientValidation =
+      err.message.includes('required') ||
+      err.message.includes('invalid') ||
+      err.message.includes('empty');
+
+    if (isClientValidation) {
+      return res.status(400).json({
+        success: false,
+        code: 'VALIDATION_ERROR',
+        error: err.message
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      code: 'INTERNAL_ERROR',
+      error: 'An unexpected error occurred while preparing your order. Please try again in a few moments.'
+    });
   }
 }

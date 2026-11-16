@@ -100,9 +100,25 @@ export async function handlePaymentRoutes(req, res) {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ success: true, message: 'Administrator session authenticated successfully.' }));
       } catch (err) {
-        res.statusCode = 500;
+        console.error('[paymentRoutes /api/admin/auth Error]:', err.message);
+        const isDbOrStorage = 
+          err.code === 'MISSING_DATABASE_CONFIG' ||
+          err.code === 'DURABLE_STORAGE_FAILED' ||
+          err.code === 'DURABLE_STORAGE_UNAVAILABLE' ||
+          err.code === 'DB_CONNECTION_FAILED' ||
+          err.message.includes('DATABASE_CONFIGURATION_REQUIRED') ||
+          err.message.includes('PostgreSQL') ||
+          err.message.includes('DURABLE_STORAGE');
+
+        res.statusCode = isDbOrStorage ? 503 : (err.message.includes('required') ? 400 : 500);
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ success: false, error: err.message }));
+        res.end(JSON.stringify({
+          success: false,
+          code: isDbOrStorage ? 'STORE_CHECKOUT_UNAVAILABLE' : 'CHECKOUT_ERROR',
+          error: isDbOrStorage
+            ? 'Our checkout system is temporarily unavailable due to scheduled database maintenance. Your cart items are safe. Please try again shortly or contact our store concierge.'
+            : (err.message.includes('required') ? err.message : 'An unexpected error occurred while preparing your order. Please try again in a few moments.')
+        }));
       }
     });
     return true;
@@ -260,9 +276,25 @@ export async function handlePaymentRoutes(req, res) {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(session));
       } catch (err) {
-        res.statusCode = 500;
+        console.error('[paymentRoutes /api/payments/create Error]:', err.message);
+        const isDbOrStorage = 
+          err.code === 'MISSING_DATABASE_CONFIG' ||
+          err.code === 'DURABLE_STORAGE_FAILED' ||
+          err.code === 'DURABLE_STORAGE_UNAVAILABLE' ||
+          err.code === 'DB_CONNECTION_FAILED' ||
+          err.message.includes('DATABASE_CONFIGURATION_REQUIRED') ||
+          err.message.includes('PostgreSQL') ||
+          err.message.includes('DURABLE_STORAGE');
+
+        res.statusCode = isDbOrStorage ? 503 : (err.message.includes('required') ? 400 : 500);
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ success: false, error: err.message }));
+        res.end(JSON.stringify({
+          success: false,
+          code: isDbOrStorage ? 'STORE_CHECKOUT_UNAVAILABLE' : 'CHECKOUT_ERROR',
+          error: isDbOrStorage
+            ? 'Our checkout system is temporarily unavailable due to scheduled database maintenance. Your cart items are safe. Please try again shortly or contact our store concierge.'
+            : (err.message.includes('required') ? err.message : 'An unexpected error occurred while preparing your order. Please try again in a few moments.')
+        }));
       }
     });
     return true;
@@ -304,9 +336,25 @@ export async function handlePaymentRoutes(req, res) {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(verification));
       } catch (err) {
-        res.statusCode = 500;
+        console.error('[paymentRoutes /api/payments/verify Error]:', err.message);
+        const isDbOrStorage = 
+          err.code === 'MISSING_DATABASE_CONFIG' ||
+          err.code === 'DURABLE_STORAGE_FAILED' ||
+          err.code === 'DURABLE_STORAGE_UNAVAILABLE' ||
+          err.code === 'DB_CONNECTION_FAILED' ||
+          err.message.includes('DATABASE_CONFIGURATION_REQUIRED') ||
+          err.message.includes('PostgreSQL') ||
+          err.message.includes('DURABLE_STORAGE');
+
+        res.statusCode = isDbOrStorage ? 503 : (err.message.includes('required') ? 400 : 500);
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ success: false, error: err.message }));
+        res.end(JSON.stringify({
+          success: false,
+          code: isDbOrStorage ? 'STORE_CHECKOUT_UNAVAILABLE' : 'CHECKOUT_ERROR',
+          error: isDbOrStorage
+            ? 'Our checkout system is temporarily unavailable due to scheduled database maintenance. Your cart items are safe. Please try again shortly or contact our store concierge.'
+            : (err.message.includes('required') ? err.message : 'An unexpected error occurred while preparing your order. Please try again in a few moments.')
+        }));
       }
     });
     return true;
@@ -325,9 +373,25 @@ export async function handlePaymentRoutes(req, res) {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(cancelResult));
       } catch (err) {
-        res.statusCode = 500;
+        console.error('[paymentRoutes /api/payments/cancel Error]:', err.message);
+        const isDbOrStorage = 
+          err.code === 'MISSING_DATABASE_CONFIG' ||
+          err.code === 'DURABLE_STORAGE_FAILED' ||
+          err.code === 'DURABLE_STORAGE_UNAVAILABLE' ||
+          err.code === 'DB_CONNECTION_FAILED' ||
+          err.message.includes('DATABASE_CONFIGURATION_REQUIRED') ||
+          err.message.includes('PostgreSQL') ||
+          err.message.includes('DURABLE_STORAGE');
+
+        res.statusCode = isDbOrStorage ? 503 : (err.message.includes('required') ? 400 : 500);
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ success: false, error: err.message }));
+        res.end(JSON.stringify({
+          success: false,
+          code: isDbOrStorage ? 'STORE_CHECKOUT_UNAVAILABLE' : 'CHECKOUT_ERROR',
+          error: isDbOrStorage
+            ? 'Our checkout system is temporarily unavailable due to scheduled database maintenance. Your cart items are safe. Please try again shortly or contact our store concierge.'
+            : (err.message.includes('required') ? err.message : 'An unexpected error occurred while preparing your order. Please try again in a few moments.')
+        }));
       }
     });
     return true;

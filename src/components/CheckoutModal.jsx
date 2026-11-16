@@ -11,7 +11,8 @@ import {
   verifyPaymentStatus, 
   cancelCheckout,
   isTrustedPaymentUrl,
-  formatBdtAmount 
+  formatBdtAmount,
+  isStoreMaintenanceError
 } from '../services/paymentService';
 
 export default function CheckoutModal() {
@@ -55,6 +56,7 @@ export default function CheckoutModal() {
   const [verifiedTransaction, setVerifiedTransaction] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [errorCode, setErrorCode] = useState('');
   const [pendingNotice, setPendingNotice] = useState('');
   const [manualTrxId, setManualTrxId] = useState('');
   const [isCopiedId, setIsCopiedId] = useState(false);
@@ -71,6 +73,7 @@ export default function CheckoutModal() {
     setManualTrxId('');
     setCheckoutStep('form');
     setErrorMessage('');
+    setErrorCode('');
     setPendingNotice('');
     setShowCancelConfirm(false);
   };
@@ -190,13 +193,23 @@ export default function CheckoutModal() {
         setPaymentSession(session);
         setCheckoutStep('handoff'); // Show dedicated, trustworthy payment handoff screen
       } else {
+        setErrorCode(session.code || 'GATEWAY_ERROR');
         setErrorMessage(session.error || t("Unable to initiate payment session. Please retry or choose Cash on Delivery.", "পেমেন্ট সেশন শুরু করা যায়নি।"));
         setCheckoutStep('failed');
       }
 
     } catch (err) {
       setIsSubmitting(false);
-      setErrorMessage(err.message || t("Payment initiation failed. Please check your connection or choose COD.", "পেমেন্ট শুরু করা যায়নি।"));
+      setErrorCode(err.code || '');
+      const isMaint = isStoreMaintenanceError(err);
+      if (isMaint) {
+        setErrorMessage(t(
+          "Our checkout system is temporarily unavailable due to scheduled database maintenance. Your cart items are safe. Please try again shortly or contact our store concierge.",
+          "রক্ষণাবেক্ষণের কারণে চেকআউট সাময়িকভাবে অনুপলব্ধ রয়েছে। আপনার পণ্যগুলো কার্টে সংরক্ষিত আছে। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন অথবা কাস্টমার সার্ভিসে যোগাযোগ করুন।"
+        ));
+      } else {
+        setErrorMessage(err.message || t("Payment initiation failed. Please check your connection or choose COD.", "পেমেন্ট শুরু করা যায়নি।"));
+      }
       setCheckoutStep('failed');
     }
   };
@@ -368,12 +381,22 @@ export default function CheckoutModal() {
         setCheckoutStep('pending_verification'); // COD order placed
         showToast(t(`Order ${res.order.id} confirmed with Cash on Delivery!`, `অর্ডার ${res.order.id} ক্যাশ অন ডেলিভারিতে সফল হয়েছে!`), 'success');
       } else {
+        setErrorCode(res.code || 'COD_FAILED');
         setErrorMessage(res.error || t("Failed to place Cash on Delivery order.", "ক্যাশ অন ডেলিভারিতে অর্ডার গ্রহণ করা যায়নি।"));
         setCheckoutStep('failed');
       }
     } catch (err) {
       setIsSubmitting(false);
-      setErrorMessage(err.message || t("Failed to place Cash on Delivery order.", "ক্যাশ অন ডেলিভারিতে অর্ডার গ্রহণ করা যায়নি।"));
+      setErrorCode(err.code || '');
+      const isMaint = isStoreMaintenanceError(err);
+      if (isMaint) {
+        setErrorMessage(t(
+          "Our checkout system is temporarily unavailable due to scheduled database maintenance. Your cart items are safe. Please try again shortly or contact our store concierge.",
+          "রক্ষণাবেক্ষণের কারণে চেকআউট সাময়িকভাবে অনুপলব্ধ রয়েছে। আপনার পণ্যগুলো কার্টে সংরক্ষিত আছে। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন অথবা কাস্টমার সার্ভিসে যোগাযোগ করুন।"
+        ));
+      } else {
+        setErrorMessage(err.message || t("Failed to place Cash on Delivery order.", "ক্যাশ অন ডেলিভারিতে অর্ডার গ্রহণ করা যায়নি।"));
+      }
       setCheckoutStep('failed');
     }
   };
@@ -1116,48 +1139,76 @@ export default function CheckoutModal() {
         {/* ==================================================================== */}
         {/* STEP 6: FAILED / CANCELLED PAYMENT VIEW                              */}
         {/* ==================================================================== */}
-        {checkoutStep === 'failed' && (
-          <div className="p-6 sm:p-8 text-center space-y-4 overflow-y-auto flex-1 my-auto">
-            <div className="w-14 h-14 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto shadow-xs">
-              <AlertCircle className="w-8 h-8" />
-            </div>
+        {checkoutStep === 'failed' && (() => {
+          const isMaintenance = isStoreMaintenanceError({ code: errorCode, message: errorMessage });
+          return (
+            <div 
+              role="alertdialog"
+              aria-labelledby="checkout-dialog-title"
+              aria-describedby="checkout-dialog-desc"
+              className="p-6 sm:p-8 text-center space-y-4 overflow-y-auto flex-1 my-auto"
+            >
+              <div className="w-14 h-14 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto shadow-xs">
+                <AlertCircle className="w-8 h-8" aria-hidden="true" />
+              </div>
 
-            <div className="space-y-1">
-              <h3 className="text-xl sm:text-2xl font-black text-[#062B4F]">
-                {t("Payment Was Not Completed", "পেমেন্ট সম্পন্ন হয়নি")}
-              </h3>
-              <p className="text-xs text-rose-600 max-w-md mx-auto font-medium">
-                {errorMessage || t("The payment was cancelled or timed out. Your items are safe in your shopping bag.", "পেমেন্ট সম্পন্ন করা যায়নি। পণ্যগুলো কার্টে সংরক্ষিত আছে।")}
-              </p>
-            </div>
+              <div className="space-y-1.5">
+                <h3 id="checkout-dialog-title" className="text-xl sm:text-2xl font-black text-[#062B4F]">
+                  {isMaintenance 
+                    ? t("Checkout Temporarily Unavailable", "চেকআউট সাময়িকভাবে বন্ধ আছে")
+                    : t("Payment Was Not Completed", "পেমেন্ট সম্পন্ন হয়নি")}
+                </h3>
+                <p id="checkout-dialog-desc" className="text-xs sm:text-sm text-rose-600 max-w-md mx-auto font-medium leading-relaxed">
+                  {errorMessage || (isMaintenance 
+                    ? t("Our checkout system is temporarily unavailable due to scheduled database maintenance. Your cart items are safe.", "সিস্টেম রক্ষণাবেক্ষণের কারণে চেকআউট সাময়িকভাবে বন্ধ আছে। পণ্যগুলো কার্টে সংরক্ষিত আছে।")
+                    : t("The payment was cancelled or timed out. Your items are safe in your shopping bag.", "পেমেন্ট সম্পন্ন করা যায়নি। পণ্যগুলো কার্টে সংরক্ষিত আছে।"))}
+                </p>
+                <p className="text-[11px] text-slate-500 font-normal">
+                  {t("All items in your bag and entered delivery details have been preserved.", "আপনার ব্যাগের পণ্যসমূহ এবং প্রদত্ত তথ্য সম্পূর্ণ সুরক্ষিত আছে।")}
+                </p>
+              </div>
 
-            <div className="flex flex-col gap-2 max-w-md mx-auto pt-2">
-              <button
-                onClick={handleDirectCod}
-                disabled={isSubmitting}
-                className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors"
-              >
-                <Banknote className="w-4 h-4" />
-                <span>{t("Switch to Cash on Delivery (Instant Confirmation)", "ক্যাশ অন ডেলিভারিতে অর্ডার সম্পন্ন করুন")}</span>
-              </button>
+              <div className="flex flex-col gap-2.5 max-w-md mx-auto pt-2">
+                {/* Only offer COD switch if system is NOT undergoing storewide maintenance */}
+                {!isMaintenance && (
+                  <button
+                    onClick={handleDirectCod}
+                    disabled={isSubmitting}
+                    className="w-full min-h-[44px] py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1"
+                  >
+                    <Banknote className="w-4 h-4 shrink-0" aria-hidden="true" />
+                    <span>{t("Switch to Cash on Delivery (Pay on Delivery)", "ক্যাশ অন ডেলিভারি (পণ্য হাতে পেয়ে মূল্য পরিশোধ)")}</span>
+                  </button>
+                )}
 
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setCheckoutStep('form')}
-                  className="flex-1 py-2.5 px-4 rounded-xl bg-[#062B4F] hover:bg-[#0877C9] text-white text-xs font-bold transition-colors"
-                >
-                  {t("Retry Checkout", "পুনরায় চেষ্টা করুন")}
-                </button>
-                <button
-                  onClick={handleClose}
-                  className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-bold transition-colors"
-                >
-                  {t("Close", "বন্ধ")}
-                </button>
+                <div className="flex gap-2.5">
+                  <button
+                    onClick={() => setCheckoutStep('form')}
+                    className="flex-1 min-h-[44px] py-2.5 px-4 rounded-xl bg-[#062B4F] hover:bg-[#0877C9] active:bg-[#052340] text-white text-xs sm:text-sm font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-[#0877C9] focus:ring-offset-1"
+                  >
+                    {t("Retry Checkout", "পুনরায় চেষ্টা করুন")}
+                  </button>
+                  {isMaintenance ? (
+                    <a
+                      href="https://wa.me/8801700000000?text=Hello%20AZRAQ%2C%20I%20need%20help%20placing%20my%20order"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 min-h-[44px] py-2.5 px-3 rounded-xl border border-emerald-600 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs sm:text-sm font-bold transition-colors flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    >
+                      <span>{t("WhatsApp Concierge", "হোয়াটসঅ্যাপে সহায়তা")}</span>
+                    </a>
+                  ) : null}
+                  <button
+                    onClick={handleClose}
+                    className="px-5 min-h-[44px] py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs sm:text-sm font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-1"
+                  >
+                    {t("Close", "বন্ধ")}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
       </div>
     </div>

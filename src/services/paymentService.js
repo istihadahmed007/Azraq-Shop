@@ -32,6 +32,27 @@ export function formatBdtAmount(amount) {
 }
 
 /**
+ * Helper to check if an error is a storewide maintenance / database unavailability error
+ */
+export function isStoreMaintenanceError(err) {
+  if (!err) return false;
+  const msg = (err.message || String(err)).toLowerCase();
+  const code = (err.code || '').toUpperCase();
+  return (
+    code === 'STORE_CHECKOUT_UNAVAILABLE' ||
+    code === 'MISSING_DATABASE_CONFIG' ||
+    code === 'DURABLE_STORAGE_UNAVAILABLE' ||
+    code === 'DB_CONNECTION_FAILED' ||
+    err.status === 503 ||
+    msg.includes('maintenance') ||
+    msg.includes('database') ||
+    msg.includes('postgresql') ||
+    msg.includes('durable_storage') ||
+    msg.includes('econnrefused')
+  );
+}
+
+/**
  * 1. Request dynamic checkout session from backend
  */
 export async function createCheckoutSession({ customer, items, deliveryArea, promoCode, paymentMethod = 'PAYMENTLY', notes = '' }) {
@@ -48,9 +69,15 @@ export async function createCheckoutSession({ customer, items, deliveryArea, pro
     })
   });
 
-  const data = await response.json();
+  const data = await response.json().catch(() => ({}));
   if (!response.ok || !data.success) {
-    throw new Error(data.error || 'Payment initiation failed. Please try again.');
+    const errorMsg = data.error || (response.status >= 500
+      ? 'Our checkout system is temporarily unavailable due to scheduled database maintenance. Your cart items are safe. Please try again shortly or contact our store concierge.'
+      : 'Payment initiation failed. Please try again.');
+    const err = new Error(errorMsg);
+    err.code = data.code || (response.status === 503 || response.status >= 500 ? 'STORE_CHECKOUT_UNAVAILABLE' : 'CHECKOUT_FAILED');
+    err.status = response.status;
+    throw err;
   }
 
   // Safety check on client side for returned payment URL

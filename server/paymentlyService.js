@@ -1,11 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { 
+import {
   initDb,
-  saveCheckoutAttempt, 
-  getCheckoutAttempt, 
-  getCheckoutAttemptByInvoice, 
+  saveCheckoutAttempt,
+  getCheckoutAttempt,
+  getCheckoutAttemptByInvoice,
   updateCheckoutAttempt,
   createOrderFromVerifiedPayment,
   createCodOrder,
@@ -48,7 +48,7 @@ export function isTrustedPaymentUrl(urlStr) {
     const parsed = new URL(urlStr);
     if (parsed.protocol !== 'https:') return false;
     const hostname = parsed.hostname.toLowerCase();
-    
+
     // Official Paymently hostnames
     if (hostname === 'azraq.paymently.io' || hostname.endsWith('.paymently.io')) {
       return true;
@@ -58,7 +58,7 @@ export function isTrustedPaymentUrl(urlStr) {
     try {
       const configHost = new URL(configBaseUrl).hostname.toLowerCase();
       if (hostname === configHost) return true;
-    } catch (e) {}
+    } catch (e) { }
 
     return false;
   } catch (e) {

@@ -102,7 +102,15 @@ export function getDbPool() {
 export async function initDb() {
   assertDurablePersistence();
   const p = getDbPool();
-  if (!p || isInitialized) return;
+  if (!p) {
+    if (process.env.NODE_ENV === 'production') {
+      const err = new Error('DATABASE_CONFIGURATION_REQUIRED: Production environment requires a valid PostgreSQL connection.');
+      err.code = 'MISSING_DATABASE_CONFIG';
+      throw err;
+    }
+    return;
+  }
+  if (isInitialized) return;
 
   try {
     const client = await p.connect();
@@ -250,6 +258,12 @@ export async function initDb() {
       client.release();
     }
   } catch (err) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('[PostgreSQL Init Error in Production]:', err.message);
+      const customErr = new Error(`DATABASE_INITIALIZATION_FAILED: Could not initialize database schema. ${err.message}`);
+      customErr.code = 'DB_CONNECTION_FAILED';
+      throw customErr;
+    }
     console.warn('[PostgreSQL Init Warning]:', err.message);
   }
 }
@@ -293,7 +307,16 @@ export async function saveCheckoutAttempt(attempt) {
       );
     } catch (e) {
       console.error('[DB Error saveCheckoutAttempt]:', e.message);
+      if (process.env.NODE_ENV === 'production') {
+        const err = new Error(`DURABLE_STORAGE_FAILED: Unable to record checkout attempt. ${e.message}`);
+        err.code = 'DURABLE_STORAGE_FAILED';
+        throw err;
+      }
     }
+  } else if (process.env.NODE_ENV === 'production') {
+    const err = new Error('DURABLE_STORAGE_UNAVAILABLE: Database connection pool is unavailable in production.');
+    err.code = 'DURABLE_STORAGE_UNAVAILABLE';
+    throw err;
   }
 
   memoryStore.checkout_attempts.set(record.id, record);
@@ -849,6 +872,10 @@ export async function createOrderFromVerifiedPayment({
     } finally {
       client.release();
     }
+  } else if (process.env.NODE_ENV === 'production') {
+    const err = new Error('DURABLE_STORAGE_UNAVAILABLE: Database connection pool is unavailable in production.');
+    err.code = 'DURABLE_STORAGE_UNAVAILABLE';
+    throw err;
   }
 
   // Also maintain in memoryStore
@@ -1024,6 +1051,10 @@ export async function createCodOrder({ checkoutAttempt }) {
     } finally {
       client.release();
     }
+  } else if (process.env.NODE_ENV === 'production') {
+    const err = new Error('DURABLE_STORAGE_UNAVAILABLE: Database connection pool is unavailable in production.');
+    err.code = 'DURABLE_STORAGE_UNAVAILABLE';
+    throw err;
   }
 
   const items = Array.isArray(checkoutAttempt.items_snapshot) ? checkoutAttempt.items_snapshot : [];
@@ -1210,6 +1241,10 @@ export async function createOrderWithManualTrx({
     } finally {
       client.release();
     }
+  } else if (process.env.NODE_ENV === 'production') {
+    const err = new Error('DURABLE_STORAGE_UNAVAILABLE: Database connection pool is unavailable in production.');
+    err.code = 'DURABLE_STORAGE_UNAVAILABLE';
+    throw err;
   }
 
   // Fallback in-memory

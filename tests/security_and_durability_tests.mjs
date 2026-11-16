@@ -9,7 +9,17 @@
 
 import assert from 'assert';
 import { verifyAdminAuth } from '../server/adminAuth.js';
-import { assertDurablePersistence, processRefund, initDb, saveCheckoutAttempt, createOrderFromVerifiedPayment } from '../server/db.js';
+import { 
+  assertDurablePersistence, 
+  processRefund, 
+  initDb, 
+  saveCheckoutAttempt, 
+  createOrderFromVerifiedPayment,
+  createCodOrder,
+  getCheckoutAttempt,
+  getAllOrders
+} from '../server/db.js';
+import { isStoreMaintenanceError } from '../src/services/paymentService.js';
 import { getStoredItem, setStoredItem, validateCartItems, validateFavoritesList, validateOrdersList } from '../src/utils/storage.js';
 
 let passed = 0;
@@ -112,6 +122,159 @@ await runTest('Production Invariant: assertDurablePersistence fails closed if DA
     if (prevDbUrl !== undefined) process.env.DATABASE_URL = prevDbUrl;
     else delete process.env.DATABASE_URL;
   }
+});
+
+await runTest('Production Invariant: saveCheckoutAttempt fails closed if pool unavailable in production', async () => {
+  const prevNodeEnv = process.env.NODE_ENV;
+  const prevDbUrl = process.env.DATABASE_URL;
+  process.env.NODE_ENV = 'production';
+  delete process.env.DATABASE_URL;
+
+  try {
+    let threw = false;
+    try {
+      await saveCheckoutAttempt({
+        id: 'AZQ-CHK-TEST-FAIL-CLOSED',
+        customer_name: 'Test Customer',
+        customer_phone: '01711000000',
+        shipping_address: 'Banani, Dhaka',
+        items_snapshot: [{ id: 'ITEM-1', name: 'Shirt', quantity: 1, unit_price: 1000, total_price: 1000 }],
+        subtotal: 1000,
+        delivery_fee: 70,
+        total_payable: 1070
+      });
+    } catch (e) {
+      threw = true;
+      assert.ok(e.code === 'MISSING_DATABASE_CONFIG' || e.code === 'DURABLE_STORAGE_UNAVAILABLE');
+    }
+    assert.ok(threw, 'saveCheckoutAttempt must fail closed in production without durable database');
+  } finally {
+    process.env.NODE_ENV = prevNodeEnv;
+    if (prevDbUrl !== undefined) process.env.DATABASE_URL = prevDbUrl;
+    else delete process.env.DATABASE_URL;
+  }
+});
+
+await runTest('Production Invariant: createCodOrder fails closed if pool unavailable in production', async () => {
+  const prevNodeEnv = process.env.NODE_ENV;
+  const prevDbUrl = process.env.DATABASE_URL;
+  process.env.NODE_ENV = 'production';
+  delete process.env.DATABASE_URL;
+
+  try {
+    let threw = false;
+    try {
+      await createCodOrder({
+        checkoutAttempt: {
+          id: 'AZQ-CHK-COD-FAIL',
+          customer_name: 'COD Test',
+          customer_phone: '01711223344',
+          shipping_address: 'Dhanmondi, Dhaka',
+          items_snapshot: [{ id: 'ITEM-1', name: 'Sneakers', quantity: 1, unit_price: 2500, total_price: 2500 }],
+          subtotal: 2500,
+          delivery_fee: 70,
+          total_payable: 2570
+        }
+      });
+    } catch (e) {
+      threw = true;
+      assert.ok(e.code === 'MISSING_DATABASE_CONFIG' || e.code === 'DURABLE_STORAGE_UNAVAILABLE');
+    }
+    assert.ok(threw, 'createCodOrder must fail closed in production without durable database');
+  } finally {
+    process.env.NODE_ENV = prevNodeEnv;
+    if (prevDbUrl !== undefined) process.env.DATABASE_URL = prevDbUrl;
+    else delete process.env.DATABASE_URL;
+  }
+});
+
+await runTest('Durable COD Order: Creates order marked PENDING_COD with payment due upon delivery', async () => {
+  await initDb();
+  const checkoutId = `AZQ-CHK-COD-DURABLE-${Date.now().toString(36)}`;
+  const attempt = await saveCheckoutAttempt({
+    id: checkoutId,
+    customer_name: 'Rafiqul Islam',
+    customer_phone: '01711998877',
+    shipping_address: 'Uttara Sector 3, Dhaka',
+    items_snapshot: [{ id: 'ITEM-1', name: 'Cotton Panjabi', quantity: 1, unit_price: 2200, total_price: 2200 }],
+    subtotal: 2200,
+    delivery_fee: 70,
+    discount: 0,
+    total_payable: 2270,
+    payment_method: 'COD',
+    status: 'INITIATED'
+  });
+
+  const codRes = await createCodOrder({ checkoutAttempt: attempt });
+  assert.ok(codRes.order.id.startsWith('AZQ-ORD-'));
+  assert.strictEqual(codRes.order.payment_method, 'COD');
+  assert.strictEqual(codRes.order.payment_status, 'PENDING_COD', 'COD must strictly be marked PENDING_COD, never PAID');
+  assert.strictEqual(codRes.order.fulfillment_status, 'Processing');
+  assert.strictEqual(codRes.order.currency, 'BDT');
+});
+
+await runTest('Payment Attempt vs Paid Order Separation: Checkout attempt does not create order until verified', async () => {
+  await initDb();
+  const checkoutId = `AZQ-CHK-SEPARATE-${Date.now().toString(36)}`;
+  const attempt = await saveCheckoutAttempt({
+    id: checkoutId,
+    customer_name: 'Zubair Hossain',
+    customer_phone: '01811223344',
+    shipping_address: 'Mirpur 10, Dhaka',
+    items_snapshot: [{ id: 'ITEM-2', name: 'Leather Belt', quantity: 1, unit_price: 850, total_price: 850 }],
+    subtotal: 850,
+    delivery_fee: 70,
+    discount: 0,
+    total_payable: 920,
+    payment_method: 'PAYMENTLY',
+    status: 'INITIATED'
+  });
+
+  const retrieved = await getCheckoutAttempt(checkoutId);
+  assert.strictEqual(retrieved.status, 'INITIATED');
+  assert.ok(!retrieved.order_id, 'Initiated attempt must not have order_id');
+
+  const orders = await getAllOrders();
+  const matchedOrder = orders.find(o => o.checkout_attempt_id === checkoutId);
+  assert.strictEqual(matchedOrder, undefined, 'Must not create order in orders table before payment is confirmed');
+});
+
+await runTest('Store Maintenance Error Sanitizer: Accurately classifies DB errors vs payment rejections', () => {
+  assert.strictEqual(isStoreMaintenanceError(new Error('DATABASE_CONFIGURATION_REQUIRED: Missing DATABASE_URL')), true);
+  assert.strictEqual(isStoreMaintenanceError({ code: 'STORE_CHECKOUT_UNAVAILABLE', message: 'Database down' }), true);
+  assert.strictEqual(isStoreMaintenanceError({ code: 'DURABLE_STORAGE_UNAVAILABLE', message: 'Pool missing' }), true);
+  assert.strictEqual(isStoreMaintenanceError({ status: 503, message: 'Maintenance in progress' }), true);
+  assert.strictEqual(isStoreMaintenanceError(new Error('Card was declined by bank')), false, 'User payment decline is not store maintenance');
+  assert.strictEqual(isStoreMaintenanceError(new Error('Payment session cancelled by user')), false, 'User cancellation is not store maintenance');
+});
+
+await runTest('Payment Retry Behavior: Preserves checkout details and allows retry safely', async () => {
+  await initDb();
+  const checkoutId = `AZQ-CHK-RETRY-${Date.now().toString(36)}`;
+  const original = await saveCheckoutAttempt({
+    id: checkoutId,
+    customer_name: 'Farhan Ahmed',
+    customer_phone: '01911223344',
+    shipping_address: 'Bashundhara R/A, Dhaka',
+    items_snapshot: [{ id: 'ITEM-3', name: 'Polo Shirt', quantity: 2, unit_price: 900, total_price: 1800 }],
+    subtotal: 1800,
+    delivery_fee: 70,
+    discount: 0,
+    total_payable: 1870,
+    status: 'INITIATED'
+  });
+
+  assert.strictEqual(original.items_snapshot.length, 1);
+  assert.strictEqual(original.total_payable, 1870);
+
+  // Customer retries checkout with same ID or updated info
+  const updated = await saveCheckoutAttempt({
+    ...original,
+    status: 'AWAITING_PAYMENT'
+  });
+  assert.strictEqual(updated.status, 'AWAITING_PAYMENT');
+  assert.strictEqual(updated.customer_phone, '01911223344');
+  assert.strictEqual(updated.shipping_address, 'Bashundhara R/A, Dhaka');
 });
 
 // 3. Admin Refund Processing & Audit History
