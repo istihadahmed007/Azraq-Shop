@@ -14,7 +14,8 @@ import {
   getAllTransactions,
   recordWebhookLog,
   isInvoiceFulfilled,
-  getOrderWithItems
+  getOrderWithItems,
+  processRefund
 } from './db.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -737,3 +738,5 @@ export async function getAdminTransactions() {
   await initDb();
   return await getAllTransactions();
 }
+
+export { processRefund };

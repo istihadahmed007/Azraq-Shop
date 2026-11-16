@@ -9,8 +9,8 @@ function azraqApiPlugin() {
     name: 'azraq-api-endpoints',
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
-        // 1. Paymently Gateway API & Checkout Session Endpoints & Order Tracking
-        if (req.url?.startsWith('/api/payments') || req.url?.startsWith('/api/orders') || req.url?.startsWith('/payment-checkout')) {
+        // 1. Paymently Gateway API & Checkout Session Endpoints & Order Tracking & Admin API
+        if (req.url?.startsWith('/api/payments') || req.url?.startsWith('/api/orders') || req.url?.startsWith('/api/admin') || req.url?.startsWith('/payment-checkout')) {
           const handled = await handlePaymentRoutes(req, res);
           if (handled) return;
         }
@@ -56,5 +56,20 @@ export default defineConfig({
   server: {
     port: 3000,
     open: false
+  },
+  build: {
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+            return 'vendor-react';
+          }
+          if (id.includes('node_modules/lucide-react')) {
+            return 'vendor-icons';
+          }
+        }
+      }
+    }
   }
 });

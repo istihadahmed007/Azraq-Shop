@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { ShopProvider, useShop } from './context/ShopContext';
 import NavigationDock from './components/NavigationDock';
 import Header from './components/Header';
@@ -13,17 +13,19 @@ import ProductDemonstrationSection from './components/ProductDemonstrationSectio
 import BrandValuePanel from './components/BrandValuePanel';
 import StatsRibbon from './components/StatsRibbon';
 import EditorialCtaSection from './components/EditorialCtaSection';
-import CollectionsPage from './components/CollectionsPage';
-import CollectionDetailPage from './components/CollectionDetailPage';
 import Footer from './components/Footer';
-import ProductDetailModal from './components/ProductDetailModal';
 import CartDrawer from './components/CartDrawer';
-import CheckoutModal from './components/CheckoutModal';
-import OrderTrackingModal from './components/OrderTrackingModal';
-import AdminPanel from './components/AdminPanel';
-import BrandAssetsModal from './components/BrandAssetsModal';
-import VisualSearchModal from './components/VisualSearchModal';
 import Toast from './components/Toast';
+
+// Lazy-loaded routes & secondary overlays to optimize initial bundle size & TTI
+const CollectionsPage = lazy(() => import('./components/CollectionsPage'));
+const CollectionDetailPage = lazy(() => import('./components/CollectionDetailPage'));
+const ProductDetailModal = lazy(() => import('./components/ProductDetailModal'));
+const CheckoutModal = lazy(() => import('./components/CheckoutModal'));
+const OrderTrackingModal = lazy(() => import('./components/OrderTrackingModal'));
+const AdminPanel = lazy(() => import('./components/AdminPanel'));
+const BrandAssetsModal = lazy(() => import('./components/BrandAssetsModal'));
+const VisualSearchModal = lazy(() => import('./components/VisualSearchModal'));
 
 function StorefrontContent() {
   const { currentView } = useShop();
@@ -70,23 +72,27 @@ function StorefrontContent() {
           </>
         )}
 
-        {currentView === 'collections' && <CollectionsPage />}
-
-        {currentView === 'collection-detail' && <CollectionDetailPage />}
+        <Suspense fallback={null}>
+          {currentView === 'collections' && <CollectionsPage />}
+          {currentView === 'collection-detail' && <CollectionDetailPage />}
+        </Suspense>
       </main>
 
       {/* Website Footer (Reference Match: Top 4-Feature Assurance Strip + Dark Navy Glassy Footer) */}
       <Footer />
 
       {/* Interactive Modals & Overlays */}
-      <ProductDetailModal />
       <CartDrawer />
-      <CheckoutModal />
-      <OrderTrackingModal />
-      <AdminPanel />
-      <BrandAssetsModal />
-      <VisualSearchModal />
       <Toast />
+
+      <Suspense fallback={null}>
+        <ProductDetailModal />
+        <CheckoutModal />
+        <OrderTrackingModal />
+        <AdminPanel />
+        <BrandAssetsModal />
+        <VisualSearchModal />
+      </Suspense>
 
     </div>
   );

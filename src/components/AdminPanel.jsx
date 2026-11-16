@@ -20,7 +20,15 @@ import {
   CreditCard
 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
-import { fetchTransactions, verifyPaymentStatus, requestRefund, fetchGatewayStatus } from '../services/paymentService';
+import { 
+  fetchTransactions, 
+  fetchOrders,
+  verifyPaymentStatus, 
+  requestRefund, 
+  fetchGatewayStatus,
+  authenticateAdmin,
+  updateOrderStatusOnServer
+} from '../services/paymentService';
 
 export default function AdminPanel() {
   const { 
@@ -49,31 +57,56 @@ export default function AdminPanel() {
   const [editPrice, setEditPrice] = useState('');
   const [editStock, setEditStock] = useState('');
 
-  // Admin authentication state
+  // Admin authentication state (backed by server authorization)
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return typeof window !== 'undefined' && sessionStorage.getItem('azraq_admin_auth') === 'true';
+    return typeof window !== 'undefined' && Boolean(sessionStorage.getItem('azraq_admin_key'));
   });
   const [passcode, setPasscode] = useState('');
   const [authError, setAuthError] = useState('');
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
 
-  const handleAdminLogin = (e) => {
+  const handleAdminLogin = async (e) => {
     e.preventDefault();
-    if (passcode.trim() === 'azraq2026' || passcode.trim() === 'azraqadmin') {
-      sessionStorage.setItem('azraq_admin_auth', 'true');
-      setIsAuthenticated(true);
-      setAuthError('');
-      showToast(t("Admin access authenticated successfully", "অ্যাডমিন অ্যাক্সেস সফল"), 'success');
-    } else {
-      setAuthError(t("Invalid passcode. Please enter the authorized administrator key.", "ভুল পাসকোড। অনুমোদিত কি দিন।"));
+    const cleanKey = passcode.trim();
+    if (!cleanKey) {
+      setAuthError(t("Please enter the administrator key.", "অ্যাডমিন কি দিন।"));
+      return;
     }
+
+    setIsAuthenticating(true);
+    setAuthError('');
+    try {
+      const res = await authenticateAdmin(cleanKey);
+      if (res.success) {
+        sessionStorage.setItem('azraq_admin_key', cleanKey);
+        setIsAuthenticated(true);
+        setAuthError('');
+        showToast(t("Admin access authenticated successfully", "অ্যাডমিন অ্যাক্সেস সফল"), 'success');
+        reloadAdminData();
+      } else {
+        setAuthError(res.error || t("Invalid administrator key. Access denied.", "ভুল অ্যাডমিন কি। অ্যাক্সেস প্রত্যাখ্যাত।"));
+      }
+    } catch (err) {
+      setAuthError(t("Unable to reach authentication server. Please check your connection.", "সার্ভারে যোগাযোগ করা যায়নি।"));
+    } finally {
+      setIsAuthenticating(false);
+    }
+  };
+
+  const handleAdminLogout = () => {
+    sessionStorage.removeItem('azraq_admin_key');
+    setIsAuthenticated(false);
+    setPasscode('');
+    showToast(t("Administrator session logged out", "অ্যাডমিন লগআউট সম্পন্ন"), 'info');
   };
 
   const reloadAdminData = async () => {
     setIsVerifyingTxn(true);
     try {
-      const [txns, cfg] = await Promise.all([
+      const [txns, cfg, serverOrders] = await Promise.all([
         fetchTransactions(),
-        fetchGatewayStatus()
+        fetchGatewayStatus(),
+        fetchOrders()
       ]);
       setPaymentTransactions(txns || []);
       setGatewayConfig(cfg);
@@ -203,27 +236,29 @@ export default function AdminPanel() {
             <div>
               <h3 className="text-xl font-black text-[#062B4F]">Admin Authentication Required</h3>
               <p className="text-xs text-[#062B4F]/60 mt-1 leading-relaxed">
-                Please enter the store administrator passcode to manage inventory, customer orders, and payment records.
+                Enter your authorized store administrator key to manage operations, orders, and payment records.
               </p>
             </div>
             <form onSubmit={handleAdminLogin} className="space-y-3 pt-2">
               <input
                 type="password"
-                placeholder="Enter passcode (azraq2026)"
+                placeholder="Enter Administrator Key"
                 value={passcode}
                 onChange={(e) => {
                   setPasscode(e.target.value);
                   setAuthError('');
                 }}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-xs font-mono text-center focus:outline-none focus:border-[#0877C9] shadow-inner"
+                disabled={isAuthenticating}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-xs font-mono text-center focus:outline-none focus:border-[#0877C9] shadow-inner disabled:opacity-50"
                 autoFocus
               />
               {authError && <p className="text-xs text-rose-600 font-semibold">{authError}</p>}
               <button
                 type="submit"
-                className="w-full py-2.5 rounded-xl bg-[#062B4F] hover:bg-[#0877C9] text-white text-xs font-black shadow-md transition-all active:scale-95"
+                disabled={isAuthenticating}
+                className="w-full py-2.5 rounded-xl bg-[#062B4F] hover:bg-[#0877C9] text-white text-xs font-black shadow-md transition-all active:scale-95 disabled:opacity-50"
               >
-                Unlock Operations Portal
+                {isAuthenticating ? 'Verifying with Server...' : 'Unlock Operations Portal'}
               </button>
             </form>
           </div>
@@ -625,11 +660,16 @@ export default function AdminPanel() {
                       <div className="flex items-center gap-2">
                         <select
                           value={order.order_status || order.status || 'Processing'}
-                          onChange={(e) => {
+                          onChange={async (e) => {
                             const next = e.target.value;
                             if (window.confirm(`Are you sure you want to change order ${order.id} status to "${next}"?`)) {
                               updateOrderStatus(order.id, next);
-                              showToast(`Order status updated to ${next}`, 'success');
+                              const res = await updateOrderStatusOnServer({ orderId: order.id, status: next });
+                              if (res?.success) {
+                                showToast(`Order status updated to ${next}`, 'success');
+                              } else {
+                                showToast(res?.error || `Failed to sync status with server`, 'error');
+                              }
                             }
                           }}
                           className="px-2.5 py-1 rounded-lg border border-[#D9F0FF] text-xs font-bold text-[#062B4F] bg-white"
@@ -770,10 +810,12 @@ export default function AdminPanel() {
                                   onClick={async () => {
                                     if (confirm(`Process refund for order ${txn.order_id} (৳${txn.amount})?`)) {
                                       const res = await requestRefund({ orderId: txn.order_id, amount: txn.amount });
-                                      if (res.success) {
+                                      if (res?.success) {
                                         showToast(`Order ${txn.order_id} marked as Refunded!`, 'success');
                                         const txns = await fetchTransactions();
                                         setPaymentTransactions(txns || []);
+                                      } else {
+                                        showToast(res?.error || 'Refund request failed', 'error');
                                       }
                                     }
                                   }}

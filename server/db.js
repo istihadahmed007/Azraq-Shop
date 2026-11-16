@@ -70,6 +70,14 @@ function hydrateFallbackStore() {
 // Hydrate on module load
 hydrateFallbackStore();
 
+export function assertDurablePersistence() {
+  if (process.env.NODE_ENV === 'production' && (!process.env.DATABASE_URL || process.env.DATABASE_URL.length < 10)) {
+    const err = new Error('DATABASE_CONFIGURATION_REQUIRED: Production environment requires a valid PostgreSQL DATABASE_URL.');
+    err.code = 'MISSING_DATABASE_CONFIG';
+    throw err;
+  }
+}
+
 export function getDbPool() {
   if (!pool && process.env.DATABASE_URL) {
     try {
@@ -92,6 +100,7 @@ export function getDbPool() {
 }
 
 export async function initDb() {
+  assertDurablePersistence();
   const p = getDbPool();
   if (!p || isInitialized) return;
 
@@ -249,6 +258,7 @@ export async function initDb() {
  * 1. Save a new checkout attempt before initiating any gateway action
  */
 export async function saveCheckoutAttempt(attempt) {
+  assertDurablePersistence();
   const p = getDbPool();
   const now = new Date().toISOString();
   const record = {
@@ -711,6 +721,7 @@ export async function createOrderFromVerifiedPayment({
   senderNumber = null,
   verifiedAt = null
 }) {
+  assertDurablePersistence();
   const now = new Date().toISOString();
   const verificationTime = verifiedAt || now;
   const orderId = `AZQ-ORD-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
@@ -906,6 +917,7 @@ export async function createOrderFromVerifiedPayment({
  * ONLY created upon explicit user confirmation of COD!
  */
 export async function createCodOrder({ checkoutAttempt }) {
+  assertDurablePersistence();
   const now = new Date().toISOString();
   const orderId = `AZQ-ORD-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
   const trackingToken = generateTrackingToken();
@@ -1064,6 +1076,7 @@ export async function createOrderWithManualTrx({
   transactionId,
   paymentMethod = 'Paymently Portal'
 }) {
+  assertDurablePersistence();
   const now = new Date().toISOString();
   const orderId = `AZQ-ORD-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
   const trackingToken = generateTrackingToken();
@@ -1316,9 +1329,99 @@ export async function getOrderWithItems(orderId) {
 }
 
 /**
- * 10. Record Webhook Audit Log
+ * 10. Process a Genuine Order Refund
+ */
+export async function processRefund({ orderId, amount = null, reason = 'Customer refund requested', actorSource = 'ADMIN' }) {
+  assertDurablePersistence();
+  const now = new Date().toISOString();
+  const p = getDbPool();
+
+  const allTxns = await getAllTransactions();
+  const txn = allTxns.find(t => t.order_id === orderId);
+
+  const refundAmt = Number(amount || txn?.amount || 0);
+
+  if (p) {
+    try {
+      if (txn) {
+        await p.query(
+          `UPDATE payment_transactions SET
+            status = 'REFUNDED',
+            refund_status = 'PROCESSED',
+            refund_amount = $2,
+            refund_reason = $3,
+            refunded_at = $4,
+            updated_at = $4
+           WHERE id = $1`,
+          [txn.id, refundAmt, reason, now]
+        );
+      }
+      await p.query(
+        `UPDATE orders SET
+          payment_status = 'REFUNDED',
+          fulfillment_status = 'Cancelled',
+          order_status = 'Cancelled',
+          updated_at = $2
+         WHERE id = $1`,
+        [orderId, now]
+      );
+    } catch (e) {
+      console.error('[DB Error processRefund]:', e.message);
+    }
+  }
+
+  if (txn) {
+    txn.status = 'REFUNDED';
+    txn.refund_status = 'PROCESSED';
+    txn.refund_amount = refundAmt;
+    txn.refund_reason = reason;
+    txn.refunded_at = now;
+    txn.updated_at = now;
+    memoryStore.payment_transactions.set(txn.id, txn);
+  }
+
+  const order = memoryStore.orders.get(orderId);
+  if (order) {
+    order.payment_status = 'REFUNDED';
+    order.fulfillment_status = 'Cancelled';
+    order.order_status = 'Cancelled';
+    order.updated_at = now;
+    memoryStore.orders.set(orderId, order);
+  }
+  persistFallbackStore();
+
+  await recordOrderStatusHistory({
+    orderId,
+    statusType: 'payment',
+    previousStatus: order?.payment_status || 'PAID',
+    newStatus: 'REFUNDED',
+    actorSource,
+    notes: `Refund processed: ৳${refundAmt}. Reason: ${reason}`
+  });
+
+  await recordOrderStatusHistory({
+    orderId,
+    statusType: 'fulfillment',
+    previousStatus: order?.fulfillment_status || 'Processing',
+    newStatus: 'Cancelled',
+    actorSource,
+    notes: `Order cancelled due to processed refund`
+  });
+
+  return {
+    success: true,
+    orderId,
+    refundAmount: refundAmt,
+    status: 'REFUNDED',
+    message: `Refund of ৳${refundAmt} BDT processed for order ${orderId}`
+  };
+}
+
+/**
+ * 11. Record Webhook Audit Log
  */
 export async function recordWebhookLog({ invoiceId, eventType, payload, isVerified = false }) {
+  assertDurablePersistence();
   const p = getDbPool();
   const id = `WH-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
   const now = new Date().toISOString();

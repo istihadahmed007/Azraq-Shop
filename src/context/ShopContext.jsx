@@ -1,37 +1,26 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import initialCollectionsData from '../data/collections.json';
-import initialProductsData from '../data/central_products.json';
+import initialProductsData from '../data/initial_catalog.json';
 import initialReconciliationReport from '../data/reconciliation_report.json';
+import { 
+  getStoredItem, 
+  setStoredItem, 
+  validateCartItems, 
+  validateFavoritesList, 
+  validateOrdersList 
+} from '../utils/storage.js';
 
 const ShopContext = createContext();
-
-const CATALOG_VERSION = 'v4_high_res_photography';
 
 export function ShopProvider({ children }) {
   // Collections state (18 EasyDrop categories)
   const [collections, setCollections] = useState(() => {
-    const version = localStorage.getItem('azraq_catalog_version');
-    if (version !== CATALOG_VERSION) {
-      localStorage.setItem('azraq_catalog_version', CATALOG_VERSION);
-      localStorage.removeItem('azraq_collections');
-      localStorage.removeItem('azraq_products_catalog');
-      localStorage.removeItem('azraq_reconciliation_report');
-      return initialCollectionsData.collections;
-    }
-    const saved = localStorage.getItem('azraq_collections');
-    return saved ? JSON.parse(saved) : initialCollectionsData.collections;
+    return getStoredItem('collections', initialCollectionsData.collections);
   });
 
-  // Central unique products database (1,206 EasyDrop products with strict retail pricing & original descriptions)
+  // Fast-boot initial products catalog (progressive hydration loads full 1,206 catalog asynchronously)
   const [products, setProducts] = useState(() => {
-    const saved = localStorage.getItem('azraq_products_catalog');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed && parsed.length === initialProductsData.products.length) return parsed;
-      } catch (e) {}
-    }
-    return initialProductsData.products;
+    return initialProductsData.products || [];
   });
 
   // Reconciliation audit report
@@ -47,40 +36,47 @@ export function ShopProvider({ children }) {
   const [syncStatus, setSyncStatus] = useState({
     lastSynced: initialProductsData.synced_at,
     totalCollections: initialCollectionsData.collections.length,
-    totalUniqueProducts: initialProductsData.products.length,
+    totalUniqueProducts: initialProductsData.total_catalog_count || initialProductsData.products.length,
     isSyncing: false
   });
 
-  // Cart state
+  // Asynchronously hydrate full catalog without blocking initial paint or bloating initial bundle
+  useEffect(() => {
+    let isMounted = true;
+    fetch('/data/central_products.json')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (isMounted && data?.products && Array.isArray(data.products) && data.products.length > 0) {
+          setProducts(data.products);
+          setSyncStatus(prev => ({
+            ...prev,
+            lastSynced: data.synced_at || prev.lastSynced,
+            totalUniqueProducts: data.products.length
+          }));
+        }
+      })
+      .catch(err => {
+        console.warn('[Catalog Hydration Notice] Running with initial catalog:', err.message);
+      });
+    return () => { isMounted = false; };
+  }, []);
+
+  // Cart state with validated resilient storage
   const [cart, setCart] = useState(() => {
-    const saved = localStorage.getItem('azraq_cart');
-    return saved ? JSON.parse(saved) : [];
+    return getStoredItem('cart', [], validateCartItems);
   });
 
   const [deliveryArea, setDeliveryArea] = useState('inside'); // 'inside' = ৳70, 'outside' = ৳130
   const [appliedPromo, setAppliedPromo] = useState(null);
 
-  // Favorites / Wishlist
+  // Favorites / Wishlist with validated resilient storage
   const [favorites, setFavorites] = useState(() => {
-    const saved = localStorage.getItem('azraq_favorites');
-    return saved ? JSON.parse(saved) : ['AZQ-001', 'AZQ-003', 'AZQ-021'];
+    return getStoredItem('favorites', ['AZQ-001', 'AZQ-003', 'AZQ-021'], validateFavoritesList);
   });
 
-  // Orders pipeline (persisted in localStorage, production starts empty)
+  // Orders pipeline (persisted in client storage for offline order history convenience)
   const [orders, setOrders] = useState(() => {
-    const saved = localStorage.getItem('azraq_orders');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        // Exclude legacy mock orders
-        if (Array.isArray(parsed)) {
-          return parsed.filter(o => o && o.customer && o.customer.name !== 'Shakil Ahmed' && o.customer.name !== 'Nusrat Jahan');
-        }
-      } catch (e) {
-        return [];
-      }
-    }
-    return [];
+    return getStoredItem('orders', [], validateOrdersList);
   });
 
   // UI States
@@ -95,25 +91,21 @@ export function ShopProvider({ children }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [toast, setToast] = useState(null);
 
-  // Sync to localStorage
+  // Safe, versioned, quota-resilient storage sync
   useEffect(() => {
-    localStorage.setItem('azraq_collections', JSON.stringify(collections));
+    setStoredItem('collections', collections);
   }, [collections]);
 
   useEffect(() => {
-    localStorage.setItem('azraq_products_catalog', JSON.stringify(products));
-  }, [products]);
-
-  useEffect(() => {
-    localStorage.setItem('azraq_cart', JSON.stringify(cart));
+    setStoredItem('cart', cart);
   }, [cart]);
 
   useEffect(() => {
-    localStorage.setItem('azraq_favorites', JSON.stringify(favorites));
+    setStoredItem('favorites', favorites);
   }, [favorites]);
 
   useEffect(() => {
-    localStorage.setItem('azraq_orders', JSON.stringify(orders));
+    setStoredItem('orders', orders);
   }, [orders]);
 
   // Toast trigger

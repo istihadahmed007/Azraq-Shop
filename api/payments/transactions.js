@@ -1,4 +1,5 @@
 import { getAdminTransactions } from '../../server/paymentlyService.js';
+import { verifyAdminAuth } from '../../server/adminAuth.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -10,19 +11,25 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // Authorization check for admin transaction audit
-  const adminKey = req.headers['x-admin-key'] || (req.headers.authorization ? req.headers.authorization.replace(/^Bearer\s+/i, '') : null);
-  const expectedKey = process.env.ADMIN_API_KEY || process.env.ADMIN_SECRET || 'azraq_secure_admin';
+  if (req.method !== 'GET') {
+    return res.status(405).json({ success: false, error: 'Method Not Allowed' });
+  }
 
-  // If in production and adminKey does not match, restrict
-  if (process.env.NODE_ENV === 'production' && process.env.ADMIN_API_KEY && adminKey !== expectedKey) {
-    return res.status(401).json({ success: false, error: 'Unauthorized administrative access.' });
+  // Strict Admin Authentication Check
+  const auth = verifyAdminAuth(req);
+  if (!auth.authenticated) {
+    return res.status(auth.statusCode || 401).json({
+      success: false,
+      code: 'UNAUTHORIZED_ADMIN',
+      error: auth.error
+    });
   }
 
   try {
     const transactions = await getAdminTransactions();
     return res.status(200).json({ success: true, transactions });
   } catch (err) {
+    console.error('[API /api/payments/transactions Error]:', err.message);
     return res.status(500).json({ success: false, error: err.message });
   }
 }

@@ -2,6 +2,22 @@
   "version": 2,
   "rewrites": [
     {
+      "source": "/api/admin/auth",
+      "destination": "/api/admin/auth"
+    },
+    {
+      "source": "/api/orders/track",
+      "destination": "/api/orders/track"
+    },
+    {
+      "source": "/api/orders/update-status",
+      "destination": "/api/orders/update-status"
+    },
+    {
+      "source": "/api/orders",
+      "destination": "/api/orders/index"
+    },
+    {
       "source": "/api/payments/create",
       "destination": "/api/payments/create"
     },
@@ -18,6 +34,10 @@
       "destination": "/api/payments/cancel"
     },
     {
+      "source": "/api/payments/refund",
+      "destination": "/api/payments/refund"
+    },
+    {
       "source": "/api/payments/webhook",
       "destination": "/api/payments/webhook"
     },
@@ -26,12 +46,8 @@
       "destination": "/api/payments/transactions"
     },
     {
-      "source": "/api/orders/track",
-      "destination": "/api/orders/track"
-    },
-    {
-      "source": "/api/orders",
-      "destination": "/api/orders/index"
+      "source": "/api/search-by-image",
+      "destination": "/api/search-by-image"
     }
   ]
 }

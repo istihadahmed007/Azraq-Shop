@@ -131,12 +131,44 @@ export async function fetchGatewayStatus() {
   };
 }
 
+function getAdminAuthHeaders(adminKey = null) {
+  const key = adminKey || (typeof window !== 'undefined' ? sessionStorage.getItem('azraq_admin_key') : null);
+  const headers = { 'Content-Type': 'application/json' };
+  if (key) {
+    headers['x-admin-key'] = key;
+    headers['Authorization'] = `Bearer ${key}`;
+  }
+  return headers;
+}
+
 /**
- * 5. Fetch genuine transactions (for Admin Dashboard)
+ * 5. Verify Administrator Credentials with Server
  */
-export async function fetchTransactions() {
+export async function authenticateAdmin(adminKey) {
   try {
-    const response = await fetch(`${API_BASE}/api/payments/transactions`);
+    const response = await fetch(`${API_BASE}/api/admin/auth`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-admin-key': adminKey,
+        'Authorization': `Bearer ${adminKey}`
+      },
+      body: JSON.stringify({ adminKey })
+    });
+    const data = await response.json();
+    return { success: response.ok && data.success, error: data.error };
+  } catch (e) {
+    return { success: false, error: e.message || 'Authentication service unreachable.' };
+  }
+}
+
+/**
+ * 6. Fetch genuine transactions (for Admin Dashboard, Requires Server Auth)
+ */
+export async function fetchTransactions(adminKey = null) {
+  try {
+    const headers = getAdminAuthHeaders(adminKey);
+    const response = await fetch(`${API_BASE}/api/payments/transactions`, { headers });
     if (response.ok) {
       const data = await response.json();
       return data.transactions || [];
@@ -148,11 +180,12 @@ export async function fetchTransactions() {
 }
 
 /**
- * 6. Fetch genuine orders (for Admin Dashboard)
+ * 7. Fetch genuine orders (for Admin Dashboard, Requires Server Auth)
  */
-export async function fetchOrders() {
+export async function fetchOrders(adminKey = null) {
   try {
-    const response = await fetch(`${API_BASE}/api/orders`);
+    const headers = getAdminAuthHeaders(adminKey);
+    const response = await fetch(`${API_BASE}/api/orders`, { headers });
     if (response.ok) {
       const data = await response.json();
       return data.orders || [];
@@ -164,19 +197,41 @@ export async function fetchOrders() {
 }
 
 /**
- * 7. Request a refund
+ * 8. Update Order Fulfillment Status on Server
  */
-export async function requestRefund({ orderId, reason, amount }) {
+export async function updateOrderStatusOnServer({ orderId, status, courierName = null, courierTrackingId = null, notes = null, adminKey = null }) {
   try {
+    const headers = getAdminAuthHeaders(adminKey);
+    const response = await fetch(`${API_BASE}/api/orders/update-status`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ orderId, status, courierName, courierTrackingId, notes })
+    });
+    const data = await response.json();
+    return data;
+  } catch (e) {
+    console.error('Failed to update order status on server:', e);
+    return { success: false, error: e.message };
+  }
+}
+
+/**
+ * 9. Request a refund (Requires Server Auth)
+ */
+export async function requestRefund({ orderId, reason, amount, adminKey = null }) {
+  try {
+    const headers = getAdminAuthHeaders(adminKey);
     const response = await fetch(`${API_BASE}/api/payments/refund`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ orderId, reason, amount })
     });
     if (response.ok) return await response.json();
+    const data = await response.json();
+    return { success: false, error: data.error || 'Refund request rejected' };
   } catch (e) {
     console.error('Refund request failed:', e);
+    return { success: false, error: 'Refund service unavailable' };
   }
-  return { success: false, error: 'Refund service unavailable' };
 }
 

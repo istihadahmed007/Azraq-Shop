@@ -1,7 +1,9 @@
-name: Deploy AZRAQ Storefront to GitHub Pages
+name: AZRAQ CI/CD & Deployment Verification
 
 on:
   push:
+    branches: ["main"]
+  pull_request:
     branches: ["main"]
   workflow_dispatch:
 
@@ -11,14 +13,15 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: "ci-cd"
   cancel-in-progress: true
 
 jobs:
-  build:
+  test_and_build:
+    name: Test & Build Verification
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Set up Node.js
@@ -27,31 +30,56 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm ci
 
-      - name: Build
+      - name: Run Full Audit & Security Test Suites
+        run: npm test
+
+      - name: Run Production Bundle Build
         run: npm run build
 
-      - name: Upload artifact for GitHub Pages
+      - name: Upload Static Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
 
-      - name: Deploy to gh-pages branch (Fallback & Branch Hosting)
+      - name: Deploy to gh-pages branch (Static Preview Mirror)
+        if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-          cname: shop.azraqtrips.com
 
-  deploy:
+  deploy_pages:
+    name: GitHub Pages Static Mirror Deployment
+    if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build
+    needs: test_and_build
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  smoke_test:
+    name: Production API Smoke Verification
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: test_and_build
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run API Smoke Test
+        run: node scripts/smoke_test_api.mjs
+        env:
+          TARGET_URL: "https://shop.azraqtrips.com"
+        continue-on-error: true

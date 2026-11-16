@@ -8,8 +8,9 @@ import {
   getAdminOrders,
   getPaymentlyConfig 
 } from './paymentlyService.js';
-import { getAllTransactions, getAllOrders } from './db.js';
+import { getAllTransactions, getAllOrders, processRefund, updateOrderFulfillmentStatus } from './db.js';
 import orderTrackingHandler from '../api/orders/track.js';
+import { verifyAdminAuth } from './adminAuth.js';
 
 export async function handlePaymentRoutes(req, res) {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost:3000'}`);
@@ -47,19 +48,145 @@ export async function handlePaymentRoutes(req, res) {
     return true;
   }
 
-  // 2. GET /api/payments/transactions - List genuine transactions for Admin Panel
+  // 2. GET /api/payments/transactions - List genuine transactions for Admin Panel (Requires Admin Auth)
   if (pathname === '/api/payments/transactions' && method === 'GET') {
+    const auth = verifyAdminAuth(req);
+    if (!auth.authenticated) {
+      res.statusCode = auth.statusCode || 401;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ success: false, code: 'UNAUTHORIZED_ADMIN', error: auth.error }));
+      return true;
+    }
+
     const transactions = await getAdminTransactions();
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify({ success: true, transactions }));
     return true;
   }
 
-  // 3. GET /api/orders - List genuine customer orders
+  // 3. GET /api/orders - List genuine customer orders (Requires Admin Auth)
   if (pathname === '/api/orders' && method === 'GET') {
+    const auth = verifyAdminAuth(req);
+    if (!auth.authenticated) {
+      res.statusCode = auth.statusCode || 401;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ success: false, code: 'UNAUTHORIZED_ADMIN', error: auth.error }));
+      return true;
+    }
+
     const orders = await getAdminOrders();
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify({ success: true, orders }));
+    return true;
+  }
+
+  // 3a. POST /api/admin/auth - Authenticate Admin Session
+  if (pathname === '/api/admin/auth' && method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        if (payload.adminKey && !req.headers['x-admin-key'] && !req.headers['authorization']) {
+          req.headers['x-admin-key'] = String(payload.adminKey).trim();
+        }
+        const auth = verifyAdminAuth(req);
+        if (!auth.authenticated) {
+          res.statusCode = auth.statusCode || 401;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ success: false, code: 'UNAUTHORIZED_ADMIN', error: auth.error }));
+          return;
+        }
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ success: true, message: 'Administrator session authenticated successfully.' }));
+      } catch (err) {
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return true;
+  }
+
+  // 3b. POST /api/orders/update-status - Admin Update Order Status
+  if (pathname === '/api/orders/update-status' && method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const auth = verifyAdminAuth(req);
+        if (!auth.authenticated) {
+          res.statusCode = auth.statusCode || 401;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ success: false, code: 'UNAUTHORIZED_ADMIN', error: auth.error }));
+          return;
+        }
+
+        const payload = JSON.parse(body || '{}');
+        const { orderId, status, courierName, courierTrackingId, notes } = payload;
+        if (!orderId || !status) {
+          res.statusCode = 400;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ success: false, error: 'Order ID and status are required.' }));
+          return;
+        }
+
+        const updatedOrder = await updateOrderFulfillmentStatus(orderId, status, {
+          actorSource: 'ADMIN_PANEL',
+          notes: notes || `Admin updated order status to ${status}`,
+          courierName,
+          courierTrackingId
+        });
+
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ success: true, order: updatedOrder }));
+      } catch (err) {
+        res.statusCode = err.message.includes('not found') ? 404 : 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return true;
+  }
+
+  // 3c. POST /api/payments/refund - Admin Process Refund
+  if (pathname === '/api/payments/refund' && method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const auth = verifyAdminAuth(req);
+        if (!auth.authenticated) {
+          res.statusCode = auth.statusCode || 401;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ success: false, code: 'UNAUTHORIZED_ADMIN', error: auth.error }));
+          return;
+        }
+
+        const payload = JSON.parse(body || '{}');
+        const { orderId, amount, reason } = payload;
+        if (!orderId) {
+          res.statusCode = 400;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ success: false, error: 'Order ID is required for refund.' }));
+          return;
+        }
+
+        const refundResult = await processRefund({
+          orderId,
+          amount: amount ? Number(amount) : null,
+          reason: reason || 'Customer requested return / refund',
+          actorSource: 'ADMIN_PANEL'
+        });
+
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(refundResult));
+      } catch (err) {
+        res.statusCode = err.message.includes('not found') ? 404 : 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
     return true;
   }
 

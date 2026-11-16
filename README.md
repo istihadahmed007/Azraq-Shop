@@ -4,98 +4,122 @@
 > **Descriptor:** CURATED EVERYDAY GOODS  
 > **Market:** Bangladesh  
 > **Currency:** BDT (৳)  
+> **Production Store:** [https://shop.azraqtrips.com](https://shop.azraqtrips.com)  
+> **Vercel Mirror:** [https://azraqshop.vercel.app](https://azraqshop.vercel.app)  
 > **Repository:** [https://github.com/istihadahmed007/Azraq-Shop](https://github.com/istihadahmed007/Azraq-Shop)  
 
 ---
 
-## 🌟 Overview
+## 🌟 Architecture & Hosting Topology
 
-**AZRAQ** is a premium, modern e-commerce platform built for the Bangladesh market, combining a futuristic visual design system inspired by the Nexora editorial aesthetic with a complete dropshipping catalog ingestion from [EasyDrop Asia](https://easydrop.asia/new-store).
+AZRAQ operates on a **Unified Single-Platform Hosting Architecture**:
 
----
+* **Primary Production Host (Vercel):** Serves the high-performance Vite React SPA alongside Node.js serverless API functions (`/api/payments/*`, `/api/orders/*`, `/api/admin/*`, `/api/search-by-image`) on the exact same domain (`shop.azraqtrips.com`).
+* **Relational Persistence (PostgreSQL):** Stores checkout attempts, confirmed customer orders, payment transaction logs, and append-only status audit histories (`order_status_history`). Fails closed in production if `DATABASE_URL` is omitted.
+* **Continuous Integration (GitHub Actions):** Executes all 60 unit, security, localization, and audit test suites and compiles the production bundle on every push and pull request.
 
-## 🚀 Key Features
+```mermaid
+flowchart TD
+    Client["Customer Browser (Mobile & Desktop)"]
+    VercelEdge["Vercel Edge Gateway (shop.azraqtrips.com)"]
+    ViteSPA["Vite React SPA (Lazy Loaded)"]
+    ServerlessAPI["Node.js Serverless Functions (/api/*)"]
+    PostgresDB[("PostgreSQL Database (Neon / Supabase)")]
+    PaymentlyGW["Paymently Gateway (azraq.paymently.io)"]
 
-### 1. Complete 18-Collection Taxonomy Ingestion
-- Ingests **all 18 official supplier collections** from EasyDrop (IDs: 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22).
-- **1,206 authentic unique products** with multi-photo image galleries, authentic specifications, and verified real-time stock statuses.
-
-### 2. Strict Pricing Governance
-- **100% EasyDrop Retail Price:** All products display the exact supplier retail price in BDT (৳) with **zero markup**.
-- **No Artificial Discounts:** Zero synthetic crossed-out original prices or fake markdown percentages.
-- **Supplier Privacy:** Private supplier buying costs are strictly secluded inside the administrative portal and never exposed to customers.
-
-### 3. Authentic Description Preservation
-- Every product preserves 100% of the original manufacturer descriptions, technical bullet points, measurements, Bengali phrasing, and specs with zero AI rewriting or hallucination.
-
-### 4. Futuristic Nexora-Inspired Visual Identity
-- **Palette:** Deep Navy (`#12233F`), Azure Blue (`#2677D9`), Lavender (`#EAE5FF`), Soft Purple (`#A78BFA`), Violet (`#7955E8`), and Neon-Lime (`#C9F34A`).
-- **Floating 3D Hero Composition:** Elevated product cards with a circular violet aura, floating dot matrix accents, and an interactive glass ingestion badge (`18 Collections • 1206 Products`).
-- **Signature Action Buttons:** High-contrast neon-lime pill and circular buttons (`#C9F34A`) featuring dark navy arrow badges (`#12233F`) with drop-shadow glows.
-- **Dark Feature Bar & Brand Pillars:** 4 core brand pillars (*Innovative Design*, *Powerful Performance*, *Seamless Connectivity*, *Secure by Default*).
-- **Interactive Multi-Collection Browsing:** Sibling category filter pills, dual layout modes (Editorial Visual Grid vs. Compact High-Density List), dynamic search, and price sorting.
-- **Domestic Bangladesh Checkout:** Support for Cash on Delivery (COD), bKash, and Nagad, complete with automated shipping fee calculation (Dhaka: ৳70, Outside Dhaka: ৳130, Free delivery over ৳3,000).
+    Client -->|HTTPS| VercelEdge
+    VercelEdge -->|Static Assets| ViteSPA
+    VercelEdge -->|API Requests| ServerlessAPI
+    ServerlessAPI -->|Durable Persistence| PostgresDB
+    ServerlessAPI -->|Payment Verification| PaymentlyGW
+```
 
 ---
 
-## 🛠️ Tech Stack
+## 🔒 Security & Payment Safety Invariants
 
-- **Framework:** React 18
-- **Build Tool:** Vite 5
-- **Styling:** Tailwind CSS with custom color extensions
-- **Icons:** Lucide React
-- **Deployment:** GitHub Pages / GitHub Actions
+1. **Server-Side Administrative Authentication:**
+   * Every administrative endpoint (`/api/orders`, `/api/payments/transactions`, `/api/payments/refund`, `/api/orders/update-status`) requires a valid `x-admin-key` or `Authorization: Bearer <key>` header.
+   * Compares secrets using constant-time `crypto.timingSafeEqual` to prevent timing attacks.
+   * **Fail-Closed in Production:** If `ADMIN_API_KEY` is missing or shorter than 8 characters, administrative endpoints reject all incoming requests with HTTP 500.
+
+2. **Durable Database Persistence:**
+   * In production (`NODE_ENV=production`), `DATABASE_URL` is strictly required. Persistent write operations (order creation, webhook logs, refunds) reject execution rather than silently dropping data into ephemeral serverless memory.
+
+3. **Ownership-Verified Order Tracking:**
+   * Guessable Order IDs alone are never sufficient for authorization.
+   * Customers must supply both their Order ID and either their normalized 11-digit mobile number (`018...`) or cryptographically unguessable tracking token (`trk_...`).
+   * Responses mask customer names and phone numbers to eliminate PII harvesting.
+
+4. **Payment Authoritativeness & Idempotency:**
+   * All prices, delivery fees (Inside Dhaka ৳70 / Outside Dhaka ৳130 / Free >= ৳3,000), and promo discounts are calculated server-side.
+   * Orders are only marked `PAID` after authentic provider verification.
+   * Repeated webhook and verification calls are processed idempotently.
+
+---
+
+## ⚡ Loading Performance & Storage Resiliency
+
+* **Initial JS Bundle Reduction (>96%):** The initial entry bundle was reduced from **3.58 MB down to 125 kB** (29 kB gzip) by:
+  * Extracting the 4.16 MB catalog from the synchronously bundled module graph. An ultra-slim initial catalog (13 kB) renders above-the-fold content instantly, followed by asynchronous hydration of the full catalog.
+  * Lazy-loading non-critical overlays (`CheckoutModal`, `OrderTrackingModal`, `AdminPanel`, `VisualSearchModal`, `ProductDetailModal`).
+* **Resilient Browser Storage:**
+  * Uses a safe storage utility (`src/utils/storage.js`) with versioning, runtime schema validation, and graceful quota-exceeded handling to prevent mobile browser crashes.
+  * The master catalog is never written to `localStorage`.
+
+---
+
+## ⚙️ Production Environment Variables
+
+Configure these variables in your Vercel Project Settings (**Settings → Environment Variables**):
+
+| Variable Name | Environment | Required | Description |
+| :--- | :---: | :---: | :--- |
+| `NODE_ENV` | Production | Yes | Set to `production` to activate strict fail-closed security. |
+| `ADMIN_API_KEY` | Production | Yes | Strong secret token for administrative APIs (min 16 chars). |
+| `DATABASE_URL` | Production | Yes | PostgreSQL connection string with SSL (`sslmode=require`). |
+| `PAYMENTLY_API_KEY` | Production | Yes | Merchant API key from your Paymently portal. |
+| `PAYMENTLY_BASE_URL` | Production | Yes | Default: `https://azraq.paymently.io` |
+| `APP_BASE_URL` | Production | Yes | Public URL (e.g. `https://shop.azraqtrips.com`). |
+
+---
+
+## 🧪 Automated Testing & Verification
+
+Run all test suites locally:
+
+```bash
+# Run all 60 audit, security, and storefront tests
+npm test
+
+# Run individual test suites
+npm run test:payment     # Paymently gateway & verification tests (14 tests)
+npm run test:storefront  # Delivery, catalog, and engine tests (10 tests)
+npm run test:tracking    # Customer order tracking & authorization (14 tests)
+npm run test:locale      # Bengali translation & BDT currency tests (11 tests)
+npm run test:security    # Admin auth, durability & storage tests (11 tests)
+
+# Run deployment API smoke tests
+npm run smoke:api
+```
 
 ---
 
 ## 💻 Local Development
 
-Clone the repository and install dependencies:
-
 ```bash
+# Clone the repository
 git clone https://github.com/istihadahmed007/Azraq-Shop.git
 cd Azraq-Shop
+
+# Install dependencies
 npm install
-```
 
-Start the local development server:
-
-```bash
+# Start local full-stack dev server (with API middleware)
 npm run dev
-```
 
-Build for production:
-
-```bash
+# Build production bundle
 npm run build
-```
-
-Preview production build:
-
-```bash
-npm run preview
-```
-
----
-
-## 📂 Project Structure
-
-```
-├── .github/workflows/deploy.yml     # Automated GitHub Pages CI/CD workflow
-├── database/schema.sql              # Relational PostgreSQL architecture
-├── src/
-│   ├── components/                  # UI components (Header, Hero, ProductGrid, etc.)
-│   ├── context/ShopContext.jsx      # Global multi-collection state & cart manager
-│   ├── data/
-│   │   ├── central_products.json    # 1,206 deduplicated master products
-│   │   ├── collections.json         # 18 official supplier collections
-│   │   └── reconciliation_report.json # Supplier ingestion audit report
-│   ├── App.jsx                      # Main application view router
-│   ├── main.jsx                     # Vite entry point
-│   └── index.css                    # Tailwind CSS configuration
-├── package.json
-├── tailwind.config.js
-└── vite.config.js
 ```
 
 ---
@@ -103,4 +127,3 @@ npm run preview
 ## 📄 License
 
 MIT © [AZRAQ](https://github.com/istihadahmed007/Azraq-Shop)
-
