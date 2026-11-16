@@ -40,9 +40,9 @@ export default function CartDrawer() {
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-[#062B4F]/60 backdrop-blur-sm animate-in fade-in duration-200">
-      
+
       {/* Backdrop overlay */}
-      <div 
+      <div
         className="absolute inset-0"
         onClick={() => setIsCartOpen(false)}
       />
@@ -50,7 +50,7 @@ export default function CartDrawer() {
       {/* Drawer Panel */}
       <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
         <div className="w-screen max-w-md bg-white shadow-2xl flex flex-col justify-between border-l border-[#D9F0FF]">
-          
+
           {/* Header */}
           <div className="p-5 sm:p-6 border-b border-gray-100 flex items-center justify-between bg-[#F8FCFF]">
             <div className="flex items-center gap-2.5">
@@ -92,7 +92,7 @@ export default function CartDrawer() {
             </div>
             {/* Progress Bar */}
             <div className="w-full h-2 rounded-full bg-gray-200 overflow-hidden">
-              <div 
+              <div
                 className="h-full bg-gradient-to-r from-[#0877C9] to-[#50DDF0] rounded-full transition-all duration-500"
                 style={{ width: `${freeDeliveryProgress}%` }}
               />
@@ -124,7 +124,7 @@ export default function CartDrawer() {
               </div>
             ) : (
               cart.map((item, idx) => (
-                <div 
+                <div
                   key={`${item.product.id}-${item.variant}-${idx}`}
                   className="flex gap-4 p-3 rounded-2xl bg-white border border-[#D9F0FF] shadow-xs hover:border-[#0877C9]/40 transition-all"
                 >
@@ -194,7 +194,7 @@ export default function CartDrawer() {
           {/* Footer Checkout Summary */}
           {cart.length > 0 && (
             <div className="p-5 sm:p-6 bg-[#F8FCFF] border-t border-[#D9F0FF] space-y-4">
-              
+
               {/* Delivery Zone Toggle */}
               <div className="space-y-1.5">
                 <span className="text-[11px] font-bold text-[#062B4F] block">
@@ -203,21 +203,19 @@ export default function CartDrawer() {
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <button
                     onClick={() => setDeliveryArea('inside')}
-                    className={`py-2 px-3 rounded-xl font-bold border transition-all text-center ${
-                      deliveryArea === 'inside'
-                        ? 'bg-[#062B4F] text-white border-[#062B4F] shadow-sm'
-                        : 'bg-white text-[#062B4F]/80 border-gray-200 hover:bg-gray-50'
-                    }`}
+                    className={`py-2 px-3 rounded-xl font-bold border transition-all text-center ${deliveryArea === 'inside'
+                      ? 'bg-[#062B4F] text-white border-[#062B4F] shadow-sm'
+                      : 'bg-white text-[#062B4F]/80 border-gray-200 hover:bg-gray-50'
+                      }`}
                   >
                     {t("Inside Dhaka", "ঢাকার ভেতরে")} (৳70)
                   </button>
                   <button
                     onClick={() => setDeliveryArea('outside')}
-                    className={`py-2 px-3 rounded-xl font-bold border transition-all text-center ${
-                      deliveryArea === 'outside'
-                        ? 'bg-[#062B4F] text-white border-[#062B4F] shadow-sm'
-                        : 'bg-white text-[#062B4F]/80 border-gray-200 hover:bg-gray-50'
-                    }`}
+                    className={`py-2 px-3 rounded-xl font-bold border transition-all text-center ${deliveryArea === 'outside'
+                      ? 'bg-[#062B4F] text-white border-[#062B4F] shadow-sm'
+                      : 'bg-white text-[#062B4F]/80 border-gray-200 hover:bg-gray-50'
+                      }`}
                   >
                     {t("Outside Dhaka", "ঢাকার বাইরে")} (৳130)
                   </button>
