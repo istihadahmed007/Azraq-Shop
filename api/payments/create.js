@@ -24,7 +24,7 @@ export default async function handler(req, res) {
       try { payload = JSON.parse(payload); } catch (e) {}
     }
 
-    const { customer, items, deliveryArea, promoCode, paymentMethod, notes } = payload || {};
+    const { customer, items, deliveryArea, promoCode, paymentMethod, notes, allowManualFallback } = payload || {};
 
     if (!customer) {
       return res.status(400).json({ success: false, error: 'Missing customer information.' });
@@ -65,7 +65,8 @@ export default async function handler(req, res) {
       items,
       deliveryArea: deliveryArea || 'inside',
       promoCode: promoCode || null,
-      notes: notes || ''
+      notes: notes || '',
+      allowManualFallback: allowManualFallback !== false
     });
 
     if (!session.success) {

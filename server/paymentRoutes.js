@@ -236,7 +236,7 @@ export async function handlePaymentRoutes(req, res) {
     req.on('end', async () => {
       try {
         const payload = JSON.parse(body || '{}');
-        const { customer, items, deliveryArea, promoCode, paymentMethod, notes } = payload;
+        const { customer, items, deliveryArea, promoCode, paymentMethod, notes, allowManualFallback } = payload;
 
         if (!customer) {
           res.statusCode = 400;
@@ -281,7 +281,8 @@ export async function handlePaymentRoutes(req, res) {
           items,
           deliveryArea: deliveryArea || 'inside',
           promoCode: promoCode || null,
-          notes: notes || ''
+          notes: notes || '',
+          allowManualFallback: allowManualFallback !== false
         });
 
         if (!session.success) {
