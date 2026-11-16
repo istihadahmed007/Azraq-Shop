@@ -41,7 +41,7 @@ export default function AzraqLogo({
         <img
           src="/branding/azraq-logo.png"
           alt="AZRAQ Shop"
-          className={`${heightClass} w-auto object-contain select-none ${imgClassName}`}
+          className={`${heightClass} w-auto aspect-[1024/341] object-contain select-none ${imgClassName}`}
           loading="eager"
           decoding="async"
         />
@@ -55,7 +55,7 @@ export default function AzraqLogo({
       <img
         src="/branding/azraq-logo.png"
         alt="AZRAQ Shop"
-        className={`${heightClass} w-auto object-contain select-none transition-transform duration-200 hover:scale-[1.02] ${imgClassName}`}
+        className={`${heightClass} w-auto aspect-[1024/341] object-contain select-none transition-transform duration-200 hover:scale-[1.02] ${imgClassName}`}
         loading="eager"
         decoding="async"
       />
@@ -83,7 +83,7 @@ export function AzraqBrandSymbol({
     <img
       src="/branding/azraq-icon.png"
       alt="AZRAQ Shop"
-      className={`${sizeClasses[size] || sizeClasses.md} object-contain select-none shrink-0 ${className}`}
+      className={`${sizeClasses[size] || sizeClasses.md} aspect-square object-contain select-none shrink-0 ${className}`}
       loading="eager"
       decoding="async"
     />

@@ -38,7 +38,21 @@
 </head>
 
 <body class="bg-[#F5F7FA] text-[#101C35] font-sans antialiased selection:bg-[#2563EB]/20 selection:text-[#101C35]">
-  <div id="root"></div>
+  <div id="root">
+    <div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #F5F7FA; font-family: 'Plus Jakarta Sans', system-ui, sans-serif;">
+      <img src="/branding/azraq-logo.png" alt="AZRAQ Shop" style="height: 44px; width: auto; object-fit: contain; margin-bottom: 20px;" />
+      <div style="width: 56px; height: 3px; background: rgba(16, 28, 53, 0.12); border-radius: 9999px; overflow: hidden; position: relative;">
+        <div style="position: absolute; top: 0; left: 0; bottom: 0; width: 45%; background: #2563EB; border-radius: 9999px; animation: azraq-pulse 1.2s infinite ease-in-out;"></div>
+      </div>
+      <style>
+        @keyframes azraq-pulse {
+          0% { transform: translateX(-100%); }
+          50% { transform: translateX(120%); }
+          100% { transform: translateX(250%); }
+        }
+      </style>
+    </div>
+  </div>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 

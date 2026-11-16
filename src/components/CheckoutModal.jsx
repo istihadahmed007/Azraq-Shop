@@ -1029,8 +1029,11 @@ export default function CheckoutModal() {
         {/* ==================================================================== */}
         {checkoutStep === 'verifying' && (
           <div className="p-8 sm:p-10 text-center space-y-3.5 my-auto">
-            <RefreshCw className="w-10 h-10 text-[#0877C9] animate-spin mx-auto" />
-            <h3 className="text-lg font-bold text-[#062B4F]">
+            <div className="flex justify-center mb-1">
+              <img src="/branding/azraq-icon.png" alt="AZRAQ Shop" className="w-10 h-10 object-contain animate-pulse" />
+            </div>
+            <RefreshCw className="w-7 h-7 text-[#2563EB] animate-spin mx-auto" />
+            <h3 className="text-lg font-bold text-[#101C35]">
               {t("Verifying Payment with Gateway...", "পেমেন্ট গেটওয়েতে ভেরিফাই করা হচ্ছে...")}
             </h3>
             <p className="text-xs text-slate-600 max-w-sm mx-auto">
@@ -1047,6 +1050,9 @@ export default function CheckoutModal() {
         {/* ==================================================================== */}
         {checkoutStep === 'paid_success' && confirmedOrder && (
           <div className="p-6 sm:p-8 text-center space-y-4 overflow-y-auto flex-1">
+            <div className="flex justify-center mb-1">
+              <img src="/branding/azraq-logo.png" alt="AZRAQ Shop" className="h-8 w-auto object-contain select-none" />
+            </div>
             <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-xs">
               <CheckCircle2 className="w-8 h-8" />
             </div>
