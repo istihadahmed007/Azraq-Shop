@@ -9,11 +9,11 @@
 
 import assert from 'assert';
 import { verifyAdminAuth } from '../server/adminAuth.js';
-import { 
-  assertDurablePersistence, 
-  processRefund, 
-  initDb, 
-  saveCheckoutAttempt, 
+import {
+  assertDurablePersistence,
+  processRefund,
+  initDb,
+  saveCheckoutAttempt,
   createOrderFromVerifiedPayment,
   createCodOrder,
   getCheckoutAttempt,

@@ -17,6 +17,7 @@ export default function Header() {
     setIsTrackingOpen, 
     setIsAdminOpen, 
     navigateTo,
+    currentView,
     language, 
     setLanguage, 
     searchQuery, 
@@ -28,6 +29,17 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [compareCount, setCompareCount] = useState(0);
+
+  const handleSearchSubmit = (e) => {
+    if (e) e.preventDefault();
+    if (currentView !== 'home') {
+      navigateTo('home');
+    }
+    setTimeout(() => {
+      const el = document.getElementById('all-products') || document.getElementById('shop-by-collection');
+      el?.scrollIntoView({ behavior: 'smooth' });
+    }, currentView === 'home' ? 0 : 100);
+  };
 
   return (
     <header className="sticky top-0 z-40 w-full transition-all">
@@ -87,7 +99,7 @@ export default function Header() {
 
           {/* 2. Center: Large Glassy Search Bar (Matching Reference with Search by Image) */}
           <div className="hidden md:flex flex-1 max-w-2xl relative">
-            <div className="w-full relative flex items-center">
+            <form onSubmit={handleSearchSubmit} className="w-full relative flex items-center">
               <input
                 type="text"
                 placeholder={t("Search for products, brands and collections...", "পণ্য, ব্র্যান্ড বা কালেকশন খুঁজুন...")}
@@ -111,16 +123,14 @@ export default function Header() {
               </button>
 
               <button 
-                onClick={() => {
-                  const el = document.getElementById('all-products') || document.getElementById('shop-by-collection');
-                  el?.scrollIntoView({ behavior: 'smooth' });
-                }}
+                type="submit"
                 className="absolute right-1.5 w-9 h-9 rounded-full bg-[#062B4F] hover:bg-[#0877C9] text-white flex items-center justify-center transition-all shadow-sm group/btn"
                 title="Search"
+                aria-label="Submit search"
               >
                 <Search className="w-4 h-4 transition-transform group-hover/btn:scale-110" />
               </button>
-            </div>
+            </form>
           </div>
 
           {/* 3. Right: Quick Actions (Wishlist, Compare, Cart) */}
@@ -331,8 +341,7 @@ export default function Header() {
             onSubmit={(e) => {
               e.preventDefault();
               setIsMobileMenuOpen(false);
-              const el = document.getElementById('all-products') || document.getElementById('shop-by-collection');
-              el?.scrollIntoView({ behavior: 'smooth' });
+              handleSearchSubmit();
             }}
             className="relative flex items-center"
           >
