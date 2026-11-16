@@ -94,6 +94,11 @@ export async function createCheckoutSession({ customer, items, deliveryArea, pro
   }
 
   // Fallback handler for static web hosting environments (Hostinger Static / CDN)
+  const subtotal = (items || []).reduce((acc, it) => acc + (Number(it.product?.price || it.price || 0) * (it.quantity || 1)), 0);
+  const deliveryFee = subtotal >= 3000 ? 0 : (deliveryArea === 'outside' ? 130 : 70);
+  const discount = promoCode === 'AZRAQNEW' ? 200 : (promoCode === 'AZRAQ10' ? Math.round(subtotal * 0.1) : 0);
+  const totalPayable = Math.max(0, subtotal + deliveryFee - discount);
+
   const orderId = `AZQ-ORD-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
   const checkoutId = `AZQ-CHK-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
 
@@ -108,6 +113,11 @@ export async function createCheckoutSession({ customer, items, deliveryArea, pro
         shipping_address: customer?.address || '',
         city: customer?.city || 'Dhaka',
         delivery_area: deliveryArea || 'inside',
+        total: totalPayable,
+        subtotal,
+        delivery_fee: deliveryFee,
+        discount,
+        promo_code: promoCode,
         payment_method: 'COD',
         payment_status: 'PENDING_COD',
         fulfillment_status: 'Processing',
@@ -122,12 +132,13 @@ export async function createCheckoutSession({ customer, items, deliveryArea, pro
     success: true,
     checkout_id: checkoutId,
     invoice_id: checkoutId,
+    amount: totalPayable,
     currency: 'BDT',
     payment_url: 'https://azraq.paymently.io/paymentlink/default/BDT',
     merchant_name: 'AZRAQ',
     is_fallback_link: true,
     requires_manual_trx: true,
-    instructions: 'Please complete payment on the official AZRAQ Paymently portal, then enter your TrxID below to confirm your order.'
+    instructions: `Please complete payment of ৳${totalPayable} BDT on the official AZRAQ Paymently portal, then enter your TrxID below to confirm your order.`
   };
 }
 
