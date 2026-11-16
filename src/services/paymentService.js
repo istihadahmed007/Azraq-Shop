@@ -3,6 +3,8 @@
 // STRICT: No simulated confirmations, no fake IDs, no unverified fallbacks.
 
 const API_BASE = ''; // Same origin
+const PAYMENTLY_MERCHANT_KEY = 'uMTSZ8bM6SMrj6eljYGGpfGEkXYZjSQkQ4k27qs2';
+const PAYMENTLY_BASE_URL = 'https://azraq.paymently.io';
 
 /**
  * Validate that a payment URL belongs strictly to trusted Paymently domains.
@@ -127,7 +129,54 @@ export async function createCheckoutSession({ customer, items, deliveryArea, pro
     };
   }
 
-  // Paymently checkout fallback with official portal link
+  // Dynamic session creation via Paymently Gateway API
+  try {
+    const payRes = await fetch(`${PAYMENTLY_BASE_URL}/api/checkout-v2`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'RT-UDDOKTAPAY-API-KEY': PAYMENTLY_MERCHANT_KEY,
+        'PAYMENTLY-API-KEY': PAYMENTLY_MERCHANT_KEY
+      },
+      body: JSON.stringify({
+        full_name: customer?.name ? customer.name.trim() : 'Valued Customer',
+        email: customer?.email ? customer.email.trim() : `${(customer?.phone || '01700000000').trim()}@azraqshop.com`,
+        amount: String(totalPayable),
+        metadata: {
+          checkout_id: checkoutId,
+          customer_phone: customer?.phone || '',
+          shipping_address: customer?.address || '',
+          delivery_area: deliveryArea
+        },
+        redirect_url: `https://azraq.azraqtrips.com/?payment_status=verifying&checkout_id=${checkoutId}`,
+        cancel_url: `https://azraq.azraqtrips.com/?payment_status=cancelled&checkout_id=${checkoutId}`
+      })
+    });
+
+    const payData = await payRes.json().catch(() => ({}));
+    if (payRes.ok && payData.status && payData.payment_url) {
+      if (!isTrustedPaymentUrl(payData.payment_url)) {
+        throw new Error('Received an untrusted payment URL. Session rejected for security.');
+      }
+      return {
+        success: true,
+        checkout_id: checkoutId,
+        invoice_id: payData.invoice_id || checkoutId,
+        amount: totalPayable,
+        currency: 'BDT',
+        payment_url: payData.payment_url,
+        merchant_name: 'AZRAQ',
+        is_fallback_link: false,
+        requires_manual_trx: false,
+        instructions: `Your payment of ৳${totalPayable} BDT is pre-filled and locked on Paymently. Click below to complete your payment.`
+      };
+    }
+  } catch (directErr) {
+    console.warn('[Direct Paymently API Notice]:', directErr.message);
+  }
+
+  // Fallback to official Paymently portal link only if dynamic API call is unreachable
   return {
     success: true,
     checkout_id: checkoutId,
@@ -173,6 +222,51 @@ export async function verifyPaymentStatus({ invoiceId, checkoutId, manualTrxId =
     }
   } catch (e) {
     console.warn('[Verify Payment Notice]: Server endpoint non-JSON response.', e.message);
+  }
+
+  // Direct verification via Paymently verify-payment API
+  if (invoiceId) {
+    try {
+      const verifyRes = await fetch(`${PAYMENTLY_BASE_URL}/api/verify-payment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'RT-UDDOKTAPAY-API-KEY': PAYMENTLY_MERCHANT_KEY,
+          'PAYMENTLY-API-KEY': PAYMENTLY_MERCHANT_KEY
+        },
+        body: JSON.stringify({
+          invoice_id: invoiceId
+        })
+      });
+
+      const verifyData = await verifyRes.json().catch(() => ({}));
+      if (verifyRes.ok && (verifyData.status === 'COMPLETED' || verifyData.status === 'PAID')) {
+        const orderId = `AZQ-ORD-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
+        return {
+          success: true,
+          verified: true,
+          status: 'PAID',
+          transaction: {
+            transaction_id: verifyData.transaction_id || verifyData.trx_id,
+            payment_method: verifyData.payment_method || 'Paymently'
+          },
+          order: {
+            id: orderId,
+            customer_name: checkoutSnapshot?.customer?.name || 'Customer',
+            customer_phone: checkoutSnapshot?.customer?.phone || '',
+            shipping_address: checkoutSnapshot?.customer?.address || '',
+            total: Number(verifyData.amount || 0),
+            payment_method: verifyData.payment_method || 'Paymently',
+            payment_status: 'PAID',
+            fulfillment_status: 'Processing',
+            created_at: new Date().toISOString()
+          }
+        };
+      }
+    } catch (vErr) {
+      console.warn('[Direct Paymently Verify Notice]:', vErr.message);
+    }
   }
 
   // Client reconciliation fallback when manual TrxID is provided
