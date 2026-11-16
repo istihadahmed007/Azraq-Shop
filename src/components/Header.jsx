@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { 
-  Search, Heart, GitCompare, ShoppingBag, Headphones, 
+import {
+  Search, Heart, GitCompare, ShoppingBag, Headphones,
   Menu, X, ChevronDown, Sparkles, Shield, ArrowRight,
   Globe, Package, Check, Layers, Camera
 } from 'lucide-react';
@@ -8,22 +8,22 @@ import AzraqLogo from './AzraqLogo';
 import { useShop } from '../context/ShopContext';
 
 export default function Header() {
-  const { 
+  const {
     collections,
-    totalCartItems, 
+    totalCartItems,
     cartSubtotal,
     favorites,
-    setIsCartOpen, 
-    setIsTrackingOpen, 
-    setIsAdminOpen, 
+    setIsCartOpen,
+    setIsTrackingOpen,
+    setIsAdminOpen,
     navigateTo,
     currentView,
-    language, 
-    setLanguage, 
-    searchQuery, 
+    language,
+    setLanguage,
+    searchQuery,
     setSearchQuery,
     setIsVisualSearchOpen,
-    t 
+    t
   } = useShop();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -52,7 +52,7 @@ export default function Header() {
           </div>
 
           <div className="flex items-center gap-4 text-[11px]">
-            <button 
+            <button
               onClick={() => setIsTrackingOpen(true)}
               className="hover:text-white transition-colors flex items-center gap-1"
             >
@@ -88,10 +88,10 @@ export default function Header() {
       {/* Main Glassy Header Bar (Reference Screenshot Exact Match) */}
       <div className="bg-white/85 backdrop-blur-xl border-b border-[#D9F0FF] shadow-[0_4px_20px_0_rgba(6,43,79,0.04)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4 sm:gap-8">
-          
+
           {/* 1. Left: Brand Wordmark & Monogram */}
-          <button 
-            onClick={() => navigateTo('home')} 
+          <button
+            onClick={() => navigateTo('home')}
             className="flex items-center text-left group flex-shrink-0"
           >
             <AzraqLogo variant="dark" size="md" showDescriptor={true} />
@@ -122,7 +122,7 @@ export default function Header() {
                 </span>
               </button>
 
-              <button 
+              <button
                 type="submit"
                 className="absolute right-1.5 w-9 h-9 rounded-full bg-[#062B4F] hover:bg-[#0877C9] text-white flex items-center justify-center transition-all shadow-sm group/btn"
                 title="Search"
@@ -135,7 +135,7 @@ export default function Header() {
 
           {/* 3. Right: Quick Actions (Wishlist, Compare, Cart) */}
           <div className="flex items-center gap-4 sm:gap-6">
-            
+
             {/* Wishlist */}
             <button
               onClick={() => {
@@ -215,7 +215,7 @@ export default function Header() {
       {/* Secondary Navigation Ribbon (Matching Reference Screenshot) */}
       <div className="bg-white/95 backdrop-blur-md border-b border-[#D9F0FF] hidden md:block">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between">
-          
+
           <div className="flex items-center gap-6">
             {/* Shop by Categories Dropdown Pill */}
             <div className="relative">
@@ -230,7 +230,7 @@ export default function Header() {
 
               {/* Mega Dropdown */}
               {showCategoryDropdown && (
-                <div 
+                <div
                   onMouseLeave={() => setShowCategoryDropdown(false)}
                   className="absolute top-11 left-0 w-72 bg-white rounded-xl shadow-2xl border border-[#D9F0FF] py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150 divide-y divide-gray-50"
                 >
@@ -269,15 +269,15 @@ export default function Header() {
 
             {/* Menu Links (Matching Reference: Shop, Deals, New Arrivals, Brands, Inspiration) */}
             <nav className="flex items-center gap-7 text-xs font-bold text-[#062B4F]/80">
-              <button 
+              <button
                 onClick={() => navigateTo('home')}
                 className="hover:text-[#0877C9] transition-colors py-1 relative group"
               >
                 {t("Shop", "শপ")}
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#0877C9] transition-all group-hover:w-full" />
               </button>
-              
-              <button 
+
+              <button
                 onClick={() => {
                   const el = document.getElementById('popular-products');
                   el?.scrollIntoView({ behavior: 'smooth' });
@@ -288,7 +288,7 @@ export default function Header() {
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#0877C9] transition-all group-hover:w-full" />
               </button>
 
-              <button 
+              <button
                 onClick={() => {
                   const el = document.getElementById('trending-now') || document.getElementById('all-products');
                   el?.scrollIntoView({ behavior: 'smooth' });
@@ -299,7 +299,7 @@ export default function Header() {
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#0877C9] transition-all group-hover:w-full" />
               </button>
 
-              <button 
+              <button
                 onClick={() => navigateTo('collections')}
                 className="hover:text-[#0877C9] transition-colors py-1 relative group"
               >
@@ -307,7 +307,7 @@ export default function Header() {
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#0877C9] transition-all group-hover:w-full" />
               </button>
 
-              <button 
+              <button
                 onClick={() => {
                   const el = document.getElementById('featured-collections');
                   el?.scrollIntoView({ behavior: 'smooth' });
@@ -337,7 +337,7 @@ export default function Header() {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white/95 backdrop-blur-2xl border-b border-[#D9F0FF] p-5 space-y-4 shadow-xl">
           {/* Mobile Search with Search by Image */}
-          <form 
+          <form
             onSubmit={(e) => {
               e.preventDefault();
               setIsMobileMenuOpen(false);
@@ -376,7 +376,7 @@ export default function Header() {
           </form>
 
           <div className="flex flex-col space-y-2 text-sm font-semibold text-[#062B4F]">
-            <button 
+            <button
               onClick={() => {
                 setIsMobileMenuOpen(false);
                 navigateTo('home');
@@ -385,7 +385,7 @@ export default function Header() {
             >
               {t("Home", "হোম")}
             </button>
-            <button 
+            <button
               onClick={() => {
                 setIsMobileMenuOpen(false);
                 navigateTo('collections');
@@ -394,7 +394,7 @@ export default function Header() {
             >
               {t("Browse All 18 Collections", "সকল ১৮টি কালেকশন")}
             </button>
-            <button 
+            <button
               onClick={() => {
                 setIsMobileMenuOpen(false);
                 setIsTrackingOpen(true);
@@ -424,7 +424,7 @@ export default function Header() {
               </a>
             </div>
 
-            <button 
+            <button
               onClick={() => {
                 setIsMobileMenuOpen(false);
                 setIsAdminOpen(true);

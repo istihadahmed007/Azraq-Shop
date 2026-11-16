@@ -68,12 +68,16 @@ export function isTrustedPaymentUrl(urlStr) {
 
 // Paymently Gateway Configuration
 export function getPaymentlyConfig() {
+  let baseUrl = (process.env.PAYMENTLY_BASE_URL || 'https://azraq.paymently.io').trim().replace(/\/+$/, '');
+  if (baseUrl.endsWith('/api')) {
+    baseUrl = baseUrl.slice(0, -4);
+  }
   return {
-    baseUrl: (process.env.PAYMENTLY_BASE_URL || 'https://azraq.paymently.io').replace(/\/+$/, ''),
+    baseUrl,
     apiKey: (process.env.PAYMENTLY_API_KEY || '').trim(),
     defaultPaymentLink: process.env.PAYMENTLY_DEFAULT_PAYMENT_URL || 'https://azraq.paymently.io/paymentlink/default/BDT',
     webhookSecret: (process.env.PAYMENTLY_WEBHOOK_SECRET || '').trim(),
-    appBaseUrl: (process.env.APP_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://azraqshop.vercel.app').replace(/\/+$/, ''),
+    appBaseUrl: (process.env.APP_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://shop.azraqtrips.com').replace(/\/+$/, ''),
     currency: 'BDT',
     merchantName: 'AZRAQ'
   };
