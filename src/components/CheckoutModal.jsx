@@ -259,6 +259,20 @@ export default function CheckoutModal() {
 
     } catch (err) {
       setIsSubmitting(false);
+
+      // If customer selected online payment, directly open the Paymently merchant checkout portal
+      if (paymentMethod !== 'COD') {
+        const fallbackId = `AZQ-CHK-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
+        try {
+          sessionStorage.setItem('azraq_active_checkout_id', fallbackId);
+          sessionStorage.setItem('azraq_active_invoice_id', fallbackId);
+        } catch (e) {}
+
+        showToast(t("Opening Paymently secure checkout...", "পেমেন্টলি পেমেন্ট পেইজে নিয়ে যাওয়া হচ্ছে..."), 'info');
+        window.location.href = 'https://azraq.paymently.io/paymentlink/default/BDT';
+        return;
+      }
+
       setErrorCode(err.code || 'CHECKOUT_FAILED');
       const isMaint = isStoreMaintenanceError(err);
       if (isMaint) {
