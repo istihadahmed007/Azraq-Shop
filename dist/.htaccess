@@ -1,0 +1,56 @@
+# AZRAQ Shop - Hostinger Apache / LiteSpeed Configuration
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+
+  # Route API endpoints directly to PHP handlers
+  RewriteRule ^api/admin/auth/?$ api/admin/auth.php [L,QSA]
+  RewriteRule ^api/orders/update-status/?$ api/orders/update-status.php [L,QSA]
+  RewriteRule ^api/orders/?$ api/orders/index.php [L,QSA]
+  RewriteRule ^api/payments/transactions/?$ api/payments/transactions.php [L,QSA]
+  RewriteRule ^api/payments/create/?$ api/payments/create.php [L,QSA]
+  RewriteRule ^api/payments/verify/?$ api/payments/verify.php [L,QSA]
+  RewriteRule ^api/payments/status/?$ api/payments/status.php [L,QSA]
+
+  # Do NOT rewrite other API routes to index.html
+  RewriteCond %{REQUEST_URI} !^/api/
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-l
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# Browser Caching & Cache Busting
+<IfModule mod_headers.c>
+  # Never cache index.html or root
+  <FilesMatch "^(index\.html)?$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+
+  # Security Headers
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set X-XSS-Protection "1; mode=block"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+# Gzip Compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>

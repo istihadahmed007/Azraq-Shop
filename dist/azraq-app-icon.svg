@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="appBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#12233F"/>
+      <stop offset="100%" stop-color="#091322"/>
+    </linearGradient>
+    <linearGradient id="azGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7955E8"/>
+      <stop offset="100%" stop-color="#2677D9"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#appBg)"/>
+  <rect x="24" y="24" width="464" height="464" rx="104" stroke="url(#azGlow)" stroke-width="4" stroke-opacity="0.4"/>
+  
+  <!-- Geometric AZ Symbol -->
+  <g transform="translate(64, 64) scale(0.75)">
+    <!-- Main A Frame -->
+    <path d="M120 400L220 120H292L392 400H322L295 324H217L190 400H120ZM237 266H275L256 208L237 266Z" fill="#FFFFFF"/>
+    <!-- Overlapping Dynamic Z in Neon Lime -->
+    <path d="M220 220L380 130V176L280 250H380V294L220 384V338L320 264H220V220Z" fill="#C9F34A"/>
+    <!-- Blue Accent Diamond -->
+    <polygon points="380,120 410,90 440,120 410,150" fill="#2677D9"/>
+  </g>
+</svg>
+
