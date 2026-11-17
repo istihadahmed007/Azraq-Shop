@@ -61,6 +61,9 @@ export default defineConfig({
     chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
+        entryFileNames: 'assets/[name]-[hash]-v3.js',
+        chunkFileNames: 'assets/[name]-[hash]-v3.js',
+        assetFileNames: 'assets/[name]-[hash]-v3.[ext]',
         manualChunks(id) {
           if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
             return 'vendor-react';
