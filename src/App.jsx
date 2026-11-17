@@ -38,59 +38,54 @@ function StorefrontContent() {
         <div className="absolute bottom-0 left-1/4 w-[440px] h-[440px] bg-[#69C5F5]/10 rounded-full blur-[120px]" />
       </div>
 
-      {/* Main Desktop Container (Max content width ~1440px, centered, 28-32px page gutters on desktop, 20-24px gap) */}
-      <div className="max-w-[1440px] w-full mx-auto px-3.5 sm:px-7 lg:px-8 py-4 sm:py-6 flex items-start gap-0 lg:gap-6 relative overflow-x-hidden">
+      {/* Main Desktop Container (Max content width ~1440px, centered, full available width with zero unused offsets) */}
+      <div className="max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col gap-6 relative">
         
-        {/* 1. Left Floating Sidebar Navigation (240px desktop) */}
-        <Sidebar 
-          isOpen={isSidebarOpen} 
-          onClose={() => setIsSidebarOpen(false)} 
+        {/* Top Floating Glass Header (Full viewport width alignment) */}
+        <Header 
+          onToggleSidebar={() => setIsSidebarOpen(prev => !prev)} 
         />
 
-        {/* 2. Main Content Stream (Flexible remaining width, strict overflow containment) */}
-        <div className="flex-1 min-w-0 max-w-full w-full flex flex-col gap-6 overflow-x-hidden">
-          
-          {/* Top Floating Glass Header */}
-          <Header 
-            onToggleSidebar={() => setIsSidebarOpen(prev => !prev)} 
-          />
+        {/* Primary View Container (Spans full available width cleanly) */}
+        <main className="transition-all duration-300 flex flex-col gap-7 w-full min-w-0 max-w-full">
+          {currentView === 'home' && (
+            <>
+              {/* 1. Hero Section (Left Hero + Right Stacked Promo Cards) */}
+              <HeroSection />
 
-          {/* Primary View Container (min-w-0 max-w-full prevents overflow on mobile) */}
-          <main className="transition-all duration-300 flex flex-col gap-7 w-full min-w-0 max-w-full overflow-x-hidden">
-            {currentView === 'home' && (
-              <>
-                {/* 3. Hero Section (Left Hero + Right Stacked Promo Cards) */}
-                <HeroSection />
+              {/* 2. Horizontal Category Strip (Shop by Category + Category Cards) */}
+              <BrowseByCategoriesSection />
 
-                {/* 4. Horizontal Category Strip (Shop by Category + Category Cards) */}
-                <BrowseByCategoriesSection />
+              {/* 3. Popular Products (Spacious cards + Right Featured Collection Card) */}
+              <TrendingRightNowSection />
 
-                {/* 5. Popular Products (6 Product Cards + Right Featured Collection Card) */}
-                <TrendingRightNowSection />
+              {/* 4. Complete EasyDrop Collections Explorer */}
+              <ShopByCollectionSection />
 
-                {/* 6. Complete EasyDrop Collections Explorer */}
-                <ShopByCollectionSection />
+              {/* 5. Full 1,206+ Products Catalog with Filters */}
+              <ProductGrid />
 
-                {/* 7. Full 1,206+ Products Catalog with Filters */}
-                <ProductGrid />
+              {/* 6. Bottom Horizontal Trust & Benefits Bar */}
+              <BrandValuePanel />
+            </>
+          )}
 
-                {/* 8. Bottom Horizontal Trust & Benefits Bar */}
-                <BrandValuePanel />
-              </>
-            )}
+          <Suspense fallback={null}>
+            {currentView === 'collections' && <CollectionsPage />}
+            {currentView === 'collection-detail' && <CollectionDetailPage />}
+          </Suspense>
+        </main>
 
-            <Suspense fallback={null}>
-              {currentView === 'collections' && <CollectionsPage />}
-              {currentView === 'collection-detail' && <CollectionDetailPage />}
-            </Suspense>
-          </main>
-
-          {/* Complete Website Footer */}
-          <Footer />
-
-        </div>
+        {/* Complete Website Footer */}
+        <Footer />
 
       </div>
+
+      {/* Navigation Sidebar Drawer (Renders only when active, 0px space reserved when closed) */}
+      <Sidebar 
+        isOpen={isSidebarOpen} 
+        onClose={() => setIsSidebarOpen(false)} 
+      />
 
       {/* Interactive Modals & Overlays */}
       <CartDrawer />

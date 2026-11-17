@@ -42,22 +42,22 @@ export default function Header({ onToggleSidebar }) {
     <header className="w-full max-w-full select-none sticky top-3 sm:top-5 z-30">
       <div className="w-full glass-header rounded-[22px] sm:rounded-[24px] px-3 sm:px-5 py-2 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-4 transition-all">
 
-        {/* Left: Mobile Sidebar Toggle + Brand Logo (Desktop & Tablet) */}
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Left: Navigation Menu Toggle + AZRAQ Brand Logo */}
+        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
           <button
             onClick={onToggleSidebar}
-            className="lg:hidden w-8.5 h-8.5 sm:w-10 sm:h-10 rounded-[14px] sm:rounded-2xl glass-button flex items-center justify-center text-[#101C35] hover:text-[#0877C9] transition-colors shrink-0"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-[8px] glass-button flex items-center justify-center text-[#101C35] hover:text-[#0877C9] transition-colors shrink-0"
             title="Menu"
             aria-label="Toggle navigation menu"
           >
-            <Menu className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
+            <Menu className="w-5 h-5 text-[#101C35]" />
           </button>
 
           <div
             onClick={() => navigateTo('home')}
-            className="hidden sm:block lg:hidden cursor-pointer shrink-0"
+            className="cursor-pointer shrink-0 flex items-center"
           >
-            <AzraqLogo variant="dark" size="xs" showDescriptor={false} />
+            <AzraqLogo variant="dark" size="sm" showDescriptor={false} />
           </div>
         </div>
 

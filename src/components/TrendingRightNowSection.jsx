@@ -18,8 +18,8 @@ export default function TrendingRightNowSection() {
     t
   } = useShop();
 
-  // Curated 6 popular products from the catalog
-  const popularList = products.slice(0, 6);
+  // Curated 4 popular products from the catalog (forms 5 columns with right feature card on widescreen)
+  const popularList = products.slice(0, 4);
 
   return (
     <section id="popular-products" className="w-full max-w-full overflow-hidden py-1 select-none">
@@ -45,10 +45,10 @@ export default function TrendingRightNowSection() {
         </button>
       </div>
 
-      {/* Main Grid: 6 Products on Left + 1 Editorial Feature Card on Right */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3.5 sm:gap-4 items-stretch">
+      {/* Main Grid: 4 Columns on standard desktop, 5 on wider screens, sharp square cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-4 sm:gap-5 lg:gap-6 items-stretch">
 
-        {/* 6 Product Cards */}
+        {/* 4 Spacious Product Cards */}
         {popularList.map((product) => (
           <div key={product.id} className="col-span-1 h-full">
             <ProductCard
@@ -57,22 +57,22 @@ export default function TrendingRightNowSection() {
               onToggleFavorite={toggleFavorite}
               onSelectProduct={setSelectedProduct}
               onAddToCart={addToCart}
-              compact={true}
+              compact={false}
               showCategory={true}
             />
           </div>
         ))}
 
-        {/* 1 Right-Side Featured Collection Glass Card */}
+        {/* 1 Editorial Feature Card: 5th column on xl, full-width banner on lg */}
         <div
           onClick={() => navigateTo('collections')}
-          className="col-span-2 sm:col-span-3 lg:col-span-1 xl:col-span-1 rounded-[22px] glass-card p-4 flex flex-col justify-between cursor-pointer group relative overflow-hidden h-full"
+          className="col-span-2 sm:col-span-2 md:col-span-1 lg:col-span-4 xl:col-span-1 rounded-[4px] glass-card p-4 sm:p-5 flex flex-col justify-between cursor-pointer group relative overflow-hidden h-full border border-white/95"
         >
           {/* Subtle Ambient Light */}
           <div className="absolute -top-10 -right-10 w-28 h-28 bg-[#69C5F5]/20 rounded-full blur-xl pointer-events-none" />
 
           <div>
-            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#0877C9]/10 text-[#0877C9] text-[9px] font-black uppercase tracking-wider mb-2">
+            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[2px] bg-[#0877C9]/10 text-[#0877C9] text-[9px] font-black uppercase tracking-wider mb-2">
               <Sparkles className="w-2.5 h-2.5 text-[#0877C9]" />
               <span>{t('Featured', 'বাছাই')}</span>
             </div>
@@ -92,14 +92,14 @@ export default function TrendingRightNowSection() {
           <div className="mt-4 flex flex-col gap-3">
             <button
               type="button"
-              className="w-full py-2 px-3 rounded-full glass-button-primary text-[11px] font-bold flex items-center justify-center gap-1.5"
+              className="w-full py-2 px-3 rounded-[3px] glass-button-primary text-[11px] font-bold flex items-center justify-center gap-1.5"
             >
               <span>{t('Explore More', 'আরও দেখুন')}</span>
               <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
             </button>
 
             {/* Product Photo Showcase */}
-            <div className="w-full aspect-[4/3] rounded-[16px] bg-[#F8FBFF]/85 border border-white/80 p-2 flex items-center justify-center overflow-hidden">
+            <div className="w-full aspect-[4/3] rounded-[2px] bg-[#F8FBFF]/85 border border-white/80 p-1.5 flex items-center justify-center overflow-hidden">
               <img
                 src="https://easydrop.asia/products/image-1794224164356-135288231.jpeg"
                 alt="Feature"

@@ -6,12 +6,14 @@
 
   # Route API endpoints directly to PHP handlers
   RewriteRule ^api/admin/auth/?$ api/admin/auth.php [L,QSA]
+  RewriteRule ^api/orders/track/?$ api/orders/track.php [L,QSA]
   RewriteRule ^api/orders/update-status/?$ api/orders/update-status.php [L,QSA]
   RewriteRule ^api/orders/?$ api/orders/index.php [L,QSA]
   RewriteRule ^api/payments/transactions/?$ api/payments/transactions.php [L,QSA]
   RewriteRule ^api/payments/create/?$ api/payments/create.php [L,QSA]
   RewriteRule ^api/payments/verify/?$ api/payments/verify.php [L,QSA]
   RewriteRule ^api/payments/status/?$ api/payments/status.php [L,QSA]
+  RewriteRule ^api/payments/refund/?$ api/payments/refund.php [L,QSA]
 
   # Do NOT rewrite other API routes to index.html
   RewriteCond %{REQUEST_URI} !^/api/

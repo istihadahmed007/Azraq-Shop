@@ -31,7 +31,7 @@ export default function BrowseByCategoriesSection() {
         {/* Left 'Shop by Category' Pill Card */}
         <div 
           onClick={() => navigateTo('collections')}
-          className="shrink-0 rounded-[22px] glass-card px-4 py-3 flex items-center gap-3 cursor-pointer group"
+          className="shrink-0 rounded-[14px] glass-card px-4 py-3 flex items-center gap-3 cursor-pointer group"
         >
           <span className="text-xs font-black text-[#101C35] leading-tight whitespace-nowrap">
             {t('Shop by', 'ক্যাটাগরি')} <br />
@@ -55,10 +55,10 @@ export default function BrowseByCategoriesSection() {
             <button
               key={col.id}
               onClick={() => navigateTo('collection-detail', col.slug)}
-              className="shrink-0 min-w-[92px] sm:min-w-[102px] rounded-[22px] glass-card p-2.5 sm:p-3 flex flex-col items-center gap-2 group focus:outline-none"
+              className="shrink-0 min-w-[96px] sm:min-w-[110px] rounded-[14px] glass-card p-2.5 sm:p-3 flex flex-col items-center gap-2 group focus:outline-none"
             >
               {/* Inner Image Container */}
-              <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-[16px] bg-[#F0F6FD]/90 border border-white/90 flex items-center justify-center p-1.5 overflow-hidden transition-colors group-hover:bg-white shadow-2xs">
+              <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-[10px] bg-[#F0F6FD]/90 border border-white/90 flex items-center justify-center p-1 overflow-hidden transition-colors group-hover:bg-white shadow-2xs">
                 <img
                   src={displayImage}
                   alt={col.name}
@@ -72,7 +72,7 @@ export default function BrowseByCategoriesSection() {
               </div>
 
               {/* Category Label (11-12px) */}
-              <span className="text-[11px] sm:text-[12px] font-bold text-[#101C35] group-hover:text-[#0877C9] transition-colors truncate max-w-[85px] text-center">
+              <span className="text-[11px] sm:text-[12px] font-bold text-[#101C35] group-hover:text-[#0877C9] transition-colors truncate max-w-[100px] text-center">
                 {shortTitle}
               </span>
             </button>

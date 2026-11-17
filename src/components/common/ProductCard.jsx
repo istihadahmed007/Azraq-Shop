@@ -65,27 +65,27 @@ export default function ProductCard({
 
   return (
     <div
-      className={`group relative flex flex-col justify-between h-full rounded-[22px] glass-product select-none transition-all duration-300 ${
+      className={`group relative flex flex-col justify-between h-full rounded-[4px] glass-product select-none transition-all duration-300 ${
         compact ? 'p-3' : 'p-3.5 sm:p-4'
       } ${className}`}
     >
-      {/* 1. TOP SECTION: Square 1:1 Image Well + Overlays */}
-      <div className="relative w-full aspect-square rounded-[18px] bg-[#F0F6FD]/90 border border-white/95 p-3 sm:p-3.5 flex items-center justify-center overflow-hidden transition-colors group-hover:bg-white/95">
+      {/* 1. TOP SECTION: Square 1:1 Large Image Well (Sharp corners, minimal inner padding) */}
+      <div className="relative w-full aspect-square rounded-[2px] bg-[#F0F6FD]/90 border border-white/95 p-1.5 sm:p-2 flex items-center justify-center overflow-hidden transition-colors group-hover:bg-white/95">
         
-        {/* Real Discount Badge (Only shown when authentically discounted) */}
+        {/* Real Discount Badge (Only shown when authentically discounted, sharp corners) */}
         {discountPercent && discountPercent > 0 ? (
-          <div className="absolute top-2.5 left-2.5 z-10 pointer-events-none">
-            <span className="px-2 py-0.5 rounded-full bg-[#0877C9] text-white text-[10px] font-black tracking-tight shadow-xs border border-white/40">
+          <div className="absolute top-2 left-2 z-10 pointer-events-none">
+            <span className="px-1.5 py-0.5 rounded-[2px] bg-[#0877C9] text-white text-[10px] font-black tracking-tight shadow-xs border border-white/40">
               -{discountPercent}%
             </span>
           </div>
         ) : null}
 
-        {/* Floating Top-Right Wishlist Button */}
+        {/* Floating Top-Right Wishlist Button (Sharp square glass styling) */}
         <button
           type="button"
           onClick={handleToggleFav}
-          className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-all bg-white/90 hover:bg-white backdrop-blur-md border border-white shadow-sm active:scale-90 focus:outline-none ${
+          className={`absolute top-2 right-2 z-10 w-7.5 h-7.5 sm:w-8 sm:h-8 rounded-[3px] flex items-center justify-center transition-all bg-white/90 hover:bg-white backdrop-blur-md border border-white shadow-xs active:scale-90 focus:outline-none ${
             isFav
               ? 'text-[#0877C9] bg-white'
               : 'text-[#71849B] hover:text-[#0877C9]'
@@ -96,7 +96,7 @@ export default function ProductCard({
           <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform ${isFav ? 'fill-[#0877C9] stroke-[#0877C9] scale-110' : ''}`} />
         </button>
 
-        {/* Dedicated Product Image Container: fills container cleanly, object-fit contain */}
+        {/* Dedicated Product Image Container: fills available area, object-fit contain without distortion */}
         <img
           src={displayImage}
           alt={product.name || 'Product'}
@@ -105,12 +105,12 @@ export default function ProductCard({
           onClick={handleSelect}
         />
 
-        {/* Hover Quick View Pill Overlay */}
+        {/* Hover Quick View Pill Overlay (Sharp square corners) */}
         <div className="absolute inset-0 bg-[#101C35]/10 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none group-hover:pointer-events-auto">
           <button
             type="button"
             onClick={handleSelect}
-            className="px-3 py-1.5 rounded-full bg-white text-[#101C35] text-xs font-bold shadow-md hover:text-[#0877C9] transition-all transform hover:scale-105 flex items-center gap-1.5 focus:outline-none border border-white"
+            className="px-3 py-1.5 rounded-[3px] bg-white text-[#101C35] text-xs font-bold shadow-md hover:text-[#0877C9] transition-all transform hover:scale-105 flex items-center gap-1.5 focus:outline-none border border-white"
           >
             <Eye className="w-3.5 h-3.5 text-[#0877C9]" />
             <span>{t("Quick View", "বিস্তারিত")}</span>
@@ -140,8 +140,8 @@ export default function ProductCard({
           </h3>
         </div>
 
-        {/* 3. BOTTOM SECTION: Selling Price, Original Price, Stock Status & Cart Action */}
-        <div className="flex items-end justify-between gap-2 mt-3 pt-2.5 border-t border-white/70">
+        {/* 3. BOTTOM SECTION: Selling Price, Original Price, Stock Status & Sharp Cart Button */}
+        <div className="flex items-end justify-between gap-2 mt-auto pt-3 border-t border-white/70">
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline gap-1.5 flex-wrap">
               <span className={`font-black text-[#101C35] ${compact ? 'text-[16px]' : 'text-[17px] sm:text-[18px]'}`}>
@@ -163,16 +163,16 @@ export default function ProductCard({
             </span>
           </div>
 
-          {/* Add to Bag Action Button */}
+          {/* Add to Bag Action Button (Sharp 4px square corners) */}
           <button
             type="button"
             onClick={handleAddToCart}
             disabled={!isAvailable}
-            className={`rounded-full flex items-center justify-center transition-all flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0877C9] ${
-              compact ? 'w-8 h-8 sm:w-8.5 sm:h-8.5' : 'w-9 h-9'
+            className={`rounded-[4px] flex items-center justify-center transition-all flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0877C9] ${
+              compact ? 'w-8.5 h-8.5' : 'w-9.5 h-9.5'
             } ${
               isAvailable
-                ? 'bg-gradient-to-r from-[#0877C9] to-[#2563EB] hover:from-[#076bb5] hover:to-[#1d4ed8] text-white shadow-[0_3px_12px_rgba(8,119,201,0.3)] hover:shadow-[0_4px_16px_rgba(8,119,201,0.45)] hover:scale-105 active:scale-95'
+                ? 'bg-gradient-to-r from-[#0877C9] to-[#2563EB] hover:from-[#076bb5] hover:to-[#1d4ed8] text-white shadow-xs hover:shadow-md hover:scale-105 active:scale-95'
                 : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
             }`}
             title={isAvailable ? t("Add to Cart", "ব্যাগে যোগ করুন") : t("Out of Stock", "স্টক নেই")}

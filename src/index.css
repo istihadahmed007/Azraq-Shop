@@ -96,13 +96,13 @@
   box-shadow: 0 12px 32px rgba(8, 119, 201, 0.12);
 }
 
-/* 2b. Glass Product Card (Tier 3 - Stronger white glass background for product clarity) */
+/* 2b. Glass Product Card (Tier 3 - Stronger white glass background for product clarity, sharp 4px square corners) */
 .glass-product {
   background: rgba(255, 255, 255, 0.78);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.95);
-  border-radius: 22px;
+  border-radius: 4px;
   box-shadow: 0 8px 24px rgba(50, 100, 160, 0.08);
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),

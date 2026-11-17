@@ -174,29 +174,22 @@ export default function Sidebar({ isOpen, onClose }) {
     </div>
   );
 
+  if (!isOpen) return null;
+
   return (
     <>
-      {/* 1. DESKTOP STICKY SIDEBAR (Visible on lg: 1024px+, width exactly 240px) */}
-      <aside className="hidden lg:block w-[240px] shrink-0 select-none">
-        <div className="sticky top-6 w-[240px] rounded-[24px] glass-sidebar p-4 shadow-[0_10px_35px_rgba(50,100,160,0.08)]">
-          {renderSidebarContent(false)}
-        </div>
-      </aside>
+      {/* Backdrop overlay */}
+      <div 
+        onClick={onClose}
+        className="fixed inset-0 bg-[#101C35]/35 backdrop-blur-sm z-50 animate-in fade-in transition-opacity"
+      />
 
-      {/* 2. MOBILE / TABLET OFF-CANVAS DRAWER (Rendered only when open to avoid viewport displacement) */}
-      {isOpen && (
-        <>
-          <div 
-            onClick={onClose}
-            className="fixed inset-0 bg-[#101C35]/40 backdrop-blur-sm z-50 animate-in fade-in lg:hidden"
-          />
-          <div
-            className="fixed inset-y-0 left-0 z-50 w-[270px] glass-sidebar p-5 shadow-2xl select-none lg:hidden animate-in slide-in-from-left duration-300"
-          >
-            {renderSidebarContent(true)}
-          </div>
-        </>
-      )}
+      {/* Floating Glass Navigation Drawer (Visible only when open, 0px space reserved when closed) */}
+      <aside
+        className="fixed inset-y-0 left-0 z-50 w-[280px] max-w-[85vw] glass-sidebar p-5 shadow-[0_20px_50px_rgba(16,55,100,0.18)] select-none animate-in slide-in-from-left duration-300 overflow-y-auto"
+      >
+        {renderSidebarContent(true)}
+      </aside>
     </>
   );
 }
