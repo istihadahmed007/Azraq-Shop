@@ -849,7 +849,7 @@ export default function CheckoutModal() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3 px-5 rounded-xl bg-[#062B4F] hover:bg-[#0877C9] text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#0877C9] focus:ring-offset-2 disabled:opacity-50"
+                className="w-full py-3.5 px-5 rounded-full bg-gradient-to-r from-[#0877C9] to-[#2563EB] hover:from-[#0966ab] hover:to-[#1d4ed8] text-white text-xs sm:text-sm font-bold shadow-[0_6px_20px_rgba(37,99,235,0.35)] transition-all flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#0877C9] focus:ring-offset-2 disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <>

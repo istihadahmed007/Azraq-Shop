@@ -283,10 +283,10 @@ export default function CartDrawer() {
                   setIsCartOpen(false);
                   setIsCheckoutOpen(true);
                 }}
-                className="w-full flex items-center justify-between pl-6 pr-2 py-3 rounded-full bg-[#062B4F] hover:bg-[#0877C9] text-white font-extrabold text-sm tracking-tight shadow-md transition-all transform hover:scale-[1.01] active:scale-[0.99]"
+                className="w-full flex items-center justify-between pl-6 pr-2 py-3 rounded-full bg-gradient-to-r from-[#0877C9] to-[#2563EB] hover:from-[#0966ab] hover:to-[#1d4ed8] text-white font-extrabold text-sm tracking-tight shadow-[0_6px_20px_rgba(37,99,235,0.35)] transition-all transform hover:scale-[1.01] active:scale-[0.99]"
               >
                 <span>{t("PROCEED TO CHECKOUT", "চেকআউট করুন")}</span>
-                <span className="w-8 h-8 rounded-full bg-white text-[#062B4F] flex items-center justify-center">
+                <span className="w-8 h-8 rounded-full bg-white text-[#2563EB] flex items-center justify-center shadow-xs">
                   <ArrowRight className="w-4 h-4" />
                 </span>
               </button>

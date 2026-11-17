@@ -271,7 +271,7 @@ export default function ProductDetailModal() {
               disabled={selectedProduct.in_stock === false}
               className={`flex-1 py-3 px-4 rounded-full font-bold text-xs sm:text-sm transition-all text-center flex items-center justify-center gap-2 ${
                 selectedProduct.in_stock !== false
-                  ? 'border-2 border-[#062B4F] text-[#062B4F] hover:bg-[#F0F7FF] active:scale-95'
+                  ? 'border-2 border-[#0877C9] text-[#0877C9] hover:bg-[#F0F7FF] active:scale-95'
                   : 'bg-gray-100 text-gray-400 border-2 border-gray-200 cursor-not-allowed'
               }`}
             >
@@ -290,9 +290,9 @@ export default function ProductDetailModal() {
                 }
               }}
               disabled={selectedProduct.in_stock === false}
-              className={`flex-1 py-3 px-4 rounded-full font-black text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 ${
+              className={`flex-1 py-3 px-4 rounded-full font-black text-xs sm:text-sm shadow-[0_4px_16px_rgba(37,99,235,0.3)] transition-all flex items-center justify-center gap-2 ${
                 selectedProduct.in_stock !== false
-                  ? 'bg-[#062B4F] hover:bg-[#0877C9] text-white active:scale-95'
+                  ? 'bg-gradient-to-r from-[#0877C9] to-[#2563EB] hover:from-[#0966ab] hover:to-[#1d4ed8] text-white active:scale-95'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >

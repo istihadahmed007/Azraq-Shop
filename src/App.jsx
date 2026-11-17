@@ -1,23 +1,18 @@
-import React, { Suspense, lazy } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { ShopProvider, useShop } from './context/ShopContext';
 import {
-  NavigationDock,
   Header,
   HeroSection,
   BrowseByCategoriesSection,
   TrendingRightNowSection,
-  PromotionalBannersSection,
-  FeaturedCollectionsSection,
   ShopByCollectionSection,
   ProductGrid,
-  ProductDemonstrationSection,
   BrandValuePanel,
-  StatsRibbon,
-  EditorialCtaSection,
   Footer,
   CartDrawer,
   Toast
 } from './components';
+import Sidebar from './components/Sidebar';
 
 // Lazy-loaded routes & secondary overlays to optimize initial bundle size & TTI
 const CollectionsPage = lazy(() => import('./components/CollectionsPage'));
@@ -31,57 +26,64 @@ const VisualSearchModal = lazy(() => import('./components/VisualSearchModal'));
 
 function StorefrontContent() {
   const { currentView } = useShop();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#F0F4F8] text-[#2B3A4A] selection:bg-[#F27A3F]/20 selection:text-[#2B3A4A] relative font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="min-h-screen bg-gradient-to-br from-[#E8F2FC] via-[#F1F7FE] to-[#E8F2FC] text-[#101C35] selection:bg-[#2563EB]/20 selection:text-[#101C35] font-['Plus_Jakarta_Sans',sans-serif]">
       
-      {/* Discreet Quick Dock */}
-      <NavigationDock />
+      {/* Outer App Frame (Reference Screenshot Composition) */}
+      <div className="max-w-[1720px] mx-auto p-3 sm:p-5 lg:p-6 flex items-start gap-5 lg:gap-6 relative">
+        
+        {/* 1. Left Floating Sidebar Navigation */}
+        <Sidebar 
+          isOpen={isSidebarOpen} 
+          onClose={() => setIsSidebarOpen(false)} 
+        />
 
-      {/* 1. Website Navigation Header */}
-      <Header />
+        {/* 2. Main Content Stream */}
+        <div className="flex-1 min-w-0 flex flex-col gap-4 sm:gap-6">
+          
+          {/* Top Utility & Search Header */}
+          <Header 
+            onToggleSidebar={() => setIsSidebarOpen(prev => !prev)} 
+          />
 
-      {/* Main View Container */}
-      <main className="transition-all duration-300">
-        {currentView === 'home' && (
-          <>
-            {/* 2. Hero Presentation */}
-            <HeroSection />
+          {/* Primary View Container */}
+          <main className="transition-all duration-300 flex flex-col gap-4">
+            {currentView === 'home' && (
+              <>
+                {/* 3. Hero Section (Left Hero + Right Stacked Promo Cards) */}
+                <HeroSection />
 
-            {/* 3. Browse By Categories */}
-            <BrowseByCategoriesSection />
+                {/* 4. Horizontal Category Strip (Shop by Category + Category Pills) */}
+                <BrowseByCategoriesSection />
 
-            {/* 4. Trending Right Now */}
-            <TrendingRightNowSection />
+                {/* 5. Popular Products (6 Product Cards + Right Featured Collection Card) */}
+                <TrendingRightNowSection />
 
-            {/* 5. Split Promotional Banners */}
-            <PromotionalBannersSection />
+                {/* 6. Complete EasyDrop Collections Explorer */}
+                <ShopByCollectionSection />
 
-            {/* 6. Featured Collections */}
-            <FeaturedCollectionsSection />
+                {/* 7. Full 1,206+ Products Catalog with Filters */}
+                <ProductGrid />
 
-            {/* 7. Complete Categories Explorer */}
-            <ShopByCollectionSection />
+                {/* 8. Bottom Horizontal Trust & Benefits Bar */}
+                <BrandValuePanel />
+              </>
+            )}
 
-            {/* 8. Full Products Catalog */}
-            <ProductGrid />
+            <Suspense fallback={null}>
+              {currentView === 'collections' && <CollectionsPage />}
+              {currentView === 'collection-detail' && <CollectionDetailPage />}
+            </Suspense>
+          </main>
 
-            {/* Supporting Brand Value & Trust Strips */}
-            <ProductDemonstrationSection />
-            <BrandValuePanel />
-            <StatsRibbon />
-            <EditorialCtaSection />
-          </>
-        )}
+          {/* Complete Website Footer */}
+          <Footer />
 
-        <Suspense fallback={null}>
-          {currentView === 'collections' && <CollectionsPage />}
-          {currentView === 'collection-detail' && <CollectionDetailPage />}
-        </Suspense>
-      </main>
+        </div>
 
-      {/* Website Footer */}
-      <Footer />
+      </div>
 
       {/* Interactive Modals & Overlays */}
       <CartDrawer />

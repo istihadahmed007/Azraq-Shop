@@ -1,78 +1,102 @@
 import React from 'react';
-import { Sparkles, DollarSign, ShoppingCart, Headphones } from 'lucide-react';
+import { 
+  ShieldCheck, 
+  Headphones, 
+  RotateCcw, 
+  Award, 
+  Facebook, 
+  Youtube, 
+  Instagram 
+} from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 
 export default function BrandValuePanel() {
   const { t } = useShop();
 
-  const values = [
+  const benefits = [
     {
-      icon: Sparkles,
-      title: t("Thoughtful Product Selection", "বাছাইকৃত পণ্যের সমাহার"),
-      desc: t(
-        "Every single item is physically curated from verified suppliers for daily utility and modern aesthetics.",
-        "প্রতিটি পণ্য অত্যন্ত সচেতনভাবে দৈনন্দিন উপযোগিতা ও মানের ভিত্তিতে নির্বাচিত।"
-      )
-    },
-    {
-      icon: DollarSign,
-      title: t("Transparent Pricing", "স্বচ্ছ ও যৌক্তিক মূল্য"),
-      desc: t(
-        "Direct wholesale dropshipping margins with zero hidden fees. Flat delivery fees across all of Bangladesh.",
-        "সরাসরি পাইকারি আমদানির মাধ্যমে ন্যায্য মূল্য এবং কোনো গোপন চার্জ ছাড়া কেনাকাটা।"
-      )
-    },
-    {
-      icon: ShoppingCart,
-      title: t("Convenient Shopping", "সহজ ও নির্ভরযোগ্য কেনাকাটা"),
-      desc: t(
-        "Seamless Cash on Delivery, instant bKash checkout, and door-to-door delivery within 24-72 hours.",
-        "ক্যাশ অন ডেলিভারি এবং দ্রুততম সময়ে গ্রাহকের দোরগোড়ায় পার্সেল পৌঁছানোর ব্যবস্থা।"
-      )
+      icon: ShieldCheck,
+      title: t('Secure Payment', 'নিরাপদ পেমেন্ট'),
+      desc: t('100% Secure & Trusted', '১০০% বিশ্বস্ত ও নিরাপদ'),
     },
     {
       icon: Headphones,
-      title: t("Customer Support", "সার্বক্ষণিক গ্রাহক সেবা"),
-      desc: t(
-        "Dedicated Dhaka-based concierge helpline, 7-day hassle-free replacement, and real-time tracking.",
-        "যেকোনো তথ্যে সার্বক্ষণিক সহায়তা এবং সহজ রিটার্ন ও পরিবর্তন সুবিধা।"
-      )
-    }
+      title: t('24/7 Support', '২৪/৭ কাস্টমার সাপোর্ট'),
+      desc: t("We're here to help", 'সার্বক্ষণিক সহায়তা'),
+    },
+    {
+      icon: RotateCcw,
+      title: t('Easy Return', 'সহজ রিটার্ন সুবিধা'),
+      desc: t('Hassle-Free Return', 'ঝামেলাহীন রিটার্ন পলিসি'),
+    },
+    {
+      icon: Award,
+      title: t('Best Quality', 'সেরা কোয়ালিটি'),
+      desc: t('Verified Supplier QC', 'যাচাইকৃত আসল পণ্য'),
+    },
   ];
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="rounded-2xl bg-[#062B4F] p-8 sm:p-12 text-white border border-[#69C5F5]/30 shadow-xl relative overflow-hidden">
+    <section className="w-full py-6 select-none">
+      {/* Long Rounded Translucent Trust Bar (Reference Screenshot Exact Match) */}
+      <div className="rounded-[28px] bg-white/80 backdrop-blur-2xl border border-white/80 shadow-[0_8px_32px_rgba(6,43,79,0.06)] px-6 py-4.5 flex flex-col lg:flex-row items-center justify-between gap-6">
         
-        {/* Subtle glass reflection */}
-        <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
-
-        <div className="mb-8 relative z-10">
-          <span className="text-xs font-black tracking-[0.25em] text-[#50DDF0] uppercase">
-            {t("THE AZRAQ STANDARD • 4 PILLARS", "আজরাকের মূল চার স্তম্ভ")}
-          </span>
-          <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight mt-1">
-            {t("Built on Everyday Trust & Transparency", "বিশ্বাস ও স্বচ্ছতার প্রতিশ্রুতি")}
-          </h3>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
-          {values.map((v, i) => {
-            const Icon = v.icon;
+        {/* 4 Benefits with Vertical Dividers */}
+        <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-8 flex-1">
+          {benefits.map((item, idx) => {
+            const Icon = item.icon;
             return (
-              <div key={i} className="space-y-3 group">
-                <div className="w-11 h-11 rounded-xl bg-white/10 border border-[#69C5F5]/30 flex items-center justify-center text-[#50DDF0] group-hover:scale-110 group-hover:bg-[#0877C9] group-hover:text-white transition-all">
-                  <Icon className="w-5 h-5" />
+              <div 
+                key={idx}
+                className={`flex items-center gap-3 ${
+                  idx !== 0 ? 'lg:border-l lg:border-[#D9F0FF]/80 lg:pl-6' : ''
+                }`}
+              >
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#EDF5FD] to-[#D9EDFD] flex items-center justify-center shrink-0 shadow-xs text-[#0877C9]">
+                  <Icon className="w-5 h-5 text-[#0877C9]" />
                 </div>
-                <h4 className="font-extrabold text-sm sm:text-base text-white group-hover:text-[#50DDF0] transition-colors">
-                  {v.title}
-                </h4>
-                <p className="text-xs text-white/70 leading-relaxed font-normal">
-                  {v.desc}
-                </p>
+                <div className="min-w-0">
+                  <h4 className="text-xs sm:text-sm font-extrabold text-[#101C35] truncate leading-tight">
+                    {item.title}
+                  </h4>
+                  <p className="text-[11px] font-medium text-[#71849B] truncate mt-0.5">
+                    {item.desc}
+                  </p>
+                </div>
               </div>
             );
           })}
+        </div>
+
+        {/* Social Icons on Far Right (Reference Match) */}
+        <div className="flex items-center gap-2.5 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 lg:border-l lg:border-[#D9F0FF]/80 lg:pl-6 w-full lg:w-auto justify-center lg:justify-end">
+          <a
+            href="https://facebook.com"
+            target="_blank"
+            rel="noreferrer"
+            className="w-9 h-9 rounded-full bg-white shadow-xs hover:bg-[#0877C9] text-[#0877C9] hover:text-white flex items-center justify-center transition-all hover:scale-110"
+            title="Facebook"
+          >
+            <Facebook className="w-4 h-4" />
+          </a>
+          <a
+            href="https://youtube.com"
+            target="_blank"
+            rel="noreferrer"
+            className="w-9 h-9 rounded-full bg-white shadow-xs hover:bg-[#2563EB] text-[#2563EB] hover:text-white flex items-center justify-center transition-all hover:scale-110"
+            title="YouTube"
+          >
+            <Youtube className="w-4 h-4" />
+          </a>
+          <a
+            href="https://instagram.com"
+            target="_blank"
+            rel="noreferrer"
+            className="w-9 h-9 rounded-full bg-white shadow-xs hover:bg-[#F27A3F] text-[#F27A3F] hover:text-white flex items-center justify-center transition-all hover:scale-110"
+            title="Instagram"
+          >
+            <Instagram className="w-4 h-4" />
+          </a>
         </div>
 
       </div>
