@@ -86,11 +86,8 @@ export default function BrowseByCategoriesSection() {
             onClick={() => navigateTo('collection-detail', cat.slug)}
             className="flex flex-col items-center flex-shrink-0 group focus:outline-none"
           >
-            {/* Circular Glassy Bubble with Subtle Azure Ring */}
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-b from-[#F0F7FF] to-[#E6F3FF] border border-[#69C5F5]/35 p-3 flex items-center justify-center shadow-sm group-hover:shadow-[0_8px_25px_rgba(8,119,201,0.2)] group-hover:border-[#0877C9] group-hover:scale-108 transition-all duration-300 relative overflow-hidden">
-              {/* Subtle Light Reflection Arc */}
-              <div className="absolute top-0 left-0 right-0 h-1/2 bg-white/40 rounded-t-full pointer-events-none" />
-              
+            {/* Circular Tactile Neumorphic Bubble */}
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#EEF3F8] shadow-[6px_6px_14px_#CBD7E4,-6px_-6px_14px_#FFFFFF] group-hover:shadow-[8px_8px_18px_#CBD7E4,-8px_-8px_18px_#FFFFFF] active:shadow-[inset_3px_3px_6px_#CBD7E4,inset_-3px_-3px_6px_#FFFFFF] p-3 flex items-center justify-center group-hover:scale-105 transition-all duration-300 relative overflow-hidden">
               <img
                 src={cat.image}
                 alt={cat.title}
@@ -101,19 +98,19 @@ export default function BrowseByCategoriesSection() {
             </div>
 
             {/* Category Name */}
-            <span className="text-xs sm:text-sm font-bold text-[#062B4F] mt-2.5 group-hover:text-[#0877C9] transition-colors">
+            <span className="text-xs sm:text-sm font-bold text-[#2B3A4A] mt-2.5 group-hover:text-[#F27A3F] transition-colors">
               {t(cat.title, cat.titleBn)}
             </span>
           </button>
         ))}
 
-        {/* View All Chevron Arrow Pill (Reference Match) */}
+        {/* View All Chevron Arrow Pill */}
         <button
           onClick={() => navigateTo('collections')}
-          className="w-11 h-11 rounded-full bg-white border border-[#D9F0FF] hover:border-[#69C5F5] hover:bg-[#F0F7FF] text-[#062B4F] flex items-center justify-center flex-shrink-0 shadow-sm transition-all group ml-1"
+          className="w-11 h-11 rounded-full bg-[#EEF3F8] shadow-[5px_5px_10px_#CBD7E4,-5px_-5px_10px_#FFFFFF] active:shadow-[inset_3px_3px_6px_#CBD7E4,inset_-3px_-3px_6px_#FFFFFF] text-[#2B3A4A] hover:text-[#F27A3F] flex items-center justify-center flex-shrink-0 transition-all group ml-1"
           title="All Collections"
         >
-          <ChevronRight className="w-5 h-5 text-[#0877C9] transition-transform group-hover:translate-x-0.5" />
+          <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5" />
         </button>
       </div>
 

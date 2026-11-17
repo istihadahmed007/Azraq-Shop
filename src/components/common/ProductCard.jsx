@@ -56,8 +56,8 @@ export default function ProductCard({
 
   return (
     <div
-      className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-white/85 backdrop-blur-md border border-[#D9F0FF]/80 shadow-[0_4px_20px_-4px_rgba(16,28,53,0.06)] hover:bg-white hover:border-[#2563EB]/40 hover:shadow-[0_16px_36px_-6px_rgba(37,99,235,0.14)] hover:-translate-y-0.5 transition-all duration-300 ${
-        compact ? 'p-2.5 sm:p-3' : 'p-3 sm:p-4'
+      className={`group relative flex flex-col justify-between overflow-hidden rounded-[24px] bg-[#EEF3F8] shadow-[8px_8px_18px_#CBD7E4,-8px_-8px_18px_#FFFFFF] hover:shadow-[12px_12px_24px_#CBD7E4,-12px_-12px_24px_#FFFFFF] hover:-translate-y-1 transition-all duration-300 ${
+        compact ? 'p-2.5 sm:p-3' : 'p-3.5 sm:p-4'
       } ${className}`}
     >
       {/* 1. TOP OVERLAYS (Floating Badges & Wishlist) */}
@@ -77,21 +77,21 @@ export default function ProductCard({
       <button
         type="button"
         onClick={handleToggleFav}
-        className={`absolute top-2.5 right-2.5 sm:top-3.5 sm:right-3.5 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] ${
+        className={`absolute top-2.5 right-2.5 sm:top-3.5 sm:right-3.5 z-10 w-8 h-8 rounded-xl flex items-center justify-center transition-all bg-[#F7FAFD] shadow-[3px_3px_7px_#CBD7E4,-3px_-3px_7px_#FFFFFF] active:scale-90 focus:outline-none ${
           isFav
-            ? 'bg-[#2563EB] text-white shadow-md hover:bg-[#183B70]'
-            : 'bg-white/90 backdrop-blur-sm text-[#101C35]/40 hover:text-[#2563EB] hover:bg-white shadow-xs border border-white/60'
+            ? 'text-[#F27A3F]'
+            : 'text-[#CBD7E4] hover:text-[#F27A3F]'
         }`}
         title={isFav ? t("Remove from Wishlist", "পছন্দের তালিকা থেকে সরান") : t("Add to Wishlist", "পছন্দের তালিকায় যোগ করুন")}
         aria-label={`Wishlist ${product.name}`}
       >
-        <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isFav ? 'fill-white stroke-white' : ''}`} />
+        <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-all ${isFav ? 'fill-[#F27A3F] stroke-[#F27A3F] drop-shadow-[0_2px_8px_rgba(242,122,63,0.4)]' : ''}`} />
       </button>
 
       {/* 2. PRODUCT IMAGE WELL (Strict 1:1 Aspect Ratio Box) */}
       <div
         onClick={handleSelect}
-        className="relative w-full aspect-square rounded-xl bg-gradient-to-b from-[#F5F7FA]/90 to-white/70 p-2.5 sm:p-3.5 flex items-center justify-center cursor-pointer overflow-hidden border border-white/80 group-hover:border-[#D9F0FF] transition-colors"
+        className="relative w-full aspect-square rounded-[18px] bg-[#F5F8FA] shadow-[inset_2px_2px_5px_#CBD7E4,inset_-2px_-2px_5px_#FFFFFF] p-2.5 sm:p-3.5 flex items-center justify-center cursor-pointer overflow-hidden transition-all"
       >
         <img
           src={displayImage}
@@ -103,11 +103,11 @@ export default function ProductCard({
         />
 
         {/* Hover Quick View Pill Overlay */}
-        <div className="absolute inset-0 bg-[#101C35]/15 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none group-hover:pointer-events-auto">
+        <div className="absolute inset-0 bg-[#2B3A4A]/10 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none group-hover:pointer-events-auto">
           <button
             type="button"
             onClick={handleSelect}
-            className="px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-sm text-[#101C35] text-xs font-bold shadow-lg hover:bg-[#2563EB] hover:text-white transition-all transform hover:scale-105 flex items-center gap-1.5 border border-white/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+            className="px-3.5 py-1.5 rounded-full bg-[#EEF3F8] text-[#2B3A4A] text-xs font-bold shadow-[4px_4px_10px_#CBD7E4,-4px_-4px_10px_#FFFFFF] hover:text-[#F27A3F] transition-all transform hover:scale-105 flex items-center gap-1.5 focus:outline-none"
           >
             <Eye className="w-3.5 h-3.5" />
             <span>{t("Quick View", "বিস্তারিত")}</span>
@@ -116,11 +116,11 @@ export default function ProductCard({
       </div>
 
       {/* 3. DETAILS & TYPOGRAPHY SECTION */}
-      <div className="mt-2.5 pt-2 border-t border-[#D9F0FF]/60 flex flex-col justify-between flex-1">
+      <div className="mt-2.5 pt-2 flex flex-col justify-between flex-1">
         <div>
           {/* Category Tag */}
           {showCategory && categoryLabel && (
-            <span className="text-[10px] sm:text-[11px] font-semibold text-[#183B70] block truncate tracking-wide uppercase">
+            <span className="text-[10px] sm:text-[11px] font-semibold text-[#7D8FA3] block truncate tracking-wide uppercase">
               {categoryLabel}
             </span>
           )}
@@ -128,7 +128,7 @@ export default function ProductCard({
           {/* Product Title (Strict line-clamp-2 with min-height ensures aligned baseline) */}
           <h3
             onClick={handleSelect}
-            className={`font-bold text-[#101C35] line-clamp-2 min-h-[2.25rem] sm:min-h-[2.5rem] cursor-pointer hover:text-[#2563EB] transition-colors leading-snug ${
+            className={`font-bold text-[#2B3A4A] line-clamp-2 min-h-[2.25rem] sm:min-h-[2.5rem] cursor-pointer hover:text-[#F27A3F] transition-colors leading-snug ${
               compact ? 'text-xs sm:text-[13px]' : 'text-xs sm:text-sm'
             }`}
             title={product.name}
@@ -138,17 +138,17 @@ export default function ProductCard({
 
           {/* Rating (if enabled) */}
           {showRating && (
-            <div className="flex items-center gap-1 mt-1 text-[11px] font-bold text-amber-500">
-              <Star className="w-3 h-3 fill-amber-400 text-amber-400 flex-shrink-0" />
+            <div className="flex items-center gap-1 mt-1 text-[11px] font-bold text-[#F27A3F]">
+              <Star className="w-3 h-3 fill-[#F27A3F] text-[#F27A3F] flex-shrink-0" />
               <span>{product.rating || '4.8'}</span>
             </div>
           )}
         </div>
 
         {/* 4. PRICE & ACTION FOOTER */}
-        <div className="flex items-center justify-between gap-1.5 sm:gap-2 pt-2 mt-auto border-t border-gray-100/70">
+        <div className="flex items-center justify-between gap-1.5 sm:gap-2 pt-2 mt-auto pt-2 mt-auto">
           <div className="min-w-0 flex-1">
-            <div className={`font-black text-[#101C35] truncate ${compact ? 'text-xs sm:text-sm md:text-base' : 'text-sm sm:text-base md:text-lg'}`}>
+            <div className={`font-black text-[#2B3A4A] truncate ${compact ? 'text-xs sm:text-sm md:text-base' : 'text-sm sm:text-base md:text-lg'}`}>
               ৳{(product.price || 0).toLocaleString()}
             </div>
             <span
@@ -169,7 +169,7 @@ export default function ProductCard({
               compact ? 'w-7 h-7 sm:w-8 sm:h-8' : 'w-8 h-8 sm:w-9 sm:h-9'
             } ${
               isAvailable
-                ? 'bg-[#101C35] hover:bg-[#2563EB] text-white shadow-[0_2px_8px_rgba(16,28,53,0.15)] transform hover:scale-108 active:scale-95'
+                ? 'bg-[#EEF3F8] shadow-[5px_5px_10px_#CBD7E4,-5px_-5px_10px_#FFFFFF] active:shadow-[inset_3px_3px_6px_#CBD7E4,inset_-3px_-3px_6px_#FFFFFF] text-[#2B3A4A] hover:text-[#F27A3F] active:scale-95'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}
             title={isAvailable ? t("Add to Cart", "ব্যাগে যোগ করুন") : t("Out of Stock", "স্টক নেই")}
