@@ -1,18 +1,37 @@
 import React, { useState } from 'react';
+import { useShop } from '../context/ShopContext';
+import rawImages from '../data/whiteStoreImages.json';
+
+const STORE_IMAGES = {
+  hero: rawImages['hero_boot.jpg'] || '/images/white-store/hero_boot.jpg',
+  mms: rawImages['mms.jpg'] || '/images/white-store/mms.jpg',
+  banana: rawImages['banana.jpg'] || '/images/white-store/banana.jpg',
+  lion: rawImages['lion.jpg'] || '/images/white-store/lion.jpg',
+  can: rawImages['can.jpg'] || '/images/white-store/can.jpg',
+  mask_angled: rawImages['mask_angled.jpg'] || '/images/white-store/mask_angled.jpg',
+  mask_front: rawImages['mask_front.jpg'] || '/images/white-store/mask_front.jpg',
+};
 
 /**
  * Pixel-Accurate Soft Monochrome Neumorphic ("Soft UI") Desktop Storefront
- * - Outer Viewport: #D8E4EE
- * - Main Container: #EEF3F8 (border-radius: 36px)
- * - Elevated Surface: #F7FAFD
- * - Primary Slate Text: #2B3A4A
- * - Secondary Text: #7D8FA3
- * - Active Coral Heart / Badge: #F27A3F
+ * - Canvas Background: #D8E4EE
+ * - Surface Base: #EEF3F8
+ * - Elevated / Active: #F7FAFD
+ * - Primary Slate: #2B3A4A
+ * - Secondary Steel: #7D8FA3
+ * - Active Heart / Accent: #F27A3F
  */
 export default function NeumorphicStorefront() {
+  let shopContext = null;
+  try {
+    shopContext = useShop();
+  } catch (e) {
+    // Fallback if rendered outside ShopProvider
+  }
+
   const [activeTab, setActiveTab] = useState('Brand New');
   const [searchQuery, setSearchQuery] = useState('');
-  const [cartCount, setCartCount] = useState(1);
+  const [localCartCount, setLocalCartCount] = useState(1);
   const [favorites, setFavorites] = useState({
     hero: true,
     card1: true,
@@ -30,6 +49,10 @@ export default function NeumorphicStorefront() {
   });
 
   const [notification, setNotification] = useState('');
+
+  const cartItemsCount = shopContext?.cart 
+    ? shopContext.cart.reduce((sum, item) => sum + (item.quantity || 1), 0)
+    : localCartCount;
 
   const toggleFavorite = (id) => {
     setFavorites((prev) => {
@@ -51,18 +74,49 @@ export default function NeumorphicStorefront() {
     setTimeout(() => setNotification(''), 2200);
   };
 
-  const handleBuyNow = (name) => {
-    setCartCount((c) => c + 1);
+  const handleBuyNow = (name, price = 375) => {
+    if (shopContext?.addToCart) {
+      shopContext.addToCart({
+        id: 'woodland-boot-white',
+        title: 'Woodland Boot - White leather Edition',
+        name: 'Woodland Boot - White leather Edition',
+        price: price,
+        sale_price: price,
+        image: STORE_IMAGES.hero,
+        quantity: 1,
+      });
+      if (shopContext.setIsCartOpen) {
+        shopContext.setIsCartOpen(true);
+      }
+    } else {
+      setLocalCartCount((c) => c + 1);
+    }
     showNotice(`${name} added to cart!`);
   };
 
+  const handleOpenCart = () => {
+    if (shopContext?.setIsCartOpen) {
+      shopContext.setIsCartOpen(true);
+    } else {
+      showNotice('Cart view opened');
+    }
+  };
+
+  const handleOpenProfile = () => {
+    if (shopContext?.setIsAdminOpen) {
+      shopContext.setIsAdminOpen(true);
+    } else {
+      showNotice('Profile opened');
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#D8E4EE] p-4 md:p-8 flex items-center justify-center font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="min-h-screen bg-[#D8E4EE] p-3 sm:p-6 md:p-8 flex items-center justify-center font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Main Single App Container */}
-      <main className="w-full max-w-[1140px] bg-[#EEF3F8] rounded-[36px] p-6 md:p-8 shadow-[18px_18px_36px_#CBD7E4,-18px_-18px_36px_#FFFFFF] relative select-none">
+      <main className="w-full max-w-[1140px] bg-[#EEF3F8] rounded-[36px] p-5 sm:p-7 md:p-8 shadow-[18px_18px_36px_#CBD7E4,-18px_-18px_36px_#FFFFFF] relative select-none">
         
         {/* HEADER NAVIGATION */}
-        <header className="flex flex-col md:flex-row items-center justify-between gap-6 pb-6">
+        <header className="flex flex-col md:flex-row items-center justify-between gap-5 pb-6">
           
           {/* Brand Logo */}
           <div className="flex items-center">
@@ -72,7 +126,7 @@ export default function NeumorphicStorefront() {
           </div>
 
           {/* Centered Search Bar & Category Navigation */}
-          <div className="flex-1 max-w-md flex flex-col items-center gap-2.5">
+          <div className="flex-1 max-w-md w-full flex flex-col items-center gap-2.5">
             {/* Recessed Search Bar */}
             <div className="w-full bg-[#EEF3F8] shadow-[inset_5px_5px_10px_#CBD7E4,inset_-5px_-5px_10px_#FFFFFF] rounded-full px-5 py-2 flex items-center justify-between">
               <input
@@ -88,7 +142,7 @@ export default function NeumorphicStorefront() {
             </div>
 
             {/* Category Tabs */}
-            <nav className="flex items-center gap-6 text-xs md:text-sm font-semibold">
+            <nav className="flex items-center justify-center gap-4 sm:gap-6 text-xs md:text-sm font-semibold">
               {['Brand New', 'Clothes', 'Leather', 'Accessories'].map((tab) => (
                 <button
                   key={tab}
@@ -109,8 +163,9 @@ export default function NeumorphicStorefront() {
           <div className="flex items-center gap-4">
             {/* Smiley Icon */}
             <button 
+              onClick={handleOpenProfile}
               className="w-11 h-11 rounded-full bg-[#EEF3F8] shadow-[6px_6px_14px_#CBD7E4,-6px_-6px_14px_#FFFFFF] active:shadow-[inset_4px_4px_8px_#CBD7E4,inset_-4px_-4px_8px_#FFFFFF] flex items-center justify-center text-[#2B3A4A] hover:text-[#F27A3F] transition-all"
-              title="Profile"
+              title="Profile / Admin"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10" />
@@ -120,6 +175,7 @@ export default function NeumorphicStorefront() {
 
             {/* Shopping Cart with Coral Badge */}
             <button 
+              onClick={handleOpenCart}
               className="w-11 h-11 rounded-full bg-[#EEF3F8] shadow-[6px_6px_14px_#CBD7E4,-6px_-6px_14px_#FFFFFF] active:shadow-[inset_4px_4px_8px_#CBD7E4,inset_-4px_-4px_8px_#FFFFFF] flex items-center justify-center text-[#2B3A4A] relative hover:text-[#F27A3F] transition-all"
               title="Cart"
             >
@@ -127,7 +183,7 @@ export default function NeumorphicStorefront() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 7h13M9 21a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z" />
               </svg>
               <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#F27A3F] text-white text-[10px] font-bold flex items-center justify-center shadow-sm">
-                +
+                {cartItemsCount > 9 ? '9+' : cartItemsCount || '+'}
               </span>
             </button>
           </div>
@@ -142,7 +198,7 @@ export default function NeumorphicStorefront() {
             {/* High-Key Photo Frame */}
             <div className="w-full relative rounded-[28px] overflow-hidden aspect-[4/3] bg-[#E9F0F6]">
               <img 
-                src="/images/white-store/hero_boot.jpg" 
+                src={STORE_IMAGES.hero} 
                 alt="Woodland Boot" 
                 className="w-full h-full object-cover"
               />
@@ -175,7 +231,7 @@ export default function NeumorphicStorefront() {
               </div>
 
               <button
-                onClick={() => handleBuyNow('Woodland Boot')}
+                onClick={() => handleBuyNow('Woodland Boot', 375)}
                 className="px-6 py-2.5 rounded-full bg-[#EEF3F8] shadow-[6px_6px_14px_#CBD7E4,-6px_-6px_14px_#FFFFFF] active:shadow-[inset_4px_4px_8px_#CBD7E4,inset_-4px_-4px_8px_#FFFFFF] font-bold text-sm text-[#2B3A4A] flex items-center gap-2 hover:text-[#F27A3F] transition-all group"
               >
                 <span>Buy Now</span>
@@ -193,7 +249,7 @@ export default function NeumorphicStorefront() {
               {/* Card 1: Peanut m&m's */}
               <article className="bg-[#EEF3F8] rounded-[24px] p-2.5 shadow-[8px_8px_18px_#CBD7E4,-8px_-8px_18px_#FFFFFF] hover:shadow-[10px_10px_22px_#CBD7E4,-10px_-10px_22px_#FFFFFF] transition-all flex flex-col justify-between relative group">
                 <div className="w-full aspect-square rounded-[18px] overflow-hidden relative bg-[#E9F0F6]">
-                  <img src="/images/white-store/mms.jpg" alt="Peanut m&m's" className="w-full h-full object-cover" />
+                  <img src={STORE_IMAGES.mms} alt="Peanut m&m's" className="w-full h-full object-cover" />
                   <button onClick={() => toggleFavorite('card1')} className="absolute top-2 right-2 w-7 h-7 rounded-xl bg-[#F7FAFD] shadow-[3px_3px_6px_#CBD7E4,-3px_-3px_6px_#FFFFFF] flex items-center justify-center active:scale-90">
                     <svg className={`w-3.5 h-3.5 ${favorites.card1 ? 'text-[#F27A3F] fill-[#F27A3F]' : 'text-[#CBD7E4] fill-none stroke-current'}`} viewBox="0 0 24 24">
                       <path strokeWidth={favorites.card1 ? 0 : 2} d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -209,7 +265,7 @@ export default function NeumorphicStorefront() {
               {/* Card 2: Banana Art */}
               <article className="bg-[#EEF3F8] rounded-[24px] p-2.5 shadow-[8px_8px_18px_#CBD7E4,-8px_-8px_18px_#FFFFFF] hover:shadow-[10px_10px_22px_#CBD7E4,-10px_-10px_22px_#FFFFFF] transition-all flex flex-col justify-between relative group">
                 <div className="w-full aspect-square rounded-[18px] overflow-hidden relative bg-[#E9F0F6]">
-                  <img src="/images/white-store/banana.jpg" alt="Banana Art" className="w-full h-full object-cover" />
+                  <img src={STORE_IMAGES.banana} alt="Banana Art" className="w-full h-full object-cover" />
                   <button onClick={() => toggleFavorite('card2')} className="absolute bottom-2 right-2 w-7 h-7 rounded-xl bg-[#F7FAFD] shadow-[3px_3px_6px_#CBD7E4,-3px_-3px_6px_#FFFFFF] flex items-center justify-center active:scale-90">
                     <svg className={`w-3.5 h-3.5 ${favorites.card2 ? 'text-[#F27A3F] fill-[#F27A3F]' : 'text-[#CBD7E4] fill-none stroke-current'}`} strokeWidth={2} viewBox="0 0 24 24">
                       <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -225,7 +281,7 @@ export default function NeumorphicStorefront() {
               {/* Card 3: Lion Art Print */}
               <article className="bg-[#EEF3F8] rounded-[24px] p-2.5 shadow-[8px_8px_18px_#CBD7E4,-8px_-8px_18px_#FFFFFF] hover:shadow-[10px_10px_22px_#CBD7E4,-10px_-10px_22px_#FFFFFF] transition-all flex flex-col justify-between relative group">
                 <div className="w-full aspect-square rounded-[18px] overflow-hidden relative bg-[#E9F0F6]">
-                  <img src="/images/white-store/lion.jpg" alt="Lion Art Print" className="w-full h-full object-cover" />
+                  <img src={STORE_IMAGES.lion} alt="Lion Art Print" className="w-full h-full object-cover" />
                 </div>
                 <div className="mt-2.5 px-1 pb-1">
                   <h2 className="text-xs font-semibold text-[#2B3A4A] leading-tight">Lion Art Print</h2>
@@ -250,7 +306,7 @@ export default function NeumorphicStorefront() {
               {/* Card 4: Can */}
               <article className="bg-[#EEF3F8] rounded-[24px] p-2.5 shadow-[8px_8px_18px_#CBD7E4,-8px_-8px_18px_#FFFFFF] hover:shadow-[10px_10px_22px_#CBD7E4,-10px_-10px_22px_#FFFFFF] transition-all flex flex-col justify-between relative group">
                 <div className="w-full aspect-square rounded-[18px] overflow-hidden relative bg-[#E9F0F6]">
-                  <img src="/images/white-store/can.jpg" alt="Can" className="w-full h-full object-cover" />
+                  <img src={STORE_IMAGES.can} alt="Can" className="w-full h-full object-cover" />
                   <button onClick={() => toggleFavorite('card4')} className="absolute top-2 right-2 w-7 h-7 rounded-xl bg-[#F7FAFD] shadow-[3px_3px_6px_#CBD7E4,-3px_-3px_6px_#FFFFFF] flex items-center justify-center active:scale-90">
                     <svg className={`w-3.5 h-3.5 ${favorites.card4 ? 'text-[#F27A3F] fill-[#F27A3F]' : 'text-[#CBD7E4] fill-none stroke-current'}`} viewBox="0 0 24 24">
                       <path strokeWidth={favorites.card4 ? 0 : 2} d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -263,7 +319,7 @@ export default function NeumorphicStorefront() {
                     <span className="text-[11px] font-medium text-[#7D8FA3]">Size</span>
                     <div className="flex items-center bg-[#EEF3F8] shadow-[inset_3px_3px_6px_#CBD7E4,inset_-3px_-3px_6px_#FFFFFF] px-2 py-0.5 rounded-full text-xs font-semibold text-[#2B3A4A]">
                       <button onClick={() => updateQuantity('can', -1)} className="w-3.5 h-3.5 flex items-center justify-center hover:text-[#F27A3F] active:scale-90 font-bold">-</button>
-                      <span className="px-1 min-w-[12px] text-center text-[11px]">{quantities.can}</span>
+                      <span className="px-1 min-w-[12px] text-center text-[11px] font-mono">{quantities.can}</span>
                       <button onClick={() => updateQuantity('can', 1)} className="w-3.5 h-3.5 flex items-center justify-center hover:text-[#F27A3F] active:scale-90 font-bold">+</button>
                     </div>
                   </div>
@@ -273,7 +329,7 @@ export default function NeumorphicStorefront() {
               {/* Card 5: Mask Angled */}
               <article className="bg-[#EEF3F8] rounded-[24px] p-2.5 shadow-[8px_8px_18px_#CBD7E4,-8px_-8px_18px_#FFFFFF] hover:shadow-[10px_10px_22px_#CBD7E4,-10px_-10px_22px_#FFFFFF] transition-all flex flex-col justify-between relative group">
                 <div className="w-full aspect-square rounded-[18px] overflow-hidden relative bg-[#E9F0F6]">
-                  <img src="/images/white-store/mask_angled.jpg" alt="Mask" className="w-full h-full object-cover" />
+                  <img src={STORE_IMAGES.mask_angled} alt="Mask" className="w-full h-full object-cover" />
                   <button onClick={() => toggleFavorite('card5')} className="absolute top-2 right-2 w-7 h-7 rounded-xl bg-[#F7FAFD] shadow-[3px_3px_6px_#CBD7E4,-3px_-3px_6px_#FFFFFF] flex items-center justify-center active:scale-90">
                     <svg className={`w-3.5 h-3.5 ${favorites.card5 ? 'text-[#F27A3F] fill-[#F27A3F]' : 'text-[#CBD7E4] fill-none stroke-current'}`} viewBox="0 0 24 24">
                       <path strokeWidth={favorites.card5 ? 0 : 2} d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -286,7 +342,7 @@ export default function NeumorphicStorefront() {
                     <span className="text-[11px] font-medium text-[#7D8FA3]">Size</span>
                     <div className="flex items-center bg-[#EEF3F8] shadow-[inset_3px_3px_6px_#CBD7E4,inset_-3px_-3px_6px_#FFFFFF] px-2 py-0.5 rounded-full text-xs font-semibold text-[#2B3A4A]">
                       <button onClick={() => updateQuantity('mask1', -1)} className="w-3.5 h-3.5 flex items-center justify-center hover:text-[#F27A3F] active:scale-90 font-bold">-</button>
-                      <span className="px-1 min-w-[12px] text-center text-[11px]">{quantities.mask1}</span>
+                      <span className="px-1 min-w-[12px] text-center text-[11px] font-mono">{quantities.mask1}</span>
                       <button onClick={() => updateQuantity('mask1', 1)} className="w-3.5 h-3.5 flex items-center justify-center hover:text-[#F27A3F] active:scale-90 font-bold">+</button>
                     </div>
                   </div>
@@ -296,7 +352,7 @@ export default function NeumorphicStorefront() {
               {/* Card 6: Mask Front */}
               <article className="bg-[#EEF3F8] rounded-[24px] p-2.5 shadow-[8px_8px_18px_#CBD7E4,-8px_-8px_18px_#FFFFFF] hover:shadow-[10px_10px_22px_#CBD7E4,-10px_-10px_22px_#FFFFFF] transition-all flex flex-col justify-between relative group">
                 <div className="w-full aspect-square rounded-[18px] overflow-hidden relative bg-[#E9F0F6]">
-                  <img src="/images/white-store/mask_front.jpg" alt="Mask" className="w-full h-full object-cover" />
+                  <img src={STORE_IMAGES.mask_front} alt="Mask" className="w-full h-full object-cover" />
                   <button onClick={() => toggleFavorite('card6')} className="absolute top-2 right-2 w-7 h-7 rounded-xl bg-[#F7FAFD] shadow-[3px_3px_6px_#CBD7E4,-3px_-3px_6px_#FFFFFF] flex items-center justify-center active:scale-90">
                     <svg className={`w-3.5 h-3.5 ${favorites.card6 ? 'text-[#F27A3F] fill-[#F27A3F]' : 'text-[#CBD7E4] fill-none stroke-current'}`} viewBox="0 0 24 24">
                       <path strokeWidth={favorites.card6 ? 0 : 2} d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -309,7 +365,7 @@ export default function NeumorphicStorefront() {
                     <span className="text-[11px] font-medium text-[#7D8FA3]">Size</span>
                     <div className="flex items-center bg-[#EEF3F8] shadow-[inset_3px_3px_6px_#CBD7E4,inset_-3px_-3px_6px_#FFFFFF] px-2 py-0.5 rounded-full text-xs font-semibold text-[#2B3A4A]">
                       <button onClick={() => updateQuantity('mask2', -1)} className="w-3.5 h-3.5 flex items-center justify-center hover:text-[#F27A3F] active:scale-90 font-bold">-</button>
-                      <span className="px-1 min-w-[12px] text-center text-[11px]">{quantities.mask2}</span>
+                      <span className="px-1 min-w-[12px] text-center text-[11px] font-mono">{quantities.mask2}</span>
                       <button onClick={() => updateQuantity('mask2', 1)} className="w-3.5 h-3.5 flex items-center justify-center hover:text-[#F27A3F] active:scale-90 font-bold">+</button>
                     </div>
                   </div>
