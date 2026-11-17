@@ -56,3 +56,4 @@ export { default as AdminPanel } from './AdminPanel.jsx';
 export { default as AzraqLogo, AzraqBrandSymbol } from './AzraqLogo.jsx';
 export { default as BrandAssetsModal } from './BrandAssetsModal.jsx';
 export { default as Toast } from './Toast.jsx';
+export { default as NeumorphicStorefront } from './NeumorphicStorefront.jsx';
