@@ -135,6 +135,9 @@ export async function createCheckoutSession({ customer, items, deliveryArea, pro
     response = null;
   }
 
+  const contentType = response?.headers?.get('content-type') || '';
+  const isJson = contentType.includes('application/json');
+
   if (netErr || !response || !isJson || response.status === 404) {
     // If the server endpoint /api/payments/create is offline or returned 404 (e.g. Hostinger static deployment):
     // Fall back to the official AZRAQ Paymently merchant portal link so the customer is never blocked
