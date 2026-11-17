@@ -6,12 +6,14 @@ import {
   ShieldCheck, 
   Truck, 
   RotateCcw, 
-  CreditCard,
   ArrowUp
 } from 'lucide-react';
 import AzraqLogo from './AzraqLogo';
 import { useShop } from '../context/ShopContext';
 
+/**
+ * AZRAQ Shop — Professional Light Frosted Glass Footer
+ */
 export default function Footer() {
   const { collections, navigateTo, setIsTrackingOpen, setIsAdminOpen, t } = useShop();
 
@@ -20,25 +22,25 @@ export default function Footer() {
   };
 
   return (
-    <footer id="footer-section" className="w-full pt-6 pb-12 select-none">
+    <footer id="footer-section" className="w-full pt-2 pb-10 select-none">
       
-      {/* Frosted Ice-Blue Main Footer Container */}
-      <div className="rounded-[32px] bg-white/70 backdrop-blur-2xl border border-white/80 shadow-[0_8px_32px_rgba(6,43,79,0.05)] p-6 sm:p-10">
+      {/* Frosted Main Glass Footer Container */}
+      <div className="rounded-[32px] glass-panel p-6 sm:p-10">
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10">
           
           {/* 1. Brand Column (lg:col-span-4) */}
-          <div className="lg:col-span-4 flex flex-col items-start gap-4">
+          <div className="lg:col-span-4 flex flex-col items-start gap-3.5">
             <AzraqLogo variant="dark" size="md" showDescriptor={true} />
             
-            <p className="text-xs sm:text-sm font-medium text-[#71849B] max-w-sm leading-relaxed">
+            <p className="text-xs sm:text-[13px] font-medium text-[#71849B] max-w-sm leading-relaxed">
               {t(
                 'AZRAQ is your premier destination for authentic curated everyday goods, mobile accessories, kitchen essentials, and lifestyle collections across Bangladesh.',
                 'আজরাক বাংলাদেশের অন্যতম নির্ভরযোগ্য কিউরেটেড এভরিডে গুডস, মোবাইল এক্সেসরিজ ও আধুনিক লাইফস্টাইল শপ।'
               )}
             </p>
 
-            <div className="flex flex-col gap-2 pt-2 text-xs font-semibold text-[#485B73]">
+            <div className="flex flex-col gap-2 pt-2 text-xs font-semibold text-[#101C35]">
               <div id="footer-contact" className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-[#0877C9]" />
                 <span>+880 1711-223344</span>
@@ -83,7 +85,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* 3. Popular Collections (lg:col-span-3) */}
+          {/* 3. Top Collections (lg:col-span-3) */}
           <div className="lg:col-span-3 flex flex-col gap-3">
             <h4 className="text-xs font-black uppercase tracking-wider text-[#101C35]">
               {t('Top Collections', 'জনপ্রিয় ক্যাটাগরি')}
@@ -102,7 +104,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* 4. Customer Policies (lg:col-span-3) */}
+          {/* 4. Customer Assurance Policies (lg:col-span-3) */}
           <div className="lg:col-span-3 flex flex-col gap-3">
             <h4 className="text-xs font-black uppercase tracking-wider text-[#101C35]">
               {t('Customer Assurance', 'গ্রাহক সেবা ও নীতি')}
@@ -118,12 +120,12 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar: Copyright & Scroll to Top */}
-        <div className="mt-8 pt-6 border-t border-[#D9F0FF] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-semibold text-[#71849B]">
+        <div className="mt-8 pt-6 border-t border-white/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-semibold text-[#71849B]">
           <p>© {new Date().getFullYear()} AZRAQ. {t('All rights reserved. Curated Everyday Goods.', 'সর্বস্বত্ব সংরক্ষিত। কিউরেটেড এভরিডে গুডস।')}</p>
 
           <button
             onClick={scrollToTop}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-xs hover:bg-[#0877C9] hover:text-white text-[#101C35] transition-all group"
+            className="flex items-center gap-2 px-4 py-2 rounded-full glass-button hover:text-[#0877C9] text-[#101C35] transition-all group"
           >
             <span>{t('Back to Top', 'উপরে যান')}</span>
             <ArrowUp className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform" />

@@ -25,28 +25,28 @@ export default function BrandAssetsModal() {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-azraq-navy/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#101C35]/50 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200 select-none">
       <div 
-        className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-azraq-purple/30 overflow-hidden my-4 max-h-[92vh] flex flex-col"
+        className="relative w-full max-w-4xl glass-modal rounded-[28px] shadow-2xl border border-white/90 overflow-hidden my-4 max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         
         {/* Header Bar */}
-        <div className="p-6 bg-gradient-to-r from-azraq-navy to-azraq-charcoal text-white flex items-center justify-between border-b border-azraq-purple/20">
+        <div className="p-6 bg-white/80 backdrop-blur-md text-[#101C35] flex items-center justify-between border-b border-white/80">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-azraq-charcoal border border-azraq-lime/40 flex items-center justify-center text-azraq-lime">
+            <div className="w-10 h-10 rounded-[14px] bg-[#D9EDFF] flex items-center justify-center text-[#0877C9]">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-black text-white tracking-tight">
+                <h2 className="text-lg sm:text-xl font-black text-[#101C35] tracking-tight">
                   AZRAQ Brand Identity System & Design Book
                 </h2>
-                <span className="px-2 py-0.5 rounded-full bg-azraq-lime text-azraq-navy text-[10px] font-black uppercase">
+                <span className="px-2 py-0.5 rounded-full bg-[#0877C9] text-white text-[10px] font-black uppercase">
                   Official Assets
                 </span>
               </div>
-              <p className="text-xs text-white/60">
+              <p className="text-xs text-[#71849B]">
                 Wordmark • Geometric Monogram • Packaging • Mobile Icons • Social Brand Assets
               </p>
             </div>
@@ -54,7 +54,7 @@ export default function BrandAssetsModal() {
 
           <button
             onClick={() => setIsBrandAssetsOpen(false)}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-full glass-button text-[#101C35] hover:text-[#0877C9] flex items-center justify-center transition-colors"
           >
             <X className="w-4 h-4" />
           </button>

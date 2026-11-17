@@ -270,30 +270,30 @@ export default function VisualSearchModal() {
   if (!isVisualSearchOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-[#062B4F]/75 backdrop-blur-xl animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-[#101C35]/50 backdrop-blur-md animate-in fade-in duration-200 select-none">
       
       {/* Modal Dialog Window */}
       <div 
-        className="relative w-full max-w-4xl bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-[#69C5F5]/40 overflow-hidden my-4 max-h-[92vh] flex flex-col"
+        className="relative w-full max-w-4xl glass-modal rounded-[28px] shadow-2xl border border-white/90 overflow-hidden my-4 max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         
         {/* Header Bar */}
-        <div className="p-4 sm:p-5 border-b border-[#D9F0FF] bg-gradient-to-r from-[#F0F7FF] via-white to-[#F0F7FF] flex items-center justify-between flex-shrink-0">
+        <div className="p-4 sm:p-5 border-b border-white/80 bg-white/80 backdrop-blur-md flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full bg-[#0877C9] text-white flex items-center justify-center shadow-md">
-              <Camera className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 rounded-full bg-[#0877C9] text-white flex items-center justify-center shadow-xs">
+              <Camera className="w-4 h-4 text-white" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <h2 className="text-base sm:text-lg font-black text-[#062B4F] tracking-tight">
+                <h2 className="text-base sm:text-lg font-black text-[#101C35] tracking-tight">
                   {t("AI Visual Product Search", "এআই ভিজ্যুয়াল প্রোডাক্ট সার্চ")}
                 </h2>
-                <span className="px-2 py-0.5 rounded-full bg-[#50DDF0]/20 text-[#0877C9] text-[10px] font-black uppercase tracking-wider">
+                <span className="px-2 py-0.5 rounded-full bg-[#D9EDFF] text-[#0877C9] text-[10px] font-black uppercase tracking-wider">
                   CLIP Vision
                 </span>
               </div>
-              <p className="text-xs text-[#062B4F]/60">
+              <p className="text-xs text-[#71849B]">
                 {t("Search by Image — Discover identical and visually matching products across our catalogue.", "ছবি দিয়ে সরাসরি পণ্য খুঁজুন।")}
               </p>
             </div>
@@ -301,10 +301,10 @@ export default function VisualSearchModal() {
 
           <button
             onClick={handleClose}
-            className="w-8 h-8 rounded-full text-[#062B4F]/60 hover:text-[#062B4F] hover:bg-[#D9F0FF]/50 flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-full glass-button text-[#101C35] hover:text-[#0877C9] flex items-center justify-center transition-colors"
             title="Close"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 

@@ -529,14 +529,14 @@ export default function CheckoutModal() {
 
   return (
     <div 
-      className="fixed inset-0 z-50 bg-[#062B4F]/80 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-hidden animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 bg-[#101C35]/50 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-hidden animate-in fade-in duration-150 select-none"
       role="dialog"
       aria-modal="true"
       aria-labelledby="checkout-modal-title"
     >
       {/* Modal Surface */}
       <div 
-        className="relative w-full max-w-xl bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-slate-200 overflow-hidden max-h-[92dvh] flex flex-col my-auto"
+        className="relative w-full max-w-xl glass-modal rounded-t-[28px] sm:rounded-[28px] shadow-2xl overflow-hidden max-h-[92dvh] flex flex-col my-auto border border-white/90"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Accessible live region for status announcements */}
@@ -548,17 +548,17 @@ export default function CheckoutModal() {
         </div>
 
         {/* Modal Top Bar */}
-        <div className="flex items-center justify-between px-5 py-3.5 bg-[#101C35] text-white border-b border-[#183B70]">
+        <div className="flex items-center justify-between px-5 py-3.5 bg-white/80 backdrop-blur-md text-[#101C35] border-b border-white/80">
           <div className="flex items-center gap-2.5">
             <img src="/branding/azraq-icon.png" alt="AZRAQ Shop" className="w-5 h-5 object-contain shrink-0" />
-            <h2 id="checkout-modal-title" className="text-xs font-mono font-bold tracking-wider text-[#D9F0FF] uppercase">
+            <h2 id="checkout-modal-title" className="text-xs font-mono font-bold tracking-wider text-[#0877C9] uppercase">
               AZRAQ • {t("SECURE CHECKOUT", "নিরাপদ চেকআউট")}
             </h2>
           </div>
           <button
             onClick={handleClose}
             aria-label={t("Close checkout", "বন্ধ করুন")}
-            className="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+            className="w-7.5 h-7.5 rounded-full glass-button flex items-center justify-center text-[#101C35] hover:text-[#0877C9] transition-colors focus:outline-none"
           >
             <X className="w-4 h-4" />
           </button>

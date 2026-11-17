@@ -3,6 +3,10 @@ import { Search, ArrowUpDown, RefreshCw } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import ProductCard from './common/ProductCard';
 
+/**
+ * AZRAQ Shop — Main Curated Product Catalog Grid
+ * Responsive 5-column desktop, 4-column tablet, 2-column mobile glassmorphism grid.
+ */
 export default function ProductGrid() {
   const { 
     products, 
@@ -19,8 +23,8 @@ export default function ProductGrid() {
     t 
   } = useShop();
 
-  const [sortBy, setSortBy] = useState('featured'); // 'featured', 'price-low', 'price-high', 'rating'
-  const [visibleCount, setVisibleCount] = useState(24);
+  const [sortBy, setSortBy] = useState('featured');
+  const [visibleCount, setVisibleCount] = useState(25);
 
   // Dynamic categories extracted from authentic database products
   const categories = useMemo(() => {
@@ -30,7 +34,7 @@ export default function ProductGrid() {
 
   // Reset pagination when category or search changes
   React.useEffect(() => {
-    setVisibleCount(24);
+    setVisibleCount(25);
   }, [activeCategory, searchQuery, sortBy]);
 
   const filteredAndSortedProducts = useMemo(() => {
@@ -65,21 +69,21 @@ export default function ProductGrid() {
   }, [products, activeCategory, searchQuery, sortBy]);
 
   return (
-    <section id="all-products" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 mb-16">
+    <section id="all-products" className="w-full py-2 select-none">
       
       {/* Section Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 pb-6 border-b border-[#D9F0FF]">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 pb-4 border-b border-white/60">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#50DDF0] shadow-[0_0_8px_#50DDF0]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#0877C9] shadow-[0_0_8px_rgba(8,119,201,0.5)]" />
             <span className="text-[11px] font-black tracking-widest text-[#0877C9] uppercase">
               {t("OFFICIAL AUTHORIZED CATALOGUE", "অনুমোদিত সোর্স ক্যাটালগ")}
             </span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-black text-[#062B4F] tracking-tight">
+          <h2 className="text-xl sm:text-2xl lg:text-[28px] font-black text-[#101C35] tracking-tight">
             {t("All Curated Goods", "সকল কিউরেটেড পণ্য সম্ভার")}
           </h2>
-          <p className="text-xs sm:text-sm text-[#062B4F]/65 mt-1">
+          <p className="text-xs sm:text-sm text-[#71849B] mt-1">
             {t(
               "Imported & synchronized directly from EasyDrop. Original retail prices in BDT with genuine supplier specs.",
               "ইজিড্রপ থেকে সরাসরি আমদানিকৃত। আসল রিটেইল মূল্যে বিডিটি (৳)-তে নির্ভরযোগ্য ডেলিভারি।"
@@ -87,26 +91,26 @@ export default function ProductGrid() {
           </p>
         </div>
 
-        {/* Sync Status Badge */}
+        {/* Sync Status Badge & Count */}
         <div className="flex items-center gap-3">
           <button
             onClick={syncWithEasyDrop}
             disabled={syncStatus.isSyncing}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white border border-[#D9F0FF] text-[#062B4F] hover:bg-[#F0F7FF] transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold glass-button text-[#101C35]"
             title="Sync with EasyDrop API"
           >
             <RefreshCw className={`w-3.5 h-3.5 text-[#0877C9] ${syncStatus.isSyncing ? 'animate-spin' : ''}`} />
             <span>{syncStatus.isSyncing ? t('Syncing...', 'সিংকিং...') : t('EasyDrop Synced', 'ইজিড্রপ সিংক')}</span>
           </button>
           
-          <span className="text-xs font-bold text-[#062B4F]/70">
+          <span className="text-xs font-bold text-[#71849B]">
             {filteredAndSortedProducts.length} {t("Products", "পণ্য")}
           </span>
         </div>
       </div>
 
       {/* Filter and Controls Toolbar */}
-      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 mb-6">
         
         {/* Category Pills */}
         <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0 no-scrollbar">
@@ -114,10 +118,10 @@ export default function ProductGrid() {
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
                 activeCategory === cat
-                  ? 'bg-[#101C35] text-white shadow-md'
-                  : 'bg-white hover:bg-[#F5F7FA] text-[#101C35]/75 border border-[#E2E8F0]'
+                  ? 'bg-[#0877C9] text-white shadow-xs'
+                  : 'glass-button text-[#71849B] hover:text-[#101C35]'
               }`}
             >
               {cat === 'All' ? `${t('All', 'সকল')} (${products.length})` : cat}
@@ -127,15 +131,15 @@ export default function ProductGrid() {
 
         {/* Right Tools: Search & Sort */}
         <div className="flex items-center gap-3">
-          {/* Search Bar */}
+          {/* Quick Filter Search */}
           <div className="relative flex-1 sm:w-60">
-            <Search className="w-4 h-4 text-[#062B4F]/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#71849B] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder={t("Search by product name...", "পণ্য খুঁজুন...")}
+              placeholder={t("Filter within catalog...", "পণ্য ফিল্টার করুন...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-full bg-white border border-[#D9F0FF] text-xs text-[#062B4F] placeholder-[#062B4F]/40 focus:outline-none focus:border-[#0877C9] shadow-sm"
+              className="w-full pl-9 pr-4 py-2 rounded-full glass-input text-xs text-[#101C35] placeholder-[#71849B]"
             />
           </div>
 
@@ -144,51 +148,36 @@ export default function ProductGrid() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="appearance-none pl-4 pr-9 py-2 rounded-full bg-white border border-[#D9F0FF] text-xs font-bold text-[#062B4F] focus:outline-none focus:border-[#0877C9] shadow-sm cursor-pointer"
+              className="appearance-none pl-4 pr-9 py-2 rounded-full glass-input text-xs font-bold text-[#101C35] cursor-pointer"
             >
               <option value="featured">{t("Sort: Featured", "সাজান: সেরা")}</option>
               <option value="price-low">{t("Price: Low to High", "দাম: কম থেকে বেশি")}</option>
               <option value="price-high">{t("Price: High to Low", "দাম: বেশি থেকে কম")}</option>
               <option value="rating">{t("Customer Rating", "সর্বোচ্চ রেটিং")}</option>
             </select>
-            <ArrowUpDown className="w-3.5 h-3.5 text-[#062B4F]/50 absolute right-3 pointer-events-none" />
+            <ArrowUpDown className="w-3.5 h-3.5 text-[#71849B] absolute right-3 pointer-events-none" />
           </div>
         </div>
 
       </div>
 
-      {/* Product Grid */}
+      {/* Product Grid: 5 columns on desktop, 4 on large, 3 on medium, 2 on mobile */}
       {filteredAndSortedProducts.length === 0 ? (
-        <div className="py-16 text-center rounded-2xl bg-white/95 border border-[#D9F0FF] p-8 sm:p-12 space-y-4 max-w-xl mx-auto shadow-sm">
-          <div className="w-14 h-14 rounded-full bg-[#F0F7FF] text-[#0877C9] flex items-center justify-center mx-auto">
+        <div className="py-16 text-center rounded-[28px] glass-panel p-8 sm:p-12 space-y-4 max-w-xl mx-auto">
+          <div className="w-14 h-14 rounded-full bg-[#D9EDFF] text-[#0877C9] flex items-center justify-center mx-auto">
             <Search className="w-6 h-6" />
           </div>
-          <h3 className="text-lg sm:text-xl font-black text-[#062B4F]">
+          <h3 className="text-lg sm:text-xl font-black text-[#101C35]">
             {searchQuery.trim() 
               ? `${t("No products found for", "কোনো পণ্য পাওয়া যায়নি:")} "${searchQuery}"`
               : t("No products found in this category", "এই ক্যাটাগরিতে কোনো পণ্য পাওয়া যায়নি")}
           </h3>
-          <p className="text-xs sm:text-sm text-[#062B4F]/60 max-w-md mx-auto">
+          <p className="text-xs sm:text-sm text-[#71849B] max-w-md mx-auto">
             {t(
-              "Try searching with broader terms or explore our curated popular collections below.",
-              "অন্য কোনো নামে অনুসন্ধান করুন অথবা নিচের জনপ্রিয় কালেকশনগুলো ব্রাউজ করুন।"
+              "Try searching with broader terms or explore our curated popular collections.",
+              "অন্য কোনো নামে অনুসন্ধান করুন অথবা আমাদের অন্যান্য ক্যাটাগরি ব্রাউজ করুন।"
             )}
           </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
-            {['All', 'Men', 'Women', 'Electronics', 'Bags'].map((catPill) => (
-              <button
-                key={catPill}
-                onClick={() => {
-                  setSearchQuery('');
-                  setActiveCategory(catPill);
-                }}
-                className="px-3.5 py-1.5 rounded-full bg-[#F0F7FF] hover:bg-[#D9F0FF] text-[#0877C9] text-xs font-bold transition-all border border-[#D9F0FF]"
-              >
-                {catPill}
-              </button>
-            ))}
-          </div>
 
           <div className="pt-2">
             <button
@@ -196,7 +185,7 @@ export default function ProductGrid() {
                 setActiveCategory('All');
                 setSearchQuery('');
               }}
-              className="px-6 py-2.5 rounded-full bg-[#062B4F] text-white text-xs font-black hover:bg-[#0877C9] transition-all shadow-sm"
+              className="px-6 py-2.5 rounded-full glass-button-primary text-xs font-bold"
             >
               {t("Clear All Filters", "সকল ফিল্টার মুছুন")}
             </button>
@@ -204,7 +193,7 @@ export default function ProductGrid() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5 sm:gap-4.5">
             {filteredAndSortedProducts.slice(0, visibleCount).map(product => (
               <ProductCard
                 key={product.id}
@@ -221,15 +210,15 @@ export default function ProductGrid() {
 
           {/* Pagination / Load More */}
           {visibleCount < filteredAndSortedProducts.length && (
-            <div className="mt-12 text-center space-y-3">
-              <p className="text-xs text-[#062B4F]/60 font-semibold">
+            <div className="mt-10 text-center space-y-3">
+              <p className="text-xs text-[#71849B] font-semibold">
                 {t("Showing", "দেখাচ্ছে")} {Math.min(visibleCount, filteredAndSortedProducts.length)} {t("of", "এর মধ্যে")} {filteredAndSortedProducts.length} {t("Products", "পণ্য")}
               </p>
               <button
-                onClick={() => setVisibleCount(prev => prev + 24)}
-                className="px-8 py-3 rounded-full bg-[#062B4F] hover:bg-[#0877C9] text-white font-black text-xs sm:text-sm shadow-md transition-all transform hover:scale-105 active:scale-95 inline-flex items-center gap-2"
+                onClick={() => setVisibleCount(prev => prev + 25)}
+                className="px-8 py-3 rounded-full glass-button-primary font-bold text-xs sm:text-sm inline-flex items-center gap-2"
               >
-                <span>{t("Load More Products", "আরো ২৪টি পণ্য দেখুন")}</span>
+                <span>{t("Load More Products", "আরো ২৫টি পণ্য দেখুন")}</span>
                 <span className="w-5 h-5 rounded-full bg-white/20 text-white text-[10px] flex items-center justify-center">
                   +
                 </span>

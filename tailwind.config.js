@@ -7,6 +7,14 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Transparent Glassmorphism Global Palette
+        'azraq-bg': '#E8F2FC',
+        'azraq-bg-secondary': '#F3F8FF',
+        'azraq-frost': '#D9EDFF',
+        'azraq-primary': '#0877C9',
+        'azraq-soft-blue': '#69C5F5',
+        'azraq-text': '#101C35',
+        'azraq-muted': '#71849B',
         azraq: {
           // Brand Color System (Official Palette)
           midnight: '#101C35',   // Midnight Navy (Primary)
@@ -17,13 +25,13 @@ export default {
 
           // Semantic Theme Mappings
           navy: '#101C35',       // Primary Brand Midnight Navy
-          azure: '#183B70',      // Deep Blue
+          azure: '#0877C9',      // Primary Blue
           glass: '#69C5F5',      // Glass Azure Accent
-          sky: '#D9F0FF',        // Soft Sky Blue
-          ice: '#F5F7FA',        // Soft Gray Surface
+          sky: '#D9EDFF',        // Frost Blue
+          ice: '#F3F8FF',        // Secondary Background
           cyan: '#50DDF0',       // Subtle Cyan Accent
           lime: '#C9F34A',       // Neon Highlight Accent
-          cloud: '#F5F7FA',      // Soft Gray Background
+          cloud: '#E8F2FC',      // Main Background
           charcoal: '#0D172A',   // Deepest Midnight Surface
           dark: '#0A1324',
           card: '#101C35',

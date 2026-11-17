@@ -3,21 +3,16 @@ import {
   ChevronRight, 
   Search, 
   ArrowUpDown, 
-  Filter, 
-  Heart, 
-  Eye, 
-  ArrowRight, 
-  ShoppingBag,
-  ShieldCheck, 
-  Sparkles,
-  Layers
+  Sparkles
 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import ProductCard from './common/ProductCard';
 
+/**
+ * AZRAQ Shop — Collection Detail Page
+ */
 export default function CollectionDetailPage() {
   const { 
-    collections, 
     activeCollection, 
     activeCollectionProducts, 
     navigateTo, 
@@ -29,21 +24,21 @@ export default function CollectionDetailPage() {
   } = useShop();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [priceFilter, setPriceFilter] = useState('all'); // 'all', 'under-1500', '1500-3000', 'above-3000'
+  const [priceFilter, setPriceFilter] = useState('all');
   const [inStockOnly, setInStockOnly] = useState(false);
-  const [sortBy, setSortBy] = useState('featured'); // 'featured', 'price-low', 'price-high', 'rating'
+  const [sortBy, setSortBy] = useState('featured');
   const [visibleCount, setVisibleCount] = useState(24);
 
   // Safe fallback if collection is undefined
   if (!activeCollection) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-        <h2 className="text-2xl font-bold text-[#062B4F] mb-4">
+      <div className="w-full py-16 text-center select-none">
+        <h2 className="text-2xl font-bold text-[#101C35] mb-4">
           {t("Collection Not Found", "কালেকশনটি পাওয়া যায়নি")}
         </h2>
         <button
           onClick={() => navigateTo('collections')}
-          className="px-6 py-2.5 rounded-full bg-[#062B4F] text-white text-xs font-bold hover:bg-[#0877C9] transition-colors"
+          className="px-6 py-2.5 rounded-full glass-button-primary text-xs font-bold"
         >
           {t("Browse All Collections", "সকল কালেকশন দেখুন")}
         </button>
@@ -55,7 +50,6 @@ export default function CollectionDetailPage() {
   const filteredProducts = useMemo(() => {
     let result = [...(activeCollectionProducts || [])];
 
-    // Search query within collection - SAFELY checking properties
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       result = result.filter(p => 
@@ -67,7 +61,6 @@ export default function CollectionDetailPage() {
       );
     }
 
-    // Price filter
     if (priceFilter === 'under-1500') {
       result = result.filter(p => p.price < 1500);
     } else if (priceFilter === '1500-3000') {
@@ -76,12 +69,10 @@ export default function CollectionDetailPage() {
       result = result.filter(p => p.price > 3000);
     }
 
-    // Stock availability
     if (inStockOnly) {
       result = result.filter(p => p.in_stock !== false && (p.stock === undefined || p.stock > 0));
     }
 
-    // Sorting
     if (sortBy === 'price-low') {
       result.sort((a, b) => a.price - b.price);
     } else if (sortBy === 'price-high') {
@@ -96,84 +87,84 @@ export default function CollectionDetailPage() {
   const displayedProducts = filteredProducts.slice(0, visibleCount);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen">
+    <div className="w-full py-4 min-h-screen select-none">
       
       {/* Breadcrumb Navigation */}
-      <div className="flex items-center gap-2 text-xs font-semibold text-[#062B4F]/50 mb-6">
-        <button onClick={() => navigateTo('home')} className="hover:text-[#0877C9]">
+      <div className="flex items-center gap-2 text-xs font-semibold text-[#71849B] mb-5">
+        <button onClick={() => navigateTo('home')} className="hover:text-[#0877C9] transition-colors">
           {t("Home", "হোম")}
         </button>
         <ChevronRight className="w-3.5 h-3.5" />
-        <button onClick={() => navigateTo('collections')} className="hover:text-[#0877C9]">
+        <button onClick={() => navigateTo('collections')} className="hover:text-[#0877C9] transition-colors">
           {t("Collections", "কালেকশনসমূহ")}
         </button>
         <ChevronRight className="w-3.5 h-3.5" />
-        <span className="text-[#062B4F] font-bold">{activeCollection.name}</span>
+        <span className="text-[#101C35] font-bold">{activeCollection.name}</span>
       </div>
 
-      {/* Collection Hero Banner with Glassy Azraq Theme */}
-      <div className="rounded-2xl bg-gradient-to-r from-[#062B4F] via-[#0A3D6E] to-[#062B4F] text-white p-8 sm:p-12 mb-10 border border-[#69C5F5]/30 relative overflow-hidden shadow-xl">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-[#50DDF0]/10 rounded-full blur-3xl pointer-events-none" />
+      {/* Collection Hero Banner with Frosted Glass Theme */}
+      <div className="rounded-[32px] glass-feature p-6 sm:p-10 mb-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-[#69C5F5]/20 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
           <div className="space-y-3 text-center md:text-left max-w-xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#50DDF0]/20 text-[#50DDF0] text-xs font-mono font-bold">
-              <span>{t("EASYDROP SUPPLIER CATEGORY ID", "সাপ্লায়ার ক্যাটাগরি আইডি")}: {activeCollection.id}</span>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/85 text-[#0877C9] text-xs font-mono font-bold border border-white">
+              <span>{t("COLLECTION", "কালেকশন")} #{activeCollection.id}</span>
             </div>
-            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+            <h1 className="text-2xl sm:text-4xl font-black text-[#101C35] tracking-tight">
               {activeCollection.name}
             </h1>
-            <p className="text-xs sm:text-sm text-white/80 leading-relaxed font-normal">
+            <p className="text-xs sm:text-sm text-[#71849B] leading-relaxed font-normal">
               {t(activeCollection.description_en, activeCollection.description_bn)}
             </p>
-            <div className="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-3">
-              <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-white border border-white/20">
+            <div className="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-2.5">
+              <span className="px-3 py-1 rounded-full bg-white/80 backdrop-blur-md text-xs font-semibold text-[#101C35] border border-white">
                 {activeCollectionProducts?.length || 0} {t("Products Available", "পণ্য অন্তর্ভুক্ত")}
               </span>
-              <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-white border border-white/20">
-                {t("100% EasyDrop Authentic", "১০০% অনুমোদিত সরবরাহ")}
+              <span className="px-3 py-1 rounded-full bg-white/80 backdrop-blur-md text-xs font-semibold text-[#101C35] border border-white">
+                {t("100% Verified Quality", "১০০% পরীক্ষিত গুণমান")}
               </span>
             </div>
           </div>
 
-          <div className="w-44 h-44 sm:w-56 sm:h-56 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-4 flex items-center justify-center flex-shrink-0 shadow-lg overflow-hidden">
+          <div className="w-40 h-40 sm:w-52 sm:h-52 rounded-[24px] bg-[#F8FBFF]/85 border border-white/80 p-3.5 flex items-center justify-center flex-shrink-0 shadow-2xs overflow-hidden">
             <img
               src={activeCollection.cover_image || activeCollection.image_url || activeCollection.fallback_image}
               alt={activeCollection.name}
-              className="w-full h-full object-contain filter drop-shadow-xl"
+              className="w-full h-full object-contain filter drop-shadow-sm"
             />
           </div>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8 p-4 rounded-xl bg-white/95 backdrop-blur-md border border-[#D9F0FF] shadow-sm">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-6 p-3.5 sm:p-4 rounded-[22px] glass-panel">
         
         {/* Search within collection */}
         <div className="relative flex-1 md:max-w-xs">
-          <Search className="w-4 h-4 text-[#062B4F]/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-[#71849B] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder={t("Filter within collection...", "কালেকশনে খুঁজুন...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 rounded-full bg-[#F8FCFF] border border-[#D9F0FF] text-xs text-[#062B4F] placeholder-[#062B4F]/40 focus:outline-none focus:border-[#0877C9]"
+            className="w-full pl-9 pr-4 py-2 rounded-full glass-input text-xs text-[#101C35] placeholder-[#71849B]"
           />
         </div>
 
         {/* Filter Badges & Sort */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2.5">
           
           {/* Price Quick Filter */}
-          <div className="flex items-center gap-1 text-xs">
+          <div className="flex items-center gap-1.5 text-xs">
             {['all', 'under-1500', '1500-3000', 'above-3000'].map((p) => (
               <button
                 key={p}
                 onClick={() => setPriceFilter(p)}
                 className={`px-3 py-1.5 rounded-full font-bold transition-all ${
                   priceFilter === p 
-                    ? 'bg-[#062B4F] text-white' 
-                    : 'bg-[#F8FCFF] text-[#062B4F]/70 hover:bg-[#D9F0FF]/50 border border-[#D9F0FF]'
+                    ? 'bg-[#0877C9] text-white shadow-2xs' 
+                    : 'glass-button text-[#71849B] hover:text-[#101C35]'
                 }`}
               >
                 {p === 'all' && t('All Prices', 'সব দাম')}
@@ -189,14 +180,14 @@ export default function CollectionDetailPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="appearance-none pl-3 pr-8 py-1.5 rounded-full bg-[#F8FCFF] border border-[#D9F0FF] text-xs font-bold text-[#062B4F] focus:outline-none focus:border-[#0877C9] cursor-pointer"
+              className="appearance-none pl-3 pr-8 py-1.5 rounded-full glass-input text-xs font-bold text-[#101C35] cursor-pointer"
             >
               <option value="featured">{t("Featured", "সেরা")}</option>
               <option value="price-low">{t("Price: Low to High", "দাম: কম")}</option>
               <option value="price-high">{t("Price: High to Low", "দাম: বেশি")}</option>
               <option value="rating">{t("Top Rated", "রেটিং")}</option>
             </select>
-            <ArrowUpDown className="w-3.5 h-3.5 text-[#062B4F]/50 absolute right-2.5 pointer-events-none" />
+            <ArrowUpDown className="w-3.5 h-3.5 text-[#71849B] absolute right-2.5 pointer-events-none" />
           </div>
 
         </div>
@@ -205,8 +196,8 @@ export default function CollectionDetailPage() {
 
       {/* Products Grid */}
       {displayedProducts.length === 0 ? (
-        <div className="py-16 text-center rounded-2xl bg-white/90 border border-[#D9F0FF] p-8 space-y-4">
-          <p className="text-base font-bold text-[#062B4F]">
+        <div className="py-16 text-center rounded-[28px] glass-panel p-8 space-y-4">
+          <p className="text-base font-bold text-[#101C35]">
             {t("No products found matching your filters", "কোনো পণ্য খুঁজে পাওয়া যায়নি")}
           </p>
           <button
@@ -215,13 +206,13 @@ export default function CollectionDetailPage() {
               setPriceFilter('all');
               setInStockOnly(false);
             }}
-            className="px-5 py-2 rounded-full bg-[#062B4F] text-white text-xs font-bold hover:bg-[#0877C9] transition-colors"
+            className="px-5 py-2 rounded-full glass-button-primary text-xs font-bold"
           >
             {t("Reset Filters", "ফিল্টার রিসেট করুন")}
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-4.5">
           {displayedProducts.map(product => (
             <ProductCard
               key={product.id}
@@ -242,7 +233,7 @@ export default function CollectionDetailPage() {
         <div className="text-center pt-10">
           <button
             onClick={() => setVisibleCount(prev => prev + 24)}
-            className="px-8 py-3 rounded-full bg-white border border-[#D9F0FF] text-[#062B4F] hover:bg-[#F0F7FF] hover:border-[#69C5F5] font-bold text-xs shadow-sm transition-all"
+            className="px-8 py-3 rounded-full glass-button text-[#101C35] hover:text-[#0877C9] font-bold text-xs shadow-xs transition-all"
           >
             {t(`Load More (${filteredProducts.length - visibleCount} remaining)`, `আরও দেখুন (${filteredProducts.length - visibleCount}টি বাকি)`)}
           </button>

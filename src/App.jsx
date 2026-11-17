@@ -29,33 +29,38 @@ function StorefrontContent() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#E8F2FC] via-[#F1F7FE] to-[#E8F2FC] text-[#101C35] selection:bg-[#2563EB]/20 selection:text-[#101C35] font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="min-h-screen bg-[#E8F2FC] text-[#101C35] selection:bg-[#0877C9]/20 selection:text-[#101C35] font-['Plus_Jakarta_Sans',sans-serif] relative overflow-x-hidden">
       
-      {/* Outer App Frame (Reference Screenshot Composition) */}
-      <div className="max-w-[1720px] mx-auto p-3 sm:p-5 lg:p-6 flex items-start gap-5 lg:gap-6 relative">
+      {/* Ambient Blue Background Lighting (Scandinavian Frosted Atmosphere) */}
+      <div className="fixed -top-24 -left-24 w-[480px] h-[480px] bg-[#69C5F5]/15 rounded-full blur-[130px] pointer-events-none -z-10" />
+      <div className="fixed top-1/3 -right-20 w-[520px] h-[520px] bg-[#D9EDFF]/60 rounded-full blur-[140px] pointer-events-none -z-10" />
+      <div className="fixed bottom-0 left-1/4 w-[440px] h-[440px] bg-[#69C5F5]/10 rounded-full blur-[120px] pointer-events-none -z-10" />
+
+      {/* Main Desktop Container (Max content width ~1440px, centered, clear vertical rhythm) */}
+      <div className="max-w-[1440px] mx-auto p-4 sm:p-5 lg:p-6 flex items-start gap-6 relative">
         
-        {/* 1. Left Floating Sidebar Navigation */}
+        {/* 1. Left Floating Sidebar Navigation (240px desktop) */}
         <Sidebar 
           isOpen={isSidebarOpen} 
           onClose={() => setIsSidebarOpen(false)} 
         />
 
-        {/* 2. Main Content Stream */}
-        <div className="flex-1 min-w-0 flex flex-col gap-4 sm:gap-6">
+        {/* 2. Main Content Stream (Flexible remaining width) */}
+        <div className="flex-1 min-w-0 flex flex-col gap-6">
           
-          {/* Top Utility & Search Header */}
+          {/* Top Floating Glass Header */}
           <Header 
             onToggleSidebar={() => setIsSidebarOpen(prev => !prev)} 
           />
 
           {/* Primary View Container */}
-          <main className="transition-all duration-300 flex flex-col gap-4">
+          <main className="transition-all duration-300 flex flex-col gap-7">
             {currentView === 'home' && (
               <>
                 {/* 3. Hero Section (Left Hero + Right Stacked Promo Cards) */}
                 <HeroSection />
 
-                {/* 4. Horizontal Category Strip (Shop by Category + Category Pills) */}
+                {/* 4. Horizontal Category Strip (Shop by Category + Category Cards) */}
                 <BrowseByCategoriesSection />
 
                 {/* 5. Popular Products (6 Product Cards + Right Featured Collection Card) */}

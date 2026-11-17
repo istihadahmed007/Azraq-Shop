@@ -192,28 +192,28 @@ export default function AdminPanel() {
     };
 
     return (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-azraq-navy/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-[#101C35]/50 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200 select-none">
             <div
-                className="relative w-full max-w-6xl bg-white rounded-3xl shadow-2xl border border-azraq-purple/30 overflow-hidden my-4 max-h-[92vh] flex flex-col"
+                className="relative w-full max-w-6xl glass-modal rounded-[28px] shadow-2xl border border-white/90 overflow-hidden my-4 max-h-[92vh] flex flex-col"
                 onClick={(e) => e.stopPropagation()}
             >
 
                 {/* Header Bar */}
-                <div className="p-6 bg-[#101C35] text-white flex items-center justify-between border-b border-[#183B70]">
+                <div className="p-6 bg-white/80 backdrop-blur-md text-[#101C35] flex items-center justify-between border-b border-white/80">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center p-1.5 shrink-0">
+                        <div className="w-10 h-10 rounded-[14px] bg-[#D9EDFF] border border-white/80 flex items-center justify-center p-1.5 shrink-0">
                             <img src="/branding/azraq-icon.png" alt="AZRAQ Shop" className="w-full h-full object-contain" />
                         </div>
                         <div>
                             <div className="flex items-center gap-2">
-                                <h2 className="text-xl font-black text-white tracking-tight">
+                                <h2 className="text-lg sm:text-xl font-black text-[#101C35] tracking-tight">
                                     AZRAQ Multi-Collection Operations & Dropship Portal
                                 </h2>
-                                <span className="px-2 py-0.5 rounded-full bg-[#2563EB] text-white text-[10px] font-black uppercase">
+                                <span className="px-2 py-0.5 rounded-full bg-[#0877C9] text-white text-[10px] font-black uppercase">
                                     Admin System
                                 </span>
                             </div>
-                            <p className="text-xs text-white/60">
+                            <p className="text-xs text-[#71849B]">
                                 EasyDrop Source: https://easydrop.asia/new-store • 18 Collections • 257 Unique Products
                             </p>
                         </div>
@@ -221,7 +221,7 @@ export default function AdminPanel() {
 
                     <button
                         onClick={() => setIsAdminOpen(false)}
-                        className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+                        className="w-8 h-8 rounded-full glass-button text-[#101C35] hover:text-[#0877C9] flex items-center justify-center transition-colors"
                     >
                         <X className="w-4 h-4" />
                     </button>

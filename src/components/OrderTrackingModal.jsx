@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { X, Search, CheckCircle2, Clock, Truck, Package, ShieldCheck, Headphones, Loader2, KeyRound } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 
+/**
+ * AZRAQ Shop — Transparent Glassmorphism Order Tracking Modal
+ */
 export default function OrderTrackingModal() {
   const { isTrackingOpen, setIsTrackingOpen, t } = useShop();
 
@@ -32,7 +35,6 @@ export default function OrderTrackingModal() {
 
     setIsLoading(true);
     try {
-      // Call backend secure order tracking API
       const isToken = cleanPhone.startsWith('trk_');
       const payload = {
         orderId: cleanOrderRef,
@@ -61,10 +63,10 @@ export default function OrderTrackingModal() {
         setActiveOrder(null);
       } else {
         setActiveOrder(data.order);
-        setSearchError('');
       }
     } catch (err) {
-      setSearchError(t("Connection error. Please check your network and try again.", "নেটওয়ার্ক ত্রুটি। অনুগ্রহ করে সংযোগ পরীক্ষা করে পুনরায় চেষ্টা করুন।"));
+      setSearchError(t("Network error connecting to tracking service. Please try again.", "নেটওয়ার্ক সমস্যা হয়েছে। অনুগ্রহ করে পুনরায় চেষ্টা করুন।"));
+      setActiveOrder(null);
     } finally {
       setIsLoading(false);
     }
@@ -105,41 +107,41 @@ export default function OrderTrackingModal() {
   const milestones = activeOrder ? getFulfillmentMilestones(activeOrder) : [];
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#062B4F]/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#101C35]/50 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200 select-none">
       <div 
-        className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-[#D9F0FF] overflow-hidden my-8"
+        className="relative w-full max-w-2xl glass-modal rounded-[28px] overflow-hidden my-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={() => setIsTrackingOpen(false)}
-          className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center transition-colors"
+          className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full glass-button flex items-center justify-center text-[#101C35] hover:text-[#0877C9] transition-colors"
           aria-label="Close modal"
         >
           <X className="w-4 h-4" />
         </button>
 
         {/* Header */}
-        <div className="p-6 bg-[#101C35] text-white border-b border-[#183B70]">
+        <div className="p-6 bg-white/80 backdrop-blur-md border-b border-white/80">
           <div className="flex items-center gap-2.5">
             <img src="/branding/azraq-icon.png" alt="AZRAQ Shop" className="w-5 h-5 object-contain shrink-0" />
-            <span className="text-[10px] font-mono tracking-widest text-[#50DDF0] uppercase font-bold">
+            <span className="text-[10px] font-mono tracking-widest text-[#0877C9] uppercase font-bold">
               {t("AZRAQ CONCIERGE & LOGISTICS", "আজরাক লজিস্টিকস ও সিকিউর ট্র্যাকিং")}
             </span>
-            <ShieldCheck className="w-3.5 h-3.5 text-[#50DDF0]" />
+            <ShieldCheck className="w-3.5 h-3.5 text-[#0877C9]" />
           </div>
-          <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-1">
+          <h2 className="text-xl sm:text-2xl font-black text-[#101C35] tracking-tight mt-1">
             {t("Secure Order Tracking", "অর্ডারের লাইভ অবস্থান")}
           </h2>
-          <p className="text-xs text-white/70 mt-1">
+          <p className="text-xs text-[#71849B] mt-1">
             {t("To protect customer privacy, enter your Order ID along with your phone number or tracking token.", "গ্রাহকের তথ্য সুরক্ষায় অনুগ্রহ করে অর্ডার আইডি ও ফোন নম্বর দিন।")}
           </p>
 
           {/* Secure Search Form */}
-          <form onSubmit={handleSearch} className="mt-4 space-y-2">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <form onSubmit={handleSearch} className="mt-4 space-y-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div className="relative">
-                <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-[#71849B] absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Order ID (e.g. AZQ-ORD-...)"
@@ -148,12 +150,12 @@ export default function OrderTrackingModal() {
                     setOrderReference(e.target.value);
                     if (searchError) setSearchError('');
                   }}
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-white/10 text-white text-xs placeholder:text-white/40 border border-white/20 focus:outline-none focus:border-[#50DDF0]"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-full glass-input text-xs text-[#101C35] placeholder-[#71849B]"
                 />
               </div>
 
               <div className="relative">
-                <KeyRound className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <KeyRound className="w-4 h-4 text-[#71849B] absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Mobile (018...) or Token"
@@ -162,7 +164,7 @@ export default function OrderTrackingModal() {
                     setCustomerPhone(e.target.value);
                     if (searchError) setSearchError('');
                   }}
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-white/10 text-white text-xs placeholder:text-white/40 border border-white/20 focus:outline-none focus:border-[#50DDF0]"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-full glass-input text-xs text-[#101C35] placeholder-[#71849B]"
                 />
               </div>
             </div>
@@ -171,7 +173,7 @@ export default function OrderTrackingModal() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#50DDF0] text-[#062B4F] text-xs font-black hover:bg-[#69C5F5] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-full glass-button-primary text-xs font-bold flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isLoading ? (
                   <>
@@ -186,7 +188,7 @@ export default function OrderTrackingModal() {
           </form>
 
           {searchError && (
-            <div className="mt-3 p-2.5 rounded-xl bg-rose-500/20 border border-rose-400/30 text-rose-200 text-xs font-medium">
+            <div className="mt-3 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium">
               {searchError}
             </div>
           )}
@@ -194,133 +196,94 @@ export default function OrderTrackingModal() {
 
         {/* Order Details Body */}
         {activeOrder ? (
-          <div className="p-6 space-y-6">
+          <div className="p-6 space-y-5">
             
             {/* Order Meta Card */}
-            <div className="p-4 rounded-2xl bg-[#F8FCFF] border border-[#D9F0FF] flex flex-wrap items-center justify-between gap-4">
+            <div className="p-4 rounded-[20px] glass-card flex flex-wrap items-center justify-between gap-4">
               <div>
-                <span className="text-[10px] font-mono uppercase text-[#062B4F]/50">Order Reference</span>
-                <p className="text-base font-mono font-black text-[#062B4F]">{activeOrder.id}</p>
-                <p className="text-xs text-[#062B4F]/60">
+                <span className="text-[10px] font-mono uppercase text-[#71849B]">Order Reference</span>
+                <p className="text-base font-mono font-black text-[#101C35]">{activeOrder.id}</p>
+                <p className="text-xs text-[#71849B]">
                   {activeOrder.customer_name_masked || 'Customer'} • {activeOrder.customer_phone_masked || '018****'}
                 </p>
                 {activeOrder.city && (
-                  <p className="text-[11px] text-slate-500 mt-0.5">
+                  <p className="text-[11px] text-[#71849B] mt-0.5">
                     Destination: {activeOrder.city} ({activeOrder.delivery_area === 'inside' ? 'Inside Dhaka' : 'Outside Dhaka'})
                   </p>
                 )}
               </div>
 
               <div className="text-right">
-                <span className="text-[10px] font-mono uppercase text-[#062B4F]/50">Statuses</span>
+                <span className="text-[10px] font-mono uppercase text-[#71849B]">Statuses</span>
                 <div className="flex items-center gap-1.5 justify-end mt-1">
-                  {/* Fulfillment Status */}
-                  <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#D9F0FF] text-[#0877C9] text-[10px] font-bold">
+                  <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#D9EDFF] text-[#0877C9] text-[10px] font-bold">
                     Fulfillment: {activeOrder.fulfillment_status || 'Processing'}
                   </span>
-                  {/* Payment Status */}
                   <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                    activeOrder.payment_status === 'PAID'
-                      ? 'bg-emerald-100 text-emerald-700'
-                      : activeOrder.payment_status === 'PENDING_VERIFICATION'
-                      ? 'bg-amber-100 text-amber-700'
-                      : 'bg-blue-100 text-blue-700'
+                    activeOrder.payment_status === 'PAID' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
                   }`}>
-                    Payment: {activeOrder.payment_status || 'PENDING'}
+                    Payment: {activeOrder.payment_status}
                   </span>
                 </div>
-                {activeOrder.courier_name && (
-                  <p className="text-[11px] font-mono text-slate-500 mt-1">
-                    Courier: {activeOrder.courier_name} {activeOrder.courier_tracking_id ? `(#${activeOrder.courier_tracking_id})` : ''}
-                  </p>
-                )}
               </div>
             </div>
 
-            {/* Stepper Timeline */}
+            {/* Tracking Milestones Timeline */}
             <div className="space-y-4 pt-2">
-              <h4 className="text-xs font-black uppercase tracking-wider text-[#062B4F]">
-                {t("Shipment Milestones", "ডেলিভারি ধাপসমূহ")}
-              </h4>
+              <h3 className="text-xs font-black uppercase tracking-wider text-[#101C35]">
+                {t("Logistics Progress", "ডেলিভারি ট্র্যাকিং ধাপসমূহ")}
+              </h3>
 
-              <div className="space-y-4 relative before:absolute before:left-3.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-[#D9F0FF]">
-                {milestones.map((st, i) => (
-                  <div key={i} className="flex items-start gap-4 relative">
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 z-10 ${
-                      st.status === 'completed'
-                        ? 'bg-[#0877C9] text-white shadow-sm'
-                        : st.status === 'current'
-                        ? 'bg-[#50DDF0] text-[#062B4F] ring-4 ring-[#50DDF0]/30 animate-pulse font-black'
-                        : 'bg-gray-100 text-gray-400'
+              <div className="space-y-4 relative before:absolute before:inset-0 before:left-3 before:w-0.5 before:bg-[#D9EDFF]">
+                {milestones.map((m, idx) => (
+                  <div key={idx} className="relative flex items-start gap-4 pl-8">
+                    <span className={`absolute left-1.5 top-1 -translate-x-1/2 w-4 h-4 rounded-full flex items-center justify-center border-2 ${
+                      m.status === 'completed'
+                        ? 'bg-[#0877C9] border-[#0877C9] text-white'
+                        : m.status === 'current'
+                        ? 'bg-white border-[#0877C9] text-[#0877C9] animate-pulse'
+                        : 'bg-white border-gray-300'
                     }`}>
-                      {st.status === 'completed' ? '✓' : i + 1}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <h5 className="text-xs font-bold text-[#062B4F]">{st.title}</h5>
-                        {st.time && <span className="text-[10px] font-mono text-slate-400">{st.time}</span>}
+                      {m.status === 'completed' && <CheckCircle2 className="w-3 h-3 text-white" />}
+                    </span>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <h4 className={`text-xs font-bold ${m.status === 'completed' || m.status === 'current' ? 'text-[#101C35]' : 'text-[#71849B]'}`}>
+                          {m.title}
+                        </h4>
+                        {m.time && (
+                          <span className="text-[10px] font-mono text-[#71849B]">{m.time}</span>
+                        )}
                       </div>
-                      <p className="text-[11px] text-[#062B4F]/60">{st.desc}</p>
+                      <p className="text-[11px] text-[#71849B] mt-0.5">{m.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Order Items Snapshot */}
-            {activeOrder.items && activeOrder.items.length > 0 && (
-              <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 text-xs space-y-2">
-                <span className="font-bold text-[#062B4F] block">Items in this Parcel:</span>
-                {activeOrder.items.map((it, idx) => (
-                  <div key={idx} className="flex justify-between text-gray-600 text-[11px]">
-                    <span>{it.quantity}x {it.name?.split('—')[1] || it.name} ({it.variant || 'Standard'})</span>
-                    <span className="font-mono font-bold">৳{((it.unit_price || it.price) * it.quantity).toLocaleString()}</span>
-                  </div>
-                ))}
-                <div className="pt-2 border-t border-gray-200 flex justify-between font-bold text-[#062B4F]">
-                  <span>Total Authoritative Amount:</span>
-                  <span className="font-mono text-[#0877C9]">৳{Number(activeOrder.total || 0).toLocaleString()} BDT ({activeOrder.payment_method})</span>
-                </div>
-              </div>
-            )}
-
-            {/* Audit Status History Log */}
-            {activeOrder.history && activeOrder.history.length > 0 && (
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/60 text-xs space-y-1.5">
-                <span className="text-[10px] font-mono uppercase text-slate-500 font-bold block">Status Audit Log:</span>
-                {activeOrder.history.map((h, idx) => (
-                  <div key={idx} className="text-[11px] text-slate-600 flex justify-between">
-                    <span>
-                      <strong className="text-slate-800">[{h.status_type}]</strong> {h.new_status} — {h.notes}
-                    </span>
-                    <span className="text-[10px] font-mono text-slate-400 ml-2">
-                      {new Date(h.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Support Concierge Banner */}
-            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#062B4F] text-white text-xs">
-              <div className="flex items-center gap-2">
-                <Headphones className="w-4 h-4 text-[#50DDF0]" />
-                <span>Concierge Helpline: <strong>+880 1851-172032</strong></span>
+            {/* Customer Care Hotline Box */}
+            <div className="p-3.5 rounded-[18px] bg-[#F0F7FF] border border-white/80 flex items-center justify-between text-xs text-[#101C35]">
+              <div className="flex items-center gap-2.5">
+                <Headphones className="w-4 h-4 text-[#0877C9]" />
+                <span>{t("Need help with this order?", "এই অর্ডার নিয়ে কোনো সহায়তার প্রয়োজন?")}</span>
               </div>
               <a 
-                href="https://wa.me/8801851172032" 
-                target="_blank" 
+                href="https://wa.me/8801711223344"
+                target="_blank"
                 rel="noreferrer"
-                className="px-3 py-1 rounded-full bg-[#50DDF0] text-[#062B4F] text-[10px] font-bold hover:bg-[#69C5F5] transition-colors"
+                className="px-3 py-1 rounded-full glass-button text-[11px] font-bold text-[#0877C9]"
               >
-                WhatsApp
+                WhatsApp Concierge
               </a>
             </div>
 
           </div>
         ) : (
-          <div className="p-12 text-center text-xs text-[#062B4F]/60">
-            {t("Enter your Order ID and phone number above to see real-time verified dispatch updates.", "লাইভ আপডেট দেখতে উপরে অর্ডার আইডি ও ফোন নম্বর দিন।")}
+          <div className="p-8 text-center text-xs text-[#71849B] space-y-2">
+            <Package className="w-8 h-8 text-[#0877C9]/40 mx-auto" />
+            <p>{t("Enter your Order ID (from SMS receipt) to view real-time delivery status.", "রসিদে প্রদত্ত অর্ডার আইডি দিয়ে লাইভ স্ট্যাটাস দেখুন।")}</p>
           </div>
         )}
 

@@ -3,6 +3,10 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import ProductCard from './common/ProductCard';
 
+/**
+ * AZRAQ Shop — Trending / Popular Products Section
+ * Features 6 popular cards and 1 right-side featured collection banner with equal height.
+ */
 export default function TrendingRightNowSection() {
   const { 
     products, 
@@ -14,17 +18,17 @@ export default function TrendingRightNowSection() {
     t 
   } = useShop();
 
-  // Take 6 curated popular products from the catalog
+  // Curated 6 popular products from the catalog
   const popularList = products.slice(0, 6);
 
   return (
-    <section id="popular-products" className="w-full py-4 select-none">
+    <section id="popular-products" className="w-full py-1 select-none">
       
-      {/* Section Header (Reference Screenshot Exact Match: - Popular Products ... View All ->) */}
+      {/* Section Heading & Link */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-1 rounded-full bg-[#0877C9]" />
-          <h2 className="text-lg sm:text-xl font-black text-[#101C35] tracking-tight">
+        <div className="flex items-center gap-2.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#0877C9] shadow-[0_0_8px_rgba(8,119,201,0.5)]" />
+          <h2 className="text-xl sm:text-2xl font-black text-[#101C35] tracking-tight">
             {t('Popular Products', 'জনপ্রিয় পণ্যসমূহ')}
           </h2>
         </div>
@@ -42,11 +46,11 @@ export default function TrendingRightNowSection() {
       </div>
 
       {/* Main Grid: 6 Products on Left + 1 Editorial Feature Card on Right */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-4 items-stretch">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3.5 sm:gap-4 items-stretch">
         
-        {/* 6 Product Cards (col-span-1 each, taking 6 columns on xl) */}
+        {/* 6 Product Cards */}
         {popularList.map((product) => (
-          <div key={product.id} className="xl:col-span-1">
+          <div key={product.id} className="col-span-1 h-full">
             <ProductCard
               product={product}
               isFav={favorites.includes(product.id)}
@@ -61,21 +65,27 @@ export default function TrendingRightNowSection() {
           </div>
         ))}
 
-        {/* 1 Right-Side Featured Collection Card (Matching Reference: 'Stay Connected Always') */}
+        {/* 1 Right-Side Featured Collection Glass Card */}
         <div 
           onClick={() => navigateTo('collections')}
-          className="xl:col-span-1 rounded-[24px] bg-gradient-to-br from-[#E2F0FD] via-[#D3E9FD] to-[#C0E0FB] border border-white/80 shadow-[0_6px_20px_rgba(6,43,79,0.06)] p-4 flex flex-col justify-between cursor-pointer hover:shadow-[0_12px_28px_rgba(8,119,201,0.15)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
+          className="col-span-2 sm:col-span-3 lg:col-span-1 xl:col-span-1 rounded-[22px] glass-card p-4 flex flex-col justify-between cursor-pointer group relative overflow-hidden h-full"
         >
           {/* Subtle Ambient Light */}
-          <div className="absolute -top-10 -right-10 w-28 h-28 bg-white/40 rounded-full blur-xl pointer-events-none" />
+          <div className="absolute -top-10 -right-10 w-28 h-28 bg-[#69C5F5]/20 rounded-full blur-xl pointer-events-none" />
 
           <div>
+            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#0877C9]/10 text-[#0877C9] text-[9px] font-black uppercase tracking-wider mb-2">
+              <Sparkles className="w-2.5 h-2.5 text-[#0877C9]" />
+              <span>{t('Featured', 'বাছাই')}</span>
+            </div>
+
             <h3 className="text-sm sm:text-base font-black text-[#101C35] tracking-tight leading-snug">
               {t('Stay Connected Always', 'সবসময় থাকুন কানেক্টেড')}
             </h3>
-            <p className="text-[11px] font-medium text-[#485B73] mt-1.5 leading-relaxed line-clamp-3">
+            
+            <p className="text-[11px] font-medium text-[#71849B] mt-1.5 leading-relaxed line-clamp-3">
               {t(
-                'Explore the best everyday mobile & lifestyle accessories at AZRAQ.',
+                'Explore the best everyday mobile accessories & curated essentials at AZRAQ.',
                 'সেরা গ্যাজেটস ও কিউরেটেড এভরিডে পণ্য কালেকশন।'
               )}
             </p>
@@ -84,17 +94,18 @@ export default function TrendingRightNowSection() {
           <div className="mt-4 flex flex-col gap-3">
             <button
               type="button"
-              className="w-full py-2 px-3 rounded-full bg-gradient-to-r from-[#0877C9] to-[#2563EB] text-white text-[11px] font-bold shadow-[0_3px_10px_rgba(37,99,235,0.25)] hover:shadow-md transition-all flex items-center justify-center gap-1.5"
+              className="w-full py-2 px-3 rounded-full glass-button-primary text-[11px] font-bold flex items-center justify-center gap-1.5"
             >
               <span>{t('Explore More', 'আরও দেখুন')}</span>
               <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
             </button>
 
             {/* Product Photo Showcase */}
-            <div className="w-full aspect-[4/3] rounded-xl bg-white/60 p-2 flex items-center justify-center overflow-hidden">
+            <div className="w-full aspect-[4/3] rounded-[16px] bg-[#F8FBFF]/85 border border-white/80 p-2 flex items-center justify-center overflow-hidden">
               <img
                 src="https://easydrop.asia/products/image-1794224164356-135288231.jpeg"
                 alt="Feature"
+                loading="lazy"
                 className="w-full h-full object-contain group-hover:scale-108 transition-transform duration-500"
               />
             </div>
@@ -102,7 +113,6 @@ export default function TrendingRightNowSection() {
         </div>
 
       </div>
-
     </section>
   );
 }
