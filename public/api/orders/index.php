@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $key = $_SERVER['HTTP_X_ADMIN_KEY'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? '';
 $key = preg_replace('/^Bearer\s+/i', '', trim($key));
 
-$validKeys = ['azraq-admin-secret-2026', 'azraq_admin_2026'];
+$validKeys = ['0133865246', 'azraq-admin-secret-2026', 'azraq_admin_2026'];
 $envFile = __DIR__ . '/../../.env';
 if (file_exists($envFile)) {
     $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);

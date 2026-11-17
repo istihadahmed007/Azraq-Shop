@@ -348,7 +348,7 @@ function getAdminAuthHeaders(adminKey = null) {
   return headers;
 }
 
-const AUTHORIZED_ADMIN_KEYS = ['azraq-admin-secret-2026', 'azraq_admin_2026', 'admin@azraq'];
+const AUTHORIZED_ADMIN_KEYS = ['0133865246', 'azraq-admin-secret-2026', 'azraq_admin_2026', 'admin@azraq'];
 
 /**
  * 5. Verify Administrator Credentials with Server (with resilient fallback for Hostinger/offline)
