@@ -25,8 +25,8 @@ export default function BrowseByCategoriesSection() {
     : collections.slice(0, 10);
 
   return (
-    <section id="browse-categories" className="w-full py-1 select-none">
-      <div className="flex items-center gap-3 overflow-x-auto pb-2 no-scrollbar">
+    <section id="browse-categories" className="w-full max-w-full overflow-hidden py-1 select-none">
+      <div className="w-full max-w-full flex items-center gap-3 overflow-x-auto pb-2 no-scrollbar">
         
         {/* Left 'Shop by Category' Pill Card */}
         <div 
@@ -58,12 +58,10 @@ export default function BrowseByCategoriesSection() {
               className="shrink-0 min-w-[92px] sm:min-w-[102px] rounded-[22px] glass-card p-2.5 sm:p-3 flex flex-col items-center gap-2 group focus:outline-none"
             >
               {/* Inner Image Container */}
-              <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-[16px] bg-[#F8FBFF]/90 border border-white/80 flex items-center justify-center p-1.5 overflow-hidden transition-colors group-hover:bg-white">
+              <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-[16px] bg-[#F0F6FD]/90 border border-white/90 flex items-center justify-center p-1.5 overflow-hidden transition-colors group-hover:bg-white shadow-2xs">
                 <img
                   src={displayImage}
                   alt={col.name}
-                  loading="lazy"
-                  decoding="async"
                   onError={(e) => {
                     if (col.fallback_image && e.target.src !== col.fallback_image) {
                       e.target.src = col.fallback_image;

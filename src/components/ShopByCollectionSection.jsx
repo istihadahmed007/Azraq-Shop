@@ -13,8 +13,8 @@ export default function ShopByCollectionSection() {
   const spotlightCollections = collections.slice(0, 6);
 
   return (
-    <section id="shop-by-collection" className="w-full py-2 select-none">
-      
+    <section id="shop-by-collection" className="w-full max-w-full overflow-hidden py-2 select-none">
+
       {/* Section Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
         <div>
@@ -74,8 +74,6 @@ export default function ShopByCollectionSection() {
                 <img
                   src={displayImage}
                   alt={col.name}
-                  loading="lazy"
-                  decoding="async"
                   onError={(e) => {
                     if (col.fallback_image && e.target.src !== col.fallback_image) {
                       e.target.src = col.fallback_image;

@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Search, Heart, ShoppingBag, Headphones,
-  Menu, X, Package, Shield, Globe, Camera
+  Menu, Package, Shield, Globe, Camera
 } from 'lucide-react';
 import AzraqLogo from './AzraqLogo';
 import { useShop } from '../context/ShopContext';
 
 /**
  * AZRAQ Shop — Floating Transparent Glass Header
+ * Pixel-accurate responsive glassmorphism navigation header
  */
 export default function Header({ onToggleSidebar }) {
   const {
@@ -38,44 +39,44 @@ export default function Header({ onToggleSidebar }) {
   };
 
   return (
-    <header className="w-full select-none sticky top-3 sm:top-5 z-30">
-      <div className="w-full glass-header rounded-[22px] sm:rounded-[24px] px-3 sm:px-5 py-2 sm:py-2.5 flex items-center justify-between gap-2.5 sm:gap-4 transition-all">
-        
-        {/* Left: Mobile Sidebar Toggle + Mobile Logo */}
+    <header className="w-full max-w-full select-none sticky top-3 sm:top-5 z-30">
+      <div className="w-full glass-header rounded-[22px] sm:rounded-[24px] px-3 sm:px-5 py-2 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-4 transition-all">
+
+        {/* Left: Mobile Sidebar Toggle + Brand Logo (Desktop & Tablet) */}
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={onToggleSidebar}
-            className="xl:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-[14px] sm:rounded-2xl glass-button flex items-center justify-center text-[#101C35] hover:text-[#0877C9] transition-colors"
+            className="lg:hidden w-8.5 h-8.5 sm:w-10 sm:h-10 rounded-[14px] sm:rounded-2xl glass-button flex items-center justify-center text-[#101C35] hover:text-[#0877C9] transition-colors shrink-0"
             title="Menu"
             aria-label="Toggle navigation menu"
           >
             <Menu className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
           </button>
 
-          <div 
+          <div
             onClick={() => navigateTo('home')}
-            className="xl:hidden cursor-pointer shrink-0"
+            className="hidden sm:block lg:hidden cursor-pointer shrink-0"
           >
             <AzraqLogo variant="dark" size="xs" showDescriptor={false} />
           </div>
         </div>
 
         {/* Center: Recessed Frosted Glass Search Bar */}
-        <div className="flex-1 max-w-2xl relative min-w-0">
-          <form onSubmit={handleSearchSubmit} className="w-full relative flex items-center">
+        <div className="flex-1 min-w-0 max-w-[190px] sm:max-w-2xl relative">
+          <form onSubmit={handleSearchSubmit} className="w-full min-w-0 relative flex items-center">
             <input
               type="text"
-              placeholder={t("Search products, collections...", "পণ্য, কালেকশন খুঁজুন...")}
+              placeholder={t("Search...", "অনুসন্ধান...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-3.5 sm:pl-5 pr-18 sm:pr-24 py-2 sm:py-2.5 rounded-full glass-input text-xs sm:text-sm text-[#101C35] placeholder-[#71849B] transition-all font-medium"
+              className="w-full min-w-0 pl-3.5 sm:pl-5 pr-8 sm:pr-24 py-1.5 sm:py-2.5 rounded-full glass-input text-xs sm:text-sm text-[#101C35] placeholder-[#71849B] transition-all font-medium"
             />
 
-            {/* AI Visual Image Search Button */}
+            {/* AI Visual Image Search Button (Tablet & Desktop) */}
             <button
               type="button"
               onClick={() => setIsVisualSearchOpen(true)}
-              className="absolute right-9 sm:right-11 p-1 text-[#71849B] hover:text-[#0877C9] transition-colors rounded-full"
+              className="hidden sm:block absolute right-9 sm:right-11 p-1 text-[#71849B] hover:text-[#0877C9] transition-colors rounded-full"
               title={t("Search by Image", "ছবি দিয়ে পণ্য খুঁজুন")}
             >
               <Camera className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -84,17 +85,17 @@ export default function Header({ onToggleSidebar }) {
             {/* Submit Magnifier Button */}
             <button
               type="submit"
-              className="absolute right-1 w-7 h-7 sm:w-8.5 sm:h-8.5 rounded-full bg-gradient-to-r from-[#0877C9] to-[#2563EB] hover:from-[#076bb5] hover:to-[#1d4ed8] text-white flex items-center justify-center shadow-[0_2px_8px_rgba(8,119,201,0.3)] transition-all group/btn"
+              className="absolute right-1 w-6.5 h-6.5 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-[#0877C9] to-[#2563EB] hover:from-[#076bb5] hover:to-[#1d4ed8] text-white flex items-center justify-center shadow-[0_2px_8px_rgba(8,119,201,0.3)] transition-all group/btn shrink-0"
               title="Search"
             >
-              <Search className="w-3 h-3 sm:w-4 sm:h-4 transition-transform group-hover/btn:scale-110" />
+              <Search className="w-3 h-3 sm:w-3.5 sm:h-3.5 transition-transform group-hover/btn:scale-110" />
             </button>
           </form>
         </div>
 
-        {/* Right: Frosted Utility Pill Controls */}
+        {/* Right: Frosted Utility Controls */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-          
+
           {/* Track Order Pill (Desktop) */}
           <button
             onClick={() => setIsTrackingOpen(true)}
@@ -136,7 +137,7 @@ export default function Header({ onToggleSidebar }) {
             <Shield className="w-4 h-4" />
           </button>
 
-          {/* Wishlist Button */}
+          {/* Wishlist Button (Tablet & Desktop) */}
           <button
             onClick={() => {
               if (currentView !== 'home') navigateTo('home');
@@ -144,7 +145,7 @@ export default function Header({ onToggleSidebar }) {
                 document.getElementById('popular-products')?.scrollIntoView({ behavior: 'smooth' });
               }, 100);
             }}
-            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full glass-button flex items-center justify-center text-[#101C35] hover:text-[#0877C9] relative"
+            className="hidden sm:flex w-8.5 h-8.5 sm:w-10 sm:h-10 rounded-full glass-button items-center justify-center text-[#101C35] hover:text-[#0877C9] relative shrink-0"
             title={t("Wishlist", "পছন্দের তালিকা")}
           >
             <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${favorites.length > 0 ? 'fill-[#0877C9] text-[#0877C9]' : ''}`} />
@@ -155,10 +156,10 @@ export default function Header({ onToggleSidebar }) {
             )}
           </button>
 
-          {/* Cart Button */}
+          {/* Cart Button (Always visible on all screens!) */}
           <button
             onClick={() => setIsCartOpen(true)}
-            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-[#0877C9] to-[#2563EB] hover:from-[#076bb5] hover:to-[#1d4ed8] text-white shadow-[0_4px_16px_rgba(8,119,201,0.35)] flex items-center justify-center relative hover:scale-105 active:scale-95 transition-all"
+            className="w-8.5 h-8.5 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-[#0877C9] to-[#2563EB] hover:from-[#076bb5] hover:to-[#1d4ed8] text-white shadow-[0_4px_16px_rgba(8,119,201,0.35)] flex items-center justify-center relative hover:scale-105 active:scale-95 transition-all shrink-0"
             title={t("Cart", "শপিং ব্যাগ")}
           >
             <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />

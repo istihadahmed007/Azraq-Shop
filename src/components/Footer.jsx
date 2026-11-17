@@ -1,11 +1,11 @@
 import React from 'react';
-import { 
-  Phone, 
-  Mail, 
-  MapPin, 
-  ShieldCheck, 
-  Truck, 
-  RotateCcw, 
+import {
+  Phone,
+  Mail,
+  MapPin,
+  ShieldCheck,
+  Truck,
+  RotateCcw,
   ArrowUp
 } from 'lucide-react';
 import AzraqLogo from './AzraqLogo';
@@ -22,17 +22,17 @@ export default function Footer() {
   };
 
   return (
-    <footer id="footer-section" className="w-full pt-2 pb-10 select-none">
-      
+    <footer id="footer-section" className="w-full max-w-full overflow-hidden pt-2 pb-10 select-none">
+
       {/* Frosted Main Glass Footer Container */}
       <div className="rounded-[32px] glass-panel p-6 sm:p-10">
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10">
-          
+
           {/* 1. Brand Column (lg:col-span-4) */}
           <div className="lg:col-span-4 flex flex-col items-start gap-3.5">
             <AzraqLogo variant="dark" size="md" showDescriptor={true} />
-            
+
             <p className="text-xs sm:text-[13px] font-medium text-[#71849B] max-w-sm leading-relaxed">
               {t(
                 'AZRAQ is your premier destination for authentic curated everyday goods, mobile accessories, kitchen essentials, and lifestyle collections across Bangladesh.',
@@ -93,7 +93,7 @@ export default function Footer() {
             <ul className="flex flex-col gap-2 text-xs font-semibold text-[#71849B]">
               {collections.slice(0, 5).map((col) => (
                 <li key={col.id}>
-                  <button 
+                  <button
                     onClick={() => navigateTo('collection-detail', col.slug)}
                     className="hover:text-[#0877C9] transition-colors truncate max-w-full text-left"
                   >

@@ -1,19 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  Camera, 
-  Upload, 
-  X, 
-  Sparkles, 
-  Search, 
-  RotateCcw, 
-  Crop, 
-  SlidersHorizontal, 
-  CheckCircle2, 
-  AlertCircle, 
-  Heart, 
-  Eye, 
-  ShoppingBag, 
-  ArrowRight, 
+import {
+  Camera,
+  Upload,
+  X,
+  Sparkles,
+  Search,
+  RotateCcw,
+  Crop,
+  SlidersHorizontal,
+  CheckCircle2,
+  AlertCircle,
+  Heart,
+  Eye,
+  ShoppingBag,
+  ArrowRight,
   ArrowUpDown,
   Filter,
   Image as ImageIcon,
@@ -24,16 +24,16 @@ import { performVisualSearch } from '../services/visualSearchService';
 import ProductCard from './common/ProductCard';
 
 export default function VisualSearchModal() {
-  const { 
-    isVisualSearchOpen, 
-    setIsVisualSearchOpen, 
-    products, 
-    setSelectedProduct, 
-    addToCart, 
-    favorites, 
+  const {
+    isVisualSearchOpen,
+    setIsVisualSearchOpen,
+    products,
+    setSelectedProduct,
+    addToCart,
+    favorites,
     toggleFavorite,
     showToast,
-    t 
+    t
   } = useShop();
 
   // State
@@ -271,13 +271,13 @@ export default function VisualSearchModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-[#101C35]/50 backdrop-blur-md animate-in fade-in duration-200 select-none">
-      
+
       {/* Modal Dialog Window */}
-      <div 
+      <div
         className="relative w-full max-w-4xl glass-modal rounded-[28px] shadow-2xl border border-white/90 overflow-hidden my-4 max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        
+
         {/* Header Bar */}
         <div className="p-4 sm:p-5 border-b border-white/80 bg-white/80 backdrop-blur-md flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-2.5">
@@ -310,7 +310,7 @@ export default function VisualSearchModal() {
 
         {/* Modal Scrollable Body */}
         <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6">
-          
+
           {/* Error Banner */}
           {searchError && (
             <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-center gap-2.5">
@@ -322,7 +322,7 @@ export default function VisualSearchModal() {
           {/* STEP 1: Upload & Capture Mode (When no image is chosen yet) */}
           {!selectedImage && !isCameraActive && (
             <div className="space-y-6">
-              
+
               {/* Drag & Drop Upload Zone */}
               <div
                 onDragEnter={handleDrag}
@@ -330,11 +330,10 @@ export default function VisualSearchModal() {
                 onDragOver={handleDrag}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className={`relative border-2 border-dashed rounded-2xl p-8 sm:p-12 text-center transition-all cursor-pointer ${
-                  dragActive 
-                    ? 'border-[#0877C9] bg-[#EBF6FF] scale-[1.01] shadow-[0_0_25px_rgba(8,119,201,0.25)]' 
-                    : 'border-[#69C5F5]/60 hover:border-[#0877C9] bg-gradient-to-b from-[#F8FCFF] to-[#F0F7FF]/70 hover:bg-[#F0F7FF]'
-                }`}
+                className={`relative border-2 border-dashed rounded-2xl p-8 sm:p-12 text-center transition-all cursor-pointer ${dragActive
+                  ? 'border-[#0877C9] bg-[#EBF6FF] scale-[1.01] shadow-[0_0_25px_rgba(8,119,201,0.25)]'
+                  : 'border-[#69C5F5]/60 hover:border-[#0877C9] bg-gradient-to-b from-[#F8FCFF] to-[#F0F7FF]/70 hover:bg-[#F0F7FF]'
+                  }`}
               >
                 {/* Floating ambient glow */}
                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#0877C9]/10 text-[#0877C9] flex items-center justify-center mx-auto mb-4 border border-[#69C5F5]/30 shadow-inner group-hover:scale-110 transition-transform">
@@ -356,7 +355,7 @@ export default function VisualSearchModal() {
 
               {/* Alternative Options Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                
+
                 {/* Option 2: Live Camera Capture */}
                 <button
                   onClick={startLiveCamera}
@@ -432,14 +431,14 @@ export default function VisualSearchModal() {
           {isCameraActive && (
             <div className="space-y-4 text-center">
               <div className="relative aspect-video max-w-lg mx-auto rounded-2xl bg-black overflow-hidden border-2 border-[#0877C9] shadow-2xl">
-                <video 
-                  ref={videoRef} 
-                  autoPlay 
-                  playsInline 
-                  muted 
-                  className="w-full h-full object-cover" 
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-full h-full object-cover"
                 />
-                
+
                 {/* Visual Viewfinder Reticle */}
                 <div className="absolute inset-8 border border-white/40 rounded-xl pointer-events-none flex flex-col justify-between p-2">
                   <div className="flex justify-between">
@@ -477,7 +476,7 @@ export default function VisualSearchModal() {
           {/* STEP 2: Selected Image Preview & Scan Trigger (Before Results) */}
           {selectedImage && !searchResults && (
             <div className="space-y-6">
-              
+
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-3 border-b border-[#D9F0FF]">
                 <div>
                   <h3 className="font-bold text-sm sm:text-base text-[#062B4F]">
@@ -511,10 +510,9 @@ export default function VisualSearchModal() {
 
               {/* Main Image Preview with Interactive Laser Scanning Animation */}
               <div className="relative max-w-sm mx-auto rounded-2xl bg-gradient-to-b from-[#F8FCFF] to-white border border-[#69C5F5]/40 shadow-xl overflow-hidden p-3 flex items-center justify-center">
-                
-                <div className={`w-full overflow-hidden rounded-xl bg-gray-50 flex items-center justify-center relative ${
-                  cropAspectRatio === 'square' ? 'aspect-square' : 'max-h-80'
-                }`}>
+
+                <div className={`w-full overflow-hidden rounded-xl bg-gray-50 flex items-center justify-center relative ${cropAspectRatio === 'square' ? 'aspect-square' : 'max-h-80'
+                  }`}>
                   <img
                     src={selectedImage}
                     alt="Query Product"
@@ -525,7 +523,7 @@ export default function VisualSearchModal() {
                   {isScanning && (
                     <>
                       <div className="absolute inset-0 bg-[#0877C9]/15 backdrop-blur-[1px] pointer-events-none" />
-                      
+
                       {/* Laser Line */}
                       <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#50DDF0] to-transparent shadow-[0_0_15px_#50DDF0] animate-visual-scan pointer-events-none" />
 
@@ -571,17 +569,17 @@ export default function VisualSearchModal() {
           {/* STEP 3: Results Display View */}
           {searchResults && (
             <div className="space-y-6">
-              
+
               {/* Results Top Bar */}
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-r from-[#F0F7FF] via-white to-[#F0F7FF] border border-[#D9F0FF]">
-                
+
                 {/* Query Thumbnail Pill */}
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-lg bg-white border border-[#D9F0FF] p-1 flex-shrink-0 shadow-sm overflow-hidden">
-                    <img 
-                      src={selectedImage} 
-                      alt="Queried item" 
-                      className="w-full h-full object-contain" 
+                    <img
+                      src={selectedImage}
+                      alt="Queried item"
+                      className="w-full h-full object-contain"
                     />
                   </div>
                   <div>
@@ -609,18 +607,17 @@ export default function VisualSearchModal() {
 
               {/* Filter and Sorting Toolbar */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
-                
+
                 {/* Category Pills */}
                 <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 no-scrollbar">
                   {availableCategories.slice(0, 6).map(cat => (
                     <button
                       key={cat}
                       onClick={() => setSelectedCategory(cat)}
-                      className={`px-3 py-1.5 rounded-full font-bold whitespace-nowrap transition-all ${
-                        selectedCategory === cat
-                          ? 'bg-[#062B4F] text-white shadow-sm'
-                          : 'bg-[#F8FCFF] text-[#062B4F]/70 hover:bg-[#D9F0FF]/50 border border-[#D9F0FF]'
-                      }`}
+                      className={`px-3 py-1.5 rounded-full font-bold whitespace-nowrap transition-all ${selectedCategory === cat
+                        ? 'bg-[#062B4F] text-white shadow-sm'
+                        : 'bg-[#F8FCFF] text-[#062B4F]/70 hover:bg-[#D9F0FF]/50 border border-[#D9F0FF]'
+                        }`}
                     >
                       {cat === 'All' ? t('All Categories', 'সব ক্যাটাগরি') : cat}
                     </button>

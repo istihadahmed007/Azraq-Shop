@@ -8,22 +8,22 @@ import ProductCard from './common/ProductCard';
  * Features 6 popular cards and 1 right-side featured collection banner with equal height.
  */
 export default function TrendingRightNowSection() {
-  const { 
-    products, 
-    favorites, 
-    toggleFavorite, 
-    setSelectedProduct, 
-    addToCart, 
-    navigateTo, 
-    t 
+  const {
+    products,
+    favorites,
+    toggleFavorite,
+    setSelectedProduct,
+    addToCart,
+    navigateTo,
+    t
   } = useShop();
 
   // Curated 6 popular products from the catalog
   const popularList = products.slice(0, 6);
 
   return (
-    <section id="popular-products" className="w-full py-1 select-none">
-      
+    <section id="popular-products" className="w-full max-w-full overflow-hidden py-1 select-none">
+
       {/* Section Heading & Link */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2.5">
@@ -47,7 +47,7 @@ export default function TrendingRightNowSection() {
 
       {/* Main Grid: 6 Products on Left + 1 Editorial Feature Card on Right */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3.5 sm:gap-4 items-stretch">
-        
+
         {/* 6 Product Cards */}
         {popularList.map((product) => (
           <div key={product.id} className="col-span-1 h-full">
@@ -58,15 +58,13 @@ export default function TrendingRightNowSection() {
               onSelectProduct={setSelectedProduct}
               onAddToCart={addToCart}
               compact={true}
-              showRating={false}
-              showSku={false}
-              showCategory={false}
+              showCategory={true}
             />
           </div>
         ))}
 
         {/* 1 Right-Side Featured Collection Glass Card */}
-        <div 
+        <div
           onClick={() => navigateTo('collections')}
           className="col-span-2 sm:col-span-3 lg:col-span-1 xl:col-span-1 rounded-[22px] glass-card p-4 flex flex-col justify-between cursor-pointer group relative overflow-hidden h-full"
         >
@@ -82,7 +80,7 @@ export default function TrendingRightNowSection() {
             <h3 className="text-sm sm:text-base font-black text-[#101C35] tracking-tight leading-snug">
               {t('Stay Connected Always', 'সবসময় থাকুন কানেক্টেড')}
             </h3>
-            
+
             <p className="text-[11px] font-medium text-[#71849B] mt-1.5 leading-relaxed line-clamp-3">
               {t(
                 'Explore the best everyday mobile accessories & curated essentials at AZRAQ.',
@@ -105,7 +103,6 @@ export default function TrendingRightNowSection() {
               <img
                 src="https://easydrop.asia/products/image-1794224164356-135288231.jpeg"
                 alt="Feature"
-                loading="lazy"
                 className="w-full h-full object-contain group-hover:scale-108 transition-transform duration-500"
               />
             </div>

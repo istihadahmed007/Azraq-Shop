@@ -209,6 +209,12 @@ export async function handlePaymentRoutes(req, res) {
 
   // 3b. Customer Order Tracking (GET or POST /api/orders/track)
   if (pathname === '/api/orders/track') {
+    if (!res.status) {
+      res.status = function(code) { this.statusCode = code; return this; };
+    }
+    if (!res.json) {
+      res.json = function(data) { this.setHeader('Content-Type', 'application/json'); this.end(JSON.stringify(data)); return this; };
+    }
     if (method === 'GET') {
       req.query = Object.fromEntries(url.searchParams);
       await orderTrackingHandler(req, res);
@@ -223,7 +229,16 @@ export async function handlePaymentRoutes(req, res) {
         } catch (e) {
           req.body = {};
         }
-        await orderTrackingHandler(req, res);
+        try {
+          await orderTrackingHandler(req, res);
+        } catch (err) {
+          console.error('[API /api/orders/track Async Error]:', err.message);
+          if (!res.headersSent) {
+            res.statusCode = 500;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ success: false, error: 'Internal Server Error' }));
+          }
+        }
       });
       return true;
     }

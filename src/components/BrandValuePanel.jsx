@@ -40,7 +40,7 @@ export default function BrandValuePanel() {
   ];
 
   return (
-    <section className="w-full py-2 select-none">
+    <section className="w-full max-w-full overflow-hidden py-2 select-none">
       {/* Long Rounded Transparent Benefits Bar */}
       <div className="rounded-[28px] glass-panel px-6 py-4.5 flex flex-col lg:flex-row items-center justify-between gap-5 sm:gap-6">
         
