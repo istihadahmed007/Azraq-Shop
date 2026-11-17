@@ -93,28 +93,50 @@ export function calculateServerOrderPricing({ items = [], deliveryArea = 'inside
   let subtotal = 0;
   const validatedItems = [];
 
+  if (!Array.isArray(items) || items.length === 0) {
+    throw new Error('Shopping cart is empty.');
+  }
+
   for (const item of items) {
     const productId = item.product?.id || item.id || item.product_id;
+    const sku = item.product?.sku || item.sku;
+
+    // Strict lookup: match exclusively by valid product ID or SKU
     const catalogItem = catalog.find(
-      p => p.id === productId || p.sku === item.product?.sku || p.name === item.product?.name
+      p => (productId && p.id === productId) || (sku && p.sku === sku)
     );
 
-    // Fall back to item.price if catalog not found (e.g. dynamic custom items), ensuring positive integer
-    const unitPrice = catalogItem ? Number(catalogItem.price) : Math.max(0, Number(item.product?.price || item.price || 0));
-    const qty = Math.max(1, parseInt(item.quantity || 1, 10));
+    if (!catalogItem) {
+      throw new Error(`Product "${productId || sku || 'unknown'}" is not found in the authoritative catalogue.`);
+    }
+
+    // Validate quantity as a positive integer between 1 and 100
+    const rawQty = item.quantity !== undefined ? item.quantity : 1;
+    const qty = parseInt(rawQty, 10);
+    if (isNaN(qty) || qty < 1 || qty > 100) {
+      throw new Error(`Invalid quantity "${rawQty}" for product ${catalogItem.id}. Must be an integer between 1 and 100.`);
+    }
+
+    // Validate stock availability
+    if (catalogItem.in_stock === false || catalogItem.stock_out === true) {
+      throw new Error(`Product "${catalogItem.name}" (${catalogItem.id}) is currently out of stock.`);
+    }
+
+    // Authoritative price directly from server catalog; never trust client price
+    const unitPrice = Number(catalogItem.price);
     const itemTotal = unitPrice * qty;
 
     subtotal += itemTotal;
     validatedItems.push({
-      id: productId || `PROD-${Date.now()}`,
-      product_id: productId,
-      sku: catalogItem?.sku || item.product?.sku || item.sku || null,
-      name: catalogItem?.name || item.product?.name || item.name || 'AZRAQ Item',
-      variant: item.variant || 'Default',
+      id: catalogItem.id,
+      product_id: catalogItem.id,
+      sku: catalogItem.sku || null,
+      name: catalogItem.name,
+      variant: item.variant || 'Standard',
       unit_price: unitPrice,
       quantity: qty,
       total_price: itemTotal,
-      collection_name: catalogItem?.primary_collection_name || item.collection || null
+      collection_name: catalogItem.primary_collection_name || null
     });
   }
 
@@ -265,7 +287,7 @@ export async function createPaymentlyCheckoutSession({
       },
       body: JSON.stringify({
         full_name: customer.name.trim(),
-        email: customer.email ? customer.email.trim() : `${customer.phone.trim()}@azraqshop.com`,
+        email: customer.email && customer.email.trim() ? customer.email.trim() : `${customer.phone.trim()}@azraqshop.com`,
         amount: String(pricing.totalPayable),
         metadata: {
           checkout_id: checkoutId,
@@ -274,6 +296,7 @@ export async function createPaymentlyCheckoutSession({
           merchant_brand: config.merchantName
         },
         redirect_url: redirectUrl,
+        return_type: "GET",
         cancel_url: cancelUrl,
         webhook_url: webhookUrl
       })

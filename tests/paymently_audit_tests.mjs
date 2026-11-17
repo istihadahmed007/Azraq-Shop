@@ -49,7 +49,7 @@ async function runAuditSuite() {
   console.log('================================================================\n');
 
   let passed = 0;
-  const total = 18;
+  const total = 20;
 
   const sampleCustomer = {
     name: 'Istihad Ahmed',
@@ -642,6 +642,62 @@ async function runAuditSuite() {
     passed++;
   } catch (e) {
     console.error('  ✗ TEST 18 FAILED:', e.message);
+  }
+
+  // --- TEST 19: Unknown Product Rejection ---
+  try {
+    console.log('\n▶ TEST 19 — Unknown Product Rejection: Reject products not in authoritative catalog:');
+    let threw = false;
+    try {
+      calculateServerOrderPricing({
+        items: [{ product: { id: 'NON-EXISTENT-SKU-9999' }, quantity: 1 }],
+        deliveryArea: 'inside'
+      });
+    } catch (err) {
+      threw = true;
+      if (!err.message.includes('not found in the authoritative catalogue')) {
+        throw new Error(`Unexpected error message: ${err.message}`);
+      }
+    }
+    if (!threw) {
+      throw new Error('Server pricing allowed unknown product ID without throwing');
+    }
+    console.log('  ✓ Unknown product correctly rejected with error');
+    passed++;
+  } catch (e) {
+    console.error('  ✗ TEST 19 FAILED:', e.message);
+  }
+
+  // --- TEST 20: Invalid Quantity Rejection ---
+  try {
+    console.log('\n▶ TEST 20 — Invalid Quantity Rejection: Reject negative, zero, or > 100 quantities:');
+    let threwZero = false;
+    try {
+      calculateServerOrderPricing({
+        items: [{ product: { id: 'AZQ-0001' }, quantity: 0 }],
+        deliveryArea: 'inside'
+      });
+    } catch (err) {
+      threwZero = true;
+    }
+
+    let threwLimit = false;
+    try {
+      calculateServerOrderPricing({
+        items: [{ product: { id: 'AZQ-0001' }, quantity: 101 }],
+        deliveryArea: 'inside'
+      });
+    } catch (err) {
+      threwLimit = true;
+    }
+
+    if (!threwZero || !threwLimit) {
+      throw new Error(`Quantity validation failed: threwZero=${threwZero}, threwLimit=${threwLimit}`);
+    }
+    console.log('  ✓ Invalid quantities (0 and 101) rejected safely');
+    passed++;
+  } catch (e) {
+    console.error('  ✗ TEST 20 FAILED:', e.message);
   }
 
   console.log('\n================================================================');

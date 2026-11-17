@@ -74,12 +74,8 @@ const testCodCustomer = {
 
 const testItems = [
   {
-    id: 'BAG-001',
-    name: 'Canvas Weekender Duffel',
-    variant: 'Midnight Blue',
-    quantity: 1,
-    unit_price: 2450,
-    total_price: 2450
+    id: 'AZQ-0001',
+    quantity: 1
   }
 ];
 

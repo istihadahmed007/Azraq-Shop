@@ -36,6 +36,9 @@ export default function CheckoutModal() {
   const [fullName, setFullName] = useState(() => {
     try { return localStorage.getItem('azraq_customer_name') || ''; } catch (e) { return ''; }
   });
+  const [email, setEmail] = useState(() => {
+    try { return localStorage.getItem('azraq_customer_email') || ''; } catch (e) { return ''; }
+  });
   const [phone, setPhone] = useState(() => {
     try { return localStorage.getItem('azraq_customer_phone') || ''; } catch (e) { return ''; }
   });
@@ -180,12 +183,14 @@ export default function CheckoutModal() {
     try {
       localStorage.setItem('azraq_customer_name', fullName.trim());
       localStorage.setItem('azraq_customer_phone', phone.trim());
+      localStorage.setItem('azraq_customer_email', email.trim());
       localStorage.setItem('azraq_customer_address', address.trim());
     } catch (e) {}
 
     const customerData = {
       name: fullName.trim(),
       phone: phone.trim(),
+      email: email && email.trim() ? email.trim() : null,
       address: address.trim(),
       city: city.trim() || 'Dhaka',
       thana: thana.trim() || null,
@@ -225,7 +230,8 @@ export default function CheckoutModal() {
         deliveryArea,
         promoCode: appliedPromo?.code || null,
         paymentMethod: 'PAYMENTLY',
-        notes: notes.trim()
+        notes: notes.trim(),
+        allowManualFallback: false
       });
 
       setIsSubmitting(false);
@@ -253,7 +259,7 @@ export default function CheckoutModal() {
 
     } catch (err) {
       setIsSubmitting(false);
-      setErrorCode(err.code || '');
+      setErrorCode(err.code || 'CHECKOUT_FAILED');
       const isMaint = isStoreMaintenanceError(err);
       if (isMaint) {
         setErrorMessage(t(
@@ -261,7 +267,7 @@ export default function CheckoutModal() {
           "রক্ষণাবেক্ষণের কারণে চেকআউট সাময়িকভাবে অনুপলব্ধ রয়েছে। আপনার পণ্যগুলো কার্টে সংরক্ষিত আছে। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন অথবা কাস্টমার সার্ভিসে যোগাযোগ করুন।"
         ));
       } else {
-        setErrorMessage(err.message || t("Payment initiation failed. Please check your connection or choose COD.", "পেমেন্ট শুরু করা যায়নি।"));
+        setErrorMessage(err.message || t("Payment initiation failed. Please check your connection or choose Cash on Delivery.", "পেমেন্ট শুরু করা যায়নি। আপনার কার্টের পণ্যগুলো সংরক্ষিত আছে।"));
       }
       setCheckoutStep('failed');
     }
@@ -288,7 +294,7 @@ export default function CheckoutModal() {
       customer: {
         name: fullName.trim(),
         phone: phone.trim(),
-        email: email.trim(),
+        email: email && email.trim() ? email.trim() : null,
         address: address.trim(),
         city,
         thana
@@ -360,7 +366,7 @@ export default function CheckoutModal() {
       customer: {
         name: fullName.trim(),
         phone: phone.trim(),
-        email: email.trim(),
+        email: email && email.trim() ? email.trim() : null,
         address: address.trim(),
         city,
         thana
@@ -592,6 +598,20 @@ export default function CheckoutModal() {
                     {formErrors.phone && (
                       <p className="text-[11px] text-rose-600 mt-1">{formErrors.phone}</p>
                     )}
+                  </div>
+
+                  <div>
+                    <label htmlFor="customer-email" className="block text-xs font-semibold text-[#062B4F] mb-1">
+                      {t("Email Address", "ইমেইল")} <span className="text-slate-400 font-normal">({t("Optional for receipt", "ঐচ্ছিক")})</span>
+                    </label>
+                    <input
+                      id="customer-email"
+                      type="email"
+                      placeholder="e.g. name@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 hover:border-slate-300 text-xs text-[#062B4F] bg-white transition-all focus:outline-none focus:ring-2 focus:ring-[#0877C9]"
+                    />
                   </div>
                 </div>
 
@@ -1228,6 +1248,28 @@ export default function CheckoutModal() {
               </div>
 
               <div className="flex flex-col gap-2.5 max-w-md mx-auto pt-2">
+                {/* 1-Click Direct Online Payment via Paymently Portal */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const fallbackId = `AZQ-CHK-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
+                    setPaymentSession({
+                      checkout_id: fallbackId,
+                      invoice_id: fallbackId,
+                      amount: cartTotal,
+                      payment_url: 'https://azraq.paymently.io/paymentlink/default/BDT'
+                    });
+                    try {
+                      sessionStorage.setItem('azraq_active_checkout_id', fallbackId);
+                    } catch (e) {}
+                    window.location.href = 'https://azraq.paymently.io/paymentlink/default/BDT';
+                  }}
+                  className="w-full min-h-[44px] py-2.5 px-4 rounded-xl bg-[#2563EB] hover:bg-[#183B70] active:bg-[#101C35] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-1"
+                >
+                  <ExternalLink className="w-4 h-4 shrink-0" aria-hidden="true" />
+                  <span>{t("Pay Online via Paymently Portal (bKash/Nagad/Card)", "পেমেন্টলি পোর্টালে সরাসরি পে করুন")}</span>
+                </button>
+
                 {/* Only offer COD switch if system is NOT undergoing storewide maintenance */}
                 {!isMaintenance && (
                   <button

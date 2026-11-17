@@ -84,8 +84,8 @@ runTest('Currency: BDT symbol is strictly ৳ (Taka mark U+09F3), never $ or £'
 // 3. Calculation & Display Consistency Across Views
 runTest('Consistency: server pricing calculation matches formatted output for Inside Dhaka', () => {
   const items = [
-    { id: 'AZQ-01', price: 1200, quantity: 1 },
-    { id: 'AZQ-02', price: 650, quantity: 2 }
+    { id: 'AZQ-0005', quantity: 1 },
+    { id: 'AZQ-0013', quantity: 2 }
   ];
   const pricing = calculateServerOrderPricing({ items, deliveryArea: 'inside' });
   // Subtotal = 1200 + 1300 = 2500. Delivery inside Dhaka < 3000 = 70. Total = 2570.
@@ -99,7 +99,7 @@ runTest('Consistency: server pricing calculation matches formatted output for In
 
 runTest('Consistency: free delivery triggered on subtotal >= 3000 BDT', () => {
   const items = [
-    { id: 'AZQ-01', price: 1800, quantity: 2 } // 3600 BDT
+    { id: 'AZQ-0443', quantity: 2 } // 1800 * 2 = 3600 BDT
   ];
   const pricing = calculateServerOrderPricing({ items, deliveryArea: 'inside' });
   assert.strictEqual(pricing.subtotal, 3600);
@@ -110,7 +110,7 @@ runTest('Consistency: free delivery triggered on subtotal >= 3000 BDT', () => {
 
 runTest('Consistency: outside Dhaka delivery fee is exactly 130 BDT', () => {
   const items = [
-    { id: 'AZQ-01', price: 750, quantity: 1 }
+    { id: 'AZQ-0081', quantity: 1 }
   ];
   const pricing = calculateServerOrderPricing({ items, deliveryArea: 'outside' });
   assert.strictEqual(pricing.subtotal, 750);
@@ -121,7 +121,7 @@ runTest('Consistency: outside Dhaka delivery fee is exactly 130 BDT', () => {
 
 runTest('Consistency: promo discount calculation with AZRAQNEW (৳200 discount)', () => {
   const items = [
-    { id: 'AZQ-01', price: 1000, quantity: 1 }
+    { id: 'AZQ-0078', quantity: 1 }
   ];
   const pricing = calculateServerOrderPricing({ items, deliveryArea: 'inside', promoCode: 'AZRAQNEW' });
   // Subtotal 1000 + 70 delivery - 200 discount = 870 BDT

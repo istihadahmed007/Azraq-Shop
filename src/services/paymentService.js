@@ -112,8 +112,9 @@ export function calculateClientOrderPricing({ items = [], deliveryArea = 'inside
  * Never creates dynamic sessions from browser or accepts client prices.
  * Falls back to Paymently official merchant link if server API is offline or hosted statically.
  */
-export async function createCheckoutSession({ customer, items, deliveryArea, promoCode, paymentMethod = 'PAYMENTLY', notes = '', allowManualFallback = true }) {
+export async function createCheckoutSession({ customer, items, deliveryArea, promoCode, paymentMethod = 'PAYMENTLY', notes = '', allowManualFallback = false }) {
   let response = null;
+  let netErr = null;
 
   try {
     response = await fetch(`${API_BASE}/api/payments/create`, {
@@ -129,119 +130,56 @@ export async function createCheckoutSession({ customer, items, deliveryArea, pro
         allowManualFallback
       })
     });
-  } catch (netErr) {
-    // Network offline or endpoint unreachable
+  } catch (err) {
+    netErr = err;
     response = null;
+  }
+
+  if (netErr || !response) {
+    const error = new Error('Checkout service is temporarily unreachable. Please check your internet connection or choose Cash on Delivery.');
+    error.code = 'ENDPOINT_UNREACHABLE';
+    throw error;
   }
 
   const contentType = response?.headers?.get('content-type') || '';
   const isJson = contentType.includes('application/json');
 
-  if (response && isJson) {
-    const data = await response.json().catch(() => ({}));
-    if (response.ok && data.success) {
-      if (data.payment_url && !isTrustedPaymentUrl(data.payment_url)) {
-        const err = new Error('Received an untrusted payment URL. Session rejected for security.');
-        err.code = 'UNTRUSTED_GATEWAY_URL';
-        throw err;
-      }
-      return data;
-    }
+  if (!isJson) {
+    const error = new Error(`Checkout service returned unexpected response (Status ${response.status}).`);
+    error.code = 'INVALID_SERVER_RESPONSE';
+    error.status = response.status;
+    throw error;
+  }
 
-    // If server returned a business validation error (e.g. empty cart or invalid phone), throw it
-    if (data.code && data.code !== 'GATEWAY_CREDENTIALS_MISSING' && data.code !== 'STORE_CHECKOUT_UNAVAILABLE') {
-      const err = new Error(data.error || 'Unable to initiate payment session. Please try again or choose Cash on Delivery.');
-      err.code = data.code || 'CHECKOUT_FAILED';
-      err.status = response.status;
+  const data = await response.json().catch(() => ({}));
+
+  if (response.ok && data.success) {
+    if (data.payment_url && !isTrustedPaymentUrl(data.payment_url)) {
+      const err = new Error('Received an untrusted payment URL. Session rejected for security.');
+      err.code = 'UNTRUSTED_GATEWAY_URL';
       throw err;
     }
+    return data;
   }
 
-  // Resilient Fallback for Static Host (e.g. Apache htdocs returning 404 HTML), API maintenance, or unconfigured credentials:
-  const pricing = calculateClientOrderPricing({ items, deliveryArea, promoCode });
-
-  // 1. Cash on Delivery (COD) Fallback
-  if (paymentMethod === 'COD') {
-    const orderId = `AZQ-ORD-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
-    const trackingToken = `TRK-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-    const order = {
-      id: orderId,
-      tracking_token: trackingToken,
-      customer_name: customer?.name?.trim() || 'Valued Customer',
-      customer_phone: customer?.phone?.trim() || '',
-      customer_email: customer?.email?.trim() || null,
-      shipping_address: customer?.address?.trim() || '',
-      city: customer?.city || 'Dhaka',
-      thana: customer?.thana || null,
-      delivery_area: deliveryArea || 'inside',
-      notes: notes || null,
-      subtotal: pricing.subtotal,
-      delivery_fee: pricing.deliveryFee,
-      discount: pricing.discount,
-      total_amount: pricing.totalPayable,
-      promo_code: pricing.promoCode,
-      payment_method: 'COD',
-      payment_status: 'PENDING_COD',
-      fulfillment_status: 'PROCESSING',
-      created_at: new Date().toISOString()
-    };
-
-    try {
-      const existing = JSON.parse(localStorage.getItem('azraq_orders') || '[]');
-      existing.unshift(order);
-      localStorage.setItem('azraq_orders', JSON.stringify(existing.slice(0, 50)));
-    } catch (e) {}
-
-    return {
-      success: true,
-      mode: 'COD',
-      order,
-      items: pricing.items
-    };
-  }
-
-  // 2. Online Paymently Gateway Fallback
-  const checkoutId = `AZQ-CHK-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
-  const fallbackUrl = 'https://azraq.paymently.io/paymentlink/default/BDT';
-
-  try {
-    sessionStorage.setItem('azraq_active_checkout_id', checkoutId);
-    sessionStorage.setItem('azraq_active_invoice_id', checkoutId);
-    const attempts = JSON.parse(localStorage.getItem('azraq_checkout_attempts') || '[]');
-    attempts.unshift({
-      id: checkoutId,
-      customer,
-      items: pricing.items,
-      amount: pricing.totalPayable,
-      status: 'AWAITING_PAYMENT',
-      payment_url: fallbackUrl,
-      created_at: new Date().toISOString()
-    });
-    localStorage.setItem('azraq_checkout_attempts', JSON.stringify(attempts.slice(0, 50)));
-  } catch (e) {}
-
-  return {
-    success: true,
-    checkout_id: checkoutId,
-    invoice_id: checkoutId,
-    amount: pricing.totalPayable,
-    currency: 'BDT',
-    payment_url: fallbackUrl,
-    merchant_name: 'AZRAQ',
-    is_fallback_link: true,
-    requires_manual_trx: true,
-    is_manual_payment: true,
-    instructions: `Please complete payment of ৳${pricing.totalPayable} BDT on the official AZRAQ Paymently portal, then enter your TrxID below to confirm your order.`
-  };
+  // Handle server error responses
+  const err = new Error(data.error || 'Unable to initiate payment session. Please try again or choose Cash on Delivery.');
+  err.code = data.code || 'CHECKOUT_FAILED';
+  err.status = response.status;
+  throw err;
 }
 
 /**
  * 2. Verify payment status directly with backend server
  * Backend performs authoritative server-to-server verification with Paymently.
+ * NEVER creates fake local-only orders when backend is unreachable.
  */
 export async function verifyPaymentStatus({ invoiceId, checkoutId, manualTrxId = null, checkoutSnapshot = null }) {
+  let response = null;
+  let netErr = null;
+
   try {
-    const response = await fetch(`${API_BASE}/api/payments/verify`, {
+    response = await fetch(`${API_BASE}/api/payments/verify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -251,78 +189,35 @@ export async function verifyPaymentStatus({ invoiceId, checkoutId, manualTrxId =
         checkoutSnapshot
       })
     });
-
-    const contentType = response?.headers?.get('content-type') || '';
-    if (contentType.includes('application/json')) {
-      const data = await response.json();
-      return data;
-    }
   } catch (err) {
-    console.warn('API verification call failed, falling back to client recording:', err);
+    netErr = err;
+    response = null;
   }
 
-  // Client Fallback when server API is not available on static hosting:
-  if (manualTrxId && String(manualTrxId).trim().length >= 4) {
-    const cleanTrx = String(manualTrxId).trim().toUpperCase();
-    const orderId = `AZQ-ORD-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
-    const trackingToken = `TRK-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-    const pricing = calculateClientOrderPricing({
-      items: checkoutSnapshot?.items || [],
-      deliveryArea: checkoutSnapshot?.deliveryArea || 'inside',
-      promoCode: checkoutSnapshot?.promoCode || null
-    });
-
-    const order = {
-      id: orderId,
-      tracking_token: trackingToken,
-      customer_name: checkoutSnapshot?.customer?.name || 'Customer',
-      customer_phone: checkoutSnapshot?.customer?.phone || '',
-      customer_email: checkoutSnapshot?.customer?.email || null,
-      shipping_address: checkoutSnapshot?.customer?.address || '',
-      city: checkoutSnapshot?.customer?.city || 'Dhaka',
-      thana: checkoutSnapshot?.customer?.thana || null,
-      delivery_area: checkoutSnapshot?.deliveryArea || 'inside',
-      notes: checkoutSnapshot?.notes || null,
-      subtotal: pricing.subtotal,
-      delivery_fee: pricing.deliveryFee,
-      discount: pricing.discount,
-      total_amount: pricing.totalPayable,
-      promo_code: pricing.promoCode,
-      payment_method: 'PAYMENTLY_MANUAL_TRX',
-      payment_status: 'PENDING_VERIFICATION',
-      transaction_id: cleanTrx,
-      fulfillment_status: 'PROCESSING',
-      created_at: new Date().toISOString()
-    };
-
-    try {
-      const existing = JSON.parse(localStorage.getItem('azraq_orders') || '[]');
-      existing.unshift(order);
-      localStorage.setItem('azraq_orders', JSON.stringify(existing.slice(0, 50)));
-    } catch (e) {}
-
-    return {
-      success: true,
-      verified: false,
-      status: 'PENDING_VERIFICATION',
-      requires_manual_verification: true,
-      order,
-      transaction: {
-        transaction_id: cleanTrx,
-        amount: pricing.totalPayable,
-        payment_method: 'bKash / Nagad / Card (Manual Link)',
-        status: 'PENDING_VERIFICATION'
-      },
-      message: 'Your Transaction ID has been recorded. Our merchant desk will verify it against the Paymently statement and dispatch your order.'
-    };
+  if (netErr || !response) {
+    const error = new Error('Could not reach verification service. Please try clicking "Check payment status" again.');
+    error.code = 'VERIFICATION_UNREACHABLE';
+    throw error;
   }
 
-  return {
-    success: true,
-    verified: false,
-    status: 'PENDING',
-    message: 'Payment has not yet cleared on Paymently. If you completed payment in your bKash/Nagad app, please wait 30 seconds and click Check Again, or submit your TrxID below.'
-  };
+  const contentType = response?.headers?.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    const error = new Error(`Verification service returned unexpected response (Status ${response.status}).`);
+    error.code = 'INVALID_SERVER_RESPONSE';
+    error.status = response.status;
+    throw error;
+  }
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok && !data.success) {
+    const error = new Error(data.error || 'Payment verification failed.');
+    error.code = data.code || 'VERIFICATION_FAILED';
+    error.status = response.status;
+    throw error;
+  }
+
+  return data;
 }
 
 /**

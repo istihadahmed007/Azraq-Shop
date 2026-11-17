@@ -55,7 +55,7 @@ console.log('='.repeat(64));
 // 1. Delivery Pricing Invariants
 runTest('Inside Dhaka Delivery Fee is ৳70 when subtotal < ৳3,000', () => {
   const result = calculateServerOrderPricing({
-    items: [{ id: 1, price: 1500, quantity: 1 }],
+    items: [{ id: 'AZQ-0010', quantity: 1 }],
     deliveryArea: 'inside'
   });
   assert.strictEqual(result.subtotal, 1500);
@@ -65,7 +65,7 @@ runTest('Inside Dhaka Delivery Fee is ৳70 when subtotal < ৳3,000', () => {
 
 runTest('Outside Dhaka Delivery Fee is ৳130 when subtotal < ৳3,000', () => {
   const result = calculateServerOrderPricing({
-    items: [{ id: 1, price: 1500, quantity: 1 }],
+    items: [{ id: 'AZQ-0010', quantity: 1 }],
     deliveryArea: 'outside'
   });
   assert.strictEqual(result.subtotal, 1500);
@@ -75,24 +75,24 @@ runTest('Outside Dhaka Delivery Fee is ৳130 when subtotal < ৳3,000', () => {
 
 runTest('Nationwide Free Delivery unlocks on orders >= ৳3,000', () => {
   const inside = calculateServerOrderPricing({
-    items: [{ id: 1, price: 3000, quantity: 1 }],
+    items: [{ id: 'AZQ-0263', quantity: 1 }],
     deliveryArea: 'inside'
   });
   assert.strictEqual(inside.deliveryFee, 0);
   assert.strictEqual(inside.totalPayable, 3000);
 
   const outside = calculateServerOrderPricing({
-    items: [{ id: 1, price: 3200, quantity: 1 }],
+    items: [{ id: 'AZQ-0043', quantity: 1 }],
     deliveryArea: 'outside'
   });
   assert.strictEqual(outside.deliveryFee, 0);
-  assert.strictEqual(outside.totalPayable, 3200);
+  assert.strictEqual(outside.totalPayable, 3250);
 });
 
 // 2. Promo Code Calculations
 runTest('Promo Code AZRAQNEW applies ৳200 flat discount', () => {
   const result = calculateServerOrderPricing({
-    items: [{ id: 1, price: 2000, quantity: 1 }],
+    items: [{ id: 'AZQ-0110', quantity: 1 }],
     deliveryArea: 'inside',
     promoCode: 'AZRAQNEW'
   });
@@ -102,7 +102,7 @@ runTest('Promo Code AZRAQNEW applies ৳200 flat discount', () => {
 
 runTest('Promo Code AZRAQ10 applies 10% percentage discount', () => {
   const result = calculateServerOrderPricing({
-    items: [{ id: 1, price: 2500, quantity: 1 }],
+    items: [{ id: 'AZQ-0049', quantity: 1 }],
     deliveryArea: 'outside',
     promoCode: 'AZRAQ10'
   });
@@ -118,7 +118,7 @@ await runAsyncTest('Cash on Delivery (COD) marked strictly PENDING_COD (Never PA
       phone: '01811223344',
       address: 'Road 4, Dhanmondi, Dhaka'
     },
-    items: [{ id: 'TEST-PROD-1', name: 'Cotton Shirt', price: 1200, quantity: 1 }],
+    items: [{ id: 'AZQ-0005', quantity: 1 }],
     deliveryArea: 'inside'
   });
   assert.strictEqual(res.success, true);
@@ -135,7 +135,7 @@ await runAsyncTest('Paymently checkout activates official merchant link when API
       phone: '01711223344',
       address: 'Gulshan 2, Dhaka'
     },
-    items: [{ id: 'TEST-PROD-2', name: 'Ceramic Vase', price: 1800, quantity: 1 }],
+    items: [{ id: 'AZQ-0443', quantity: 1 }],
     deliveryArea: 'inside',
     allowManualFallback: true
   });
@@ -158,7 +158,7 @@ await runAsyncTest('Serverless cold boot rehydrates session via checkoutSnapshot
         phone: '01999887766',
         address: 'Uttara Sector 11, Dhaka'
       },
-      items: [{ id: 'COLD-1', name: 'Desk Organizer', price: 950, quantity: 1 }],
+      items: [{ id: 'AZQ-0006', quantity: 1 }],
       deliveryArea: 'inside'
     }
   });

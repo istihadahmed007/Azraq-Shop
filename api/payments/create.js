@@ -66,7 +66,7 @@ export default async function handler(req, res) {
       deliveryArea: deliveryArea || 'inside',
       promoCode: promoCode || null,
       notes: notes || '',
-      allowManualFallback: allowManualFallback !== false
+      allowManualFallback: allowManualFallback === true
     });
 
     if (!session.success) {
