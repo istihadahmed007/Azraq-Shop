@@ -63,11 +63,19 @@ function createMockFetch({ staticRecordHandler, apiHandler, delay = 0, shouldFai
           return {
             ok: true,
             status: 200,
-            json: async () => p
+            json: async () => p,
+            text: async () => JSON.stringify(p),
+            headers: new Map([['content-type', 'application/json']])
           };
         }
       }
-      return { ok: false, status: 404, json: async () => ({ error: 'Not found' }) };
+      return { 
+        ok: false, 
+        status: 404, 
+        json: async () => ({ error: 'Not found' }),
+        text: async () => JSON.stringify({ error: 'Not found' }),
+        headers: new Map([['content-type', 'application/json']])
+      };
     }
 
     if (urlStr.includes('/api/products')) {
@@ -82,14 +90,28 @@ function createMockFetch({ staticRecordHandler, apiHandler, delay = 0, shouldFai
           return {
             ok: true,
             status: 200,
-            json: async () => ({ success: true, product: p })
+            json: async () => ({ success: true, product: p }),
+            text: async () => JSON.stringify({ success: true, product: p }),
+            headers: new Map([['content-type', 'application/json']])
           };
         }
       }
-      return { ok: false, status: 404, json: async () => ({ success: false, error: 'Not found' }) };
+      return { 
+        ok: false, 
+        status: 404, 
+        json: async () => ({ success: false, error: 'Not found' }),
+        text: async () => JSON.stringify({ success: false, error: 'Not found' }),
+        headers: new Map([['content-type', 'application/json']])
+      };
     }
 
-    return { ok: false, status: 404, json: async () => ({}) };
+    return { 
+      ok: false, 
+      status: 404, 
+      json: async () => ({}),
+      text: async () => '{}',
+      headers: new Map([['content-type', 'application/json']])
+    };
   };
 }
 
@@ -231,24 +253,28 @@ function createMockFetch({ staticRecordHandler, apiHandler, delay = 0, shouldFai
       assert.ok(hydratedCatalog.some(p => p.id === 'AZQ-1206'));
     });
 
-    // 11. Vercel routing / SPA fallback regex verification
-    await runTest('Scenario 11: Vercel routing regex excludes /data/, /branding/, and /api/ from SPA fallback', () => {
-      const vercelConfig = JSON.parse(fs.readFileSync('vercel.json', 'utf8'));
-      const spaRewrite = vercelConfig.rewrites.find(r => r.destination === '/index.html');
-      assert.ok(spaRewrite, 'Must contain SPA fallback rewrite to /index.html');
+    // 11. Standalone Node.js server routing invariants & complete Vercel elimination
+    await runTest('Scenario 11: Standalone Node server routing invariants & complete Vercel elimination', () => {
+      // 1. Verify Vercel configuration files have been completely eliminated
+      assert.strictEqual(fs.existsSync('vercel.json'), false, 'vercel.json must be completely deleted');
+      assert.strictEqual(fs.existsSync('.vercel'), false, '.vercel directory must not exist');
+      assert.strictEqual(fs.existsSync('.vercelignore'), false, '.vercelignore must not exist');
 
-      const regexPattern = new RegExp(spaRewrite.source.replace(/^\//, '^/'));
+      // 2. Verify server.js contains correct standalone routing architecture
+      const serverCode = fs.readFileSync('server.js', 'utf8');
       
-      // These should match the SPA rewrite (falling back to index.html):
-      assert.ok(regexPattern.test('/product/some-product-azq-0028'), '/product/... must match SPA rewrite');
-      assert.ok(regexPattern.test('/collections'), '/collections must match SPA rewrite');
-      assert.ok(regexPattern.test('/collection/gadgets'), '/collection/... must match SPA rewrite');
-
-      // These MUST NOT match the SPA rewrite (they must hit static files or API endpoints directly):
-      assert.ok(!regexPattern.test('/data/products/AZQ-0028.json'), '/data/products/... must not be rewritten to index.html');
-      assert.ok(!regexPattern.test('/data/central_products.json'), '/data/central_products.json must not be rewritten to index.html');
-      assert.ok(!regexPattern.test('/api/products?id=AZQ-0028'), '/api/products must not be rewritten to index.html');
-      assert.ok(!regexPattern.test('/branding/logo.png'), '/branding/... must not be rewritten to index.html');
+      // Health check endpoint
+      assert.ok(serverCode.includes("pathname === '/health'"), 'server.js must implement GET /health');
+      
+      // API 404 protection (API routes must never return index.html)
+      assert.ok(serverCode.includes("ENDPOINT_NOT_FOUND") || serverCode.includes("API route not found"), 'server.js must return JSON 404 for unknown API endpoints');
+      
+      // Missing asset 404 protection (Missing JS, CSS, PNG, JSON must return 404, never index.html)
+      assert.ok(serverCode.includes("isAssetPath") || serverCode.includes("Asset not found"), 'server.js must protect missing assets from falling back to index.html');
+      
+      // Binds to 0.0.0.0 and process.env.PORT
+      assert.ok(serverCode.includes("0.0.0.0"), 'server.js must bind to 0.0.0.0');
+      assert.ok(serverCode.includes("process.env.PORT"), 'server.js must read process.env.PORT');
     });
 
     // 12. Single product standalone file integrity

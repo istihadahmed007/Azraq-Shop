@@ -144,82 +144,149 @@ export function extractProductIdFromSlug(slugOrId) {
   return null;
 }
 
+// In-flight request deduplication cache to prevent duplicate network requests
+const inFlightRequests = new Map();
+
+/**
+ * Safely parses response as JSON, preventing SyntaxErrors when non-JSON is received.
+ */
+async function safeParseResponse(res) {
+  try {
+    if (typeof res.json === 'function' && typeof res.text !== 'function') {
+      return await res.json();
+    }
+    const contentType = res.headers && typeof res.headers.get === 'function' ? (res.headers.get('content-type') || '') : '';
+    if (typeof res.text === 'function') {
+      const text = await res.text();
+      if (contentType && !contentType.includes('json') && text.trim().startsWith('<')) {
+        return null;
+      }
+      return JSON.parse(text);
+    }
+    if (typeof res.json === 'function') {
+      return await res.json();
+    }
+    return null;
+  } catch (err) {
+    return null;
+  }
+}
+
 /**
  * Fetches a single product record directly without needing the full monolithic catalog.
  * Resolution chain:
  * 1. Fast static lookup: /data/products/{ID}.json (~2.7 KB)
  * 2. Dedicated API lookup: /api/products?id={ID} or ?slug={SLUG}
- * 3. Graceful timeout and abort support.
+ * 3. Graceful timeout, request deduplication, and safe error classification.
  */
 export async function fetchSingleProduct(slugOrId, options = {}) {
   const { signal, timeoutMs = 8000, baseUrl = '' } = options;
-  if (!slugOrId) return { product: null, isNotFound: true, isError: false, error: null };
-
-  const extractedId = extractProductIdFromSlug(slugOrId);
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-  // Propagate external abort if provided
-  if (signal) {
-    if (signal.aborted) {
-      controller.abort();
-    } else {
-      signal.addEventListener('abort', () => controller.abort(), { once: true });
-    }
+  if (!slugOrId) {
+    return { product: null, isNotFound: true, isError: false, isServerError: false, isNetworkError: false, error: null };
   }
 
-  try {
-    // 1. Try static standalone record first if ID is recognized
-    if (extractedId) {
-      try {
-        const staticUrl = `${baseUrl}/data/products/${extractedId}.json`;
-        const res = await fetch(staticUrl, { signal: controller.signal });
-        if (res.ok) {
-          const product = await res.json();
-          if (product && product.id) {
-            clearTimeout(timeoutId);
-            return { product, isNotFound: false, isError: false, error: null };
+  const cacheKey = `${baseUrl}:${String(slugOrId).trim().toLowerCase()}`;
+  if (inFlightRequests.has(cacheKey)) {
+    return inFlightRequests.get(cacheKey);
+  }
+
+  const fetchPromise = (async () => {
+    const extractedId = extractProductIdFromSlug(slugOrId);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    if (signal) {
+      if (signal.aborted) {
+        controller.abort();
+      } else {
+        signal.addEventListener('abort', () => controller.abort(), { once: true });
+      }
+    }
+
+    try {
+      // 1. Try static standalone record first if ID is recognized
+      if (extractedId) {
+        try {
+          const staticUrl = `${baseUrl}/data/products/${extractedId}.json`;
+          const res = await fetch(staticUrl, { signal: controller.signal });
+          if (res.ok) {
+            const product = await safeParseResponse(res);
+            if (product && product.id) {
+              clearTimeout(timeoutId);
+              return { 
+                product, 
+                isNotFound: false, 
+                isError: false, 
+                isServerError: false, 
+                isNetworkError: false, 
+                error: null 
+              };
+            }
           }
+        } catch (err) {
+          if (err.name === 'AbortError' && signal?.aborted) throw err;
+          // Continue to API fallback on static fetch issue
         }
-      } catch (err) {
-        if (err.name === 'AbortError' && signal?.aborted) throw err;
-        // Continue to API fallback on network/fetch failure
       }
-    }
 
-    // 2. Fallback to serverless API endpoint (/api/products?id=... or ?slug=...)
-    const param = extractedId 
-      ? `id=${encodeURIComponent(extractedId)}` 
-      : `slug=${encodeURIComponent(slugOrId)}`;
-    const apiUrl = `${baseUrl}/api/products?${param}`;
+      // 2. Fallback to server API endpoint (/api/products?id=... or ?slug=...)
+      const param = extractedId 
+        ? `id=${encodeURIComponent(extractedId)}` 
+        : `slug=${encodeURIComponent(slugOrId)}`;
+      const apiUrl = `${baseUrl}/api/products?${param}`;
 
-    const apiRes = await fetch(apiUrl, { signal: controller.signal });
-    clearTimeout(timeoutId);
+      const apiRes = await fetch(apiUrl, { signal: controller.signal });
+      clearTimeout(timeoutId);
 
-    if (apiRes.ok) {
-      const data = await apiRes.json();
-      if (data && data.product) {
-        return { product: data.product, isNotFound: false, isError: false, error: null };
+      if (apiRes.ok) {
+        const data = await safeParseResponse(apiRes);
+        if (data && data.product) {
+          return { 
+            product: data.product, 
+            isNotFound: false, 
+            isError: false, 
+            isServerError: false, 
+            isNetworkError: false, 
+            error: null 
+          };
+        }
+      } else if (apiRes.status === 404) {
+        return { 
+          product: null, 
+          isNotFound: true, 
+          isError: false, 
+          isServerError: false, 
+          isNetworkError: false, 
+          error: 'Product not found' 
+        };
       }
-    } else if (apiRes.status === 404) {
-      return { product: null, isNotFound: true, isError: false, error: 'Product not found' };
-    }
 
-    return {
-      product: null,
-      isNotFound: apiRes.status === 404,
-      isError: apiRes.status !== 404,
-      error: `Server responded with status ${apiRes.status}`
-    };
-  } catch (err) {
-    clearTimeout(timeoutId);
-    const isTimeout = err.name === 'AbortError' && !signal?.aborted;
-    return {
-      product: null,
-      isNotFound: false,
-      isError: true,
-      isTimeout,
-      error: isTimeout ? 'Product loading timed out' : err.message
-    };
-  }
+      const isServer = apiRes.status >= 500;
+      return {
+        product: null,
+        isNotFound: apiRes.status === 404,
+        isError: true,
+        isServerError: isServer,
+        isNetworkError: false,
+        error: `Server responded with status ${apiRes.status}`
+      };
+    } catch (err) {
+      clearTimeout(timeoutId);
+      const isTimeout = err.name === 'AbortError' && !signal?.aborted;
+      return {
+        product: null,
+        isNotFound: false,
+        isError: true,
+        isServerError: false,
+        isNetworkError: true,
+        isTimeout,
+        error: isTimeout ? 'Product loading timed out' : (err.message || 'Network connection failed')
+      };
+    } finally {
+      inFlightRequests.delete(cacheKey);
+    }
+  })();
+
+  inFlightRequests.set(cacheKey, fetchPromise);
+  return fetchPromise;
 }

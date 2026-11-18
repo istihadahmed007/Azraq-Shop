@@ -88,6 +88,58 @@ async function runSmokeTests() {
     }
   });
 
+  // 7. Standalone Server Health Check
+  await assertRoute('GET /health returns 200 with status ok and safe uptime', async () => {
+    const res = await fetch(`${TARGET_URL}/health`);
+    if (!res.ok) throw new Error(`Status ${res.status}: ${res.statusText}`);
+    const data = await res.json();
+    if (data.status !== 'ok') throw new Error(`Expected status: 'ok', got ${data.status}`);
+    if (typeof data.uptime_seconds !== 'number') throw new Error('Expected numeric uptime_seconds');
+  });
+
+  // 8. Standalone Single Product Lookup API
+  await assertRoute('GET /api/products?id=AZQ-0028 returns 200 with valid product record', async () => {
+    const res = await fetch(`${TARGET_URL}/api/products?id=AZQ-0028`);
+    if (!res.ok) throw new Error(`Status ${res.status}: ${res.statusText}`);
+    const data = await res.json();
+    if (!data.success || !data.product) throw new Error('Expected success: true and product data');
+    if (data.product.id !== 'AZQ-0028') throw new Error(`Expected AZQ-0028, got ${data.product.id}`);
+  });
+
+  // 9. API Route 404 Protection (Must return JSON 404, NEVER HTML index.html)
+  await assertRoute('GET /api/unknown-route returns JSON 404 and NEVER HTML index', async () => {
+    const res = await fetch(`${TARGET_URL}/api/unknown-route-test-404`);
+    if (res.status !== 404) throw new Error(`Expected status 404, got ${res.status}`);
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      throw new Error(`Expected application/json, got ${contentType}. API must NEVER return HTML!`);
+    }
+  });
+
+  // 10. Missing Asset 404 Protection (Missing JS/CSS/image returns 404, NEVER HTML)
+  await assertRoute('GET /assets/missing-asset.js returns 404 and NEVER index.html', async () => {
+    const res = await fetch(`${TARGET_URL}/assets/missing-asset-test.js`);
+    if (res.status !== 404) throw new Error(`Expected status 404 for missing asset, got ${res.status}`);
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('text/html')) {
+      throw new Error(`Missing JS asset must return 404 text, NOT HTML! Got: ${contentType}`);
+    }
+  });
+
+  // 11. Direct Product Route returns React SPA Application
+  await assertRoute('GET /product/shaver-azq-0077 returns 200 HTML for direct page loads & refreshes', async () => {
+    const res = await fetch(`${TARGET_URL}/product/shaver-azq-0077`);
+    if (!res.ok) throw new Error(`Status ${res.status}: ${res.statusText}`);
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('text/html')) {
+      throw new Error(`Expected text/html for SPA route, got ${contentType}`);
+    }
+    const html = await res.text();
+    if (!html.includes('<div id="root">') && !html.includes('id="root"')) {
+      throw new Error('Expected root div element in React index.html');
+    }
+  });
+
   console.log('='.repeat(64));
   console.log(`📊 SMOKE TESTS COMPLETED: ${passed}/${total} PASSED`);
   console.log('='.repeat(64));

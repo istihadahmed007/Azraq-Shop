@@ -17,7 +17,10 @@ import {
   Layers,
   Sparkles,
   ArrowRight,
-  AlertCircle
+  AlertCircle,
+  AlertTriangle,
+  WifiOff,
+  ServerCrash
 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import ProductImage from './common/ProductImage';
@@ -103,15 +106,21 @@ export default function ProductDetailPage() {
           } else {
             setFetchStatus('notFound');
           }
+        } else if (res.isServerError) {
+          setFetchStatus('serverError');
+          setFetchError(res.error || 'The product service is currently unavailable.');
+        } else if (res.isNetworkError) {
+          setFetchStatus('networkError');
+          setFetchError(res.error || 'A network connection or timeout occurred.');
         } else if (res.isError) {
-          setFetchStatus('error');
+          setFetchStatus('networkError');
           setFetchError(res.error || 'Failed to load product details');
         }
       })
       .catch(err => {
         if (!isMounted) return;
         if (err.name === 'AbortError') return;
-        setFetchStatus('error');
+        setFetchStatus('networkError');
         setFetchError(err.message || 'Network error loading product');
       });
 
@@ -203,7 +212,13 @@ export default function ProductDetailPage() {
   }, [product]);
 
   // 1. Loading state: active when product is being loaded from single record or catalog
-  if (!product && (fetchStatus === 'loading' || fetchStatus === 'idle' || (fetchStatus !== 'error' && fetchStatus !== 'notFound' && catalogStatus === 'loading'))) {
+  const isStillLoading = !product && (
+    fetchStatus === 'loading' || 
+    fetchStatus === 'idle' || 
+    (fetchStatus !== 'error' && fetchStatus !== 'networkError' && fetchStatus !== 'serverError' && fetchStatus !== 'notFound' && catalogStatus === 'loading')
+  );
+
+  if (isStillLoading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center select-none">
         <div className="w-10 h-10 rounded-full border-3 border-[#0877C9]/30 border-t-[#0877C9] animate-spin mb-3" />
@@ -215,17 +230,52 @@ export default function ProductDetailPage() {
   }
 
   // 2. Recoverable Network Error state (CRITICAL: NEVER display 404 for network errors or timeouts)
-  if (!product && fetchStatus === 'error') {
+  if (!product && (fetchStatus === 'networkError' || fetchStatus === 'error')) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center select-none">
         <div className="w-16 h-16 rounded-full bg-[#FFF1F0] border border-[#FFA39E] flex items-center justify-center mb-4 text-[#CF1322]">
-          <AlertCircle className="w-8 h-8" />
+          <WifiOff className="w-8 h-8" />
         </div>
         <h1 className="text-2xl font-bold text-[#293B52] mb-2">
-          {t("Unable to Load Product", "পণ্যটি লোড করা সম্ভব হয়নি")}
+          {t("Network Connection Issue", "নেটওয়ার্ক সংযোগ সমস্যা")}
         </h1>
         <p className="text-xs text-[#6B7D93] max-w-md mb-6">
           {fetchError || t("A network connection or server timeout occurred while loading this product. Please check your connection and retry.", "সংযোগজনিত সমস্যার কারণে পণ্যটি লোড করা যায়নি। দয়া করে পুনরায় চেষ্টা করুন।")}
+        </p>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handleRetry}
+            className="px-6 py-2.5 rounded-full bg-[#0877C9] text-white font-bold text-xs shadow-md hover:bg-[#0665AC] transition-all flex items-center gap-2 cursor-pointer"
+          >
+            <RotateCcw className="w-4 h-4" />
+            <span>{t("Retry", "পুনরায় চেষ্টা করুন")}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="px-6 py-2.5 rounded-full bg-[#EDF4F9] border border-[#D5E2EE] text-[#293B52] font-semibold text-xs hover:bg-[#E4EEF5] transition-all flex items-center gap-2 cursor-pointer"
+          >
+            <span>{t("Back to Home", "হোমপেজে ফিরে যান")}</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 2b. Recoverable Server Error state (500s)
+  if (!product && fetchStatus === 'serverError') {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center select-none">
+        <div className="w-16 h-16 rounded-full bg-[#FFF7E6] border border-[#FFD591] flex items-center justify-center mb-4 text-[#D46B08]">
+          <ServerCrash className="w-8 h-8" />
+        </div>
+        <h1 className="text-2xl font-bold text-[#293B52] mb-2">
+          {t("Service Temporarily Unavailable", "সার্ভার সাময়িকভাবে অনুপলব্ধ")}
+        </h1>
+        <p className="text-xs text-[#6B7D93] max-w-md mb-6">
+          {fetchError || t("The catalog server encountered a temporary error. Your cart and session are safe. Please retry.", "ক্যাটালগ সার্ভারে সাময়িক সমস্যা হয়েছে। দয়া করে পুনরায় চেষ্টা করুন।")}
         </p>
         <div className="flex items-center gap-3">
           <button
@@ -358,7 +408,7 @@ export default function ProductDetailPage() {
           <div className="lg:col-span-7 flex flex-col gap-4">
 
             {/* Primary Main Image Viewer */}
-            <div 
+            <div
               onClick={() => setIsZoomOpen(true)}
               className="relative w-full aspect-square max-h-[560px] mx-auto rounded-[22px] bg-white border border-[#D5E2EE]/80 overflow-hidden shadow-inner flex items-center justify-center group cursor-zoom-in"
             >
@@ -828,7 +878,7 @@ export default function ProductDetailPage() {
           onClick={() => setIsZoomOpen(false)}
         >
           {/* Top Bar: Title, Zoom Controls & Close */}
-          <div 
+          <div
             className="flex items-center justify-between gap-3 text-white z-20 pb-2 border-b border-white/10"
             onClick={(e) => e.stopPropagation()}
           >
@@ -884,7 +934,7 @@ export default function ProductDetailPage() {
               </button>
             )}
 
-            <div 
+            <div
               className="max-w-4xl max-h-[75vh] flex items-center justify-center transition-transform duration-200"
               style={{ transform: `scale(${zoomScale})` }}
             >
@@ -909,7 +959,7 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Bottom Bar: Thumbnail Strip & Keyboard Hint */}
-          <div 
+          <div
             className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 border-t border-white/10 z-20"
             onClick={(e) => e.stopPropagation()}
           >
@@ -925,11 +975,10 @@ export default function ProductDetailPage() {
                     key={idx}
                     type="button"
                     onClick={() => setActiveImageIndex(idx)}
-                    className={`w-12 h-12 rounded-[10px] bg-white border-2 flex items-center justify-center overflow-hidden shrink-0 transition-all ${
-                      activeImageIndex === idx
-                        ? 'border-[#0877C9] scale-105 shadow-md'
-                        : 'border-white/40 opacity-60 hover:opacity-100'
-                    }`}
+                    className={`w-12 h-12 rounded-[10px] bg-white border-2 flex items-center justify-center overflow-hidden shrink-0 transition-all ${activeImageIndex === idx
+                      ? 'border-[#0877C9] scale-105 shadow-md'
+                      : 'border-white/40 opacity-60 hover:opacity-100'
+                      }`}
                   >
                     <ProductImage
                       src={imgUrl}

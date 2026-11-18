@@ -38,7 +38,7 @@ for (const product of products) {
   const canonicalFile = path.join(targetDir, `${product.id.toUpperCase()}.json`);
   fs.writeFileSync(canonicalFile, jsonStr, 'utf8');
 
-  // Lowercase alias for case-sensitive environments (Linux/Vercel)
+  // Lowercase alias for case-sensitive environments (Linux/POSIX)
   const lowerId = product.id.toLowerCase();
   if (lowerId !== product.id.toUpperCase()) {
     const lowerFile = path.join(targetDir, `${lowerId}.json`);

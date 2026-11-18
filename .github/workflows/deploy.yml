@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 # The static preview is published to gh-pages using the contents permission.
-# The production application and /api routes remain deployed by Vercel.
+# The production application and /api routes are served by the standalone Node.js server.
 permissions:
   contents: write
 

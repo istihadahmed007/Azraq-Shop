@@ -5,33 +5,32 @@
 > **Market:** Bangladesh  
 > **Currency:** BDT (৳)  
 > **Production Store:** [https://azraq.azraqtrips.com](https://azraq.azraqtrips.com)  
-> **Vercel Mirror:** [https://azraqshop.vercel.app](https://azraqshop.vercel.app)  
 > **Repository:** [https://github.com/istihadahmed007/Azraq-Shop](https://github.com/istihadahmed007/Azraq-Shop)  
 
 ---
 
 ## 🌟 Architecture & Hosting Topology
 
-AZRAQ operates on a **Unified Single-Platform Hosting Architecture**:
+AZRAQ operates on a **Unified Standalone Node.js Server Architecture**:
 
-* **Primary Production Host (Vercel):** Serves the high-performance Vite React SPA alongside Node.js serverless API functions (`/api/payments/*`, `/api/orders/*`, `/api/admin/*`, `/api/search-by-image`) on the exact same domain (`shop.azraqtrips.com`).
+* **Standalone Node.js Server (`server.js`):** A lightweight, provider-independent HTTP server serving the production Vite React SPA (`dist/`) alongside all API routes (`/api/products`, `/api/payments/*`, `/api/orders/*`, `/api/admin/*`, `/api/search-by-image`) and `/health`. Binds to `0.0.0.0` and `process.env.PORT`.
 * **Relational Persistence (PostgreSQL):** Stores checkout attempts, confirmed customer orders, payment transaction logs, and append-only status audit histories (`order_status_history`). Fails closed in production if `DATABASE_URL` is omitted.
-* **Continuous Integration (GitHub Actions):** Executes all 60 unit, security, localization, and audit test suites and compiles the production bundle on every push and pull request.
+* **Continuous Integration (GitHub Actions):** Executes all unit, security, localization, direct load, and audit test suites and compiles the production bundle on every push and pull request.
 
 ```mermaid
 flowchart TD
     Client["Customer Browser (Mobile & Desktop)"]
-    VercelEdge["Vercel Edge Gateway (shop.azraqtrips.com)"]
-    ViteSPA["Vite React SPA (Lazy Loaded)"]
-    ServerlessAPI["Node.js Serverless Functions (/api/*)"]
-    PostgresDB[("PostgreSQL Database (Neon / Supabase)")]
+    NodeServer["Standalone Node.js Server (server.js: 0.0.0.0:PORT)"]
+    ViteSPA["Vite React SPA (dist/index.html & assets)"]
+    ServerAPI["Native Node.js API Endpoints (/api/*)"]
+    PostgresDB[("PostgreSQL Database (Neon / Supabase / VPS)")]
     PaymentlyGW["Paymently Gateway (azraq.paymently.io)"]
 
-    Client -->|HTTPS| VercelEdge
-    VercelEdge -->|Static Assets| ViteSPA
-    VercelEdge -->|API Requests| ServerlessAPI
-    ServerlessAPI -->|Durable Persistence| PostgresDB
-    ServerlessAPI -->|Payment Verification| PaymentlyGW
+    Client -->|HTTP/HTTPS| NodeServer
+    NodeServer -->|Static Assets & HTML Fallback| ViteSPA
+    NodeServer -->|API Requests| ServerAPI
+    ServerAPI -->|Durable Persistence| PostgresDB
+    ServerAPI -->|Payment Verification| PaymentlyGW
 ```
 
 ---
@@ -71,16 +70,18 @@ flowchart TD
 
 ## ⚙️ Production Environment Variables
 
-Configure these variables in your Vercel Project Settings (**Settings → Environment Variables**):
+Configure these variables in your deployment environment (e.g. systemd, PM2, Docker, or hosting dashboard):
 
 | Variable Name | Environment | Required | Description |
 | :--- | :---: | :---: | :--- |
+| `PORT` | Production | No | Listening port for Node.js server (Default: `3000`). |
+| `HOST` | Production | No | Interface to bind to (Default: `0.0.0.0`). |
 | `NODE_ENV` | Production | Yes | Set to `production` to activate strict fail-closed security. |
 | `ADMIN_API_KEY` | Production | Yes | Strong secret token for administrative APIs (min 16 chars). |
 | `DATABASE_URL` | Production | Yes | PostgreSQL connection string with SSL (`sslmode=require`). |
 | `PAYMENTLY_API_KEY` | Production | Yes | Merchant API key from your Paymently portal. |
 | `PAYMENTLY_BASE_URL` | Production | Yes | Default: `https://azraq.paymently.io` |
-| `APP_BASE_URL` | Production | Yes | Public URL (e.g. `https://shop.azraqtrips.com`). |
+| `APP_BASE_URL` | Production | Yes | Public URL (e.g. `https://azraq.azraqtrips.com`). |
 
 ---
 

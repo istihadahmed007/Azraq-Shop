@@ -1,7 +1,7 @@
 /**
  * Client Visual Search Service
  * Hybrid Architecture:
- * 1. Attempts backend API POST /api/search-by-image (Vercel serverless / Node / PHP Apache)
+ * 1. Attempts backend API POST /api/search-by-image (Node server / PHP Apache)
  * 2. If the backend returns 404 or is unavailable (e.g. Hostinger static deploy, GitHub Pages, or offline),
  *    seamlessly runs the in-browser 256-D visual recognition engine with identical category taxonomy rules.
  */
