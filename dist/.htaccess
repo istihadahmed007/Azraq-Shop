@@ -14,6 +14,7 @@
   RewriteRule ^api/payments/verify/?$ api/payments/verify.php [L,QSA]
   RewriteRule ^api/payments/status/?$ api/payments/status.php [L,QSA]
   RewriteRule ^api/payments/refund/?$ api/payments/refund.php [L,QSA]
+  RewriteRule ^api/search-by-image/?$ api/search-by-image.php [L,QSA]
 
   # Do NOT rewrite other API routes to index.html
   RewriteCond %{REQUEST_URI} !^/api/
