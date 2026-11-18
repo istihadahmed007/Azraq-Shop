@@ -32,12 +32,12 @@ export default function ProductCard({
   const fallbackImage = 'https://easydrop.asia/products/image-1794224164356-135288231.jpeg';
   const displayImage = imageError || !product.main_image ? fallbackImage : product.main_image;
   const isAvailable = product.in_stock !== false;
-  
+
   // Real original price & discount calculation (only when authentic compare price > selling price)
-  const originalPrice = product.compare_price || 
+  const originalPrice = product.compare_price ||
     (product.supplier_retail_price && product.supplier_retail_price > product.price ? product.supplier_retail_price : null);
-  const discountPercent = originalPrice && originalPrice > product.price 
-    ? Math.round(((originalPrice - product.price) / originalPrice) * 100) 
+  const discountPercent = originalPrice && originalPrice > product.price
+    ? Math.round(((originalPrice - product.price) / originalPrice) * 100)
     : (product.discount_percent || null);
 
   const shortName = product.name?.split('—')?.[1]?.trim() || product.name?.split('(')?.[0]?.trim() || product.name || '';
@@ -71,7 +71,7 @@ export default function ProductCard({
     >
       {/* 1. TOP IMAGE WELL: 1:1 Square Container, Full Available Width */}
       <div className="relative w-full aspect-square bg-[#FFFFFF] flex items-center justify-center overflow-hidden border-b border-gray-100">
-        
+
         {/* Authentic Shopee-style Discount Ribbon at Upper-Right Corner */}
         {discountPercent && discountPercent > 0 ? (
           <div className="absolute top-0 right-0 z-10 pointer-events-none">
@@ -85,9 +85,8 @@ export default function ProductCard({
         <button
           type="button"
           onClick={handleToggleFav}
-          className={`absolute top-1.5 left-1.5 z-10 w-7 h-7 rounded-full flex items-center justify-center transition-colors bg-white/90 hover:bg-white border border-gray-200/80 shadow-2xs focus:outline-none ${
-            isFav ? 'text-[#EE4D2D]' : 'text-gray-400 hover:text-[#EE4D2D]'
-          }`}
+          className={`absolute top-1.5 left-1.5 z-10 w-7 h-7 rounded-full flex items-center justify-center transition-colors bg-white/90 hover:bg-white border border-gray-200/80 shadow-2xs focus:outline-none ${isFav ? 'text-[#EE4D2D]' : 'text-gray-400 hover:text-[#EE4D2D]'
+            }`}
           title={isFav ? t("Remove from Wishlist", "পছন্দের তালিকা থেকে সরান") : t("Add to Wishlist", "পছন্দের তালিকায় যোগ করুন")}
           aria-label={`Wishlist ${product.name}`}
         >
@@ -121,9 +120,8 @@ export default function ProductCard({
 
           {/* Product Title: 2-line clamp */}
           <h3
-            className={`font-normal text-[#212121] line-clamp-2 min-h-[2.3rem] sm:min-h-[2.5rem] group-hover:text-[#0877C9] transition-colors leading-snug ${
-              compact ? 'text-[12px]' : 'text-[13px] sm:text-[13.5px]'
-            }`}
+            className={`font-normal text-[#212121] line-clamp-2 min-h-[2.3rem] sm:min-h-[2.5rem] group-hover:text-[#0877C9] transition-colors leading-snug ${compact ? 'text-[12px]' : 'text-[13px] sm:text-[13.5px]'
+              }`}
             title={product.name}
           >
             {shortName}
@@ -147,9 +145,8 @@ export default function ProductCard({
 
             {/* In-stock status */}
             <span
-              className={`text-[10px] font-medium block truncate mt-0.5 ${
-                isAvailable ? 'text-emerald-700' : 'text-gray-400'
-              }`}
+              className={`text-[10px] font-medium block truncate mt-0.5 ${isAvailable ? 'text-emerald-700' : 'text-gray-400'
+                }`}
             >
               {isAvailable ? t("In Stock", "স্টকে রয়েছে") : t("Out of Stock", "স্টক নেই")}
             </span>
@@ -160,13 +157,11 @@ export default function ProductCard({
             type="button"
             onClick={handleAddToCart}
             disabled={!isAvailable}
-            className={`rounded-[3px] flex items-center justify-center transition-all flex-shrink-0 focus:outline-none ${
-              compact ? 'w-7 h-7' : 'w-7.5 h-7.5 sm:w-8 sm:h-8'
-            } ${
-              isAvailable
+            className={`rounded-[3px] flex items-center justify-center transition-all flex-shrink-0 focus:outline-none ${compact ? 'w-7 h-7' : 'w-7.5 h-7.5 sm:w-8 sm:h-8'
+              } ${isAvailable
                 ? 'bg-[#0877C9] hover:bg-[#0665AC] text-white shadow-2xs active:scale-95'
                 : 'bg-gray-100 text-gray-300 cursor-not-allowed'
-            }`}
+              }`}
             title={isAvailable ? t("Add to Cart", "ব্যাগে যোগ করুন") : t("Out of Stock", "স্টক নেই")}
             aria-label={isAvailable ? `Add ${product.name} to bag` : `${product.name} is out of stock`}
           >

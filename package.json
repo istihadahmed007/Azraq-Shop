@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node tests/paymently_audit_tests.mjs && node tests/storefront_audit_tests.mjs && node tests/order_tracking_audit_tests.mjs && node tests/localization_and_currency_tests.mjs && node tests/security_and_durability_tests.mjs",
+    "test": "node tests/paymently_audit_tests.mjs && node tests/storefront_audit_tests.mjs && node tests/order_tracking_audit_tests.mjs && node tests/localization_and_currency_tests.mjs && node tests/security_and_durability_tests.mjs && node tests/visual_search_accuracy.test.mjs",
+    "test:visual": "node tests/visual_search_accuracy.test.mjs",
     "test:payment": "node tests/paymently_audit_tests.mjs",
     "test:storefront": "node tests/storefront_audit_tests.mjs",
     "test:tracking": "node tests/order_tracking_audit_tests.mjs",
@@ -19,10 +20,14 @@
   "dependencies": {
     "canvas-confetti": "^1.9.2",
     "clsx": "^2.1.1",
+    "image-decode": "^1.2.2",
+    "jpeg-js": "^0.4.4",
     "lucide-react": "^0.344.0",
     "pg": "^8.23.1",
+    "pngjs": "^7.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "sharp": "^0.35.5",
     "tailwind-merge": "^2.2.1"
   },
   "devDependencies": {

@@ -26,11 +26,11 @@ export default function BrandAssetsModal() {
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-[#101C35]/50 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200 select-none">
-      <div 
+      <div
         className="relative w-full max-w-4xl glass-modal rounded-[8px] shadow-2xl border border-white/95 overflow-hidden my-4 max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        
+
         {/* Header Bar */}
         <div className="p-5 sm:p-6 bg-white/85 backdrop-blur-md text-[#101C35] flex items-center justify-between border-b border-white/90">
           <div className="flex items-center gap-3">
@@ -62,7 +62,7 @@ export default function BrandAssetsModal() {
 
         {/* Modal Body */}
         <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-10 bg-white">
-          
+
           {/* Brand Manifesto Section */}
           <div className="p-6 rounded-3xl bg-azraq-cloud border border-azraq-purple/20 space-y-2">
             <span className="text-xs font-mono font-bold text-azraq-violet uppercase tracking-widest">
@@ -104,7 +104,7 @@ export default function BrandAssetsModal() {
 
             {/* Brand Symbol & App Icon */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-              
+
               {/* Monogram Isolated */}
               <div className="p-5 rounded-2xl bg-[#F5F7FA] border border-gray-200 flex flex-col items-center justify-center gap-3 text-center">
                 <span className="text-[10px] font-mono uppercase text-gray-500">Official Brand Symbol</span>
@@ -142,7 +142,7 @@ export default function BrandAssetsModal() {
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               {colors.map(c => (
-                <div 
+                <div
                   key={c.hex}
                   onClick={() => copyColor(c.hex)}
                   className="p-3 rounded-2xl border border-gray-200 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between h-28"
@@ -168,7 +168,7 @@ export default function BrandAssetsModal() {
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              
+
               {/* Luxury Shipper Box */}
               <div className="p-5 rounded-2xl bg-azraq-navy text-white space-y-3 relative overflow-hidden">
                 <div className="w-8 h-8 rounded-lg bg-azraq-charcoal flex items-center justify-center text-azraq-lime">
@@ -222,7 +222,7 @@ export default function BrandAssetsModal() {
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              
+
               {/* Instagram Story / Reel Mockup */}
               <div className="p-5 rounded-2xl bg-gradient-to-b from-azraq-lavender to-white border border-azraq-purple/30 space-y-3">
                 <div className="flex items-center justify-between text-xs font-bold text-azraq-navy">

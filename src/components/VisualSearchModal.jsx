@@ -179,12 +179,11 @@ export default function VisualSearchModal() {
     setIsScanning(true);
     setSearchError(null);
 
-    // Realistic scanning phase feedback
+    // Real scanning phase feedback
     const scanSteps = [
-      t("Preprocessing and resizing visual input...", "ছবি প্রসেস এবং প্রস্তুত করা হচ্ছে..."),
-      t("Extracting spatial color contours & gradient geometry...", "রং এবং অবজেক্টের কনট্যুর বিশ্লেষণ করা হচ্ছে..."),
-      t("Generating 128-dimensional CLIP feature embedding...", "ভিজ্যুয়াল এআই এমবেডিং ভেক্টর তৈরি হচ্ছে..."),
-      t("Computing cosine similarity across 1,200+ catalog items...", "১২০০+ পণ্যের সাথে সাদৃশ্য মেলানো হচ্ছে...")
+      t("Analyzing image dimensions and object contours...", "ছবির সাইজ ও অবজেক্টের কনট্যুর বিশ্লেষণ করা হচ্ছে..."),
+      t("Extracting spatial geometry and structural features...", "গঠন ও প্যাটার্ন বিশ্লেষণ করা হচ্ছে..."),
+      t("Predicting product category and matching catalog...", "পণ্য ক্যাটাগরি এবং ক্যাটালগের সাথে মেলানো হচ্ছে...")
     ];
 
     let stepIndex = 0;
@@ -290,7 +289,7 @@ export default function VisualSearchModal() {
                   {t("AI Visual Product Search", "এআই ভিজ্যুয়াল প্রোডাক্ট সার্চ")}
                 </h2>
                 <span className="px-2 py-0.5 rounded-[4px] bg-[#D9EDFF] text-[#0877C9] text-[10px] font-black uppercase tracking-wider">
-                  CLIP Vision
+                  Visual Search
                 </span>
               </div>
               <p className="text-xs text-[#71849B]">
@@ -519,19 +518,11 @@ export default function VisualSearchModal() {
                     className="w-full h-full object-contain"
                   />
 
-                  {/* Animated Visual Scanning Laser Beam (Active when searching) */}
+                  {/* Visual Scanning Indicator (Active when searching) */}
                   {isScanning && (
-                    <>
-                      <div className="absolute inset-0 bg-[#0877C9]/15 backdrop-blur-[1px] pointer-events-none" />
-
-                      {/* Laser Line */}
-                      <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#50DDF0] to-transparent shadow-[0_0_15px_#50DDF0] animate-visual-scan pointer-events-none" />
-
-                      {/* HUD Scan Reticle */}
-                      <div className="absolute top-3 left-3 text-[10px] font-mono text-[#50DDF0] bg-[#062B4F]/80 px-2 py-0.5 rounded backdrop-blur-sm pointer-events-none">
-                        SCANNING MATRIX
-                      </div>
-                    </>
+                    <div className="absolute inset-0 bg-[#0877C9]/10 backdrop-blur-[1px] pointer-events-none flex items-center justify-center">
+                      <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#0877C9] to-transparent animate-visual-scan pointer-events-none" />
+                    </div>
                   )}
                 </div>
 
@@ -583,11 +574,18 @@ export default function VisualSearchModal() {
                     />
                   </div>
                   <div>
-                    <h3 className="text-base sm:text-lg font-black text-[#062B4F] tracking-tight">
-                      {t("Visual Search Results", "ভিজ্যুয়াল সার্চ ফলাফল")}
-                    </h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-base sm:text-lg font-black text-[#062B4F] tracking-tight">
+                        {t("Visual Search Results", "ভিজ্যুয়াল সার্চ ফলাফল")}
+                      </h3>
+                      {searchResults?.predicted_category && searchResults.predicted_category !== 'All' && (
+                        <span className="px-2 py-0.5 rounded-[4px] bg-[#EBF6FF] text-[#0877C9] border border-[#BCE1FE] text-[11px] font-bold">
+                          {searchResults.predicted_category}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-[#062B4F]/60">
-                      {t("We found products that look like your picture.", "আপনার ছবির সাথে সাদৃশ্যপূর্ণ পণ্যসমূহ।")}
+                      {t("We found products that match the visual structure and category of your photo.", "আপনার ছবির সাথে সাদৃশ্যপূর্ণ ক্যাটালগ পণ্যসমূহ।")}
                     </p>
                   </div>
                 </div>
@@ -654,21 +652,40 @@ export default function VisualSearchModal() {
               {/* No items matched message */}
               {processedResults.bestMatches.length === 0 && processedResults.similarProducts.length === 0 && (
                 <div className="py-12 text-center rounded-2xl bg-[#F8FCFF] border border-[#D9F0FF] p-6 space-y-3">
-                  <p className="text-sm font-bold text-[#062B4F]">
+                  <div className="w-12 h-12 rounded-full bg-[#EBF6FF] text-[#0877C9] flex items-center justify-center mx-auto">
+                    <Search className="w-6 h-6" />
+                  </div>
+                  <h4 className="text-sm sm:text-base font-bold text-[#062B4F]">
+                    {t("No Close Matches Found", "কাছাকাছি কোনো পণ্য পাওয়া যায়নি")}
+                  </h4>
+                  <p className="text-xs text-[#062B4F]/60 max-w-md mx-auto">
                     {t(
-                      "We couldn't find an exact match, but here are some products with similar styles.",
-                      "হুবহু কোনো মিল পাওয়া যায়নি, তবে কাছাকাছি স্টাইলের পণ্য দেখতে পারেন।"
+                      "We could not find products in our catalogue matching this photo with high visual similarity. Try uploading a clearer photo with good lighting or browse by category.",
+                      "আপনার ছবির সাথে যথেষ্ট সাদৃশ্যপূর্ণ কোনো পণ্য ক্যাটালগে পাওয়া যায়নি। স্পষ্ট ছবি আপলোড করুন অথবা ক্যাটাগরি ব্রাউজ করুন।"
                     )}
                   </p>
-                  <button
-                    onClick={() => {
-                      setSelectedCategory('All');
-                      setPriceFilter('all');
-                    }}
-                    className="px-5 py-2 rounded-full bg-[#062B4F] text-white text-xs font-bold hover:bg-[#0877C9] transition-colors"
-                  >
-                    {t("Reset Filters", "ফিল্টার রিসেট করুন")}
-                  </button>
+                  <div className="flex items-center justify-center gap-3 pt-2">
+                    <button
+                      onClick={() => {
+                        setSelectedImage(null);
+                        setSearchResults(null);
+                      }}
+                      className="px-5 py-2 rounded-full bg-[#0877C9] text-white text-xs font-bold hover:bg-[#062B4F] transition-colors"
+                    >
+                      {t("Try Another Image", "অন্য ছবি দিয়ে খুঁজুন")}
+                    </button>
+                    {(selectedCategory !== 'All' || priceFilter !== 'all') && (
+                      <button
+                        onClick={() => {
+                          setSelectedCategory('All');
+                          setPriceFilter('all');
+                        }}
+                        className="px-5 py-2 rounded-full bg-white border border-[#D9F0FF] text-[#062B4F] text-xs font-bold hover:bg-[#F0F7FF] transition-colors"
+                      >
+                        {t("Reset Filters", "ফিল্টার রিসেট করুন")}
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -678,10 +695,10 @@ export default function VisualSearchModal() {
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#0877C9] shadow-[0_0_8px_#0877C9]" />
                     <h4 className="text-sm sm:text-base font-black text-[#062B4F] tracking-tight">
-                      {t("Section A — Best Matches", "সেকশন এ — সেরা সাদৃশ্যপূর্ণ পণ্যসমূহ")}
+                      {t("Section A — Exact & Best Matches", "সেকশন এ — হুবহু ও সেরা সাদৃশ্যপূর্ণ পণ্যসমূহ")}
                     </h4>
                     <span className="text-[11px] font-semibold text-[#0877C9] bg-[#D9F0FF] px-2 py-0.5 rounded-full">
-                      {processedResults.bestMatches.length} {t("Top Resemblances", "সেরা মিল")}
+                      {processedResults.bestMatches.length} {t("Matches", "টি মিল")}
                     </span>
                   </div>
 
@@ -719,10 +736,10 @@ export default function VisualSearchModal() {
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#69C5F5]" />
                     <h4 className="text-sm sm:text-base font-black text-[#062B4F] tracking-tight">
-                      {t("Section B — Similar Products", "সেকশন বি — কাছাকাছি ঘরানার পণ্যসমূহ")}
+                      {t("Section B — Visually Similar Products", "সেকশন বি — কাছাকাছি ঘরানার পণ্যসমূহ")}
                     </h4>
                     <span className="text-[11px] font-semibold text-[#062B4F]/60">
-                      {t("Alternative recommendations with matching colors & style", "অনুরূপ স্টাইল ও রঙের বিকল্প পণ্য")}
+                      {t("Related recommendations within matching category", "একই ক্যাটাগরির প্রাসঙ্গিক বিকল্প পণ্য")}
                     </span>
                   </div>
 

@@ -1,86 +1,171 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import {
+  extractVisualFeaturesFromBuffer,
+  hammingDistance,
+  cosineSimilarity
+} from './visualFeatureExtractor.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load product embeddings database
+// Cached embeddings & category models
 let embeddingsCache = null;
+let categoryCentroids = {};
+let categoryAspectRatios = {};
+let categoryCounts = {};
+let lastMtime = 0;
 
-function getEmbeddings() {
-  if (!embeddingsCache) {
-    const embeddingsPath = path.join(__dirname, '../src/data/product_embeddings.json');
-    if (fs.existsSync(embeddingsPath)) {
+function loadEmbeddingsIndex() {
+  const embeddingsPath = path.join(__dirname, '../src/data/product_embeddings.json');
+  if (!fs.existsSync(embeddingsPath)) {
+    console.warn(`[Visual Search Server] Embeddings file not found at ${embeddingsPath}`);
+    return [];
+  }
+
+  const stat = fs.statSync(embeddingsPath);
+  if (!embeddingsCache || stat.mtimeMs !== lastMtime) {
+    try {
       const data = JSON.parse(fs.readFileSync(embeddingsPath, 'utf8'));
       embeddingsCache = data.embeddings || [];
-      console.log(`[Visual Search Server] Loaded ${embeddingsCache.length} product embeddings into memory.`);
-    } else {
+      categoryCentroids = data.category_centroids || {};
+      categoryAspectRatios = data.category_aspect_ratios || {};
+      
+      categoryCounts = {};
+      embeddingsCache.forEach(p => {
+        categoryCounts[p.category] = (categoryCounts[p.category] || 0) + 1;
+      });
+
+      lastMtime = stat.mtimeMs;
+      console.log(`[Visual Search Server] Loaded ${embeddingsCache.length} products (dim: ${data.dimensions || 256}, version: ${data.version || 'v2'}) into visual memory.`);
+    } catch (err) {
+      console.error('[Visual Search Server] Failed to parse embeddings file:', err.message);
       embeddingsCache = [];
-      console.warn(`[Visual Search Server] Embeddings file not found at ${embeddingsPath}`);
     }
   }
   return embeddingsCache;
 }
 
-// Compute cosine similarity between two normalized float vectors
-function cosineSimilarity(vecA, vecB) {
-  let dotProduct = 0;
-  for (let i = 0; i < vecA.length; i++) {
-    dotProduct += vecA[i] * vecB[i];
+// Category Taxonomy Relationships (Sister categories for natural discovery without leakage)
+const CATEGORY_TAXONOMY_GROUPS = {
+  'Men Clothing': ['Men Clothing', 'Drop Shoulder T-Shirt', 'Winter Collection'],
+  'Drop Shoulder T-Shirt': ['Drop Shoulder T-Shirt', 'Men Clothing'],
+  'Winter Collection': ['Winter Collection', 'Men Clothing'],
+  'Sunglass Collection': ['Sunglass Collection', 'Men Accessories'],
+  'Men Accessories': ['Men Accessories', 'Sunglass Collection', 'Jewelries & Accessories'],
+  'Kitchen Appliances': ['Kitchen Appliances', 'Home & Lifestyle'],
+  'Home & Lifestyle': ['Home & Lifestyle', 'Kitchen Appliances'],
+  'Gadgets & IT Accessories': ['Gadgets & IT Accessories', 'Consumer Electronics'],
+  'Consumer Electronics': ['Consumer Electronics', 'Gadgets & IT Accessories'],
+  'Jewelries & Accessories': ['Jewelries & Accessories', 'Men Accessories'],
+  'Health & Beauty': ['Health & Beauty', 'Personal Wellness', 'Soap & Fragrance'],
+  'Personal Wellness': ['Personal Wellness', 'Health & Beauty'],
+  'Soap & Fragrance': ['Soap & Fragrance', 'Health & Beauty'],
+  'Sports & Kids': ['Sports & Kids', 'Baby & Mom'],
+  'Baby & Mom': ['Baby & Mom', 'Sports & Kids'],
+  'Couple Combo': ['Couple Combo', 'Gifts', 'Jewelries & Accessories'],
+  'Gifts': ['Gifts', 'Couple Combo']
+};
+
+/**
+ * Predicts the most accurate category for an uploaded image.
+ * 1. Checks for exact/near dHash catalog matches (distance <= 8).
+ * 2. Uses category-size-normalized k-NN voting + centroid similarity + aspect ratio.
+ */
+export function predictProductCategory(queryFeatures, catalogEmbeddings) {
+  // Step 1: Exact dHash catalog match check
+  let closestDhash = 64;
+  let exactMatchProduct = null;
+
+  for (const item of catalogEmbeddings) {
+    const dist = hammingDistance(queryFeatures.dhash, item.dhash);
+    if (dist < closestDhash) {
+      closestDhash = dist;
+      exactMatchProduct = item;
+    }
   }
-  return dotProduct;
-}
 
-// Extract color profile and feature vector from base64 image data
-export function extractImageFeaturesFromBuffer(buffer, mimeType) {
-  // Simple deterministic sample-based visual feature projection from image bytes
-  const bytes = buffer.slice(0, Math.min(buffer.length, 32768));
-  const vector = new Float32Array(128);
-
-  let byteSum = 0;
-  let rSum = 0, gSum = 0, bSum = 0;
-
-  for (let i = 0; i < bytes.length; i++) {
-    byteSum += bytes[i];
-    const mod = i % 3;
-    if (mod === 0) rSum += bytes[i];
-    else if (mod === 1) gSum += bytes[i];
-    else bSum += bytes[i];
+  if (closestDhash <= 8 && exactMatchProduct) {
+    const cat = exactMatchProduct.category;
+    return {
+      predictedCategory: cat,
+      confidence: 0.98,
+      allowedCategories: CATEGORY_TAXONOMY_GROUPS[cat] || [cat],
+      exactCatalogMatch: exactMatchProduct
+    };
   }
 
-  const avgIntensity = byteSum / bytes.length;
-  const avgR = (rSum / (bytes.length / 3)) / 255;
-  const avgG = (gSum / (bytes.length / 3)) / 255;
-  const avgB = (bSum / (bytes.length / 3)) / 255;
+  // Step 2: Normalized Category Classification
+  const scores = {};
+  const queryVector = queryFeatures.vector;
+  const rawAspect = queryFeatures.rawAspectRatio || 1.0;
 
-  // Synthesize 128-d spatial/color projection
-  for (let i = 0; i < 128; i++) {
-    const sampleIdx = (i * 137) % bytes.length;
-    const rawVal = bytes[sampleIdx] / 255;
-    const colorWeight = (i % 3 === 0) ? avgR : (i % 3 === 1) ? avgG : avgB;
-    vector[i] = (rawVal * 0.5) + (colorWeight * 0.3) + (avgIntensity / 255 * 0.2);
+  // A. Category Centroid Cosine Similarity
+  for (const [category, centroid] of Object.entries(categoryCentroids)) {
+    const sim = cosineSimilarity(queryVector, centroid);
+    scores[category] = (scores[category] || 0) + Math.max(0, sim) * 0.50;
+
+    // Aspect ratio bonus/penalty
+    const expectedAspect = categoryAspectRatios[category] || 1.0;
+    const aspectDiff = Math.abs(rawAspect - expectedAspect);
+    if (aspectDiff < 0.20) {
+      scores[category] += 0.12;
+    } else if (aspectDiff > 0.70) {
+      scores[category] -= 0.12;
+    }
   }
 
-  // L2-Normalize
-  let norm = 0;
-  for (let i = 0; i < 128; i++) norm += vector[i] * vector[i];
-  norm = Math.sqrt(norm) || 1;
-  const normalizedVector = Array.from(vector).map(v => +(v / norm).toFixed(5));
+  // B. Normalized k-NN Voting (Top 25 nearest catalog products)
+  const neighbors = catalogEmbeddings
+    .map(p => ({
+      category: p.category,
+      sim: cosineSimilarity(queryVector, p.vector)
+    }))
+    .sort((a, b) => b.sim - a.sim)
+    .slice(0, 25);
 
-  // Determine dominant hex color
-  const hexR = Math.min(255, Math.floor(avgR * 255)).toString(16).padStart(2, '0');
-  const hexG = Math.min(255, Math.floor(avgG * 255)).toString(16).padStart(2, '0');
-  const hexB = Math.min(255, Math.floor(avgB * 255)).toString(16).padStart(2, '0');
+  neighbors.forEach((n, idx) => {
+    if (n.sim > 0.10) {
+      // Normalize vote by square root of category population to prevent large categories from dominating
+      const catCount = categoryCounts[n.category] || 1;
+      const sizeWeight = 1 / Math.sqrt(catCount);
+      const rankWeight = (25 - idx) / 25;
+      const vote = n.sim * rankWeight * sizeWeight * 4.0;
+      scores[n.category] = (scores[n.category] || 0) + vote;
+    }
+  });
+
+  // Rank categories
+  const sortedCategories = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+
+  if (sortedCategories.length === 0) {
+    return { predictedCategory: 'All', confidence: 0.0, allowedCategories: [] };
+  }
+
+  const topCategory = sortedCategories[0][0];
+  const topScore = Math.max(0.01, sortedCategories[0][1]);
+  const secondScore = sortedCategories[1] ? Math.max(0, sortedCategories[1][1]) : 0;
+  const confidence = Math.min(0.99, +(topScore / (topScore + secondScore * 0.6)).toFixed(2));
+
+  let allowedCategories = CATEGORY_TAXONOMY_GROUPS[topCategory] || [topCategory];
+  if (confidence < 0.50 && sortedCategories[1]) {
+    const secondCategory = sortedCategories[1][0];
+    const secondGroup = CATEGORY_TAXONOMY_GROUPS[secondCategory] || [secondCategory];
+    allowedCategories = Array.from(new Set([...allowedCategories, ...secondGroup]));
+  }
 
   return {
-    vector: normalizedVector,
-    dominantColor: `#${hexR}${hexG}${hexB}`,
-    avgIntensity: +(avgIntensity / 255).toFixed(3)
+    predictedCategory: topCategory,
+    confidence,
+    allowedCategories,
+    exactCatalogMatch: null
   };
 }
 
-// Main API Handler for Visual Product Search
+/**
+ * Main API Handler for Visual Product Search
+ */
 export async function searchProductsByImage({ imageBase64, mimeType = 'image/jpeg', filters = {} }) {
   const startTime = Date.now();
 
@@ -101,71 +186,135 @@ export async function searchProductsByImage({ imageBase64, mimeType = 'image/jpe
     throw new Error('Image file size exceeds the 10 MB limit');
   }
 
-  // Feature extraction
-  const { vector, dominantColor, avgIntensity } = extractImageFeaturesFromBuffer(buffer, mimeType);
-  const catalogEmbeddings = getEmbeddings();
+  // 1. Extract genuine visual features from uploaded image
+  const queryFeatures = await extractVisualFeaturesFromBuffer(buffer);
+  const catalogEmbeddings = loadEmbeddingsIndex();
 
   if (!catalogEmbeddings || catalogEmbeddings.length === 0) {
-    throw new Error('Product catalogue embeddings are not initialized');
+    throw new Error('Product catalogue visual embeddings are not initialized.');
   }
 
-  // Calculate similarity scores for all products in catalog
-  let scoredProducts = catalogEmbeddings.map(item => {
-    const rawSim = cosineSimilarity(vector, item.vector);
-    
-    // Calibrate similarity percentage between 60% and 98%
-    const normalizedSimilarity = Math.min(0.98, Math.max(0.40, (rawSim + 1) / 2));
-    const similarityPercent = Math.round(normalizedSimilarity * 100);
+  // 2. Predict Product Category & Restrict Candidate Pool
+  const { predictedCategory, confidence, allowedCategories, exactCatalogMatch } = predictProductCategory(
+    queryFeatures,
+    catalogEmbeddings
+  );
 
-    return {
-      id: item.id,
-      sku: item.sku,
-      name: item.name,
-      category: item.category,
-      price: item.price,
-      main_image: item.main_image,
-      dominant_colors: item.dominant_colors,
-      visual_tags: item.visual_tags,
-      similarity: similarityPercent,
-      raw_similarity: +rawSim.toFixed(4)
-    };
+  let candidatePool = catalogEmbeddings;
+
+  // If client explicitly selected a category filter
+  if (filters.category && filters.category !== 'All') {
+    candidatePool = candidatePool.filter(p => p.category === filters.category);
+  } else if (allowedCategories && allowedCategories.length > 0) {
+    // Restrict strictly to predicted category taxonomy to eliminate cross-category leakage
+    candidatePool = candidatePool.filter(p => allowedCategories.includes(p.category));
+  }
+
+  // Apply optional price filters
+  if (filters.maxPrice) {
+    candidatePool = candidatePool.filter(p => p.price <= filters.maxPrice);
+  }
+  if (filters.minPrice) {
+    candidatePool = candidatePool.filter(p => p.price >= filters.minPrice);
+  }
+
+  // 3. Score Candidates with Genuine Visual Similarity & dHash Distance
+  const scoredProducts = [];
+
+  for (const item of candidatePool) {
+    if (!item.vector || item.vector.length !== 256) continue;
+
+    const dhashDist = hammingDistance(queryFeatures.dhash, item.dhash);
+    const cosSim = cosineSimilarity(queryFeatures.vector, item.vector);
+
+    let similarityPercent = 0;
+    let matchType = 'similar';
+
+    if (dhashDist <= 6) {
+      // Exact duplicate or tight crop of product photography
+      similarityPercent = Math.min(99, Math.round(96 + (6 - dhashDist) * 0.5));
+      matchType = 'exact';
+    } else if (dhashDist <= 12) {
+      // Near-identical photograph / variant angle
+      similarityPercent = Math.min(94, Math.round(86 + (12 - dhashDist) * 1.3));
+      matchType = 'exact';
+    } else {
+      // Calibrated cosine similarity for zero-centered unit vectors
+      const normalizedSim = (cosSim + 0.15) / 1.05;
+      similarityPercent = Math.max(0, Math.min(85, Math.round(normalizedSim * 100)));
+      if (similarityPercent >= 82) {
+        matchType = 'similar';
+      }
+    }
+
+    // Strict relevance threshold: products below 50% are discarded to prevent unrelated results
+    if (similarityPercent >= 50) {
+      scoredProducts.push({
+        id: item.id,
+        sku: item.sku,
+        name: item.name,
+        category: item.category,
+        category_id: item.category_id,
+        price: item.price,
+        main_image: item.main_image,
+        images: item.images,
+        similarity: similarityPercent,
+        raw_similarity: +cosSim.toFixed(4),
+        dhash_distance: dhashDist,
+        match_type: matchType
+      });
+    }
+  }
+
+  // If there's an exactCatalogMatch from Step 1 and it's not already in scoredProducts, ensure it is added
+  if (exactCatalogMatch && !scoredProducts.some(p => p.id === exactCatalogMatch.id)) {
+    const dist = hammingDistance(queryFeatures.dhash, exactCatalogMatch.dhash);
+    scoredProducts.unshift({
+      id: exactCatalogMatch.id,
+      sku: exactCatalogMatch.sku,
+      name: exactCatalogMatch.name,
+      category: exactCatalogMatch.category,
+      category_id: exactCatalogMatch.category_id,
+      price: exactCatalogMatch.price,
+      main_image: exactCatalogMatch.main_image,
+      images: exactCatalogMatch.images,
+      similarity: 99,
+      raw_similarity: 1.0,
+      dhash_distance: dist,
+      match_type: 'exact'
+    });
+  }
+
+  // Sort descending by similarity, exact matches first
+  scoredProducts.sort((a, b) => {
+    if (a.match_type === 'exact' && b.match_type !== 'exact') return -1;
+    if (b.match_type === 'exact' && a.match_type !== 'exact') return 1;
+    return b.similarity - a.similarity;
   });
 
-  // Apply optional category and price filters
-  if (filters.category && filters.category !== 'All') {
-    scoredProducts = scoredProducts.filter(p => p.category === filters.category);
-  }
-
-  if (filters.maxPrice) {
-    scoredProducts = scoredProducts.filter(p => p.price <= filters.maxPrice);
-  }
-
-  if (filters.minPrice) {
-    scoredProducts = scoredProducts.filter(p => p.price >= filters.minPrice);
-  }
-
-  // Sort by highest visual similarity
-  scoredProducts.sort((a, b) => b.similarity - a.similarity);
-
-  // Partition into Section A (Best Matches) and Section B (Similar Products)
-  const bestMatches = scoredProducts.slice(0, 8);
-  const similarProducts = scoredProducts.slice(8, 24);
+  // 4. Partition into Section A (Exact / Best Matches) and Section B (Similar Products)
+  const bestMatches = scoredProducts.filter(p => p.match_type === 'exact' || p.similarity >= 80);
+  const similarProducts = scoredProducts.filter(p => p.match_type !== 'exact' && p.similarity < 80);
 
   const durationMs = Date.now() - startTime;
 
   return {
     success: true,
+    predicted_category: predictedCategory,
+    category_confidence: confidence,
     total_candidates: scoredProducts.length,
     search_duration_ms: durationMs,
     extracted_features: {
-      dominant_color: dominantColor,
-      detected_intensity: avgIntensity,
-      dimensions_analyzed: vector.length
+      dominant_color: queryFeatures.dominantColor,
+      raw_aspect_ratio: queryFeatures.rawAspectRatio,
+      fg_aspect_ratio: queryFeatures.fgAspectRatio,
+      detected_intensity: queryFeatures.detectedIntensity,
+      dimensions_analyzed: 256
     },
     sections: {
-      best_matches: bestMatches,
-      similar_products: similarProducts
-    }
+      best_matches: bestMatches.slice(0, 12),
+      similar_products: similarProducts.slice(0, 24)
+    },
+    no_matches: scoredProducts.length === 0
   };
 }
-
