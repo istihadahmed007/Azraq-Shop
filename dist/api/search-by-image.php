@@ -124,7 +124,7 @@ for ($y = 0; $y < $targetSize; $y++) {
             if ($x < $minX) $minX = $x;
             if ($x > $maxX) $maxX = $x;
             if ($y < $minY) $minY = $y;
-            if ($y > $maxY) maxY = $y;
+            if ($y > $maxY) $maxY = $y;
 
             $rSum += $r; $gSum += $g; $bSum += $b;
             $colorCount++;
@@ -314,6 +314,27 @@ foreach ($embeddings as $prod) {
     }
 }
 
+// Canonical Category Mapping (Maps micro-categories to root department models to prevent overfitting)
+$canonicalMap = [
+    'Drop Shoulder T-Shirt' => 'Men Clothing',
+    'Winter Collection' => 'Men Clothing',
+    'Men Clothing' => 'Men Clothing',
+    'Sunglass Collection' => 'Men Accessories',
+    'Men Accessories' => 'Men Accessories',
+    'Kitchen Appliances' => 'Kitchen Appliances',
+    'Home & Lifestyle' => 'Home & Lifestyle',
+    'Gadgets & IT Accessories' => 'Gadgets & IT Accessories',
+    'Consumer Electronics' => 'Gadgets & IT Accessories',
+    'Jewelries & Accessories' => 'Jewelries & Accessories',
+    'Health & Beauty' => 'Health & Beauty',
+    'Personal Wellness' => 'Health & Beauty',
+    'Soap & Fragrance' => 'Health & Beauty',
+    'Sports & Kids' => 'Sports & Kids',
+    'Baby & Mom' => 'Baby & Mom',
+    'Couple Combo' => 'Couple Combo',
+    'Gifts' => 'Gifts'
+];
+
 $predictedCategory = 'All';
 $allowedCategories = [];
 
@@ -321,24 +342,49 @@ if ($minDist <= 8 && $exactMatch) {
     $predictedCategory = $exactMatch['category'];
     $allowedCategories = $taxonomyGroups[$predictedCategory] ?? [$predictedCategory];
 } else {
-    // Predict via Category Centroid Cosine Similarity
-    $bestCat = 'Gadgets & IT Accessories';
-    $bestScore = -1.0;
-
+    // Predict via Canonical Centroid + Normalized Top-20 k-NN Voting
+    $centroidScores = [];
     foreach ($categoryCentroids as $cat => $centroid) {
+        $canonical = $canonicalMap[$cat] ?? $cat;
         $sim = 0.0;
         for ($i = 0; $i < 256; $i++) {
             $sim += $queryVector[$i] * ($centroid[$i] ?? 0);
         }
-        $expectedAspect = $categoryAspectRatios[$cat] ?? 1.0;
-        if (abs($rawAspectRatio - $expectedAspect) < 0.20) {
-            $sim += 0.06;
-        }
-        if ($sim > $bestScore) {
-            $bestScore = $sim;
-            $bestCat = $cat;
-        }
+        $centroidScores[$canonical] = max($centroidScores[$canonical] ?? 0.0, $sim);
     }
+
+    // Top 20 k-NN neighbors
+    $neighbors = [];
+    $catCounts = [];
+    foreach ($embeddings as $p) {
+        $can = $canonicalMap[$p['category'] ?? ''] ?? ($p['category'] ?? '');
+        $catCounts[$can] = ($catCounts[$can] ?? 0) + 1;
+        $pVec = $p['vector'] ?? null;
+        if (!$pVec || count($pVec) !== 256) continue;
+        $sim = 0.0;
+        for ($i = 0; $i < 256; $i++) {
+            $sim += $queryVector[$i] * $pVec[$i];
+        }
+        $neighbors[] = ['canonical' => $can, 'sim' => $sim];
+    }
+    usort($neighbors, fn($a, $b) => $b['sim'] <=> $a['sim']);
+    $top20 = array_slice($neighbors, 0, 20);
+
+    $neighborScores = [];
+    foreach ($top20 as $idx => $n) {
+        $rankWeight = (20 - $idx) / 20.0;
+        $count = $catCounts[$n['canonical']] ?? 1;
+        $normWeight = 1.0 / pow($count, 0.4);
+        $neighborScores[$n['canonical']] = ($neighborScores[$n['canonical']] ?? 0.0) + $n['sim'] * $rankWeight * $normWeight;
+    }
+
+    $combined = [];
+    foreach ($centroidScores as $c => $cent) {
+        $combined[$c] = $cent * 0.70 + ($neighborScores[$c] ?? 0.0) * 0.30;
+    }
+    arsort($combined);
+
+    $bestCat = !empty($combined) ? array_key_first($combined) : 'Gadgets & IT Accessories';
     $predictedCategory = $bestCat;
     $allowedCategories = $taxonomyGroups[$predictedCategory] ?? [$predictedCategory];
 }

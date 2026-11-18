@@ -68,10 +68,31 @@ const CATEGORY_TAXONOMY_GROUPS = {
   'Gifts': ['Gifts', 'Couple Combo']
 };
 
+// Canonical Category Mapping (Maps micro-categories to root department models to prevent overfitting)
+const CATEGORY_CANONICAL_MAP = {
+  'Drop Shoulder T-Shirt': 'Men Clothing',
+  'Winter Collection': 'Men Clothing',
+  'Men Clothing': 'Men Clothing',
+  'Sunglass Collection': 'Men Accessories',
+  'Men Accessories': 'Men Accessories',
+  'Kitchen Appliances': 'Kitchen Appliances',
+  'Home & Lifestyle': 'Home & Lifestyle',
+  'Gadgets & IT Accessories': 'Gadgets & IT Accessories',
+  'Consumer Electronics': 'Gadgets & IT Accessories',
+  'Jewelries & Accessories': 'Jewelries & Accessories',
+  'Health & Beauty': 'Health & Beauty',
+  'Personal Wellness': 'Health & Beauty',
+  'Soap & Fragrance': 'Health & Beauty',
+  'Sports & Kids': 'Sports & Kids',
+  'Baby & Mom': 'Baby & Mom',
+  'Couple Combo': 'Couple Combo',
+  'Gifts': 'Gifts'
+};
+
 /**
  * Predicts the most accurate category for an uploaded image.
  * 1. Checks for exact/near dHash catalog matches (distance <= 8).
- * 2. Uses category-size-normalized k-NN voting + centroid similarity + aspect ratio.
+ * 2. Uses category-canonical centroid similarity + normalized top-20 k-NN voting.
  */
 export function predictProductCategory(queryFeatures, catalogEmbeddings) {
   // Step 1: Exact dHash catalog match check
@@ -96,47 +117,41 @@ export function predictProductCategory(queryFeatures, catalogEmbeddings) {
     };
   }
 
-  // Step 2: Normalized Category Classification
-  const scores = {};
+  // Step 2: Canonical Centroid & Normalized k-NN Classification
   const queryVector = queryFeatures.vector;
-  const rawAspect = queryFeatures.rawAspectRatio || 1.0;
 
-  // A. Category Centroid Cosine Similarity (Primary Signal - weight 0.85)
+  // A. Canonical Centroid Cosine Similarity
+  const centroidScores = {};
   for (const [category, centroid] of Object.entries(categoryCentroids)) {
+    const canonical = CATEGORY_CANONICAL_MAP[category] || category;
     const sim = cosineSimilarity(queryVector, centroid);
-    scores[category] = (scores[category] || 0) + Math.max(0, sim) * 0.85;
-
-    // Aspect ratio bonus/penalty
-    const expectedAspect = categoryAspectRatios[category] || 1.0;
-    const aspectDiff = Math.abs(rawAspect - expectedAspect);
-    if (aspectDiff < 0.20) {
-      scores[category] += 0.08;
-    } else if (aspectDiff > 0.70) {
-      scores[category] -= 0.08;
-    }
+    centroidScores[canonical] = Math.max(centroidScores[canonical] || 0, sim);
   }
 
-  // B. Normalized k-NN Voting (Secondary Signal - weight 0.15)
+  // B. Normalized k-NN Voting (top 20 nearest neighbors)
   const neighbors = catalogEmbeddings
     .map(p => ({
       category: p.category,
+      canonical: CATEGORY_CANONICAL_MAP[p.category] || p.category,
       sim: cosineSimilarity(queryVector, p.vector)
     }))
     .sort((a, b) => b.sim - a.sim)
-    .slice(0, 15);
+    .slice(0, 20);
 
+  const neighborScores = {};
   neighbors.forEach((n, idx) => {
-    if (n.sim > 0.15) {
-      const catCount = categoryCounts[n.category] || 1;
-      const sizeWeight = 1 / Math.sqrt(catCount);
-      const rankWeight = (15 - idx) / 15;
-      const vote = n.sim * rankWeight * sizeWeight * 0.15;
-      scores[n.category] = (scores[n.category] || 0) + vote;
-    }
+    const rankWeight = (20 - idx) / 20;
+    const count = categoryCounts[n.canonical] || categoryCounts[n.category] || 1;
+    const normWeight = 1 / Math.pow(count, 0.4);
+    neighborScores[n.canonical] = (neighborScores[n.canonical] || 0) + n.sim * rankWeight * normWeight;
   });
 
-  // Rank categories
-  const sortedCategories = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const combined = {};
+  for (const [c, cent] of Object.entries(centroidScores)) {
+    combined[c] = cent * 0.70 + (neighborScores[c] || 0) * 0.30;
+  }
+
+  const sortedCategories = Object.entries(combined).sort((a, b) => b[1] - a[1]);
 
   if (sortedCategories.length === 0) {
     return { predictedCategory: 'All', confidence: 0.0, allowedCategories: [] };
@@ -147,12 +162,7 @@ export function predictProductCategory(queryFeatures, catalogEmbeddings) {
   const secondScore = sortedCategories[1] ? Math.max(0, sortedCategories[1][1]) : 0;
   const confidence = Math.min(0.99, +(topScore / (topScore + secondScore * 0.6)).toFixed(2));
 
-  let allowedCategories = CATEGORY_TAXONOMY_GROUPS[topCategory] || [topCategory];
-  if (confidence < 0.50 && sortedCategories[1]) {
-    const secondCategory = sortedCategories[1][0];
-    const secondGroup = CATEGORY_TAXONOMY_GROUPS[secondCategory] || [secondCategory];
-    allowedCategories = Array.from(new Set([...allowedCategories, ...secondGroup]));
-  }
+  const allowedCategories = CATEGORY_TAXONOMY_GROUPS[topCategory] || [topCategory];
 
   return {
     predictedCategory: topCategory,

@@ -19,6 +19,24 @@ async function loadClientCatalogEmbeddings() {
     };
   }
 
+  // 1. Try Vite dynamic module import first (100% reliable across any origin, port, base path)
+  try {
+    const mod = await import('../data/product_embeddings.json');
+    const data = mod.default || mod;
+    if (data && Array.isArray(data.embeddings) && data.embeddings.length > 0) {
+      cachedClientEmbeddings = data.embeddings;
+      cachedCentroids = data.category_centroids || {};
+      cachedAspectRatios = data.category_aspect_ratios || {};
+      return {
+        embeddings: cachedClientEmbeddings,
+        centroids: cachedCentroids,
+        aspectRatios: cachedAspectRatios
+      };
+    }
+  } catch (err) {
+    // Dynamic import failed, continue to fetch fallback
+  }
+
   const possibleUrls = [
     './data/product_embeddings.json',
     '/data/product_embeddings.json',
@@ -68,6 +86,27 @@ const TAXONOMY_GROUPS = {
   'Baby & Mom': ['Baby & Mom', 'Sports & Kids'],
   'Couple Combo': ['Couple Combo', 'Gifts', 'Jewelries & Accessories'],
   'Gifts': ['Gifts', 'Couple Combo']
+};
+
+// Canonical Category Mapping (Maps micro-categories to root department models to prevent overfitting)
+const CATEGORY_CANONICAL_MAP = {
+  'Drop Shoulder T-Shirt': 'Men Clothing',
+  'Winter Collection': 'Men Clothing',
+  'Men Clothing': 'Men Clothing',
+  'Sunglass Collection': 'Men Accessories',
+  'Men Accessories': 'Men Accessories',
+  'Kitchen Appliances': 'Kitchen Appliances',
+  'Home & Lifestyle': 'Home & Lifestyle',
+  'Gadgets & IT Accessories': 'Gadgets & IT Accessories',
+  'Consumer Electronics': 'Gadgets & IT Accessories',
+  'Jewelries & Accessories': 'Jewelries & Accessories',
+  'Health & Beauty': 'Health & Beauty',
+  'Personal Wellness': 'Health & Beauty',
+  'Soap & Fragrance': 'Health & Beauty',
+  'Sports & Kids': 'Sports & Kids',
+  'Baby & Mom': 'Baby & Mom',
+  'Couple Combo': 'Couple Combo',
+  'Gifts': 'Gifts'
 };
 
 function hammingDistance(hex1, hex2) {
@@ -372,27 +411,52 @@ async function runInBrowserSearch({ imageBase64, filters = {} }) {
     confidence = 0.98;
     allowedCategories = TAXONOMY_GROUPS[predictedCategory] || [predictedCategory];
   } else {
-    // Step 2: Category Centroid and k-NN classification
-    const scores = {};
+    // Step 2: Canonical Centroid and Normalized k-NN classification
     const queryVector = queryFeatures.vector;
-    const rawAspect = queryFeatures.rawAspectRatio || 1.0;
 
+    // A. Canonical Centroid Cosine Similarity
+    const centroidScores = {};
     for (const [category, centroid] of Object.entries(centroids)) {
+      const canonical = CATEGORY_CANONICAL_MAP[category] || category;
       const sim = cosineSimilarity(queryVector, centroid);
-      scores[category] = (scores[category] || 0) + Math.max(0, sim) * 0.85;
-
-      const expectedAspect = aspectRatios[category] || 1.0;
-      if (Math.abs(rawAspect - expectedAspect) < 0.20) {
-        scores[category] += 0.08;
-      } else if (Math.abs(rawAspect - expectedAspect) > 0.70) {
-        scores[category] -= 0.08;
-      }
+      centroidScores[canonical] = Math.max(centroidScores[canonical] || 0, sim);
     }
 
-    const sortedCats = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+    // B. Normalized k-NN Voting (top 20 nearest neighbors)
+    const neighbors = embeddings
+      .map(p => ({
+        category: p.category,
+        canonical: CATEGORY_CANONICAL_MAP[p.category] || p.category,
+        sim: cosineSimilarity(queryVector, p.vector)
+      }))
+      .sort((a, b) => b.sim - a.sim)
+      .slice(0, 20);
+
+    const catCounts = {};
+    embeddings.forEach(p => {
+      const c = CATEGORY_CANONICAL_MAP[p.category] || p.category;
+      catCounts[c] = (catCounts[c] || 0) + 1;
+    });
+
+    const neighborScores = {};
+    neighbors.forEach((n, idx) => {
+      const rankWeight = (20 - idx) / 20;
+      const count = catCounts[n.canonical] || 1;
+      const normWeight = 1 / Math.pow(count, 0.4);
+      neighborScores[n.canonical] = (neighborScores[n.canonical] || 0) + n.sim * rankWeight * normWeight;
+    });
+
+    const combined = {};
+    for (const [c, cent] of Object.entries(centroidScores)) {
+      combined[c] = cent * 0.70 + (neighborScores[c] || 0) * 0.30;
+    }
+
+    const sortedCats = Object.entries(combined).sort((a, b) => b[1] - a[1]);
     if (sortedCats.length > 0) {
       predictedCategory = sortedCats[0][0];
-      confidence = Math.min(0.95, +(sortedCats[0][1] / (sortedCats[0][1] + (sortedCats[1]?.[1] || 0) * 0.6)).toFixed(2));
+      const topScore = Math.max(0.01, sortedCats[0][1]);
+      const secondScore = sortedCats[1] ? Math.max(0, sortedCats[1][1]) : 0;
+      confidence = Math.min(0.99, +(topScore / (topScore + secondScore * 0.6)).toFixed(2));
       allowedCategories = TAXONOMY_GROUPS[predictedCategory] || [predictedCategory];
     }
   }

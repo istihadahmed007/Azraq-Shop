@@ -128,6 +128,25 @@ async function runTestSuite() {
   });
   console.log(`  ✅ Partitioned correctly: ${best.length} Exact/Best Matches, ${similar.length} Similar Alternatives.\n`);
 
+  // TEST 5: Verify speaker query never leaks into Men Clothing
+  console.log('Test 5: Validating Speaker Query Category Purity (Zero Clothing Leakage)...');
+  const speakerBuf = fs.readFileSync(path.join(__dirname, '../test_images/user_query_speaker.jpg'));
+  const speakerRes = await searchProductsByImage({
+    imageBase64: speakerBuf.toString('base64')
+  });
+  assert.notStrictEqual(speakerRes.predicted_category, 'Men Clothing', 'Speaker must NOT classify as Men Clothing');
+  assert.ok(
+    ['Gadgets & IT Accessories', 'Consumer Electronics'].includes(speakerRes.predicted_category),
+    `Speaker must classify into electronics/gadgets, got: ${speakerRes.predicted_category}`
+  );
+  const speakerAllMatches = [
+    ...(speakerRes.sections.best_matches || []),
+    ...(speakerRes.sections.similar_products || [])
+  ];
+  const clothingMatches = speakerAllMatches.filter(p => p.category === 'Men Clothing');
+  assert.strictEqual(clothingMatches.length, 0, 'Speaker results must contain ZERO clothing products');
+  console.log(`  ✅ Speaker query predicted "${speakerRes.predicted_category}" with 0 clothing leakage.\n`);
+
   console.log('=============================================================');
   console.log('🎉 ALL VISUAL SEARCH ACCURACY TESTS PASSED PERFECTLY!');
   console.log('=============================================================\n');

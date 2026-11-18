@@ -16,7 +16,21 @@ export default async function handler(req, res) {
 
   try {
     let body = req.body;
-    if (typeof body === 'string') {
+    if (!body) {
+      // Buffer raw Node http stream when running in standalone server or custom runner
+      const chunks = [];
+      for await (const chunk of req) {
+        chunks.push(chunk);
+      }
+      const rawText = Buffer.concat(chunks).toString('utf8');
+      if (rawText) {
+        try {
+          body = JSON.parse(rawText);
+        } catch (e) {
+          body = { imageBase64: rawText };
+        }
+      }
+    } else if (typeof body === 'string') {
       try { body = JSON.parse(body); } catch (e) {}
     }
 
