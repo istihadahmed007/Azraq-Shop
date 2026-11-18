@@ -15,17 +15,17 @@ export default function AzraqLogo({
   const isLight = variant === 'light'; // For dark backgrounds
 
   // Responsive height presets preserving 3:1 aspect ratio without layout shift
-  // xs: ~24px height (~72px width)
-  // sm: ~32px height (~96px width)
-  // md: ~38-42px height (~114-126px width)
-  // lg: ~48-52px height (~144-156px width)
-  // xl: ~60-64px height (~180-192px width)
+  // xs: ~28-32px height (~84-96px width)
+  // sm: ~36-40px height (~108-120px width)
+  // md: ~44-50px height (~132-150px width)
+  // lg: ~52-60px height (~156-180px width)
+  // xl: ~64-80px height (~192-240px width)
   const sizeClasses = {
-    xs: 'h-6 sm:h-7',
-    sm: 'h-8 sm:h-9',
-    md: 'h-9 sm:h-10 md:h-11',
-    lg: 'h-11 sm:h-12 md:h-14',
-    xl: 'h-14 sm:h-16 md:h-20'
+    xs: 'h-7 sm:h-8',
+    sm: 'h-9 sm:h-10',
+    md: 'h-10 sm:h-11 md:h-12.5',
+    lg: 'h-12 sm:h-14 md:h-16',
+    xl: 'h-16 sm:h-20 md:h-24'
   };
 
   const heightClass = sizeClasses[size] || sizeClasses.md;

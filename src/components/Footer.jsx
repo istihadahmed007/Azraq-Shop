@@ -33,7 +33,7 @@ export default function Footer() {
 
           {/* 1. Brand & Contact (lg:col-span-4) */}
           <div className="lg:col-span-4 flex flex-col items-start gap-3.5">
-            <AzraqLogo variant="dark" size="sm" showDescriptor={false} />
+            <AzraqLogo variant="dark" size="md" showDescriptor={false} />
 
             <p className="text-xs text-[#6B7D93] max-w-sm leading-relaxed">
               {t(

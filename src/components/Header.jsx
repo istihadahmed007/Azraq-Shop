@@ -57,7 +57,7 @@ export default function Header({ onToggleSidebar }) {
 
   return (
     <header className="w-full bg-[#F7FAFD] border border-[#D5E2EE]/90 rounded-[24px] shadow-[0_10px_30px_rgba(50,75,100,0.08)] select-none sticky top-2 z-40">
-      
+
       {/* 1. TOP UTILITY MICRO BAR (Desktop & Tablet) */}
       <div className="hidden sm:flex items-center justify-between px-5 sm:px-6 py-2 border-b border-[#E1EDF7] text-[11px] text-[#6B7D93] bg-[#F0F6FA]/50 rounded-t-[24px]">
         <div className="flex items-center gap-4">
@@ -66,7 +66,7 @@ export default function Header({ onToggleSidebar }) {
             <span className="font-medium">{t("Nationwide Delivery: ৳80 Dhaka / ৳150 Outside", "সারাদেশে দ্রুত ডেলিভারি: ঢাকা ৮০৳ / বাইরে ১৫০৳")}</span>
           </span>
           <span className="text-[#C3D4E4]">|</span>
-          <button 
+          <button
             onClick={() => window.open('https://wa.me/8801851172032', '_blank')}
             className="hover:text-[#0877C9] flex items-center gap-1 transition-colors font-medium"
           >
@@ -127,7 +127,7 @@ export default function Header({ onToggleSidebar }) {
             onClick={() => navigateTo('home')}
             className="cursor-pointer shrink-0 flex items-center"
           >
-            <AzraqLogo variant="dark" size="sm" showDescriptor={false} />
+            <AzraqLogo variant="dark" size="md" showDescriptor={false} />
           </div>
         </div>
 
@@ -231,11 +231,10 @@ export default function Header({ onToggleSidebar }) {
                   document.getElementById('all-products')?.scrollIntoView({ behavior: 'smooth' });
                 }, 100);
               }}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-full whitespace-nowrap transition-all border ${
-                isSelected
-                  ? 'bg-[#0877C9] text-white border-[#0877C9] shadow-xs'
-                  : 'bg-transparent hover:bg-[#EDF4F9] text-[#293B52] hover:text-[#0877C9] border-transparent hover:border-[#D5E2EE]'
-              }`}
+              className={`text-xs font-semibold px-3 py-1.5 rounded-full whitespace-nowrap transition-all border ${isSelected
+                ? 'bg-[#0877C9] text-white border-[#0877C9] shadow-xs'
+                : 'bg-transparent hover:bg-[#EDF4F9] text-[#293B52] hover:text-[#0877C9] border-transparent hover:border-[#D5E2EE]'
+                }`}
             >
               {item.label}
             </button>
