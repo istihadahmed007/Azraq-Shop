@@ -147,6 +147,22 @@ async function runTestSuite() {
   assert.strictEqual(clothingMatches.length, 0, 'Speaker results must contain ZERO clothing products');
   console.log(`  ✅ Speaker query predicted "${speakerRes.predicted_category}" with 0 clothing leakage.\n`);
 
+  // TEST 6: Validating Shaver/Trimmer Query Purity (Zero T-Shirt / Clothing Leakage)
+  console.log('Test 6: Validating Shaver/Trimmer Query Purity (Zero Clothing Leakage)...');
+  const shaverBuf = fs.readFileSync(path.join(__dirname, '../test_images/clean_shaver.jpg'));
+  const shaverRes = await searchProductsByImage({
+    imageBase64: shaverBuf.toString('base64')
+  });
+  assert.notStrictEqual(shaverRes.predicted_category, 'Men Clothing', 'Shaver must NOT classify as Men Clothing');
+  assert.notStrictEqual(shaverRes.predicted_category, 'Drop Shoulder T-Shirt', 'Shaver must NOT classify as Drop Shoulder T-Shirt');
+  const shaverAllMatches = [
+    ...(shaverRes.sections.best_matches || []),
+    ...(shaverRes.sections.similar_products || [])
+  ];
+  const shaverClothingMatches = shaverAllMatches.filter(p => p.category === 'Men Clothing' || p.category === 'Drop Shoulder T-Shirt');
+  assert.strictEqual(shaverClothingMatches.length, 0, 'Shaver results must contain ZERO clothing products');
+  console.log(`  ✅ Shaver query predicted "${shaverRes.predicted_category}" with 0 clothing leakage.\n`);
+
   console.log('=============================================================');
   console.log('🎉 ALL VISUAL SEARCH ACCURACY TESTS PASSED PERFECTLY!');
   console.log('=============================================================\n');
