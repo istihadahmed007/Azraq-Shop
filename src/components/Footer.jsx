@@ -6,13 +6,15 @@ import {
   ShieldCheck,
   Truck,
   RotateCcw,
-  ArrowUp
+  ArrowUp,
+  CreditCard
 } from 'lucide-react';
 import AzraqLogo from './AzraqLogo';
 import { useShop } from '../context/ShopContext';
 
 /**
- * AZRAQ Shop — Professional Light Frosted Glass Footer
+ * AZRAQ Shop — Clean Professional Retail E-Commerce Footer
+ * Shopee-inspired structured layout: Customer Care, About AZRAQ, Payment & Logistics, Copyright.
  */
 export default function Footer() {
   const { collections, navigateTo, setIsTrackingOpen, setIsAdminOpen, t } = useShop();
@@ -22,75 +24,75 @@ export default function Footer() {
   };
 
   return (
-    <footer id="footer-section" className="w-full max-w-full overflow-hidden pt-2 pb-10 select-none">
+    <footer id="footer-section" className="w-full pt-4 pb-8 select-none">
 
-      {/* Frosted Main Glass Footer Container (Sharp 8px radius) */}
-      <div className="rounded-[8px] glass-panel p-6 sm:p-10 border border-white/95 shadow-sm">
+      <div className="bg-white border border-gray-200 rounded-[4px] p-6 sm:p-8 shadow-xs">
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10">
+        {/* 4-Column Retail Footer Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 lg:gap-8 pb-6 border-b border-gray-100">
 
-          {/* 1. Brand Column (lg:col-span-4) */}
-          <div className="lg:col-span-4 flex flex-col items-start gap-3.5">
-            <AzraqLogo variant="dark" size="md" showDescriptor={true} />
+          {/* 1. Brand & Contact (lg:col-span-4) */}
+          <div className="lg:col-span-4 flex flex-col items-start gap-3">
+            <AzraqLogo variant="dark" size="sm" showDescriptor={false} />
 
-            <p className="text-xs sm:text-[13px] font-medium text-[#71849B] max-w-sm leading-relaxed">
+            <p className="text-xs text-[#757575] max-w-sm leading-relaxed">
               {t(
-                'AZRAQ is your premier destination for authentic curated everyday goods, mobile accessories, kitchen essentials, and lifestyle collections across Bangladesh.',
-                'আজরাক বাংলাদেশের অন্যতম নির্ভরযোগ্য কিউরেটেড এভরিডে গুডস, মোবাইল এক্সেসরিজ ও আধুনিক লাইফস্টাইল শপ।'
+                'AZRAQ Shop is your trusted online retail destination for authentic gadgets, kitchen essentials, and curated everyday lifestyle goods in Bangladesh.',
+                'আজরাক শপ — বাংলাদেশের নির্ভরযোগ্য অনলাইন রিটেইল শপ। আসল পণ্যের নিশ্চয়তা ও দ্রুত হোম ডেলিভারি।'
               )}
             </p>
 
-            <div className="flex flex-col gap-2 pt-2 text-xs font-semibold text-[#101C35]">
-              <div id="footer-contact" className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-[#0877C9]" />
-                <span>+880 1711-223344</span>
+            <div className="flex flex-col gap-1.5 pt-1 text-xs text-[#212121]">
+              <div id="footer-contact" className="flex items-center gap-2">
+                <Phone className="w-3.5 h-3.5 text-[#0877C9]" />
+                <span className="font-semibold">+880 1711-223344</span>
               </div>
-              <div className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-[#0877C9]" />
+              <div className="flex items-center gap-2">
+                <Mail className="w-3.5 h-3.5 text-[#0877C9]" />
                 <span>support@azraqtrips.com</span>
               </div>
-              <div className="flex items-center gap-2.5">
-                <MapPin className="w-4 h-4 text-[#0877C9]" />
+              <div className="flex items-center gap-2">
+                <MapPin className="w-3.5 h-3.5 text-[#0877C9]" />
                 <span>Dhaka, Bangladesh</span>
               </div>
             </div>
           </div>
 
-          {/* 2. Quick Links (lg:col-span-2) */}
-          <div className="lg:col-span-2 flex flex-col gap-3">
-            <h4 className="text-xs font-black uppercase tracking-wider text-[#101C35]">
-              {t('Quick Links', 'দ্রুত লিংক')}
+          {/* 2. Customer Care (lg:col-span-3) */}
+          <div className="lg:col-span-3 flex flex-col gap-2.5">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#212121]">
+              {t('Customer Care', 'গ্রাহক সেবা')}
             </h4>
-            <ul className="flex flex-col gap-2 text-xs font-semibold text-[#71849B]">
-              <li>
-                <button onClick={() => navigateTo('home')} className="hover:text-[#0877C9] transition-colors">
-                  {t('Home', 'হোম')}
-                </button>
-              </li>
-              <li>
-                <button onClick={() => navigateTo('collections')} className="hover:text-[#0877C9] transition-colors">
-                  {t('All 18 Collections', 'সকল ১৮টি কালেকশন')}
-                </button>
-              </li>
+            <ul className="flex flex-col gap-1.5 text-xs text-[#757575]">
               <li>
                 <button onClick={() => setIsTrackingOpen(true)} className="hover:text-[#0877C9] transition-colors">
-                  {t('Track Order', 'অর্ডার ট্র্যাকিং')}
+                  {t('Track Your Order', 'অর্ডার ট্র্যাক করুন')}
+                </button>
+              </li>
+              <li>
+                <button onClick={() => window.open('https://wa.me/8801711223344', '_blank')} className="hover:text-[#0877C9] transition-colors">
+                  {t('Help Center & Support', 'হেল্প সেন্টার ও সহায়তা')}
+                </button>
+              </li>
+              <li>
+                <button onClick={() => navigateTo('home')} className="hover:text-[#0877C9] transition-colors">
+                  {t('Shipping & Delivery Policy', 'ডেলিভারি পলিসি')}
                 </button>
               </li>
               <li>
                 <button onClick={() => setIsAdminOpen(true)} className="hover:text-[#0877C9] transition-colors">
-                  {t('Admin Operations', 'অ্যাডমিন পোর্টাল')}
+                  {t('Merchant & Admin Portal', 'অ্যাডমিন পোর্টাল')}
                 </button>
               </li>
             </ul>
           </div>
 
-          {/* 3. Top Collections (lg:col-span-3) */}
-          <div className="lg:col-span-3 flex flex-col gap-3">
-            <h4 className="text-xs font-black uppercase tracking-wider text-[#101C35]">
-              {t('Top Collections', 'জনপ্রিয় ক্যাটাগরি')}
+          {/* 3. Top Categories (lg:col-span-3) */}
+          <div className="lg:col-span-3 flex flex-col gap-2.5">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#212121]">
+              {t('Catalog Categories', 'ক্যাটালগ ক্যাটাগরি')}
             </h4>
-            <ul className="flex flex-col gap-2 text-xs font-semibold text-[#71849B]">
+            <ul className="flex flex-col gap-1.5 text-xs text-[#757575]">
               {collections.slice(0, 5).map((col) => (
                 <li key={col.id}>
                   <button
@@ -101,34 +103,57 @@ export default function Footer() {
                   </button>
                 </li>
               ))}
+              <li>
+                <button
+                  onClick={() => navigateTo('collections')}
+                  className="text-[#0877C9] font-medium hover:underline"
+                >
+                  {t('View All 18 Collections →', 'সকল ১৮টি কালেকশন দেখুন →')}
+                </button>
+              </li>
             </ul>
           </div>
 
-          {/* 4. Customer Assurance Policies (lg:col-span-3) */}
-          <div className="lg:col-span-3 flex flex-col gap-3">
-            <h4 className="text-xs font-black uppercase tracking-wider text-[#101C35]">
-              {t('Customer Assurance', 'গ্রাহক সেবা ও নীতি')}
+          {/* 4. Payment & Delivery (lg:col-span-2) */}
+          <div className="lg:col-span-2 flex flex-col gap-2.5">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#212121]">
+              {t('Payment & Delivery', 'পেমেন্ট ও ডেলিভারি')}
             </h4>
-            <div className="flex flex-col gap-2.5 text-xs font-medium text-[#71849B]">
-              <p>• {t('Free Delivery over ৳3,000 nationwide', '৩০০০৳ এর অর্ডারে সারা দেশে ফ্রি ডেলিভারি')}</p>
-              <p>• {t('Cash on Delivery & Secure Online Payment', 'ক্যাশ অন ডেলিভারি ও সুরক্ষিত পেমেন্ট')}</p>
-              <p>• {t('7-day verified return guarantee', '৭ দিনের সহজ রিটার্ন সুবিধা')}</p>
-              <p>• {t('100% genuine supplier warranty specs', '১০০% আসল প্রোডাক্ট কোয়ালিটি গ্যারান্টি')}</p>
+            <div className="flex flex-col gap-2 text-xs text-[#757575]">
+              <div>
+                <p className="font-semibold text-[#212121] mb-1">{t('Payment Methods', 'পেমেন্ট মেথড')}</p>
+                <div className="flex flex-wrap gap-1 text-[11px] font-medium text-gray-600">
+                  <span className="px-1.5 py-0.5 bg-gray-50 border border-gray-200 rounded-[2px]">Paymently</span>
+                  <span className="px-1.5 py-0.5 bg-gray-50 border border-gray-200 rounded-[2px]">bKash</span>
+                  <span className="px-1.5 py-0.5 bg-gray-50 border border-gray-200 rounded-[2px]">Nagad</span>
+                  <span className="px-1.5 py-0.5 bg-gray-50 border border-gray-200 rounded-[2px]">Cards</span>
+                  <span className="px-1.5 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-[2px]">COD</span>
+                </div>
+              </div>
+
+              <div className="pt-1">
+                <p className="font-semibold text-[#212121] mb-1">{t('Delivery Areas', 'ডেলিভারি এরিয়া')}</p>
+                <p className="text-[11px] leading-relaxed">
+                  • {t('Dhaka: 24–48h (৳70)', 'ঢাকা: ২৪–৪৮ ঘণ্টা (৭০৳)')}<br />
+                  • {t('Outside: 48–72h (৳130)', 'বাইরে: ৪৮–৭২ ঘণ্টা (১৩০৳)')}<br />
+                  • {t('Free over ৳3,000', '৩০০০৳ এর অর্ডারে ফ্রি')}
+                </p>
+              </div>
             </div>
           </div>
 
         </div>
 
-        {/* Bottom Bar: Copyright & Scroll to Top */}
-        <div className="mt-8 pt-6 border-t border-white/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-semibold text-[#71849B]">
-          <p>© {new Date().getFullYear()} AZRAQ. {t('All rights reserved. Curated Everyday Goods.', 'সর্বস্বত্ব সংরক্ষিত। কিউরেটেড এভরিডে গুডস।')}</p>
+        {/* Bottom Bar: Copyright & Back to Top */}
+        <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+          <p>© {new Date().getFullYear()} AZRAQ. {t('All rights reserved. EasyDrop Official Retail Partner.', 'সর্বস্বত্ব সংরক্ষিত। ইজিড্রপ অফিসিয়াল রিটেইল পার্টনার।')}</p>
 
           <button
             onClick={scrollToTop}
-            className="flex items-center gap-2 px-4 py-2 rounded-[6px] glass-button hover:text-[#0877C9] text-[#101C35] transition-all group shadow-2xs"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-[3px] border border-gray-200 hover:border-[#0877C9] text-gray-600 hover:text-[#0877C9] transition-colors"
           >
             <span>{t('Back to Top', 'উপরে যান')}</span>
-            <ArrowUp className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform" />
+            <ArrowUp className="w-3.5 h-3.5" />
           </button>
         </div>
 

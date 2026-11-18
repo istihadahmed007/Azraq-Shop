@@ -1,14 +1,14 @@
 import React from 'react';
 import {
   Search, Heart, ShoppingBag, Headphones,
-  Menu, Package, Shield, Globe, Camera
+  Menu, Package, Shield, Globe, Camera, ChevronDown
 } from 'lucide-react';
 import AzraqLogo from './AzraqLogo';
 import { useShop } from '../context/ShopContext';
 
 /**
- * AZRAQ Shop — Floating Transparent Glass Header
- * Pixel-accurate responsive glassmorphism navigation header
+ * AZRAQ Shop — Professional Retail E-Commerce Header
+ * Shopee-inspired high-utility header with top utility bar, prominent search, and category strip.
  */
 export default function Header({ onToggleSidebar }) {
   const {
@@ -24,6 +24,7 @@ export default function Header({ onToggleSidebar }) {
     searchQuery,
     setSearchQuery,
     setIsVisualSearchOpen,
+    setActiveCategory,
     t
   } = useShop();
 
@@ -38,19 +39,82 @@ export default function Header({ onToggleSidebar }) {
     }, currentView === 'home' ? 0 : 100);
   };
 
-  return (
-    <header className="w-full max-w-full select-none sticky top-2 sm:top-4 z-30">
-      <div className="w-full glass-header rounded-[8px] px-3 sm:px-5 py-2 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-4 transition-all border border-white/95 shadow-sm">
+  const navCategories = [
+    { label: t("All Products", "সকল পণ্য"), cat: 'All' },
+    { label: t("Gadgets & IT", "গ্যাজেটস"), cat: 'Gadgets & IT Accessories' },
+    { label: t("Men's Fashion", "মেনস ফ্যাশন"), cat: 'Men Clothing' },
+    { label: t("Kitchen", "কিচেন"), cat: 'Kitchen Appliances' },
+    { label: t("Sports & Kids", "স্পোর্টস ও কিডস"), cat: 'Sports & Kids' },
+    { label: t("Health & Beauty", "হেলথ ও বিউটি"), cat: 'Health & Beauty' },
+    { label: t("Home & Living", "হোম ও লিভিং"), cat: 'Home & Lifestyle' },
+  ];
 
-        {/* Left: Navigation Menu Toggle + AZRAQ Brand Logo */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+  return (
+    <header className="w-full bg-white border border-gray-200 rounded-[4px] shadow-xs select-none sticky top-1 z-30">
+      
+      {/* 1. TOP UTILITY MICRO BAR (Desktop & Tablet) */}
+      <div className="hidden sm:flex items-center justify-between px-4 py-1.5 border-b border-gray-100 text-[11px] text-[#757575] bg-[#FAFAFA]">
+        <div className="flex items-center gap-4">
+          <span className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span>{t("Nationwide Delivery: ৳70 Dhaka / ৳130 Outside", "সারাদেশে দ্রুত ডেলিভারি: ঢাকা ৭০৳ / বাইরে ১৩০৳")}</span>
+          </span>
+          <span className="text-gray-300">|</span>
+          <button 
+            onClick={() => window.open('https://wa.me/8801711223344', '_blank')}
+            className="hover:text-[#0877C9] flex items-center gap-1 transition-colors"
+          >
+            <Headphones className="w-3 h-3 text-[#0877C9]" />
+            <span>+880 1711-223344</span>
+          </button>
+        </div>
+
+        <div className="flex items-center gap-4">
+          {/* Order Tracking */}
+          <button
+            onClick={() => setIsTrackingOpen(true)}
+            className="hover:text-[#0877C9] flex items-center gap-1 transition-colors font-medium"
+          >
+            <Package className="w-3 h-3 text-[#0877C9]" />
+            <span>{t("Track Order", "অর্ডার ট্র্যাক")}</span>
+          </button>
+
+          <span className="text-gray-300">|</span>
+
+          {/* Language Toggle */}
+          <button
+            onClick={() => setLanguage(language === 'bn' ? 'en' : 'bn')}
+            className="hover:text-[#0877C9] flex items-center gap-1 transition-colors font-medium"
+          >
+            <Globe className="w-3 h-3 text-[#0877C9]" />
+            <span>{language === 'bn' ? 'English' : 'বাংলা'}</span>
+          </button>
+
+          <span className="text-gray-300">|</span>
+
+          {/* Admin Operations Access */}
+          <button
+            onClick={() => setIsAdminOpen(true)}
+            className="hover:text-[#0877C9] flex items-center gap-1 transition-colors font-medium"
+          >
+            <Shield className="w-3 h-3 text-[#0877C9]" />
+            <span>{t("Admin Portal", "অ্যাডমিন")}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 2. MAIN HEADER BAR */}
+      <div className="px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-3 sm:gap-6">
+
+        {/* Left: Menu Drawer Toggle + AZRAQ Brand Logo */}
+        <div className="flex items-center gap-2.5 shrink-0">
           <button
             onClick={onToggleSidebar}
-            className="w-9 h-9 sm:w-10 sm:h-10 rounded-[6px] glass-button flex items-center justify-center text-[#101C35] hover:text-[#0877C9] transition-colors shrink-0"
-            title="Menu"
+            className="w-8 h-8 rounded-[3px] border border-gray-200 bg-white hover:bg-gray-50 flex items-center justify-center text-[#212121] hover:text-[#0877C9] transition-colors"
+            title={t("All Categories", "সকল ক্যাটাগরি")}
             aria-label="Toggle navigation menu"
           >
-            <Menu className="w-5 h-5 text-[#101C35]" />
+            <Menu className="w-4 h-4" />
           </button>
 
           <div
@@ -61,81 +125,42 @@ export default function Header({ onToggleSidebar }) {
           </div>
         </div>
 
-        {/* Center: Frosted Glass Search Bar with Sharp Geometry */}
-        <div className="flex-1 min-w-0 max-w-[200px] sm:max-w-2xl relative">
-          <form onSubmit={handleSearchSubmit} className="w-full min-w-0 relative flex items-center">
-            <input
-              type="text"
-              placeholder={t("Search products, collections...", "পণ্য বা কালেকশন খুঁজুন...")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full min-w-0 pl-3 sm:pl-4 pr-16 sm:pr-24 py-1.5 sm:py-2 rounded-[6px] glass-input text-xs sm:text-sm text-[#101C35] placeholder-[#71849B] transition-all font-medium border border-white/90 focus:border-[#0877C9]"
-            />
+        {/* Center: Large High-Visibility Search Box (Shopee Style) */}
+        <div className="flex-1 min-w-0 max-w-2xl">
+          <form onSubmit={handleSearchSubmit} className="relative flex items-center w-full">
+            <div className="relative w-full flex items-center border-2 border-[#0877C9] rounded-[3px] overflow-hidden bg-white shadow-2xs">
+              <input
+                type="text"
+                placeholder={t("Search products, collections, brands...", "পণ্য বা কালেকশন খুঁজুন...")}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-3 pr-20 py-1.5 sm:py-2 text-xs sm:text-sm text-[#212121] placeholder-gray-400 focus:outline-none"
+              />
 
-            {/* AI Visual Image Search Button (Tablet & Desktop) */}
-            <button
-              type="button"
-              onClick={() => setIsVisualSearchOpen(true)}
-              className="hidden sm:block absolute right-9 sm:right-11 p-1 text-[#71849B] hover:text-[#0877C9] transition-colors rounded-[4px]"
-              title={t("Search by Image", "ছবি দিয়ে পণ্য খুঁজুন")}
-            >
-              <Camera className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            </button>
+              {/* AI Visual Image Search Button */}
+              <button
+                type="button"
+                onClick={() => setIsVisualSearchOpen(true)}
+                className="absolute right-12 sm:right-14 p-1 text-gray-400 hover:text-[#0877C9] transition-colors"
+                title={t("Search by Image", "ছবি দিয়ে পণ্য খুঁজুন")}
+              >
+                <Camera className="w-4 h-4" />
+              </button>
 
-            {/* Submit Magnifier Button */}
-            <button
-              type="submit"
-              className="absolute right-1 w-7 h-7 sm:w-8 sm:h-8 rounded-[4px] bg-gradient-to-r from-[#0877C9] to-[#2563EB] hover:from-[#076bb5] hover:to-[#1d4ed8] text-white flex items-center justify-center shadow-xs transition-all group/btn shrink-0"
-              title="Search"
-            >
-              <Search className="w-3.5 h-3.5 transition-transform group-hover/btn:scale-110" />
-            </button>
+              {/* Shopee-style Solid Search Button */}
+              <button
+                type="submit"
+                className="w-10 sm:w-12 h-full bg-[#0877C9] hover:bg-[#0665AC] text-white flex items-center justify-center transition-colors shrink-0"
+                title={t("Search", "অনুসন্ধান")}
+              >
+                <Search className="w-4 h-4" />
+              </button>
+            </div>
           </form>
         </div>
 
-        {/* Right: Frosted Utility Controls */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-
-          {/* Track Order Pill (Desktop) */}
-          <button
-            onClick={() => setIsTrackingOpen(true)}
-            className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] glass-button text-xs font-bold text-[#101C35] hover:text-[#0877C9] group"
-            title={t("Track Order", "অর্ডার ট্র্যাক")}
-          >
-            <Package className="w-3.5 h-3.5 text-[#0877C9] transition-transform group-hover:scale-110" />
-            <span>{t("Track Order", "ট্র্যাক")}</span>
-          </button>
-
-          {/* Help / Support Pill (Desktop) */}
-          <button
-            onClick={() => {
-              window.open('https://wa.me/8801711223344', '_blank');
-            }}
-            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] glass-button text-xs font-bold text-[#101C35] hover:text-[#0877C9] group"
-            title={t("Customer Support", "সহায়তা")}
-          >
-            <Headphones className="w-3.5 h-3.5 text-[#0877C9] transition-transform group-hover:scale-110" />
-            <span>{t("Help", "হেল্প")}</span>
-          </button>
-
-          {/* Language Toggle (Desktop & Tablet) */}
-          <button
-            onClick={() => setLanguage(language === 'bn' ? 'en' : 'bn')}
-            className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-[6px] glass-button text-xs font-bold text-[#101C35] hover:text-[#0877C9]"
-            title={t("Switch Language", "ভাষা পরিবর্তন")}
-          >
-            <Globe className="w-3.5 h-3.5 text-[#0877C9]" />
-            <span>{language === 'bn' ? 'EN' : 'বাং'}</span>
-          </button>
-
-          {/* Account / Admin Portal */}
-          <button
-            onClick={() => setIsAdminOpen(true)}
-            className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-[6px] glass-button items-center justify-center text-[#101C35] hover:text-[#0877C9]"
-            title={t("Admin / Account", "অ্যাডমিন পোর্টাল")}
-          >
-            <Shield className="w-4 h-4" />
-          </button>
+        {/* Right: Wishlist & Shopping Cart */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
 
           {/* Wishlist Button (Tablet & Desktop) */}
           <button
@@ -145,32 +170,66 @@ export default function Header({ onToggleSidebar }) {
                 document.getElementById('popular-products')?.scrollIntoView({ behavior: 'smooth' });
               }, 100);
             }}
-            className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-[6px] glass-button items-center justify-center text-[#101C35] hover:text-[#0877C9] relative shrink-0"
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-[3px] text-[#757575] hover:text-[#0877C9] hover:bg-gray-50 border border-transparent hover:border-gray-200 transition-colors relative"
             title={t("Wishlist", "পছন্দের তালিকা")}
           >
-            <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${favorites.length > 0 ? 'fill-[#0877C9] text-[#0877C9]' : ''}`} />
+            <Heart className={`w-4 h-4 ${favorites.length > 0 ? 'fill-[#0877C9] text-[#0877C9]' : ''}`} />
+            <span className="text-xs font-semibold hidden md:inline">{t("Wishlist", "পছন্দ")}</span>
             {favorites.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#0877C9] text-white text-[9px] font-bold flex items-center justify-center shadow-xs">
+              <span className="w-4 h-4 rounded-full bg-[#0877C9] text-white text-[9px] font-bold flex items-center justify-center">
                 {favorites.length}
               </span>
             )}
           </button>
 
-          {/* Cart Button (Always visible on all screens!) */}
+          {/* Shopping Cart Button */}
           <button
             onClick={() => setIsCartOpen(true)}
-            className="w-9 h-9 sm:w-10 sm:h-10 rounded-[6px] bg-gradient-to-r from-[#0877C9] to-[#2563EB] hover:from-[#076bb5] hover:to-[#1d4ed8] text-white shadow-xs flex items-center justify-center relative hover:scale-102 active:scale-98 transition-all shrink-0"
-            title={t("Cart", "শপিং ব্যাগ")}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-[3px] bg-[#0877C9] hover:bg-[#0665AC] text-white shadow-2xs transition-colors shrink-0"
+            title={t("Shopping Cart", "শপিং ব্যাগ")}
           >
-            <ShoppingBag className="w-4 h-4 text-white" />
-            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#101C35] border border-white text-white text-[8px] sm:text-[9px] font-bold flex items-center justify-center shadow-xs">
-              {totalCartItems > 9 ? '9+' : totalCartItems}
-            </span>
+            <div className="relative flex items-center">
+              <ShoppingBag className="w-4 h-4" />
+              <span className="absolute -top-1.5 -right-2 w-4 h-4 rounded-full bg-[#EE4D2D] border border-white text-white text-[8px] sm:text-[9px] font-bold flex items-center justify-center shadow-xs">
+                {totalCartItems > 9 ? '9+' : totalCartItems}
+              </span>
+            </div>
+            <span className="text-xs font-bold hidden sm:inline">{t("Cart", "ব্যাগ")}</span>
           </button>
 
         </div>
 
       </div>
+
+      {/* 3. CATEGORY NAVIGATION STRIP (Desktop & Tablet) */}
+      <div className="hidden md:flex items-center gap-1 px-4 py-1.5 border-t border-gray-100 bg-white overflow-x-auto no-scrollbar">
+        <button
+          onClick={() => navigateTo('collections')}
+          className="text-xs font-bold text-[#0877C9] hover:text-[#0665AC] flex items-center gap-1 px-2.5 py-1 rounded-[3px] hover:bg-blue-50/60 whitespace-nowrap transition-colors"
+        >
+          <span>{t("All 18 Collections", "১৮টি কালেকশন")}</span>
+          <ChevronDown className="w-3 h-3" />
+        </button>
+
+        <span className="text-gray-300 mx-1">|</span>
+
+        {navCategories.map((item, idx) => (
+          <button
+            key={idx}
+            onClick={() => {
+              if (currentView !== 'home') navigateTo('home');
+              setActiveCategory(item.cat);
+              setTimeout(() => {
+                document.getElementById('all-products')?.scrollIntoView({ behavior: 'smooth' });
+              }, 100);
+            }}
+            className="text-xs font-medium text-[#4B5563] hover:text-[#0877C9] hover:bg-gray-50 px-2.5 py-1 rounded-[3px] whitespace-nowrap transition-colors"
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+
     </header>
   );
 }

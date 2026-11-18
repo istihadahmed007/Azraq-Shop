@@ -4,15 +4,14 @@ import { useShop } from '../context/ShopContext';
 import ProductCard from './common/ProductCard';
 
 /**
- * AZRAQ Shop — Main Curated Product Catalog Grid
- *
- * Implements:
- * - Phase 2: Two dedicated, visually balanced toolbar rows.
- *   Row 1: All Products + Top categories (Gadgets, Sports, Men, Kitchen, etc.) with smooth horizontal scroll.
- *   Row 2: Product search + Sort dropdown + In-stock toggle + Clear filters.
- * - Phase 6: Intelligent responsive columns:
- *   1600px+: 6 cols | 1280-1599px: 5 cols | 1024-1279px: 4 cols | 768-1023px: 3 cols | Mobile: 2 cols.
- * - Equal card heights, 100% full content width.
+ * AZRAQ Shop — Daily Discover Product Catalog Grid (Shopee Retail Layout)
+ * 
+ * Shopee-inspired signature shopping section:
+ * 1. Bold "DAILY DISCOVER" active header tab.
+ * 2. Clean category filter tabs with horizontal scroll.
+ * 3. Sorting & in-stock filter bar.
+ * 4. High-density responsive grid (6 cols on desktop, 2 cols on mobile).
+ * 5. Clean "See More" retail pagination button.
  */
 export default function ProductGrid() {
   const {
@@ -32,13 +31,12 @@ export default function ProductGrid() {
 
   const [sortBy, setSortBy] = useState('featured');
   const [inStockOnly, setInStockOnly] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(30);
+  const [visibleCount, setVisibleCount] = useState(36);
 
   // Dynamic priority ordered categories extracted from authentic database products
   const categories = useMemo(() => {
     const rawCategories = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
 
-    // Desired priority order per specification
     const priority = [
       'Gadgets & IT Accessories',
       'Sports & Kids',
@@ -60,7 +58,7 @@ export default function ProductGrid() {
 
   // Reset pagination when category, search, or filters change
   React.useEffect(() => {
-    setVisibleCount(30);
+    setVisibleCount(36);
   }, [activeCategory, searchQuery, sortBy, inStockOnly]);
 
   const filteredAndSortedProducts = useMemo(() => {
@@ -99,222 +97,179 @@ export default function ProductGrid() {
     return result;
   }, [products, activeCategory, searchQuery, sortBy, inStockOnly]);
 
+  const displayedProducts = filteredAndSortedProducts.slice(0, visibleCount);
+
   return (
-    <section id="all-products" className="w-full py-2 select-none">
+    <section id="all-products" className="w-full select-none flex flex-col gap-3">
 
-      {/* 1. Section Header: Title + Sync Status Badge */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5 pb-3.5 border-b border-white/60">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-[#0877C9] shadow-[0_0_8px_rgba(8,119,201,0.5)]" />
-            <span className="text-[11px] font-bold tracking-wider text-[#0877C9] uppercase">
-              {t("Authorized Collection", "অনুমোদিত সোর্স কালেকশন")}
-            </span>
-          </div>
-          <h2 className="text-2xl lg:text-[28px] font-black text-[#101C35] tracking-tight">
-            {t("All Curated Goods", "সকল কিউরেটেড পণ্য সম্ভার")}
+      {/* 1. SHOPEE-STYLE "DAILY DISCOVER" SECTION HEADER TAB */}
+      <div className="bg-white border-b-2 border-[#0877C9] px-4 py-3 flex items-center justify-between rounded-t-[4px] shadow-2xs">
+        <div className="flex items-center gap-3">
+          <h2 className="text-sm sm:text-base font-extrabold uppercase tracking-wider text-[#0877C9]">
+            {t("Daily Discover", "প্রতিদিনের আবিষ্কার")}
           </h2>
-          <p className="text-xs sm:text-sm text-[#71849B] mt-0.5">
-            {t(
-              "Genuine lifestyle items imported directly from EasyDrop with verified specifications in BDT.",
-              "আসল রিটেইল মূল্যে বিডিটি (৳)-তে নির্ভরযোগ্য ডেলিভারি ও যাচাইকৃত পণ্য সম্ভার।"
-            )}
-          </p>
-        </div>
-
-        {/* Sync Status Badge & Count */}
-        <div className="flex items-center gap-2.5 self-start sm:self-end">
-          <button
-            onClick={syncWithEasyDrop}
-            disabled={syncStatus.isSyncing}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold glass-button text-[#101C35]"
-            title="Sync with EasyDrop API"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 text-[#0877C9] ${syncStatus.isSyncing ? 'animate-spin' : ''}`} />
-            <span>{syncStatus.isSyncing ? t('Syncing...', 'সিংকিং...') : t('EasyDrop Synced', 'ইজিড্রপ সিংক')}</span>
-          </button>
-
-          <span className="text-xs font-bold text-[#71849B] px-2.5 py-1 rounded-full bg-white/70 border border-white/80">
-            {filteredAndSortedProducts.length} {t("Products", "পণ্য")}
+          <span className="text-xs font-medium text-gray-400">
+            ({filteredAndSortedProducts.length} {t("Items", "পণ্য")})
           </span>
         </div>
+
+        {/* Sync Status Badge */}
+        <button
+          onClick={syncWithEasyDrop}
+          disabled={syncStatus.isSyncing}
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-[3px] text-xs font-medium text-gray-500 hover:text-[#0877C9] hover:bg-gray-50 border border-gray-200 transition-colors"
+          title="Sync with EasyDrop API"
+        >
+          <RefreshCw className={`w-3 h-3 text-[#0877C9] ${syncStatus.isSyncing ? 'animate-spin' : ''}`} />
+          <span className="hidden sm:inline">{syncStatus.isSyncing ? t('Syncing...', 'সিংকিং...') : t('EasyDrop Verified', 'ইজিড্রপ ভেরিফাইড')}</span>
+        </button>
       </div>
 
-      {/* 2. DEDICATED TWO-ROW TOOLBAR */}
-      <div className="flex flex-col gap-3 mb-6">
+      {/* 2. CATEGORY TABS & FILTER TOOLBAR */}
+      <div className="bg-white border border-gray-200 rounded-[4px] p-3 sm:p-4 flex flex-col gap-3 shadow-xs">
+        
+        {/* Category Tabs Strip */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+          {categories.map((cat) => {
+            const isActive = activeCategory === cat;
+            const displayName = cat === 'All' ? t('All Products', 'সকল পণ্য') : cat;
 
-        {/* ROW 1: Horizontally Scrollable Category Filter Buttons (Sharp 6px radius) */}
-        <div className="w-full relative">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1.5 no-scrollbar scroll-smooth">
-            {categories.map((cat) => {
-              const isActive = activeCategory === cat;
-              const displayName = cat === 'All'
-                ? `${t('All Products', 'সকল পণ্য')} (${products.length})`
-                : cat;
-
-              return (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`px-3.5 py-1.5 rounded-[6px] text-xs font-bold transition-all whitespace-nowrap shrink-0 border ${isActive
-                    ? 'bg-[#0877C9] text-white border-[#0877C9] shadow-xs'
-                    : 'bg-white/80 hover:bg-white text-[#71849B] hover:text-[#101C35] border-white/90 shadow-2xs'
-                    }`}
-                >
-                  {displayName}
-                </button>
-              );
-            })}
-          </div>
+            return (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-3 py-1.5 rounded-[3px] text-xs font-semibold whitespace-nowrap transition-colors border ${
+                  isActive
+                    ? 'bg-[#0877C9] text-white border-[#0877C9]'
+                    : 'bg-white hover:bg-gray-50 text-[#4B5563] border-gray-200'
+                }`}
+              >
+                {displayName}
+              </button>
+            );
+          })}
         </div>
 
-        {/* ROW 2: Product Search + Sort + In-Stock Toggle */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
-
-          {/* Product Search Input (Sharp 6px Translucent Control) */}
-          <div className="relative flex-1 sm:max-w-md">
-            <Search className="w-4 h-4 text-[#71849B] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+        {/* Filter Controls Row: Search + Sort Options + In-stock Toggle */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-2 border-t border-gray-100">
+          
+          {/* Within-catalog search input */}
+          <div className="relative flex-1 sm:max-w-xs">
+            <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               placeholder={t("Filter within catalog...", "পণ্য ফিল্টার করুন...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 rounded-[6px] glass-input text-xs text-[#101C35] placeholder-[#71849B] border border-white/90 focus:border-[#0877C9]"
+              className="w-full pl-8 pr-7 py-1.5 text-xs text-[#212121] placeholder-gray-400 rounded-[3px] border border-gray-200 focus:outline-none focus:border-[#0877C9]"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 rounded-[3px] bg-slate-200/80 hover:bg-slate-300 text-[#101C35] flex items-center justify-center text-[10px]"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 aria-label="Clear search"
               >
-                <X className="w-2.5 h-2.5" />
+                <X className="w-3 h-3" />
               </button>
             )}
           </div>
 
-          {/* Right Tools: Sort Dropdown + In-Stock Toggle */}
-          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+          {/* Sort Buttons & In-stock Checkbox */}
+          <div className="flex items-center gap-2 flex-wrap text-xs">
+            <span className="text-gray-500 font-medium hidden md:inline">{t("Sort by:", "সাজান:")}</span>
 
-            {/* In-Stock Only Toggle */}
             <button
-              onClick={() => setInStockOnly(prev => !prev)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-[6px] text-xs font-bold transition-all border shrink-0 ${inStockOnly
-                ? 'bg-[#0877C9]/15 text-[#0877C9] border-[#0877C9]/40'
-                : 'bg-white/80 hover:bg-white text-[#71849B] border-white/90'
-                }`}
+              onClick={() => setSortBy('featured')}
+              className={`px-2.5 py-1 rounded-[3px] font-medium border ${
+                sortBy === 'featured'
+                  ? 'bg-blue-50 text-[#0877C9] border-[#0877C9] font-bold'
+                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+              }`}
             >
-              <div className={`w-3.5 h-3.5 rounded-[3px] flex items-center justify-center border ${inStockOnly ? 'bg-[#0877C9] border-[#0877C9] text-white' : 'border-[#71849B]/50'}`}>
-                {inStockOnly && <Check className="w-2.5 h-2.5 stroke-[3]" />}
-              </div>
-              <span>{t("In Stock Only", "স্টকে আছে")}</span>
+              {t("Featured", "বাছাই")}
             </button>
 
-            {/* Sort Dropdown */}
-            <div className="relative flex items-center flex-1 sm:flex-none">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="appearance-none w-full sm:w-auto pl-3 pr-8 py-2 rounded-[6px] glass-input text-xs font-bold text-[#101C35] cursor-pointer border border-white/90 focus:border-[#0877C9]"
-              >
-                <option value="featured">{t("Sort: Featured", "সাজান: সেরা")}</option>
-                <option value="price-low">{t("Price: Low to High", "দাম: কম থেকে বেশি")}</option>
-                <option value="price-high">{t("Price: High to Low", "দাম: বেশি থেকে কম")}</option>
-                <option value="rating">{t("Customer Rating", "সর্বোচ্চ রেটিং")}</option>
-              </select>
-              <ArrowUpDown className="w-3.5 h-3.5 text-[#71849B] absolute right-2.5 pointer-events-none" />
-            </div>
+            <button
+              onClick={() => setSortBy('price-low')}
+              className={`px-2.5 py-1 rounded-[3px] font-medium border ${
+                sortBy === 'price-low'
+                  ? 'bg-blue-50 text-[#0877C9] border-[#0877C9] font-bold'
+                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              {t("Price: Low to High", "দাম: কম থেকে বেশি")}
+            </button>
 
-            {/* Clear All Filters Button */}
-            {(activeCategory !== 'All' || searchQuery.trim() || inStockOnly || sortBy !== 'featured') && (
-              <button
-                onClick={() => {
-                  setActiveCategory('All');
-                  setSearchQuery('');
-                  setInStockOnly(false);
-                  setSortBy('featured');
-                }}
-                className="px-3 py-2 rounded-[6px] bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-bold transition-colors whitespace-nowrap"
-                title="Reset all filters"
-              >
-                {t("Reset", "রিসেট")}
-              </button>
-            )}
+            <button
+              onClick={() => setSortBy('price-high')}
+              className={`px-2.5 py-1 rounded-[3px] font-medium border ${
+                sortBy === 'price-high'
+                  ? 'bg-blue-50 text-[#0877C9] border-[#0877C9] font-bold'
+                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              {t("Price: High to Low", "দাম: বেশি থেকে কম")}
+            </button>
 
+            {/* In-Stock Toggle */}
+            <label className="flex items-center gap-1.5 ml-1 cursor-pointer font-medium text-gray-600 select-none">
+              <input
+                type="checkbox"
+                checked={inStockOnly}
+                onChange={(e) => setInStockOnly(e.target.checked)}
+                className="w-3.5 h-3.5 text-[#0877C9] rounded border-gray-300 focus:ring-0"
+              />
+              <span>{t("In Stock Only", "শুধু স্টকে আছে")}</span>
+            </label>
           </div>
 
         </div>
 
       </div>
 
-      {/* 3. PRODUCT GRID: Responsive Columns (Desktop: 5-6, Tablet: 3-4, Mobile: 2) */}
-      {filteredAndSortedProducts.length === 0 ? (
-        <div className="py-16 text-center rounded-[8px] glass-panel p-8 sm:p-12 space-y-4 max-w-xl mx-auto">
-          <div className="w-12 h-12 rounded-[6px] bg-[#D9EDFF] text-[#0877C9] flex items-center justify-center mx-auto">
-            <Search className="w-5 h-5" />
-          </div>
-          <h3 className="text-lg sm:text-xl font-black text-[#101C35]">
-            {searchQuery.trim()
-              ? `${t("No products found for", "কোনো পণ্য পাওয়া যায়নি:")} "${searchQuery}"`
-              : t("No products found in this category", "এই ক্যাটাগরিতে কোনো পণ্য পাওয়া যায়নি")}
-          </h3>
-          <p className="text-xs sm:text-sm text-[#71849B] max-w-md mx-auto">
-            {t(
-              "Try searching with broader terms or explore our curated popular collections.",
-              "অন্য কোনো নামে অনুসন্ধান করুন অথবা আমাদের অন্যান্য ক্যাটাগরি ব্রাউজ করুন।"
-            )}
-          </p>
-
-          <div className="pt-2">
-            <button
-              onClick={() => {
-                setActiveCategory('All');
-                setSearchQuery('');
-                setInStockOnly(false);
-                setSortBy('featured');
-              }}
-              className="px-5 py-2 rounded-[6px] glass-button-primary text-xs font-bold"
-            >
-              {t("Clear All Filters", "সকল ফিল্টার মুছুন")}
-            </button>
-          </div>
+      {/* 3. HIGH-DENSITY RESPONSIVE PRODUCT GRID (Shopee Standard) */}
+      {displayedProducts.length === 0 ? (
+        <div className="bg-white border border-gray-200 rounded-[4px] p-10 text-center text-gray-500 shadow-xs">
+          <p className="text-sm font-semibold">{t("No products found matching your filter.", "কোন পণ্য পাওয়া যায়নি।")}</p>
+          <button
+            onClick={() => {
+              setActiveCategory('All');
+              setSearchQuery('');
+              setInStockOnly(false);
+            }}
+            className="mt-3 px-4 py-1.5 rounded-[3px] bg-[#0877C9] text-white text-xs font-semibold hover:bg-[#0665AC] transition-colors"
+          >
+            {t("Reset Filters", "ফিল্টার রিসেট করুন")}
+          </button>
         </div>
       ) : (
-        <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2.5 sm:gap-3.5 lg:gap-4">
-            {filteredAndSortedProducts.slice(0, visibleCount).map(product => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5 sm:gap-3 items-stretch">
+          {displayedProducts.map((product) => (
+            <div key={product.id} className="h-full">
               <ProductCard
-                key={product.id}
                 product={product}
                 isFav={favorites.includes(product.id)}
                 onToggleFavorite={toggleFavorite}
                 onSelectProduct={setSelectedProduct}
                 onAddToCart={addToCart}
+                compact={false}
                 showCategory={true}
               />
-            ))}
-          </div>
-
-          {/* Load More Pagination */}
-          {visibleCount < filteredAndSortedProducts.length && (
-            <div className="mt-8 flex flex-col items-center justify-center gap-2">
-              <button
-                onClick={() => setVisibleCount(prev => prev + 24)}
-                className="px-8 py-2.5 rounded-[6px] glass-button hover:bg-white text-xs font-bold text-[#101C35] hover:text-[#0877C9] shadow-xs transition-all transform hover:scale-102"
-              >
-                {t(
-                  `Load More Goods (${filteredAndSortedProducts.length - visibleCount} remaining)`,
-                  `আরও পণ্য লোড করুন (${filteredAndSortedProducts.length - visibleCount}টি বাকি)`
-                )}
-              </button>
-              <span className="text-[11px] text-[#71849B]">
-                {t(
-                  `Showing ${visibleCount} of ${filteredAndSortedProducts.length} items`,
-                  `${filteredAndSortedProducts.length}-এর মধ্যে ${visibleCount}টি দেখানো হচ্ছে`
-                )}
-              </span>
             </div>
-          )}
-        </>
+          ))}
+        </div>
+      )}
+
+      {/* 4. SHOPEE-STYLE "SEE MORE" PAGINATION BUTTON */}
+      {visibleCount < filteredAndSortedProducts.length && (
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={() => setVisibleCount(prev => prev + 24)}
+            className="px-10 py-2.5 bg-white border border-gray-300 hover:border-[#0877C9] hover:text-[#0877C9] text-[#212121] text-xs sm:text-sm font-semibold rounded-[3px] shadow-2xs hover:shadow-xs transition-all"
+          >
+            {t("See More Products", "আরও পণ্য দেখুন")} ({filteredAndSortedProducts.length - visibleCount} {t("remaining", "বাকি")})
+          </button>
+        </div>
       )}
 
     </section>

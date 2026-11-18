@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
-import { Heart, ShoppingBag, Eye } from 'lucide-react';
+import { Heart, ShoppingBag, Eye, Check } from 'lucide-react';
 import { useShop } from '../../context/ShopContext';
 
 /**
- * AZRAQ Shop — Premium Transparent Glassmorphism Product Card
- *
- * Implements:
- * 1. Dedicated 1:1 square aspect-ratio ice-blue glass well with object-fit: contain.
- * 2. Floating wishlist icon button at top-right.
- * 3. Optional real discount badge only (no internal SKU labels).
- * 4. Middle: Category label + 2-line clamped title with fixed min-height.
- * 5. Bottom: Prominent BDT price (17-19px), optional original price, stock status, and add-to-cart.
- * 6. Tier 3 .glass-product styling with 22px rounded corners and 2px hover elevation.
+ * AZRAQ Shop — Shopee-Inspired Retail Product Card
+ * 
+ * Clean, modern, professional retail product card:
+ * 1. 100% full-width 1:1 square container with clean white background.
+ * 2. Proper object-contain scaling to preserve full product without distortion.
+ * 3. Authentic Shopee-style discount tag at top-right corner.
+ * 4. Minimalist wishlist button at top-left.
+ * 5. Clean 2-line clamped title in readable charcoal.
+ * 6. Prominent BDT price (৳) with strikethrough compare price.
+ * 7. Authentic stock indicator & compact quick-add button.
  */
 export default function ProductCard({
   product,
@@ -32,7 +33,7 @@ export default function ProductCard({
   const displayImage = imageError || !product.main_image ? fallbackImage : product.main_image;
   const isAvailable = product.in_stock !== false;
   
-  // Real original price & discount calculation (only when authentic retail price > selling price)
+  // Real original price & discount calculation (only when authentic compare price > selling price)
   const originalPrice = product.compare_price || 
     (product.supplier_retail_price && product.supplier_retail_price > product.price ? product.supplier_retail_price : null);
   const discountPercent = originalPrice && originalPrice > product.price 
@@ -65,72 +66,63 @@ export default function ProductCard({
 
   return (
     <div
-      className={`group relative flex flex-col justify-between h-full rounded-[6px] glass-product select-none transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 border border-white/95 bg-white/90 overflow-hidden ${className}`}
+      onClick={handleSelect}
+      className={`group relative flex flex-col justify-between h-full rounded-[4px] bg-white border border-gray-200 hover:border-[#0877C9] hover:shadow-md transition-all duration-150 select-none cursor-pointer overflow-hidden ${className}`}
     >
-      {/* 1. TOP SECTION: Square 1:1 Full-Width Large Image Area (Shopee Proportions) */}
-      <div className="relative w-full aspect-square bg-[#F8FBFF] flex items-center justify-center overflow-hidden border-b border-white/90">
+      {/* 1. TOP IMAGE WELL: 1:1 Square Container, Full Available Width */}
+      <div className="relative w-full aspect-square bg-[#FFFFFF] flex items-center justify-center overflow-hidden border-b border-gray-100">
         
-        {/* Discount Badge at Upper-Right Corner of Photograph */}
+        {/* Authentic Shopee-style Discount Ribbon at Upper-Right Corner */}
         {discountPercent && discountPercent > 0 ? (
           <div className="absolute top-0 right-0 z-10 pointer-events-none">
-            <span className="px-2 py-0.5 rounded-bl-[6px] bg-gradient-to-r from-[#0877C9] to-[#2563EB] text-white text-[10px] sm:text-[11px] font-black tracking-tight shadow-xs block">
+            <span className="px-1.5 py-0.5 rounded-bl-[4px] bg-[#EE4D2D] text-white text-[10px] sm:text-[11px] font-bold tracking-tight block shadow-2xs">
               -{discountPercent}%
             </span>
           </div>
         ) : null}
 
-        {/* Wishlist Button: Neatly Positioned at Upper-Left Over Image */}
+        {/* Minimalist Wishlist Button at Upper-Left Over Image */}
         <button
           type="button"
           onClick={handleToggleFav}
-          className={`absolute top-2 left-2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-[4px] flex items-center justify-center transition-all backdrop-blur-md border border-white shadow-xs active:scale-90 focus:outline-none ${
-            isFav
-              ? 'text-[#0877C9] bg-white'
-              : 'text-[#71849B] bg-white/85 hover:bg-white hover:text-[#0877C9]'
+          className={`absolute top-1.5 left-1.5 z-10 w-7 h-7 rounded-full flex items-center justify-center transition-colors bg-white/90 hover:bg-white border border-gray-200/80 shadow-2xs focus:outline-none ${
+            isFav ? 'text-[#EE4D2D]' : 'text-gray-400 hover:text-[#EE4D2D]'
           }`}
           title={isFav ? t("Remove from Wishlist", "পছন্দের তালিকা থেকে সরান") : t("Add to Wishlist", "পছন্দের তালিকায় যোগ করুন")}
           aria-label={`Wishlist ${product.name}`}
         >
-          <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform ${isFav ? 'fill-[#0877C9] stroke-[#0877C9] scale-110' : ''}`} />
+          <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-[#EE4D2D] stroke-[#EE4D2D]' : ''}`} />
         </button>
 
-        {/* Dedicated Product Image: Occupies Full Available Space, Object-Contain Without Distortion */}
+        {/* Product Photograph: Contained, Clear, Sharp, No Unwanted Padding */}
         <img
           src={displayImage}
           alt={product.name || 'Product'}
           onError={() => setImageError(true)}
-          className="w-full h-full object-contain p-2 transition-transform duration-300 group-hover:scale-105 cursor-pointer filter drop-shadow-2xs"
-          onClick={handleSelect}
+          className="w-full h-full object-contain p-2.5 transition-transform duration-300 group-hover:scale-104"
         />
 
-        {/* Quick View Pill Overlay on Hover */}
-        <div className="absolute inset-0 bg-[#101C35]/15 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none group-hover:pointer-events-auto">
-          <button
-            type="button"
-            onClick={handleSelect}
-            className="px-3 py-1.5 rounded-[4px] bg-white text-[#101C35] text-xs font-bold shadow-md hover:text-[#0877C9] transition-all transform hover:scale-105 flex items-center gap-1.5 focus:outline-none border border-white"
-          >
-            <Eye className="w-3.5 h-3.5 text-[#0877C9]" />
-            <span>{t("Quick View", "বিস্তারিত")}</span>
-          </button>
+        {/* Quick View Button on Hover */}
+        <div className="absolute inset-x-0 bottom-0 py-1.5 bg-black/40 text-white text-center text-[11px] font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex items-center justify-center gap-1 backdrop-blur-2xs">
+          <Eye className="w-3.5 h-3.5" />
+          <span>{t("Quick View", "বিস্তারিত")}</span>
         </div>
       </div>
 
-      {/* 2. CARD INFORMATION LAYOUT: Positioned Directly Below Photograph */}
-      <div className={`flex flex-col justify-between flex-grow ${compact ? 'p-2 sm:p-2.5' : 'p-2.5 sm:p-3'}`}>
+      {/* 2. PRODUCT INFORMATION SECTION */}
+      <div className={`flex flex-col justify-between flex-grow ${compact ? 'p-2' : 'p-2.5 sm:p-3'}`}>
         <div>
-          {/* Category Label */}
+          {/* Category Tag */}
           {showCategory && categoryLabel && (
-            <span className="text-[10px] sm:text-[11px] font-semibold text-[#71849B] block truncate capitalize mb-0.5">
+            <span className="text-[10px] sm:text-[11px] font-medium text-gray-500 block truncate capitalize mb-0.5">
               {categoryLabel}
             </span>
           )}
 
-          {/* Product Name: Clamped strictly to 2 lines */}
+          {/* Product Title: 2-line clamp */}
           <h3
-            onClick={handleSelect}
-            className={`font-semibold text-[#101C35] line-clamp-2 min-h-[2.4rem] sm:min-h-[2.6rem] cursor-pointer hover:text-[#0877C9] transition-colors leading-snug ${
-              compact ? 'text-[12px] sm:text-[13px]' : 'text-[13px] sm:text-[14px]'
+            className={`font-normal text-[#212121] line-clamp-2 min-h-[2.3rem] sm:min-h-[2.5rem] group-hover:text-[#0877C9] transition-colors leading-snug ${
+              compact ? 'text-[12px]' : 'text-[13px] sm:text-[13.5px]'
             }`}
             title={product.name}
           >
@@ -138,26 +130,28 @@ export default function ProductCard({
           </h3>
         </div>
 
-        {/* 3. BOTTOM SECTION: Selling Price, Original Price, Stock Status & Compact Add to Cart */}
-        <div className="flex items-end justify-between gap-1.5 mt-2 pt-2 border-t border-slate-100/90">
+        {/* 3. PRICE & ACTIONS ROW */}
+        <div className="mt-2 pt-2 border-t border-gray-100 flex items-end justify-between gap-1.5">
           <div className="min-w-0 flex-1">
+            {/* Price display: BDT ৳ in primary color */}
             <div className="flex items-baseline gap-1.5 flex-wrap">
-              <span className={`font-black text-[#101C35] ${compact ? 'text-[15px]' : 'text-[16px] sm:text-[17px]'}`}>
+              <span className={`font-bold text-[#0877C9] ${compact ? 'text-[14px]' : 'text-[15px] sm:text-[16px]'}`}>
                 ৳{(product.price || 0).toLocaleString()}
               </span>
               {originalPrice && originalPrice > product.price && (
-                <span className="text-[10px] sm:text-[11px] text-[#71849B] line-through font-medium">
+                <span className="text-[10px] sm:text-[11px] text-gray-400 line-through font-normal">
                   ৳{originalPrice.toLocaleString()}
                 </span>
               )}
             </div>
 
+            {/* In-stock status */}
             <span
-              className={`text-[10px] sm:text-[11px] font-semibold block truncate mt-0.5 ${
-                isAvailable ? 'text-emerald-600' : 'text-rose-500'
+              className={`text-[10px] font-medium block truncate mt-0.5 ${
+                isAvailable ? 'text-emerald-700' : 'text-gray-400'
               }`}
             >
-              {isAvailable ? t("In Stock", "স্টকে রয়েছে") : t("Out of Stock", "স্টক শেষ")}
+              {isAvailable ? t("In Stock", "স্টকে রয়েছে") : t("Out of Stock", "স্টক নেই")}
             </span>
           </div>
 
@@ -166,17 +160,17 @@ export default function ProductCard({
             type="button"
             onClick={handleAddToCart}
             disabled={!isAvailable}
-            className={`rounded-[4px] flex items-center justify-center transition-all flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0877C9] ${
-              compact ? 'w-7.5 h-7.5' : 'w-8 h-8 sm:w-8.5 sm:h-8.5'
+            className={`rounded-[3px] flex items-center justify-center transition-all flex-shrink-0 focus:outline-none ${
+              compact ? 'w-7 h-7' : 'w-7.5 h-7.5 sm:w-8 sm:h-8'
             } ${
               isAvailable
-                ? 'bg-gradient-to-r from-[#0877C9] to-[#2563EB] hover:from-[#076bb5] hover:to-[#1d4ed8] text-white shadow-xs hover:shadow-md hover:scale-105 active:scale-95'
-                : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                ? 'bg-[#0877C9] hover:bg-[#0665AC] text-white shadow-2xs active:scale-95'
+                : 'bg-gray-100 text-gray-300 cursor-not-allowed'
             }`}
             title={isAvailable ? t("Add to Cart", "ব্যাগে যোগ করুন") : t("Out of Stock", "স্টক নেই")}
             aria-label={isAvailable ? `Add ${product.name} to bag` : `${product.name} is out of stock`}
           >
-            <ShoppingBag className={compact ? 'w-3.5 h-3.5' : 'w-4 h-4'} />
+            <ShoppingBag className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>

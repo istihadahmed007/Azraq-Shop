@@ -38,56 +38,50 @@ export default function CollectionsPage() {
     <div className="w-full py-4 min-h-screen select-none">
       
       {/* Breadcrumb Header */}
-      <div className="flex items-center gap-2 text-xs font-semibold text-[#71849B] mb-4">
+      <div className="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-4">
         <button onClick={() => navigateTo('home')} className="hover:text-[#0877C9] transition-colors">
           {t("Home", "হোম")}
         </button>
         <ChevronRight className="w-3.5 h-3.5" />
-        <span className="text-[#101C35]">{t("All Collections", "সকল কালেকশন")}</span>
+        <span className="text-[#212121]">{t("All Collections", "সকল কালেকশন")}</span>
       </div>
 
       {/* Page Title & Stats */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-white/60 mb-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-gray-200 mb-5">
         <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#0877C9] shadow-[0_0_8px_rgba(8,119,201,0.5)]" />
-            <span className="text-[11px] font-black tracking-widest text-[#0877C9] uppercase">
-              {t("AUTHENTIC TAXONOMY BROWSER", "ইজিড্রপ ক্যাটাগরি ব্রাউজার")}
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-4xl font-black text-[#101C35] tracking-tight">
-            {t("Explore Collections", "সকল কালেকশন এক্সপ্লোর করুন")}
+          <h1 className="text-xl sm:text-2xl font-bold text-[#212121] tracking-tight">
+            {t("Explore Collections", "সকল কালেকশন")}
           </h1>
-          <p className="text-xs sm:text-sm text-[#71849B] mt-1 max-w-xl">
+          <p className="text-xs sm:text-sm text-[#757575] mt-1 max-w-xl">
             {t(
-              "Browse 18 complete EasyDrop supplier categories. Filtered, organized and verified for seamless discovery.",
-              "১৮টি মূল ক্যাটাগরি ও ১২০৬টি যাচাইকৃত পণ্যের পূর্ণাঙ্গ তালিকা।"
+              "Browse all 18 authentic EasyDrop catalog categories with genuine photography and verified prices in BDT.",
+              "১৮টি মূল ক্যাটাগরি ও পণ্যের পূর্ণাঙ্গ তালিকা।"
             )}
           </p>
         </div>
 
         {/* View Mode Toggle & Total Count */}
         <div className="flex items-center gap-3">
-          <span className="text-xs font-bold text-[#71849B]">
+          <span className="text-xs font-medium text-gray-500">
             {filteredCollections.length} {t("Collections", "ক্যাটাগরি")}
           </span>
 
-          <div className="flex items-center glass-panel rounded-[6px] p-1 shadow-2xs border border-white/90">
+          <div className="flex items-center bg-white rounded-[3px] p-0.5 border border-gray-200 shadow-2xs">
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-[4px] transition-colors ${
-                viewMode === 'grid' ? 'bg-[#0877C9] text-white' : 'text-[#71849B] hover:text-[#101C35]'
+              className={`p-1.5 rounded-[2px] transition-colors ${
+                viewMode === 'grid' ? 'bg-[#0877C9] text-white' : 'text-gray-500 hover:text-[#212121]'
               }`}
-              title="Editorial Grid Mode"
+              title="Grid Mode"
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded-[4px] transition-colors ${
-                viewMode === 'list' ? 'bg-[#0877C9] text-white' : 'text-[#71849B] hover:text-[#101C35]'
+              className={`p-1.5 rounded-[2px] transition-colors ${
+                viewMode === 'list' ? 'bg-[#0877C9] text-white' : 'text-gray-500 hover:text-[#212121]'
               }`}
-              title="Compact Category List Mode"
+              title="List Mode"
             >
               <List className="w-4 h-4" />
             </button>

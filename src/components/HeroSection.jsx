@@ -1,102 +1,80 @@
 import React from 'react';
-import { ArrowRight, Sparkles, Truck, ShieldCheck, Zap } from 'lucide-react';
+import { ArrowRight, Truck, ShieldCheck, CreditCard, RotateCcw } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 
 /**
- * AZRAQ Shop — Premium Frosted Glassmorphism Hero Section
+ * AZRAQ Shop — Professional Retail E-Commerce Hero Banner
+ * 
+ * Shopee-inspired retail layout:
+ * - 2/3 Main Promotional Banner on left showcasing authentic catalog products.
+ * - 1/3 Stacked Promotional Banners on right with direct category shortcuts.
+ * - 4-Column Service Guarantee Strip below the banners.
  */
 export default function HeroSection() {
-  const { products, collections, navigateTo, setIsTrackingOpen, t } = useShop();
+  const { products, collections, navigateTo, t } = useShop();
 
-  // Authentic AZRAQ products for showcase
+  // Authentic catalog products for promotional display
   const heroProduct = products.find(p => p.id === 'AZQ-0001') || products[0];
-  const audioProduct = products.find(p => p.id === 'AZQ-0009' || p.id === 'AZQ-0035') || products[5];
+  const sideProduct1 = products.find(p => p.id === 'AZQ-0009' || p.id === 'AZQ-0035') || products[1];
+  const sideProduct2 = products.find(p => p.id === 'AZQ-0043' || p.id === 'AZQ-0049') || products[2];
 
   return (
-    <section className="w-full min-w-0 select-none">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch w-full min-w-0">
+    <section className="w-full select-none flex flex-col gap-3">
+      
+      {/* 1. TOP BANNER GRID (2/3 Main Banner + 1/3 Stacked Banners) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch w-full">
 
-        {/* ========================================================
-            1. MAIN CENTRAL FROSTED GLASS HERO BANNER (col-span-8)
-           ======================================================== */}
-        <div className="lg:col-span-8 rounded-[8px] glass-feature p-6 sm:p-8 lg:p-9 flex items-center relative overflow-hidden min-h-[360px] sm:min-h-[380px] border border-white/95 shadow-sm">
+        {/* Left: 2/3 Main Promotional Banner (lg:col-span-8) */}
+        <div className="lg:col-span-8 rounded-[4px] bg-[#FFFFFF] border border-gray-200 p-5 sm:p-7 flex flex-col justify-between relative overflow-hidden min-h-[300px] sm:min-h-[340px] shadow-xs">
+          
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center relative z-10 w-full flex-1">
+            
+            {/* Banner Text Content */}
+            <div className="md:col-span-7 flex flex-col items-start gap-2.5">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#0877C9] bg-blue-50 px-2 py-0.5 rounded-[2px] border border-blue-100">
+                {t('AZRAQ Official Store', 'আজরাক অফিসিয়াল স্টোর')}
+              </span>
 
-          {/* Subtle Blue Ambient Lighting */}
-          <div className="absolute -top-20 -right-20 w-80 h-80 bg-[#69C5F5]/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-[#D9EDFF]/50 rounded-full blur-2xl pointer-events-none" />
-
-          {/* Left Hero Content & Right Product Spotlight */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center relative z-10 w-full">
-
-            {/* Left Texts & CTAs */}
-            <div className="md:col-span-7 flex flex-col items-start gap-3.5">
-
-              {/* Eyebrow Tag (Sharp rectangular glass styling) */}
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] bg-white/90 backdrop-blur-md border border-white/90 shadow-2xs">
-                <Sparkles className="w-3.5 h-3.5 text-[#0877C9]" />
-                <span className="text-[11px] font-black uppercase tracking-wider text-[#0877C9]">
-                  {t('Curated Everyday Goods', 'কিউরেটেড এভরিডে গুডস')}
-                </span>
-              </div>
-
-              {/* Main Headline */}
-              <h1 className="text-3xl sm:text-4xl lg:text-[42px] font-black text-[#101C35] tracking-tight leading-[1.14]">
-                {t('Discover Better.', 'উন্নত জীবন।')} <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0877C9] via-[#2563EB] to-[#50DDF0]">
-                  {t('Live Better.', 'সেরা পছন্দ।')}
-                </span>
+              <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-bold text-[#212121] tracking-tight leading-tight">
+                {t('Curated Everyday Goods & Gadgets', 'কিউরেটেড এভরিডে গুডস ও গ্যাজেটস')}
               </h1>
 
-              {/* Short descriptive copy */}
-              <p className="text-xs sm:text-[14px] font-medium text-[#71849B] max-w-md leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#757575] max-w-md leading-relaxed">
                 {t(
-                  'Premium lifestyle accessories, smart gadgets, and curated everyday essentials designed for modern living in Bangladesh.',
-                  'স্মার্ট জীবনযাপনের জন্য প্রিমিয়াম মোবাইল এক্সেসরিজ, গ্যাজেটস ও কিউরেটেড এভরিডে পণ্যের সমাহার।'
+                  'Authentic products with verified specifications, transparent BDT pricing, and fast nationwide delivery.',
+                  'আসল পণ্যের নিশ্চয়তা, বিডিটি (৳) মূল্য এবং সারা দেশে ক্যাশ অন ডেলিভারি।'
                 )}
               </p>
 
-              {/* CTA Buttons (Sharp 6px radius) */}
-              <div className="flex items-center gap-2.5 sm:gap-3 pt-1.5 flex-wrap">
+              <div className="flex items-center gap-3 pt-2">
                 <button
                   onClick={() => {
                     const el = document.getElementById('all-products') || document.getElementById('popular-products');
                     el?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="px-6 py-2.5 sm:py-3 rounded-[6px] glass-button-primary text-xs sm:text-sm font-bold flex items-center gap-2 group shadow-sm"
+                  className="px-5 py-2.5 rounded-[3px] bg-[#0877C9] hover:bg-[#0665AC] text-white text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-2xs transition-colors"
                 >
                   <span>{t('Shop Now', 'এখনই কিনুন')}</span>
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="w-4 h-4" />
                 </button>
 
                 <button
                   onClick={() => navigateTo('collections')}
-                  className="px-5 py-2.5 sm:py-3 rounded-[6px] glass-button text-xs sm:text-sm font-bold text-[#101C35] hover:text-[#0877C9]"
+                  className="px-4 py-2.5 rounded-[3px] border border-gray-300 hover:bg-gray-50 text-xs sm:text-sm font-semibold text-[#212121] transition-colors"
                 >
-                  {t('Explore Collections', 'সকল কালেকশন')}
+                  {t('All 18 Collections', '১৮টি কালেকশন')}
                 </button>
               </div>
-
             </div>
 
-            {/* Right Product Arrangement: Prominent, properly fitted photo */}
-            <div className="md:col-span-5 relative flex items-center justify-center min-h-[240px] sm:min-h-[280px]">
-
-              {/* Glowing Pedestal Circle */}
-              <div className="absolute inset-0 m-auto w-52 h-52 sm:w-64 sm:h-64 rounded-full bg-gradient-to-tr from-[#69C5F5]/25 to-[#D9EDFF]/50 border border-white/80 shadow-[0_12px_36px_rgba(8,119,201,0.15)]" />
-
-              {/* Main Product Feature Image: Substantially larger and visually prominent */}
-              <div className="relative z-10 w-full max-w-[260px] sm:max-w-[300px] h-[220px] sm:h-[260px] flex items-center justify-center">
+            {/* Banner Product Photography */}
+            <div className="md:col-span-5 relative flex items-center justify-center min-h-[200px]">
+              <div className="w-full max-w-[240px] h-[200px] sm:h-[230px] flex items-center justify-center bg-gray-50/50 rounded-[4px] p-2 border border-gray-100">
                 <img
                   src={heroProduct?.main_image || "https://easydrop.asia/products/image-1794224164356-135288231.jpeg"}
-                  alt={heroProduct?.name || "Curated Everyday Tech"}
-                  className="w-full h-full object-contain filter drop-shadow-[0_14px_28px_rgba(16,55,100,0.18)] hover:scale-105 transition-transform duration-500"
+                  alt={heroProduct?.name || "Featured Product"}
+                  className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
                 />
-              </div>
-
-              {/* Floating Verified Badge (Sharp 4px radius) */}
-              <div className="absolute -bottom-1 -left-1 z-20 px-2.5 py-1 rounded-[4px] bg-white/95 backdrop-blur-md border border-white shadow-2xs flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#0877C9]" />
-                <span className="text-[10px] font-bold text-[#101C35]">100% Authentic QC</span>
               </div>
             </div>
 
@@ -104,78 +82,108 @@ export default function HeroSection() {
 
         </div>
 
-        {/* ========================================================
-            2. RIGHT STACKED PROMOTIONAL PANELS (col-span-4)
-           ======================================================== */}
-        <div className="lg:col-span-4 flex flex-col gap-4 justify-between">
+        {/* Right: 1/3 Two Stacked Category Promo Cards (lg:col-span-4) */}
+        <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3">
 
-          {/* Top Card: Curated Collections / Discount Panel */}
+          {/* Top Right Promo Card */}
           <div
-            onClick={() => {
-              const el = document.getElementById('popular-products');
-              el?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="flex-1 rounded-[8px] glass-card p-4 sm:p-5 flex items-center justify-between gap-3 cursor-pointer group relative overflow-hidden border border-white/95 bg-white/90"
+            onClick={() => navigateTo('collections')}
+            className="flex-1 rounded-[4px] bg-[#FFFFFF] border border-gray-200 p-4 flex items-center justify-between gap-3 cursor-pointer hover:border-[#0877C9] transition-all group shadow-xs"
           >
-            <div className="flex flex-col items-start gap-1 z-10 min-w-0 flex-1">
-              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-[#0877C9]">
-                {t('Curated Finds', 'বাছাইকৃত পণ্য')}
+            <div className="flex-1 min-w-0">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#0877C9] block mb-1">
+                {t('Smart Tech', 'স্মার্ট গ্যাজেটস')}
               </span>
-              <h3 className="text-base sm:text-xl font-black text-[#101C35] tracking-tight">
-                Up to 50% OFF
+              <h3 className="text-sm font-bold text-[#212121] leading-snug group-hover:text-[#0877C9] transition-colors">
+                {sideProduct1?.name ? sideProduct1.name.slice(0, 32) : t('Gadgets & Audio', 'গ্যাজেটস ও অডিও')}
               </h3>
-              <p className="text-[11px] sm:text-xs font-semibold text-[#71849B]">
-                {t('On Top Brands', 'সেরা ব্র্যান্ডের ওপর')}
+              <p className="text-xs text-[#0877C9] font-bold mt-1">
+                ৳{(sideProduct1?.price || 650).toLocaleString()} BDT
               </p>
-
-              <div className="mt-2 w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-[4px] bg-white shadow-2xs group-hover:bg-[#0877C9] group-hover:text-white flex items-center justify-center transition-colors">
-                <ArrowRight className="w-3.5 h-3.5 text-[#101C35] group-hover:text-white transition-colors" />
-              </div>
             </div>
-
-            {/* Product Photo on Right: Appropriately large & sharp */}
-            <div className="w-20 h-20 sm:w-24 sm:h-24 relative flex items-center justify-center shrink-0 overflow-hidden rounded-[6px] bg-[#F8FBFF] p-2 border border-white/90">
+            <div className="w-20 h-20 shrink-0 rounded-[3px] bg-gray-50 border border-gray-100 p-1 flex items-center justify-center">
               <img
-                src={audioProduct?.main_image || "https://easydrop.asia/products/image-1793785736570-415262366.jpeg"}
-                alt="Headphones"
-                className="w-full h-full object-contain filter drop-shadow-2xs group-hover:scale-108 transition-transform duration-300"
+                src={sideProduct1?.main_image || "https://easydrop.asia/products/image-1794224164356-135288231.jpeg"}
+                alt=""
+                className="w-full h-full object-contain group-hover:scale-105 transition-transform"
               />
             </div>
           </div>
 
-          {/* Bottom Card: Fast & Reliable Delivery Across Bangladesh */}
+          {/* Bottom Right Promo Card */}
           <div
-            onClick={() => setIsTrackingOpen(true)}
-            className="flex-1 rounded-[8px] glass-card p-4 sm:p-5 flex items-center justify-between gap-3 cursor-pointer group relative overflow-hidden border border-white/95 bg-white/90"
+            onClick={() => navigateTo('collections')}
+            className="flex-1 rounded-[4px] bg-[#FFFFFF] border border-gray-200 p-4 flex items-center justify-between gap-3 cursor-pointer hover:border-[#0877C9] transition-all group shadow-xs"
           >
-            <div className="flex flex-col items-start gap-0.5 sm:gap-1 z-10 min-w-0 flex-1">
-              <h3 className="text-sm sm:text-base font-black text-[#101C35] tracking-tight leading-snug">
-                {t('Fast & Reliable', 'দ্রুত ও নির্ভরযোগ্য')} <br />
-                {t('Delivery', 'হোম ডেলিভারি')}
+            <div className="flex-1 min-w-0">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#EE4D2D] block mb-1">
+                {t('Lifestyle Picks', 'লাইফস্টাইল')}
+              </span>
+              <h3 className="text-sm font-bold text-[#212121] leading-snug group-hover:text-[#0877C9] transition-colors">
+                {sideProduct2?.name ? sideProduct2.name.slice(0, 32) : t('Home & Living', 'হোম ও লিভিং')}
               </h3>
-              <p className="text-[11px] sm:text-xs font-semibold text-[#71849B] mt-0.5">
-                {t('Across Bangladesh', 'সারা বাংলাদেশে')}
+              <p className="text-xs text-[#0877C9] font-bold mt-1">
+                ৳{(sideProduct2?.price || 1200).toLocaleString()} BDT
               </p>
-
-              <div className="mt-2 w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-[4px] bg-white shadow-2xs group-hover:bg-[#0877C9] group-hover:text-white flex items-center justify-center transition-colors">
-                <ArrowRight className="w-3.5 h-3.5 text-[#101C35] group-hover:text-white transition-colors" />
-              </div>
             </div>
-
-            {/* Delivery Parcel Box Graphic */}
-            <div className="w-20 h-20 sm:w-24 sm:h-24 relative flex items-center justify-center shrink-0">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-[8px] bg-gradient-to-tr from-[#0877C9] to-[#2563EB] shadow-[0_8px_20px_rgba(8,119,201,0.25)] flex items-center justify-center text-white transform -rotate-3 group-hover:rotate-0 transition-transform duration-300">
-                <div className="flex flex-col items-center">
-                  <span className="text-xs sm:text-base font-black italic tracking-wider">AZQ</span>
-                  <span className="text-[7px] sm:text-[9px] font-bold text-sky-200">EXPRESS</span>
-                </div>
-              </div>
+            <div className="w-20 h-20 shrink-0 rounded-[3px] bg-gray-50 border border-gray-100 p-1 flex items-center justify-center">
+              <img
+                src={sideProduct2?.main_image || "https://easydrop.asia/products/image-1794224164356-135288231.jpeg"}
+                alt=""
+                className="w-full h-full object-contain group-hover:scale-105 transition-transform"
+              />
             </div>
           </div>
 
         </div>
 
       </div>
+
+      {/* 2. SHOPEE-STYLE 4-COLUMN SERVICE GUARANTEE STRIP */}
+      <div className="rounded-[4px] bg-white border border-gray-200 px-4 py-3 grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs shadow-2xs">
+        
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-[3px] bg-blue-50 text-[#0877C9] flex items-center justify-center shrink-0">
+            <Truck className="w-4 h-4" />
+          </div>
+          <div>
+            <p className="font-bold text-[#212121]">{t('Nationwide Delivery', 'সারাদেশে ডেলিভারি')}</p>
+            <p className="text-[11px] text-[#757575]">{t('৳70 Dhaka / ৳130 Outside', 'ঢাকা ৭০৳ / বাইরে ১৩০৳')}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-[3px] bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+            <ShieldCheck className="w-4 h-4" />
+          </div>
+          <div>
+            <p className="font-bold text-[#212121]">{t('Cash on Delivery', 'ক্যাশ অন ডেলিভারি')}</p>
+            <p className="text-[11px] text-[#757575]">{t('Pay upon receiving goods', 'পণ্য বুঝে নিয়ে মূল্য দিন')}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-[3px] bg-blue-50 text-[#0877C9] flex items-center justify-center shrink-0">
+            <CreditCard className="w-4 h-4" />
+          </div>
+          <div>
+            <p className="font-bold text-[#212121]">{t('Secure Payments', 'নিরাপদ পেমেন্ট')}</p>
+            <p className="text-[11px] text-[#757575]">{t('bKash, Nagad, Cards via Paymently', 'বিকাশ, নগদ ও কার্ড পেমেন্টলি')}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-[3px] bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
+            <RotateCcw className="w-4 h-4" />
+          </div>
+          <div>
+            <p className="font-bold text-[#212121]">{t('7-Day Returns', '৭ দিনের রিটার্ন')}</p>
+            <p className="text-[11px] text-[#757575]">{t('Verified policy on defects', 'সহজ রিটার্ন পলিসি')}</p>
+          </div>
+        </div>
+
+      </div>
+
     </section>
   );
 }

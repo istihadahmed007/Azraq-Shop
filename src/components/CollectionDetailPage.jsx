@@ -90,7 +90,7 @@ export default function CollectionDetailPage() {
     <div className="w-full py-4 min-h-screen select-none">
       
       {/* Breadcrumb Navigation */}
-      <div className="flex items-center gap-2 text-xs font-semibold text-[#71849B] mb-5">
+      <div className="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-4">
         <button onClick={() => navigateTo('home')} className="hover:text-[#0877C9] transition-colors">
           {t("Home", "হোম")}
         </button>
@@ -99,35 +99,33 @@ export default function CollectionDetailPage() {
           {t("Collections", "কালেকশনসমূহ")}
         </button>
         <ChevronRight className="w-3.5 h-3.5" />
-        <span className="text-[#101C35] font-bold">{activeCollection.name}</span>
+        <span className="text-[#212121] font-bold">{activeCollection.name}</span>
       </div>
 
-      {/* Collection Hero Banner with Frosted Glass Theme */}
-      <div className="rounded-[8px] glass-feature p-6 sm:p-8 mb-6 relative overflow-hidden border border-white/95 shadow-sm">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-[#69C5F5]/20 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
-          <div className="space-y-3 text-center md:text-left max-w-xl">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] bg-white/90 text-[#0877C9] text-xs font-mono font-bold border border-white">
+      {/* Collection Hero Banner with Clean Retail Layout */}
+      <div className="rounded-[4px] bg-white border border-gray-200 p-5 sm:p-6 mb-4 shadow-xs">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 text-center md:text-left max-w-xl">
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[2px] bg-blue-50 text-[#0877C9] text-xs font-bold border border-blue-100">
               <span>{t("COLLECTION", "কালেকশন")} #{activeCollection.id}</span>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-black text-[#101C35] tracking-tight">
+            <h1 className="text-xl sm:text-3xl font-bold text-[#212121] tracking-tight">
               {activeCollection.name}
             </h1>
-            <p className="text-xs sm:text-sm text-[#71849B] leading-relaxed font-normal">
+            <p className="text-xs sm:text-sm text-[#757575] leading-relaxed">
               {t(activeCollection.description_en, activeCollection.description_bn)}
             </p>
             <div className="pt-1 flex flex-wrap items-center justify-center md:justify-start gap-2">
-              <span className="px-2.5 py-1 rounded-[4px] bg-white/90 backdrop-blur-md text-xs font-semibold text-[#101C35] border border-white shadow-2xs">
+              <span className="px-2.5 py-0.5 rounded-[2px] bg-gray-50 text-xs font-medium text-gray-600 border border-gray-200">
                 {activeCollectionProducts?.length || 0} {t("Products Available", "পণ্য অন্তর্ভুক্ত")}
               </span>
-              <span className="px-2.5 py-1 rounded-[4px] bg-white/90 backdrop-blur-md text-xs font-semibold text-[#101C35] border border-white shadow-2xs">
-                {t("100% Verified Quality", "১০০% পরীক্ষিত গুণমান")}
+              <span className="px-2.5 py-0.5 rounded-[2px] bg-emerald-50 text-xs font-medium text-emerald-800 border border-emerald-200">
+                {t("100% Authentic Quality", "১০০% আসল পণ্য")}
               </span>
             </div>
           </div>
 
-          <div className="w-36 h-36 sm:w-48 sm:h-48 rounded-[6px] bg-[#F8FBFF] border border-white/90 p-3 flex items-center justify-center flex-shrink-0 shadow-2xs overflow-hidden">
+          <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-[3px] bg-gray-50 border border-gray-200 p-2 flex items-center justify-center shrink-0 overflow-hidden">
             <img
               src={activeCollection.cover_image || activeCollection.image_url || activeCollection.fallback_image}
               alt={activeCollection.name}
@@ -137,24 +135,24 @@ export default function CollectionDetailPage() {
                   e.target.src = fallback;
                 }
               }}
-              className="w-full h-full object-contain filter drop-shadow-2xs"
+              className="w-full h-full object-contain"
             />
           </div>
         </div>
       </div>
 
-      {/* Filter and Search Bar (Sharp 6px radius) */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 mb-6 p-3 rounded-[8px] glass-panel border border-white/95">
+      {/* Filter and Search Bar */}
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 mb-4 p-3 rounded-[4px] bg-white border border-gray-200 shadow-2xs">
         
         {/* Search within collection */}
         <div className="relative flex-1 md:max-w-xs">
-          <Search className="w-4 h-4 text-[#71849B] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             placeholder={t("Filter within collection...", "কালেকশনে খুঁজুন...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-1.5 rounded-[6px] glass-input text-xs text-[#101C35] placeholder-[#71849B] border border-white/90 focus:border-[#0877C9]"
+            className="w-full pl-8 pr-3 py-1.5 rounded-[3px] border border-gray-200 text-xs text-[#212121] placeholder-gray-400 focus:outline-none focus:border-[#0877C9]"
           />
         </div>
 
