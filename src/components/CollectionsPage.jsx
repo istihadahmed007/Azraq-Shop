@@ -1,11 +1,14 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { Search, LayoutGrid, List, ArrowRight, Sparkles, ArrowUpDown, ChevronRight } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
+import ProductImage from './common/ProductImage';
 
 /**
  * AZRAQ Shop — Full Collections Browser Page
  */
 export default function CollectionsPage() {
+  const navigate = useNavigate();
   const { collections, navigateTo, t } = useShop();
 
   const [viewMode, setViewMode] = useState('grid');
@@ -39,9 +42,9 @@ export default function CollectionsPage() {
       
       {/* Breadcrumb Header */}
       <div className="flex items-center gap-2 text-xs font-semibold text-[#6B7D93] mb-4">
-        <button onClick={() => navigateTo('home')} className="hover:text-[#0877C9] transition-colors">
+        <Link to="/" className="hover:text-[#0877C9] transition-colors">
           {t("Home", "হোম")}
-        </button>
+        </Link>
         <ChevronRight className="w-3.5 h-3.5" />
         <span className="text-[#293B52] font-bold">{t("All Collections", "সকল কালেকশন")}</span>
       </div>
@@ -136,7 +139,7 @@ export default function CollectionsPage() {
             return (
               <div
                 key={col.id}
-                onClick={() => navigateTo('collection-detail', col.slug)}
+                onClick={() => navigate(`/collection/${col.slug}`)}
                 className="group cursor-pointer rounded-[20px] bg-[#F7FAFD] p-5 transition-all duration-300 flex flex-col justify-between relative overflow-hidden border border-[#D5E2EE]/90 shadow-[0_10px_30px_rgba(50,75,100,0.06)] hover:shadow-[0_14px_35px_rgba(50,75,100,0.12)] hover:-translate-y-1"
               >
                 <div className="flex items-center justify-between z-10 mb-3.5">
@@ -192,7 +195,7 @@ export default function CollectionsPage() {
           {filteredCollections.map(col => (
             <div
               key={col.id}
-              onClick={() => navigateTo('collection-detail', col.slug)}
+              onClick={() => navigate(`/collection/${col.slug}`)}
               className="rounded-[20px] bg-[#F7FAFD] p-4 flex items-center justify-between gap-4 cursor-pointer border border-[#D5E2EE]/90 shadow-[0_10px_30px_rgba(50,75,100,0.06)] hover:shadow-md hover:border-[#0877C9]/40 transition-all"
             >
               <div className="flex items-center gap-4 min-w-0">

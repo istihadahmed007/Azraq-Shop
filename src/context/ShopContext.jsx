@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import initialCollectionsData from '../data/collections.json';
 import initialProductsData from '../data/initial_catalog.json';
 import initialReconciliationReport from '../data/reconciliation_report.json';
@@ -9,10 +10,18 @@ import {
   validateFavoritesList, 
   validateOrdersList 
 } from '../utils/storage.js';
+import { generateProductSlug } from '../utils/productUtils.js';
 
 const ShopContext = createContext();
 
 export function ShopProvider({ children }) {
+  // Navigation hook (wrapped in try/catch to maintain test runner safety)
+  let navigate = null;
+  try {
+    navigate = useNavigate();
+  } catch (e) {
+    // Non-router execution environment fallback
+  }
   // Collections state (18 EasyDrop categories)
   const [collections, setCollections] = useState(() => {
     return getStoredItem('collections', initialCollectionsData.collections);
@@ -127,13 +136,40 @@ export function ShopProvider({ children }) {
     }, 3500);
   };
 
-  // Navigation router helper
+  // Navigation router helper (bridges legacy view states with URL routing)
   const navigateTo = (view, slug = null) => {
     setCurrentView(view);
     if (slug) {
       setActiveCollectionSlug(slug);
     }
+    if (navigate) {
+      if (view === 'home') navigate('/');
+      else if (view === 'collections') navigate('/collections');
+      else if (view === 'collection-detail' && slug) navigate(`/collection/${slug}`);
+      else if (view === 'product' && slug) navigate(`/product/${slug}`);
+    } else if (typeof window !== 'undefined') {
+      let targetPath = '/';
+      if (view === 'collections') targetPath = '/collections';
+      else if (view === 'collection-detail' && slug) targetPath = `/collection/${slug}`;
+      else if (view === 'product' && slug) targetPath = `/product/${slug}`;
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState({}, '', targetPath);
+      }
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Product selection handler: seamlessly routes to dedicated product page /product/:slug
+  const handleSelectProduct = (product) => {
+    setSelectedProduct(product);
+    if (product) {
+      const slug = generateProductSlug(product);
+      if (navigate) {
+        navigate(`/product/${slug}`);
+      } else if (typeof window !== 'undefined') {
+        window.location.href = `/product/${slug}`;
+      }
+    }
   };
 
   // Cart operations
@@ -352,7 +388,7 @@ export function ShopProvider({ children }) {
         isCartOpen,
         setIsCartOpen,
         selectedProduct,
-        setSelectedProduct,
+        setSelectedProduct: handleSelectProduct,
         isCheckoutOpen,
         setIsCheckoutOpen,
         isTrackingOpen,

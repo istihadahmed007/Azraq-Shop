@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
-import { Heart, ShoppingBag, Eye, Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Heart, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useShop } from '../../context/ShopContext';
+import ProductImage from './ProductImage';
+import { generateProductSlug } from '../../utils/productUtils';
 
 /**
  * AZRAQ Shop — Premium Soft-Neumorphic Product Card
  * 
  * 1. Large 100% full-width 1:1 square image container (edge-to-edge photography).
- * 2. High-priority product photography filling the container without awkward whitespace.
+ * 2. High-priority product photography filling the container with proper aspect ratio.
  * 3. Soft-neumorphic card surface (#F7FAFD, 20px radius, soft shadow).
  * 4. Minimal circular wishlist floating button at top-left.
  * 5. Authentic discount ribbon at top-right (only when authentic compare price > selling price).
  * 6. Clean 2-line clamped title in readable navy slate (#293B52).
  * 7. Prominent BDT price (৳) with strikethrough compare price.
  * 8. Authentic stock indicator & circular quick-add button.
+ * 9. Navigates directly to dedicated /product/:slug page on click (no modal).
  */
 export default function ProductCard({
   product,
@@ -25,13 +29,12 @@ export default function ProductCard({
   className = ''
 }) {
   const { t } = useShop();
-  const [imageError, setImageError] = useState(false);
+  const navigate = useNavigate();
 
   if (!product) return null;
 
-  const fallbackImage = 'https://easydrop.asia/products/image-1794224164356-135288231.jpeg';
-  const displayImage = imageError || !product.main_image ? fallbackImage : product.main_image;
   const isAvailable = product.in_stock !== false;
+  const productSlug = generateProductSlug(product);
 
   // Real original price & discount calculation (only when authentic compare price > selling price)
   const originalPrice = product.compare_price ||
@@ -43,10 +46,12 @@ export default function ProductCard({
   const shortName = product.name?.split('—')?.[1]?.trim() || product.name?.split('(')?.[0]?.trim() || product.name || '';
   const categoryLabel = product.category || product.primary_collection_name || '';
 
-  const handleSelect = (e) => {
+  const handleNavigateToProduct = (e) => {
     e?.stopPropagation?.();
     if (onSelectProduct) {
       onSelectProduct(product);
+    } else {
+      navigate(`/product/${productSlug}`);
     }
   };
 
@@ -66,7 +71,7 @@ export default function ProductCard({
 
   return (
     <div
-      onClick={handleSelect}
+      onClick={handleNavigateToProduct}
       className={`group relative flex flex-col justify-between h-full rounded-[20px] bg-[#F7FAFD] border border-[#D5E2EE]/85 shadow-[0_8px_24px_rgba(50,75,100,0.07)] hover:shadow-[0_16px_36px_rgba(50,75,100,0.13)] hover:-translate-y-1 transition-all duration-200 select-none cursor-pointer overflow-hidden ${className}`}
     >
       {/* 1. TOP IMAGE WELL: 1:1 Square Container, Full Available Width, Edge-to-Edge */}
@@ -74,7 +79,7 @@ export default function ProductCard({
 
         {/* Authentic Discount Ribbon at Upper-Right Corner */}
         {discountPercent && discountPercent > 0 ? (
-          <div className="absolute top-2 right-2 z-10 pointer-events-none">
+          <div className="absolute top-2.5 right-2.5 z-10 pointer-events-none">
             <span className="px-2 py-0.5 rounded-full bg-[#EE8056] text-white text-[10px] sm:text-[11px] font-bold tracking-tight shadow-sm">
               -{discountPercent}%
             </span>
@@ -94,19 +99,20 @@ export default function ProductCard({
           <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-[#EE8056] stroke-[#EE8056]' : ''}`} />
         </button>
 
-        {/* Product Photograph: Edge-to-Edge Cover Presentation, Preserving Full Visual Impact */}
-        <img
-          src={displayImage}
+        {/* Product Photograph: Handled by ProductImage component without generic fallbacks */}
+        <ProductImage
+          src={product.main_image}
           alt={product.name || 'Product'}
-          onError={() => setImageError(true)}
-          className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-104"
-          loading="lazy"
+          fit="cover"
+          aspectRatio="square"
+          className="transition-transform duration-300 group-hover:scale-104"
+          zoomOnHover={true}
         />
 
-        {/* Quick View Button on Hover */}
-        <div className="absolute inset-x-0 bottom-0 py-1.5 bg-[#293B52]/50 text-white text-center text-[11px] font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex items-center justify-center gap-1 backdrop-blur-xs">
-          <Eye className="w-3.5 h-3.5" />
-          <span>{t("Quick View", "বিস্তারিত")}</span>
+        {/* View Details hover banner */}
+        <div className="absolute inset-x-0 bottom-0 py-1.5 bg-[#293B52]/60 text-white text-center text-[11px] font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex items-center justify-center gap-1 backdrop-blur-xs">
+          <span>{t("View Details", "বিস্তারিত দেখুন")}</span>
+          <ArrowRight className="w-3 h-3" />
         </div>
       </div>
 

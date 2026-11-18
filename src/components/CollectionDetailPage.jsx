@@ -1,20 +1,27 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
   ChevronRight, 
   Search, 
   ArrowUpDown, 
-  Sparkles
+  Sparkles,
+  ArrowRight
 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import ProductCard from './common/ProductCard';
+import ProductImage from './common/ProductImage';
 
 /**
  * AZRAQ Shop — Collection Detail Page
  */
 export default function CollectionDetailPage() {
+  const { slug } = useParams();
+  const navigate = useNavigate();
   const { 
-    activeCollection, 
-    activeCollectionProducts, 
+    collections,
+    products,
+    activeCollection: contextActiveCollection, 
+    activeCollectionProducts: contextCollectionProducts, 
     navigateTo, 
     setSelectedProduct, 
     addToCart, 
@@ -27,18 +34,47 @@ export default function CollectionDetailPage() {
   const [priceFilter, setPriceFilter] = useState('all');
   const [inStockOnly, setInStockOnly] = useState(false);
   const [sortBy, setSortBy] = useState('featured');
-  const [visibleCount, setVisibleCount] = useState(24);
+  const [visibleCount, setVisibleCount] = useState(25);
+
+  // Resolve collection either from URL parameter or fallback to context activeCollection
+  const activeCollection = useMemo(() => {
+    if (slug) {
+      return collections.find(c => c.slug === slug) || null;
+    }
+    return contextActiveCollection || collections[0];
+  }, [slug, collections, contextActiveCollection]);
+
+  // Resolve products belonging to this collection
+  const collectionProducts = useMemo(() => {
+    if (!activeCollection) return [];
+    return products.filter(p => 
+      (p.collection_ids && p.collection_ids.includes(activeCollection.id)) ||
+      p.category === activeCollection.name ||
+      p.primary_collection_name === activeCollection.name
+    );
+  }, [activeCollection, products]);
+
+  // Dynamic SEO Page Title
+  useEffect(() => {
+    if (activeCollection) {
+      document.title = `${activeCollection.name} — AZRAQ Collections`;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [activeCollection]);
 
   // Safe fallback if collection is undefined
   if (!activeCollection) {
     return (
       <div className="w-full py-16 text-center select-none">
-        <h2 className="text-2xl font-bold text-[#101C35] mb-4">
+        <h2 className="text-2xl font-bold text-[#293B52] mb-3">
           {t("Collection Not Found", "কালেকশনটি পাওয়া যায়নি")}
         </h2>
+        <p className="text-xs text-[#6B7D93] mb-6">
+          {t("The category you requested does not exist or has been relocated.", "আপনার অনুরোধকৃত কালেকশনটি পাওয়া যায়নি।")}
+        </p>
         <button
-          onClick={() => navigateTo('collections')}
-          className="px-6 py-2.5 rounded-full glass-button-primary text-xs font-bold"
+          onClick={() => navigate('/collections')}
+          className="px-6 py-2.5 rounded-full bg-[#0877C9] text-white text-xs font-bold shadow-sm hover:bg-[#0665AC] transition-all"
         >
           {t("Browse All Collections", "সকল কালেকশন দেখুন")}
         </button>
@@ -48,7 +84,7 @@ export default function CollectionDetailPage() {
 
   // Filter and sort products belonging to this collection
   const filteredProducts = useMemo(() => {
-    let result = [...(activeCollectionProducts || [])];
+    let result = [...(collectionProducts || [])];
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -91,13 +127,13 @@ export default function CollectionDetailPage() {
       
       {/* Breadcrumb Navigation */}
       <div className="flex items-center gap-2 text-xs font-semibold text-[#6B7D93] mb-4">
-        <button onClick={() => navigateTo('home')} className="hover:text-[#0877C9] transition-colors">
+        <Link to="/" className="hover:text-[#0877C9] transition-colors">
           {t("Home", "হোম")}
-        </button>
+        </Link>
         <ChevronRight className="w-3.5 h-3.5" />
-        <button onClick={() => navigateTo('collections')} className="hover:text-[#0877C9] transition-colors">
+        <Link to="/collections" className="hover:text-[#0877C9] transition-colors">
           {t("Collections", "কালেকশনসমূহ")}
-        </button>
+        </Link>
         <ChevronRight className="w-3.5 h-3.5" />
         <span className="text-[#293B52] font-bold">{activeCollection.name}</span>
       </div>

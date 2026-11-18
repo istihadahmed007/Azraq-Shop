@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { X, Star, ShieldCheck, Truck, ShoppingBag, ArrowRight, Heart, Check, RefreshCw } from 'lucide-react';
+import { X, Star, ShieldCheck, Truck, ShoppingBag, ArrowRight, Heart, Check, RefreshCw, ExternalLink } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
+import ProductImage from './common/ProductImage';
+import { generateProductSlug } from '../utils/productUtils';
 
 /**
- * AZRAQ Shop — Premium Transparent Glassmorphism Product Detail Modal
+ * AZRAQ Shop — Legacy Product Detail Modal (Deprecated in favor of dedicated /product/:slug pages)
  */
 export default function ProductDetailModal() {
   const { 
@@ -33,38 +35,39 @@ export default function ProductDetailModal() {
     setIsCheckoutOpen(true);
   };
 
+  const handleOpenDedicatedPage = () => {
+    setSelectedProduct(null);
+    window.location.href = `/product/${generateProductSlug(selectedProduct)}`;
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-[#101C35]/50 backdrop-blur-md animate-in fade-in duration-200 select-none">
       
       {/* Modal Dialog Container */}
       <div 
-        className="relative w-full max-w-4xl glass-modal rounded-[8px] overflow-hidden my-6 max-h-[90vh] flex flex-col md:flex-row shadow-2xl border border-white/95"
+        className="relative w-full max-w-4xl glass-modal rounded-[26px] bg-[#F7FAFD] overflow-hidden my-6 max-h-[90vh] flex flex-col md:flex-row shadow-2xl border border-[#D5E2EE]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={() => setSelectedProduct(null)}
-          className="absolute top-4 right-4 z-20 w-8 h-8 rounded-[6px] glass-button flex items-center justify-center text-[#101C35] hover:text-[#0877C9] transition-all"
+          className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-[#EDF4F9] border border-[#D5E2EE] flex items-center justify-center text-[#293B52] hover:text-[#0877C9] transition-all"
         >
           <X className="w-4 h-4" />
         </button>
 
         {/* Left Column: Image Gallery with Thumbnails */}
-        <div className="w-full md:w-1/2 p-5 sm:p-6 bg-[#F8FBFF] flex flex-col justify-between border-b md:border-b-0 md:border-r border-white/90">
+        <div className="w-full md:w-1/2 p-5 sm:p-6 bg-[#EDF4F9] flex flex-col justify-between border-b md:border-b-0 md:border-r border-[#D5E2EE]">
           
-          {/* Main Selected Image */}
-          <div className="relative w-full aspect-square flex items-center justify-center rounded-[6px] bg-white p-3 border border-white shadow-2xs overflow-hidden">
-            <img
+          {/* Main Selected Image: Protected from flex distortion by ProductImage */}
+          <div className="relative w-full aspect-square flex items-center justify-center rounded-[18px] bg-white p-3 border border-[#D5E2EE] shadow-inner overflow-hidden">
+            <ProductImage
               src={images[activeImageIndex] || selectedProduct.main_image}
               alt={selectedProduct.name}
-              loading="eager"
-              decoding="async"
-              onError={(e) => {
-                if (e.target.src !== selectedProduct.main_image) {
-                  e.target.src = selectedProduct.main_image;
-                }
-              }}
-              className="w-full h-full object-contain filter drop-shadow-xs transition-all duration-300"
+              fit="contain"
+              aspectRatio="square"
+              priority={true}
+              className="p-2"
             />
             
             {/* Top Badges */}

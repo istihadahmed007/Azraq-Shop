@@ -1,6 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Truck, ShieldCheck, CreditCard, RotateCcw, Heart, ShoppingBag, Sparkles } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
+import ProductImage from './common/ProductImage';
+import { generateProductSlug } from '../utils/productUtils';
 
 /**
  * AZRAQ Shop — Editorial Asymmetric Bento Hero Showcase
@@ -12,6 +15,7 @@ import { useShop } from '../context/ShopContext';
  *   clean square product cards, consistent dimensions, and instant add-to-cart interactions.
  */
 export default function HeroSection() {
+  const navigate = useNavigate();
   const {
     products,
     favorites,
@@ -27,6 +31,11 @@ export default function HeroSection() {
   const bentoProducts = products.slice(1, 5);
 
   const isHeroFav = featuredProduct ? favorites.includes(featuredProduct.id) : false;
+
+  const handleOpenProduct = (p) => {
+    if (!p) return;
+    navigate(`/product/${generateProductSlug(p)}`);
+  };
 
   return (
     <section className="w-full select-none flex flex-col gap-6">
@@ -64,13 +73,15 @@ export default function HeroSection() {
 
           {/* Large Square Product Photograph: Edge-to-Edge Container */}
           <div 
-            onClick={() => featuredProduct && setSelectedProduct(featuredProduct)}
+            onClick={() => handleOpenProduct(featuredProduct)}
             className="w-full aspect-square rounded-[22px] overflow-hidden bg-white border border-[#E1EDF7] shadow-inner p-2 my-5 flex items-center justify-center cursor-pointer relative"
           >
-            <img
-              src={featuredProduct?.main_image || "https://easydrop.asia/products/image-1794224164356-135288231.jpeg"}
+            <ProductImage
+              src={featuredProduct?.main_image}
               alt={featuredProduct?.name || "Featured Product"}
-              className="w-full h-full object-cover rounded-[16px] group-hover:scale-104 transition-transform duration-300"
+              fit="contain"
+              aspectRatio="square"
+              className="p-3 group-hover:scale-104 transition-transform duration-300"
             />
           </div>
 
@@ -81,7 +92,7 @@ export default function HeroSection() {
                 {featuredProduct?.category || t('Flagship Technology', 'ফ্ল্যাগশিপ প্রযুক্তি')}
               </span>
               <h1 
-                onClick={() => featuredProduct && setSelectedProduct(featuredProduct)}
+                onClick={() => handleOpenProduct(featuredProduct)}
                 className="text-xl sm:text-2xl font-bold text-[#293B52] tracking-tight leading-snug hover:text-[#0877C9] cursor-pointer transition-colors"
               >
                 {featuredProduct?.name || t('Premium Smart Device', 'প্রিমিয়াম স্মার্ট ডিভাইস')}
@@ -104,11 +115,7 @@ export default function HeroSection() {
 
               <button
                 type="button"
-                onClick={() => {
-                  if (featuredProduct) {
-                    addToCart(featuredProduct, featuredProduct.variants?.[0] || 'Standard', 1);
-                  }
-                }}
+                onClick={() => handleOpenProduct(featuredProduct)}
                 className="px-6 py-3 rounded-full bg-[#0877C9] hover:bg-[#0665AC] text-white text-xs sm:text-sm font-bold flex items-center gap-2 shadow-md hover:shadow-lg transition-all active:scale-95"
               >
                 <span>{t('Shop Now', 'এখনই অর্ডার করুন')}</span>
@@ -152,15 +159,17 @@ export default function HeroSection() {
               return (
                 <div
                   key={p.id}
-                  onClick={() => setSelectedProduct(p)}
+                  onClick={() => handleOpenProduct(p)}
                   className="rounded-[22px] bg-[#F7FAFD] border border-[#D5E2EE]/90 p-3.5 sm:p-4 shadow-[0_6px_20px_rgba(50,75,100,0.06)] hover:shadow-[0_12px_28px_rgba(50,75,100,0.11)] hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between group"
                 >
                   {/* Top Square Image Well */}
                   <div className="w-full aspect-square rounded-[18px] bg-white border border-[#E1EDF7] overflow-hidden relative flex items-center justify-center p-2 mb-3">
-                    <img
+                    <ProductImage
                       src={p.main_image}
                       alt={p.name}
-                      className="w-full h-full object-cover rounded-[14px] group-hover:scale-104 transition-transform duration-300"
+                      fit="cover"
+                      aspectRatio="square"
+                      className="rounded-[14px] group-hover:scale-104 transition-transform duration-300"
                     />
 
                     {/* Wishlist Button */}

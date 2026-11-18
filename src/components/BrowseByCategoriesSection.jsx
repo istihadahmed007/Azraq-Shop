@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight, ChevronRight, Grid } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
+import ProductImage from './common/ProductImage';
 
 /**
  * AZRAQ Shop — Shop by Category Section
@@ -55,7 +56,7 @@ export default function BrowseByCategoriesSection() {
         {/* Clean Neumorphic Category Grid: 8 columns on desktop, 4 on tablet, 2 on mobile */}
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-3.5">
           {displayCategories.slice(0, 8).map((col) => {
-            const displayImage = col.cover_image || col.image_url || col.fallback_image || 'https://easydrop.asia/products/image-1794224164356-135288231.jpeg';
+            const displayImage = col.cover_image || col.image_url;
             const shortTitle = col.name
               .replace(' & IT Accessories', '')
               .replace(' Collection', '')
@@ -72,16 +73,12 @@ export default function BrowseByCategoriesSection() {
               >
                 {/* Image Well */}
                 <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-[16px] bg-white border border-[#E1EDF7] shadow-inner p-1.5 flex items-center justify-center overflow-hidden mb-2 group-hover:scale-106 transition-transform duration-200">
-                  <img
+                  <ProductImage
                     src={displayImage}
                     alt={col.name}
-                    onError={(e) => {
-                      const fallback = col.fallback_image || 'https://easydrop.asia/products/image-1794224164356-135288231.jpeg';
-                      if (e.target.src !== fallback) {
-                        e.target.src = fallback;
-                      }
-                    }}
-                    className="w-full h-full object-cover rounded-[12px]"
+                    fit="contain"
+                    aspectRatio="square"
+                    className="rounded-[12px]"
                   />
                 </div>
 

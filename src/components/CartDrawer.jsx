@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { X, Trash2, ArrowRight, ShoppingBag, Tag, CheckCircle2 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
+import ProductImage from './common/ProductImage';
+import { generateProductSlug } from '../utils/productUtils';
 
 /**
  * AZRAQ Shop — Transparent Glassmorphism Cart Drawer
@@ -131,14 +133,23 @@ export default function CartDrawer() {
               cart.map((item, idx) => (
                 <div
                   key={`${item.product.id}-${item.variant}-${idx}`}
-                  className="flex gap-3 p-2.5 rounded-[6px] glass-card border border-white/95 bg-white/90"
+                  className="flex gap-3 p-3 rounded-[16px] bg-[#EDF4F9] border border-[#D5E2EE]/90 shadow-2xs"
                 >
                   {/* Thumbnail: Crisp & large */}
-                  <div className="w-16 h-16 rounded-[4px] bg-[#F8FBFF] border border-white/90 flex-shrink-0 flex items-center justify-center p-1 overflow-hidden">
-                    <img
+                  <div
+                    onClick={() => {
+                      setIsCartOpen(false);
+                      if (item.product) {
+                        window.location.href = `/product/${generateProductSlug(item.product)}`;
+                      }
+                    }}
+                    className="w-16 h-16 rounded-[12px] bg-white border border-[#D5E2EE] flex-shrink-0 flex items-center justify-center p-1 overflow-hidden cursor-pointer shadow-inner"
+                  >
+                    <ProductImage
                       src={item.product.main_image}
                       alt={item.product.name}
-                      className="w-full h-full object-contain"
+                      fit="contain"
+                      aspectRatio="square"
                     />
                   </div>
 
@@ -146,12 +157,20 @@ export default function CartDrawer() {
                   <div className="flex-1 flex flex-col justify-between min-w-0">
                     <div>
                       <div className="flex items-start justify-between gap-1.5">
-                        <h4 className="text-xs font-bold text-[#101C35] line-clamp-1">
+                        <h4
+                          onClick={() => {
+                            setIsCartOpen(false);
+                            if (item.product) {
+                              window.location.href = `/product/${generateProductSlug(item.product)}`;
+                            }
+                          }}
+                          className="text-xs font-bold text-[#293B52] line-clamp-1 hover:text-[#0877C9] cursor-pointer transition-colors"
+                        >
                           {item.product.name.split('—')[1] || item.product.name}
                         </h4>
                         <button
                           onClick={() => removeFromCart(item.product.id, item.variant)}
-                          className="text-[#71849B] hover:text-rose-500 transition-colors p-0.5"
+                          className="text-[#8CA0B6] hover:text-[#EE8056] transition-colors p-1"
                           title="Remove item"
                           aria-label="Remove item"
                         >

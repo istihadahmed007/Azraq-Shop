@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node tests/paymently_audit_tests.mjs && node tests/storefront_audit_tests.mjs && node tests/order_tracking_audit_tests.mjs && node tests/localization_and_currency_tests.mjs && node tests/security_and_durability_tests.mjs && node tests/visual_search_accuracy.test.mjs",
+    "test": "node tests/paymently_audit_tests.mjs && node tests/storefront_audit_tests.mjs && node tests/order_tracking_audit_tests.mjs && node tests/localization_and_currency_tests.mjs && node tests/security_and_durability_tests.mjs && node tests/visual_search_accuracy.test.mjs && node tests/product_page_and_routing_tests.mjs",
     "test:visual": "node tests/visual_search_accuracy.test.mjs",
     "test:payment": "node tests/paymently_audit_tests.mjs",
     "test:storefront": "node tests/storefront_audit_tests.mjs",
@@ -27,6 +27,7 @@
     "pngjs": "^7.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^7.18.5",
     "sharp": "^0.35.5",
     "tailwind-merge": "^2.2.1"
   },

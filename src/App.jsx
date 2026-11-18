@@ -1,4 +1,5 @@
-import React, { useState, Suspense, lazy } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
+import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { ShopProvider, useShop } from './context/ShopContext';
 import {
   Header,
@@ -13,94 +14,188 @@ import {
   Toast
 } from './components';
 import Sidebar from './components/Sidebar';
+import { Package, ArrowRight } from 'lucide-react';
 
 // Lazy-loaded routes & secondary overlays to optimize initial bundle size & TTI
 const CollectionsPage = lazy(() => import('./components/CollectionsPage'));
 const CollectionDetailPage = lazy(() => import('./components/CollectionDetailPage'));
-const ProductDetailModal = lazy(() => import('./components/ProductDetailModal'));
+const ProductDetailPage = lazy(() => import('./components/ProductDetailPage'));
 const CheckoutModal = lazy(() => import('./components/CheckoutModal'));
 const OrderTrackingModal = lazy(() => import('./components/OrderTrackingModal'));
 const AdminPanel = lazy(() => import('./components/AdminPanel'));
 const BrandAssetsModal = lazy(() => import('./components/BrandAssetsModal'));
 const VisualSearchModal = lazy(() => import('./components/VisualSearchModal'));
 
+function LoadingFallback() {
+  return (
+    <div className="w-full min-h-[40vh] flex items-center justify-center">
+      <div className="w-10 h-10 rounded-full border-3 border-[#0877C9]/30 border-t-[#0877C9] animate-spin" />
+    </div>
+  );
+}
+
+function NotFoundPage() {
+  const { t } = useShop();
+  return (
+    <div className="py-20 text-center select-none flex flex-col items-center justify-center">
+      <div className="w-16 h-16 rounded-full bg-[#EDF4F9] border border-[#D5E2EE] flex items-center justify-center mb-4 text-[#0877C9]">
+        <Package className="w-8 h-8 opacity-70" />
+      </div>
+      <h2 className="text-2xl font-bold text-[#293B52] mb-2">
+        {t("Page Not Found (404)", "পৃষ্ঠাটি পাওয়া যায়নি (৪০৪)")}
+      </h2>
+      <p className="text-xs text-[#6B7D93] max-w-sm mb-6">
+        {t("The page or product you requested could not be found or has been relocated.", "আপনার অনুরোধকৃত পেজটি পাওয়া যায়নি।")}
+      </p>
+      <Link
+        to="/"
+        className="px-6 py-2.5 rounded-full bg-[#0877C9] text-white text-xs font-bold shadow-md hover:bg-[#0665AC] transition-all flex items-center gap-2"
+      >
+        <span>{t("Back to Home", "হোমপেজে ফিরে যান")}</span>
+        <ArrowRight className="w-4 h-4" />
+      </Link>
+    </div>
+  );
+}
+
+// Synchronizes React Router URL changes with context state for active tab highlights
+function RouteSynchronizer() {
+  const location = useLocation();
+  const { setCurrentView, setActiveCollectionSlug } = useShop();
+
+  useEffect(() => {
+    const path = location.pathname;
+    if (path === '/' || path === '') {
+      setCurrentView('home');
+    } else if (path === '/collections') {
+      setCurrentView('collections');
+    } else if (path.startsWith('/collection/')) {
+      setCurrentView('collection-detail');
+      const slug = path.replace('/collection/', '').split('/')[0];
+      if (slug) setActiveCollectionSlug(slug);
+    } else if (path.startsWith('/product/')) {
+      setCurrentView('product');
+    }
+  }, [location, setCurrentView, setActiveCollectionSlug]);
+
+  return null;
+}
+
 function StorefrontContent() {
-  const { currentView } = useShop();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-      <div className="min-h-screen bg-[#E4EEF5] text-[#293B52] selection:bg-[#0877C9]/20 selection:text-[#0877C9] font-sans relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#E4EEF5] text-[#293B52] selection:bg-[#0877C9]/20 selection:text-[#0877C9] font-sans relative overflow-x-hidden">
+      <RouteSynchronizer />
 
-          {/* Main Desktop Container (Maximum content width ~1360px with generous spacing) */}
-          <div className="max-w-[1360px] w-full mx-auto px-3 sm:px-5 lg:px-6 py-3 sm:py-5 flex flex-col gap-7 sm:gap-8 relative">
+      {/* Main Desktop Container (Maximum content width ~1360px with generous spacing) */}
+      <div className="max-w-[1360px] w-full mx-auto px-3 sm:px-5 lg:px-6 py-3 sm:py-5 flex flex-col gap-7 sm:gap-8 relative">
 
-            {/* Top Header (Minimal Premium Soft Neumorphic Header) */}
-            <Header
-              onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
+        {/* Top Header (Minimal Premium Soft Neumorphic Header) */}
+        <Header
+          onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
+        />
+
+        {/* Primary Route-Based View Container */}
+        <main className="transition-all duration-200 flex flex-col gap-7 sm:gap-8 w-full min-w-0 max-w-full">
+          <Routes>
+            {/* 1. Home Page Route */}
+            <Route
+              path="/"
+              element={
+                <>
+                  {/* 1. Asymmetric Bento Hero Product Showcase */}
+                  <HeroSection />
+
+                  {/* 2. Shop by Category (Neumorphic Category Grid with authentic photos) */}
+                  <BrowseByCategoriesSection />
+
+                  {/* 3. Featured Products / Best Sellers (Strictly 5 product cards per row) */}
+                  <TrendingRightNowSection />
+
+                  {/* 4. Complete EasyDrop Collections Explorer */}
+                  <ShopByCollectionSection />
+
+                  {/* 5. Daily Discover Product Catalog Grid (Strictly 5 product cards per row) */}
+                  <ProductGrid />
+
+                  {/* 6. Customer Assurance & Retail Guarantees */}
+                  <BrandValuePanel />
+                </>
+              }
             />
 
-              {/* Primary View Container */}
-              <main className="transition-all duration-200 flex flex-col gap-7 sm:gap-8 w-full min-w-0 max-w-full">
-                {currentView === 'home' && (
-                  <>
-                    {/* 1. Asymmetric Bento Hero Product Showcase */}
-                    <HeroSection />
-
-                    {/* 2. Shop by Category (Neumorphic Category Grid with authentic photos) */}
-                    <BrowseByCategoriesSection />
-
-                    {/* 3. Featured Products / Best Sellers (Strictly 5 product cards per row) */}
-                    <TrendingRightNowSection />
-
-                    {/* 4. Complete EasyDrop Collections Explorer */}
-                    <ShopByCollectionSection />
-
-                    {/* 5. Daily Discover Product Catalog Grid (Strictly 5 product cards per row) */}
-                    <ProductGrid />
-
-                    {/* 6. Customer Assurance & Retail Guarantees */}
-                    <BrandValuePanel />
-                  </>
-                )}
-
-                <Suspense fallback={null}>
-                  {currentView === 'collections' && <CollectionsPage />}
-                  {currentView === 'collection-detail' && <CollectionDetailPage />}
+            {/* 2. All Collections Browser Route */}
+            <Route
+              path="/collections"
+              element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <CollectionsPage />
                 </Suspense>
-              </main>
+              }
+            />
 
-              {/* Professional E-Commerce Footer */}
-              <Footer />
+            {/* 3. Individual Collection Detail Route */}
+            <Route
+              path="/collection/:slug"
+              element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <CollectionDetailPage />
+                </Suspense>
+              }
+            />
 
-          </div>
+            {/* 4. Dedicated Individual Product Page Route */}
+            <Route
+              path="/product/:slug"
+              element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <ProductDetailPage />
+                </Suspense>
+              }
+            />
 
-          {/* Navigation Sidebar Drawer */}
-          <Sidebar
-            isOpen={isSidebarOpen}
-            onClose={() => setIsSidebarOpen(false)}
-          />
+            {/* 5. 404 Catch-All Route */}
+            <Route
+              path="*"
+              element={<NotFoundPage />}
+            />
+          </Routes>
+        </main>
 
-          {/* Interactive Modals & Overlays */}
-          <CartDrawer />
-          <Toast />
+        {/* Professional E-Commerce Footer */}
+        <Footer />
 
-          <Suspense fallback={null}>
-            <ProductDetailModal />
-            <CheckoutModal />
-            <OrderTrackingModal />
-            <AdminPanel />
-            <BrandAssetsModal />
-            <VisualSearchModal />
-          </Suspense>
+      </div>
 
-        </div>
-        );
+      {/* Navigation Sidebar Drawer */}
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
+
+      {/* Interactive Modals & Overlays */}
+      <CartDrawer />
+      <Toast />
+
+      <Suspense fallback={null}>
+        <CheckoutModal />
+        <OrderTrackingModal />
+        <AdminPanel />
+        <BrandAssetsModal />
+        <VisualSearchModal />
+      </Suspense>
+
+    </div>
+  );
 }
 
-        export default function App() {
+export default function App() {
   return (
-        <ShopProvider>
-          <StorefrontContent />
-        </ShopProvider>
-        );
+    <BrowserRouter>
+      <ShopProvider>
+        <StorefrontContent />
+      </ShopProvider>
+    </BrowserRouter>
+  );
 }

@@ -29,6 +29,8 @@ export { default as EditorialCtaSection } from './EditorialCtaSection.jsx';
 // 3. Catalog & Search
 // ==========================================
 export { default as ProductCard } from './common/ProductCard.jsx';
+export { default as ProductImage } from './common/ProductImage.jsx';
+export { default as ProductDetailPage } from './ProductDetailPage.jsx';
 export { default as ProductGrid } from './ProductGrid.jsx';
 export { default as ProductDetailModal } from './ProductDetailModal.jsx';
 export { default as CollectionsPage } from './CollectionsPage.jsx';

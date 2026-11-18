@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChevronRight, Layers } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
+import ProductImage from './common/ProductImage';
 
 /**
  * AZRAQ Shop — Shop by Collection Section
@@ -45,7 +46,7 @@ export default function ShopByCollectionSection() {
         {/* 6-Column Clean Collection Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-3.5">
           {spotlightCollections.map(col => {
-            const displayImage = col.cover_image || col.image_url || col.fallback_image;
+            const displayImage = col.cover_image || col.image_url;
             const count = col.imported_product_count ?? col.product_count ?? 0;
 
             return (
@@ -56,16 +57,12 @@ export default function ShopByCollectionSection() {
               >
                 {/* Collection Image */}
                 <div className="relative w-full aspect-square bg-white rounded-[16px] border border-[#E1EDF7] p-2 flex items-center justify-center overflow-hidden mb-2.5">
-                  <img
+                  <ProductImage
                     src={displayImage}
                     alt={col.name}
-                    onError={(e) => {
-                      const fallback = col.fallback_image || 'https://easydrop.asia/products/image-1794224164356-135288231.jpeg';
-                      if (e.target.src !== fallback) {
-                        e.target.src = fallback;
-                      }
-                    }}
-                    className="w-full h-full object-cover rounded-[12px] group-hover:scale-105 transition-transform duration-200"
+                    fit="contain"
+                    aspectRatio="square"
+                    className="rounded-[12px] group-hover:scale-105 transition-transform duration-200"
                   />
                 </div>
 
