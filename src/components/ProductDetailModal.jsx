@@ -38,22 +38,22 @@ export default function ProductDetailModal() {
       
       {/* Modal Dialog Container */}
       <div 
-        className="relative w-full max-w-4xl glass-modal rounded-[28px] overflow-hidden my-6 max-h-[90vh] flex flex-col md:flex-row shadow-2xl"
+        className="relative w-full max-w-4xl glass-modal rounded-[8px] overflow-hidden my-6 max-h-[90vh] flex flex-col md:flex-row shadow-2xl border border-white/95"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={() => setSelectedProduct(null)}
-          className="absolute top-4 right-4 z-20 w-8.5 h-8.5 rounded-full glass-button flex items-center justify-center text-[#101C35] hover:text-[#0877C9] transition-all"
+          className="absolute top-4 right-4 z-20 w-8 h-8 rounded-[6px] glass-button flex items-center justify-center text-[#101C35] hover:text-[#0877C9] transition-all"
         >
           <X className="w-4 h-4" />
         </button>
 
         {/* Left Column: Image Gallery with Thumbnails */}
-        <div className="w-full md:w-1/2 p-6 sm:p-7 bg-[#F8FBFF]/70 flex flex-col justify-between border-b md:border-b-0 md:border-r border-white/80">
+        <div className="w-full md:w-1/2 p-5 sm:p-6 bg-[#F8FBFF] flex flex-col justify-between border-b md:border-b-0 md:border-r border-white/90">
           
           {/* Main Selected Image */}
-          <div className="relative w-full aspect-square flex items-center justify-center rounded-[22px] bg-white/90 p-4 border border-white shadow-2xs overflow-hidden">
+          <div className="relative w-full aspect-square flex items-center justify-center rounded-[6px] bg-white p-3 border border-white shadow-2xs overflow-hidden">
             <img
               src={images[activeImageIndex] || selectedProduct.main_image}
               alt={selectedProduct.name}
@@ -69,10 +69,10 @@ export default function ProductDetailModal() {
             
             {/* Top Badges */}
             <div className="absolute top-3 left-3 flex flex-col gap-1 pointer-events-none">
-              <span className="px-2.5 py-1 rounded-full bg-[#101C35]/90 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider shadow-xs border border-white/20">
+              <span className="px-2.5 py-0.5 rounded-[4px] bg-[#101C35]/90 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider shadow-xs border border-white/20">
                 {selectedProduct.badge || 'Curated'}
               </span>
-              <span className="px-2 py-0.5 rounded-md bg-[#D9EDFF]/90 backdrop-blur-md text-[#0877C9] text-[9px] font-mono font-bold border border-white/50">
+              <span className="px-2 py-0.5 rounded-[4px] bg-[#D9EDFF]/90 backdrop-blur-md text-[#0877C9] text-[9px] font-mono font-bold border border-white/50">
                 #{selectedProduct.id}
               </span>
             </div>
@@ -80,17 +80,17 @@ export default function ProductDetailModal() {
             {/* Wishlist Button */}
             <button
               onClick={() => toggleFavorite(selectedProduct.id)}
-              className={`absolute top-3 right-3 w-8 h-8 rounded-full glass-button flex items-center justify-center shadow-xs transition-all ${
+              className={`absolute top-3 right-3 w-7.5 h-7.5 rounded-[4px] glass-button flex items-center justify-center shadow-xs transition-all ${
                 isFav ? 'text-[#0877C9] bg-white' : 'text-[#71849B] hover:text-[#0877C9]'
               }`}
             >
-              <Heart className={`w-4 h-4 ${isFav ? 'fill-[#0877C9] stroke-[#0877C9]' : ''}`} />
+              <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-[#0877C9] stroke-[#0877C9]' : ''}`} />
             </button>
           </div>
 
           {/* Thumbnail Carousel */}
-          <div className="mt-4">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#71849B] mb-2">
+          <div className="mt-3.5">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#71849B] mb-1.5">
               {t("AUTHENTIC PRODUCT VIEWS", "পণ্যের ছবিসমূহ")} ({images.length})
             </p>
             <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
@@ -98,10 +98,10 @@ export default function ProductDetailModal() {
                 <button
                   key={idx}
                   onClick={() => setActiveImageIndex(idx)}
-                  className={`w-14 h-14 rounded-[14px] p-1.5 bg-white/90 backdrop-blur-sm border flex-shrink-0 transition-all overflow-hidden flex items-center justify-center ${
+                  className={`w-13 h-13 rounded-[4px] p-1 bg-white border flex-shrink-0 transition-all overflow-hidden flex items-center justify-center ${
                     activeImageIndex === idx
-                      ? 'border-[#0877C9] ring-2 ring-[#0877C9]/30 shadow-xs scale-105'
-                      : 'border-white/80 opacity-70 hover:opacity-100 hover:border-[#69C5F5]'
+                      ? 'border-[#0877C9] ring-2 ring-[#0877C9]/30 shadow-xs scale-102'
+                      : 'border-white/90 opacity-70 hover:opacity-100 hover:border-[#69C5F5]'
                   }`}
                 >
                   <img
@@ -115,7 +115,7 @@ export default function ProductDetailModal() {
           </div>
 
           {/* Trust Guarantee Note */}
-          <div className="mt-4 pt-3 border-t border-white/80 flex items-center justify-between text-[11px] text-[#71849B] font-medium">
+          <div className="mt-3.5 pt-3 border-t border-white/90 flex items-center justify-between text-[11px] text-[#71849B] font-medium">
             <span className="flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5 text-[#0877C9]" />
               {t("Inspected Quality", "মান নিশ্চিত")}
@@ -129,9 +129,9 @@ export default function ProductDetailModal() {
         </div>
 
         {/* Right Column: Product Specs, Variants, Quantity, Actions */}
-        <div className="w-full md:w-1/2 p-6 sm:p-8 overflow-y-auto max-h-[85vh] flex flex-col justify-between space-y-5">
+        <div className="w-full md:w-1/2 p-6 sm:p-7 overflow-y-auto max-h-[85vh] flex flex-col justify-between space-y-4">
           
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             {/* Category & Rating */}
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-[#0877C9] tracking-wider uppercase">
@@ -150,7 +150,7 @@ export default function ProductDetailModal() {
             </h2>
 
             {/* Price Box */}
-            <div className="p-3.5 rounded-[18px] bg-gradient-to-r from-[#F0F7FF] to-[#E6F3FF] border border-white/80 flex items-baseline justify-between shadow-2xs">
+            <div className="p-3 rounded-[6px] bg-gradient-to-r from-[#F0F7FF] to-[#E6F3FF] border border-white/90 flex items-baseline justify-between shadow-2xs">
               <div>
                 <span className="text-2xl sm:text-3xl font-black text-[#101C35]">
                   ৳{selectedProduct.price.toLocaleString()}
@@ -159,7 +159,7 @@ export default function ProductDetailModal() {
                   {t("BDT Retail Price", "নির্ধারিত মূল্য")}
                 </span>
               </div>
-              <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+              <span className={`px-2 py-0.5 rounded-[4px] text-xs font-bold border ${
                 selectedProduct.in_stock !== false 
                   ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
                   : 'bg-rose-50 text-rose-700 border-rose-200'
@@ -169,17 +169,17 @@ export default function ProductDetailModal() {
             </div>
 
             {/* Product Details & Specifications */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#71849B]">
                 {t("AUTHENTIC PRODUCT DETAILS & SPECIFICATIONS", "অনুমোদিত পণ্যের বিবরণ ও স্পেসিফিকেশন")}
               </span>
-              <div className="text-xs sm:text-[13px] text-[#101C35]/85 leading-relaxed whitespace-pre-line bg-white/70 p-3.5 rounded-[16px] border border-white/80 max-h-40 overflow-y-auto">
+              <div className="text-xs sm:text-[13px] text-[#101C35]/85 leading-relaxed whitespace-pre-line bg-white/80 p-3 rounded-[6px] border border-white/90 max-h-36 overflow-y-auto">
                 {selectedProduct.description || selectedProduct.description_en || t("Description details available upon request.", "বিস্তারিত বিবরণ শীঘ্রই যুক্ত হচ্ছে।")}
               </div>
             </div>
 
             {/* Delivery & Return Policies Box */}
-            <div className="p-3.5 rounded-[16px] bg-[#F8FBFF]/90 border border-white/80 space-y-2 text-xs">
+            <div className="p-3 rounded-[6px] bg-[#F8FBFF] border border-white/90 space-y-1.5 text-xs">
               <div className="flex items-start gap-2">
                 <Truck className="w-4 h-4 text-[#0877C9] mt-0.5 flex-shrink-0" />
                 <div>
@@ -197,20 +197,20 @@ export default function ProductDetailModal() {
 
             {/* Variant / Color Selector */}
             {selectedProduct.variants && selectedProduct.variants.length > 0 && (
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs font-bold text-[#101C35]">
                   <span>{t("Select Edition / Color", "রং বা এডিশন নির্বাচন করুন")}:</span>
                   <span className="text-[#0877C9] font-semibold">{selectedVariant}</span>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {selectedProduct.variants.map((v, i) => (
                     <button
                       key={i}
                       onClick={() => setSelectedVariant(v)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                      className={`px-3 py-1 rounded-[4px] text-xs font-semibold transition-all border ${
                         selectedVariant === v
-                          ? 'bg-[#0877C9] text-white shadow-2xs'
-                          : 'glass-button text-[#71849B]'
+                          ? 'bg-[#0877C9] text-white border-[#0877C9] shadow-2xs'
+                          : 'glass-button text-[#71849B] border-white/90'
                       }`}
                     >
                       {v}
@@ -225,10 +225,10 @@ export default function ProductDetailModal() {
               <span className="text-xs font-bold text-[#101C35]">
                 {t("Quantity", "পরিমাণ")}:
               </span>
-              <div className="flex items-center glass-panel rounded-full overflow-hidden">
+              <div className="flex items-center glass-panel rounded-[4px] overflow-hidden border border-white/90">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-3 py-1 text-sm font-bold text-[#101C35] hover:bg-white/80"
+                  className="px-2.5 py-1 text-sm font-bold text-[#101C35] hover:bg-white/80"
                 >
                   -
                 </button>
@@ -237,7 +237,7 @@ export default function ProductDetailModal() {
                 </span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
-                  className="px-3 py-1 text-sm font-bold text-[#101C35] hover:bg-white/80"
+                  className="px-2.5 py-1 text-sm font-bold text-[#101C35] hover:bg-white/80"
                 >
                   +
                 </button>
@@ -247,7 +247,7 @@ export default function ProductDetailModal() {
           </div>
 
           {/* Action Buttons */}
-          <div className="pt-4 border-t border-white/80 flex flex-col sm:flex-row gap-3">
+          <div className="pt-3 border-t border-white/80 flex flex-col sm:flex-row gap-2.5">
             <button
               onClick={() => {
                 if (selectedProduct.in_stock !== false) {
@@ -256,9 +256,9 @@ export default function ProductDetailModal() {
                 }
               }}
               disabled={selectedProduct.in_stock === false}
-              className={`flex-1 py-3 px-4 rounded-full font-bold text-xs sm:text-sm transition-all text-center flex items-center justify-center gap-2 ${
+              className={`flex-1 py-2.5 px-4 rounded-[6px] font-bold text-xs sm:text-sm transition-all text-center flex items-center justify-center gap-2 ${
                 selectedProduct.in_stock !== false
-                  ? 'glass-button text-[#0877C9] hover:bg-white active:scale-95'
+                  ? 'glass-button text-[#0877C9] hover:bg-white active:scale-98 shadow-2xs'
                   : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
               }`}
             >
@@ -277,9 +277,9 @@ export default function ProductDetailModal() {
                 }
               }}
               disabled={selectedProduct.in_stock === false}
-              className={`flex-1 py-3 px-4 rounded-full font-black text-xs sm:text-sm glass-button-primary transition-all flex items-center justify-center gap-2 ${
+              className={`flex-1 py-2.5 px-4 rounded-[6px] font-black text-xs sm:text-sm glass-button-primary transition-all flex items-center justify-center gap-2 shadow-xs ${
                 selectedProduct.in_stock !== false
-                  ? 'active:scale-95'
+                  ? 'active:scale-98'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >

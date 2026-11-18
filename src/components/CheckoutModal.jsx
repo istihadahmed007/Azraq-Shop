@@ -534,9 +534,9 @@ export default function CheckoutModal() {
       aria-modal="true"
       aria-labelledby="checkout-modal-title"
     >
-      {/* Modal Surface */}
+      {/* Modal Surface (Sharp 8px radius) */}
       <div 
-        className="relative w-full max-w-xl glass-modal rounded-t-[28px] sm:rounded-[28px] shadow-2xl overflow-hidden max-h-[92dvh] flex flex-col my-auto border border-white/90"
+        className="relative w-full max-w-xl glass-modal rounded-t-[8px] sm:rounded-[8px] shadow-2xl overflow-hidden max-h-[92dvh] flex flex-col my-auto border border-white/95"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Accessible live region for status announcements */}
@@ -548,7 +548,7 @@ export default function CheckoutModal() {
         </div>
 
         {/* Modal Top Bar */}
-        <div className="flex items-center justify-between px-5 py-3.5 bg-white/80 backdrop-blur-md text-[#101C35] border-b border-white/80">
+        <div className="flex items-center justify-between px-5 py-3.5 bg-white/85 backdrop-blur-md text-[#101C35] border-b border-white/90">
           <div className="flex items-center gap-2.5">
             <img src="/branding/azraq-icon.png" alt="AZRAQ Shop" className="w-5 h-5 object-contain shrink-0" />
             <h2 id="checkout-modal-title" className="text-xs font-mono font-bold tracking-wider text-[#0877C9] uppercase">
@@ -558,7 +558,7 @@ export default function CheckoutModal() {
           <button
             onClick={handleClose}
             aria-label={t("Close checkout", "বন্ধ করুন")}
-            className="w-7.5 h-7.5 rounded-full glass-button flex items-center justify-center text-[#101C35] hover:text-[#0877C9] transition-colors focus:outline-none"
+            className="w-7.5 h-7.5 rounded-[4px] glass-button flex items-center justify-center text-[#101C35] hover:text-[#0877C9] transition-colors focus:outline-none"
           >
             <X className="w-4 h-4" />
           </button>
@@ -849,7 +849,7 @@ export default function CheckoutModal() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 px-5 rounded-full bg-gradient-to-r from-[#0877C9] to-[#2563EB] hover:from-[#0966ab] hover:to-[#1d4ed8] text-white text-xs sm:text-sm font-bold shadow-[0_6px_20px_rgba(37,99,235,0.35)] transition-all flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#0877C9] focus:ring-offset-2 disabled:opacity-50"
+                className="w-full py-3 px-5 rounded-[6px] bg-gradient-to-r from-[#0877C9] to-[#2563EB] hover:from-[#0966ab] hover:to-[#1d4ed8] text-white text-xs sm:text-sm font-bold shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#0877C9] focus:ring-offset-2 disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <>
@@ -1120,12 +1120,12 @@ export default function CheckoutModal() {
             <div className="flex justify-center mb-1">
               <img src="/branding/azraq-logo.png" alt="AZRAQ Shop" className="h-8 w-auto object-contain select-none" />
             </div>
-            <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-xs">
-              <CheckCircle2 className="w-8 h-8" />
+            <div className="w-12 h-12 rounded-[6px] bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-2xs">
+              <CheckCircle2 className="w-6 h-6" />
             </div>
 
             <div className="space-y-1">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 uppercase tracking-wide">
+              <span className="px-2.5 py-0.5 rounded-[4px] text-[10px] font-bold bg-emerald-100 text-emerald-800 uppercase tracking-wide">
                 {t("PAID & VERIFIED", "পেমেন্ট সফল ও ভেরিফাইড")}
               </span>
               <h3 className="text-xl sm:text-2xl font-black text-[#062B4F]">
@@ -1170,13 +1170,13 @@ export default function CheckoutModal() {
                   handleClose();
                   setIsTrackingOpen(true);
                 }}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-[#062B4F] hover:bg-[#0877C9] text-white text-xs font-bold transition-colors shadow-xs"
+                className="flex-1 py-2.5 px-4 rounded-[6px] bg-[#062B4F] hover:bg-[#0877C9] text-white text-xs font-bold transition-colors shadow-2xs"
               >
                 {t("Track My Order", "অর্ডার ট্র্যাক করুন")}
               </button>
               <button
                 onClick={handleClose}
-                className="flex-1 py-2.5 px-4 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors"
+                className="flex-1 py-2.5 px-4 rounded-[6px] border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors"
               >
                 {t("Continue Shopping", "আরও কেনাকাটা করুন")}
               </button>
@@ -1189,12 +1189,12 @@ export default function CheckoutModal() {
         {/* ==================================================================== */}
         {checkoutStep === 'pending_verification' && confirmedOrder && (
           <div className="p-6 sm:p-8 text-center space-y-4 overflow-y-auto flex-1">
-            <div className="w-14 h-14 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mx-auto shadow-xs">
-              <Clock className="w-8 h-8" />
+            <div className="w-12 h-12 rounded-[6px] bg-amber-100 text-amber-700 flex items-center justify-center mx-auto shadow-2xs">
+              <Clock className="w-6 h-6" />
             </div>
 
             <div className="space-y-1">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 uppercase tracking-wide">
+              <span className="px-2.5 py-0.5 rounded-[4px] text-[10px] font-bold bg-amber-100 text-amber-800 uppercase tracking-wide">
                 {confirmedOrder.payment_method === 'COD' 
                   ? t("CASH ON DELIVERY", "ক্যাশ অন ডেলিভারি") 
                   : t("PAYMENT SUBMITTED — AWAITING VERIFICATION", "পেমেন্ট জমা — ভেরিফিকেশন অপেক্ষমান")}
@@ -1248,13 +1248,13 @@ export default function CheckoutModal() {
                   handleClose();
                   setIsTrackingOpen(true);
                 }}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-[#062B4F] hover:bg-[#0877C9] text-white text-xs font-bold transition-colors shadow-xs"
+                className="flex-1 py-2.5 px-4 rounded-[6px] bg-[#062B4F] hover:bg-[#0877C9] text-white text-xs font-bold transition-colors shadow-2xs"
               >
                 {t("Track My Order", "অর্ডার ট্র্যাক করুন")}
               </button>
               <button
                 onClick={handleClose}
-                className="flex-1 py-2.5 px-4 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors"
+                className="flex-1 py-2.5 px-4 rounded-[6px] border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors"
               >
                 {t("Continue Shopping", "আরও কেনাকাটা করুন")}
               </button>
@@ -1274,8 +1274,8 @@ export default function CheckoutModal() {
               aria-describedby="checkout-dialog-desc"
               className="p-6 sm:p-8 text-center space-y-4 overflow-y-auto flex-1 my-auto"
             >
-              <div className="w-14 h-14 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto shadow-xs">
-                <AlertCircle className="w-8 h-8" aria-hidden="true" />
+              <div className="w-12 h-12 rounded-[6px] bg-rose-100 text-rose-600 flex items-center justify-center mx-auto shadow-2xs">
+                <AlertCircle className="w-6 h-6" aria-hidden="true" />
               </div>
 
               <div className="space-y-1.5">

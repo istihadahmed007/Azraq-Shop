@@ -45,8 +45,8 @@ export default function TrendingRightNowSection() {
         </button>
       </div>
 
-      {/* Main Grid: 4 Columns on standard desktop, 5 on wider screens, sharp square cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-4 sm:gap-5 lg:gap-6 items-stretch">
+      {/* Main Grid: Shopee-proportioned product cards with responsive 2 to 5 columns */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 sm:gap-3.5 lg:gap-4 items-stretch">
 
         {/* 4 Spacious Product Cards */}
         {popularList.map((product) => (
@@ -66,13 +66,13 @@ export default function TrendingRightNowSection() {
         {/* 1 Editorial Feature Card: 5th column on xl, full-width banner on lg */}
         <div
           onClick={() => navigateTo('collections')}
-          className="col-span-2 sm:col-span-2 md:col-span-1 lg:col-span-4 xl:col-span-1 rounded-[4px] glass-card p-4 sm:p-5 flex flex-col justify-between cursor-pointer group relative overflow-hidden h-full border border-white/95"
+          className="col-span-2 sm:col-span-2 md:col-span-1 lg:col-span-4 xl:col-span-1 rounded-[6px] glass-card p-3.5 sm:p-4 flex flex-col justify-between cursor-pointer group relative overflow-hidden h-full border border-white/95 bg-white/90"
         >
           {/* Subtle Ambient Light */}
           <div className="absolute -top-10 -right-10 w-28 h-28 bg-[#69C5F5]/20 rounded-full blur-xl pointer-events-none" />
 
           <div>
-            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[2px] bg-[#0877C9]/10 text-[#0877C9] text-[9px] font-black uppercase tracking-wider mb-2">
+            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-[#0877C9]/10 text-[#0877C9] text-[9px] font-black uppercase tracking-wider mb-2">
               <Sparkles className="w-2.5 h-2.5 text-[#0877C9]" />
               <span>{t('Featured', 'বাছাই')}</span>
             </div>
@@ -81,7 +81,7 @@ export default function TrendingRightNowSection() {
               {t('Stay Connected Always', 'সবসময় থাকুন কানেক্টেড')}
             </h3>
 
-            <p className="text-[11px] font-medium text-[#71849B] mt-1.5 leading-relaxed line-clamp-3">
+            <p className="text-[11px] font-medium text-[#71849B] mt-1 leading-relaxed line-clamp-2">
               {t(
                 'Explore the best everyday mobile accessories & curated essentials at AZRAQ.',
                 'সেরা গ্যাজেটস ও কিউরেটেড এভরিডে পণ্য কালেকশন।'
@@ -89,21 +89,21 @@ export default function TrendingRightNowSection() {
             </p>
           </div>
 
-          <div className="mt-4 flex flex-col gap-3">
+          <div className="mt-3 flex flex-col gap-2.5">
             <button
               type="button"
-              className="w-full py-2 px-3 rounded-[3px] glass-button-primary text-[11px] font-bold flex items-center justify-center gap-1.5"
+              className="w-full py-2 px-3 rounded-[4px] glass-button-primary text-[11px] font-bold flex items-center justify-center gap-1.5"
             >
               <span>{t('Explore More', 'আরও দেখুন')}</span>
               <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
             </button>
 
             {/* Product Photo Showcase */}
-            <div className="w-full aspect-[4/3] rounded-[2px] bg-[#F8FBFF]/85 border border-white/80 p-1.5 flex items-center justify-center overflow-hidden">
+            <div className="w-full aspect-square rounded-[4px] bg-[#F8FBFF] border border-white/90 p-2 flex items-center justify-center overflow-hidden">
               <img
                 src="https://easydrop.asia/products/image-1794224164356-135288231.jpeg"
                 alt="Feature"
-                className="w-full h-full object-contain group-hover:scale-108 transition-transform duration-500"
+                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
               />
             </div>
           </div>

@@ -37,7 +37,7 @@ export default function ProductGrid() {
   // Dynamic priority ordered categories extracted from authentic database products
   const categories = useMemo(() => {
     const rawCategories = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
-    
+
     // Desired priority order per specification
     const priority = [
       'Gadgets & IT Accessories',
@@ -100,7 +100,7 @@ export default function ProductGrid() {
   }, [products, activeCategory, searchQuery, sortBy, inStockOnly]);
 
   return (
-    <section id="all-products" className="w-full max-w-full overflow-hidden py-2 select-none">
+    <section id="all-products" className="w-full py-2 select-none">
 
       {/* 1. Section Header: Title + Sync Status Badge */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5 pb-3.5 border-b border-white/60">
@@ -140,27 +140,26 @@ export default function ProductGrid() {
         </div>
       </div>
 
-      {/* 2. DEDICATED TWO-ROW TOOLBAR (Phase 2 Requirement) */}
+      {/* 2. DEDICATED TWO-ROW TOOLBAR */}
       <div className="flex flex-col gap-3 mb-6">
 
-        {/* ROW 1: Horizontally Scrollable Category Filter Pills */}
-        <div className="w-full relative min-w-0 max-w-full overflow-hidden">
-          <div className="w-full max-w-full flex items-center gap-2 overflow-x-auto pb-1.5 no-scrollbar scroll-smooth">
+        {/* ROW 1: Horizontally Scrollable Category Filter Buttons (Sharp 6px radius) */}
+        <div className="w-full relative">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1.5 no-scrollbar scroll-smooth">
             {categories.map((cat) => {
               const isActive = activeCategory === cat;
-              const displayName = cat === 'All' 
-                ? `${t('All Products', 'সকল পণ্য')} (${products.length})` 
+              const displayName = cat === 'All'
+                ? `${t('All Products', 'সকল পণ্য')} (${products.length})`
                 : cat;
 
               return (
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap shrink-0 border ${
-                    isActive
-                      ? 'bg-[#0877C9] text-white border-[#0877C9] shadow-xs'
-                      : 'bg-white/75 hover:bg-white text-[#71849B] hover:text-[#101C35] border-white/90 shadow-xs'
-                  }`}
+                  className={`px-3.5 py-1.5 rounded-[6px] text-xs font-bold transition-all whitespace-nowrap shrink-0 border ${isActive
+                    ? 'bg-[#0877C9] text-white border-[#0877C9] shadow-xs'
+                    : 'bg-white/80 hover:bg-white text-[#71849B] hover:text-[#101C35] border-white/90 shadow-2xs'
+                    }`}
                 >
                   {displayName}
                 </button>
@@ -171,21 +170,21 @@ export default function ProductGrid() {
 
         {/* ROW 2: Product Search + Sort + In-Stock Toggle */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
-          
-          {/* Product Search Input (Pill Shaped Translucent Control) */}
+
+          {/* Product Search Input (Sharp 6px Translucent Control) */}
           <div className="relative flex-1 sm:max-w-md">
-            <Search className="w-4 h-4 text-[#71849B] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-4 h-4 text-[#71849B] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               placeholder={t("Filter within catalog...", "পণ্য ফিল্টার করুন...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 rounded-full glass-input text-xs text-[#101C35] placeholder-[#71849B] border border-white/90 focus:border-[#0877C9]"
+              className="w-full pl-9 pr-8 py-2 rounded-[6px] glass-input text-xs text-[#101C35] placeholder-[#71849B] border border-white/90 focus:border-[#0877C9]"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-slate-200/80 hover:bg-slate-300 text-[#101C35] flex items-center justify-center text-[10px]"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 rounded-[3px] bg-slate-200/80 hover:bg-slate-300 text-[#101C35] flex items-center justify-center text-[10px]"
                 aria-label="Clear search"
               >
                 <X className="w-2.5 h-2.5" />
@@ -195,17 +194,16 @@ export default function ProductGrid() {
 
           {/* Right Tools: Sort Dropdown + In-Stock Toggle */}
           <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-            
+
             {/* In-Stock Only Toggle */}
             <button
               onClick={() => setInStockOnly(prev => !prev)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold transition-all border shrink-0 ${
-                inStockOnly
-                  ? 'bg-[#0877C9]/15 text-[#0877C9] border-[#0877C9]/40'
-                  : 'bg-white/75 hover:bg-white text-[#71849B] border-white/90'
-              }`}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-[6px] text-xs font-bold transition-all border shrink-0 ${inStockOnly
+                ? 'bg-[#0877C9]/15 text-[#0877C9] border-[#0877C9]/40'
+                : 'bg-white/80 hover:bg-white text-[#71849B] border-white/90'
+                }`}
             >
-              <div className={`w-3.5 h-3.5 rounded flex items-center justify-center border ${inStockOnly ? 'bg-[#0877C9] border-[#0877C9] text-white' : 'border-[#71849B]/50'}`}>
+              <div className={`w-3.5 h-3.5 rounded-[3px] flex items-center justify-center border ${inStockOnly ? 'bg-[#0877C9] border-[#0877C9] text-white' : 'border-[#71849B]/50'}`}>
                 {inStockOnly && <Check className="w-2.5 h-2.5 stroke-[3]" />}
               </div>
               <span>{t("In Stock Only", "স্টকে আছে")}</span>
@@ -216,17 +214,17 @@ export default function ProductGrid() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="appearance-none w-full sm:w-auto pl-3.5 pr-8 py-2 rounded-full glass-input text-xs font-bold text-[#101C35] cursor-pointer border border-white/90 focus:border-[#0877C9]"
+                className="appearance-none w-full sm:w-auto pl-3 pr-8 py-2 rounded-[6px] glass-input text-xs font-bold text-[#101C35] cursor-pointer border border-white/90 focus:border-[#0877C9]"
               >
                 <option value="featured">{t("Sort: Featured", "সাজান: সেরা")}</option>
                 <option value="price-low">{t("Price: Low to High", "দাম: কম থেকে বেশি")}</option>
                 <option value="price-high">{t("Price: High to Low", "দাম: বেশি থেকে কম")}</option>
                 <option value="rating">{t("Customer Rating", "সর্বোচ্চ রেটিং")}</option>
               </select>
-              <ArrowUpDown className="w-3.5 h-3.5 text-[#71849B] absolute right-3 pointer-events-none" />
+              <ArrowUpDown className="w-3.5 h-3.5 text-[#71849B] absolute right-2.5 pointer-events-none" />
             </div>
 
-            {/* Clear All Filters Button (Only when filters active) */}
+            {/* Clear All Filters Button */}
             {(activeCategory !== 'All' || searchQuery.trim() || inStockOnly || sortBy !== 'featured') && (
               <button
                 onClick={() => {
@@ -235,7 +233,7 @@ export default function ProductGrid() {
                   setInStockOnly(false);
                   setSortBy('featured');
                 }}
-                className="px-3 py-2 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-bold transition-colors whitespace-nowrap"
+                className="px-3 py-2 rounded-[6px] bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-bold transition-colors whitespace-nowrap"
                 title="Reset all filters"
               >
                 {t("Reset", "রিসেট")}
@@ -248,11 +246,11 @@ export default function ProductGrid() {
 
       </div>
 
-      {/* 3. PRODUCT GRID: Responsive Columns (Phase 6) */}
+      {/* 3. PRODUCT GRID: Responsive Columns (Desktop: 5-6, Tablet: 3-4, Mobile: 2) */}
       {filteredAndSortedProducts.length === 0 ? (
-        <div className="py-16 text-center rounded-[28px] glass-panel p-8 sm:p-12 space-y-4 max-w-xl mx-auto">
-          <div className="w-14 h-14 rounded-full bg-[#D9EDFF] text-[#0877C9] flex items-center justify-center mx-auto">
-            <Search className="w-6 h-6" />
+        <div className="py-16 text-center rounded-[8px] glass-panel p-8 sm:p-12 space-y-4 max-w-xl mx-auto">
+          <div className="w-12 h-12 rounded-[6px] bg-[#D9EDFF] text-[#0877C9] flex items-center justify-center mx-auto">
+            <Search className="w-5 h-5" />
           </div>
           <h3 className="text-lg sm:text-xl font-black text-[#101C35]">
             {searchQuery.trim()
@@ -274,7 +272,7 @@ export default function ProductGrid() {
                 setInStockOnly(false);
                 setSortBy('featured');
               }}
-              className="px-6 py-2.5 rounded-full glass-button-primary text-xs font-bold"
+              className="px-5 py-2 rounded-[6px] glass-button-primary text-xs font-bold"
             >
               {t("Clear All Filters", "সকল ফিল্টার মুছুন")}
             </button>
@@ -282,7 +280,7 @@ export default function ProductGrid() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-4 sm:gap-5 lg:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2.5 sm:gap-3.5 lg:gap-4">
             {filteredAndSortedProducts.slice(0, visibleCount).map(product => (
               <ProductCard
                 key={product.id}
@@ -301,7 +299,7 @@ export default function ProductGrid() {
             <div className="mt-8 flex flex-col items-center justify-center gap-2">
               <button
                 onClick={() => setVisibleCount(prev => prev + 24)}
-                className="px-8 py-3 rounded-full glass-button hover:bg-white text-xs font-bold text-[#101C35] hover:text-[#0877C9] shadow-sm transition-all transform hover:scale-105"
+                className="px-8 py-2.5 rounded-[6px] glass-button hover:bg-white text-xs font-bold text-[#101C35] hover:text-[#0877C9] shadow-xs transition-all transform hover:scale-102"
               >
                 {t(
                   `Load More Goods (${filteredAndSortedProducts.length - visibleCount} remaining)`,

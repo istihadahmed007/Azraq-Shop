@@ -65,30 +65,28 @@ export default function ProductCard({
 
   return (
     <div
-      className={`group relative flex flex-col justify-between h-full rounded-[4px] glass-product select-none transition-all duration-300 ${
-        compact ? 'p-3' : 'p-3.5 sm:p-4'
-      } ${className}`}
+      className={`group relative flex flex-col justify-between h-full rounded-[6px] glass-product select-none transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 border border-white/95 bg-white/90 overflow-hidden ${className}`}
     >
-      {/* 1. TOP SECTION: Square 1:1 Large Image Well (Sharp corners, minimal inner padding) */}
-      <div className="relative w-full aspect-square rounded-[2px] bg-[#F0F6FD]/90 border border-white/95 p-1.5 sm:p-2 flex items-center justify-center overflow-hidden transition-colors group-hover:bg-white/95">
+      {/* 1. TOP SECTION: Square 1:1 Full-Width Large Image Area (Shopee Proportions) */}
+      <div className="relative w-full aspect-square bg-[#F8FBFF] flex items-center justify-center overflow-hidden border-b border-white/90">
         
-        {/* Real Discount Badge (Only shown when authentically discounted, sharp corners) */}
+        {/* Discount Badge at Upper-Right Corner of Photograph */}
         {discountPercent && discountPercent > 0 ? (
-          <div className="absolute top-2 left-2 z-10 pointer-events-none">
-            <span className="px-1.5 py-0.5 rounded-[2px] bg-[#0877C9] text-white text-[10px] font-black tracking-tight shadow-xs border border-white/40">
+          <div className="absolute top-0 right-0 z-10 pointer-events-none">
+            <span className="px-2 py-0.5 rounded-bl-[6px] bg-gradient-to-r from-[#0877C9] to-[#2563EB] text-white text-[10px] sm:text-[11px] font-black tracking-tight shadow-xs block">
               -{discountPercent}%
             </span>
           </div>
         ) : null}
 
-        {/* Floating Top-Right Wishlist Button (Sharp square glass styling) */}
+        {/* Wishlist Button: Neatly Positioned at Upper-Left Over Image */}
         <button
           type="button"
           onClick={handleToggleFav}
-          className={`absolute top-2 right-2 z-10 w-7.5 h-7.5 sm:w-8 sm:h-8 rounded-[3px] flex items-center justify-center transition-all bg-white/90 hover:bg-white backdrop-blur-md border border-white shadow-xs active:scale-90 focus:outline-none ${
+          className={`absolute top-2 left-2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-[4px] flex items-center justify-center transition-all backdrop-blur-md border border-white shadow-xs active:scale-90 focus:outline-none ${
             isFav
               ? 'text-[#0877C9] bg-white'
-              : 'text-[#71849B] hover:text-[#0877C9]'
+              : 'text-[#71849B] bg-white/85 hover:bg-white hover:text-[#0877C9]'
           }`}
           title={isFav ? t("Remove from Wishlist", "পছন্দের তালিকা থেকে সরান") : t("Add to Wishlist", "পছন্দের তালিকায় যোগ করুন")}
           aria-label={`Wishlist ${product.name}`}
@@ -96,21 +94,21 @@ export default function ProductCard({
           <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform ${isFav ? 'fill-[#0877C9] stroke-[#0877C9] scale-110' : ''}`} />
         </button>
 
-        {/* Dedicated Product Image Container: fills available area, object-fit contain without distortion */}
+        {/* Dedicated Product Image: Occupies Full Available Space, Object-Contain Without Distortion */}
         <img
           src={displayImage}
           alt={product.name || 'Product'}
           onError={() => setImageError(true)}
-          className="w-full h-full object-contain filter drop-shadow-xs transition-transform duration-500 group-hover:scale-105 cursor-pointer"
+          className="w-full h-full object-contain p-2 transition-transform duration-300 group-hover:scale-105 cursor-pointer filter drop-shadow-2xs"
           onClick={handleSelect}
         />
 
-        {/* Hover Quick View Pill Overlay (Sharp square corners) */}
-        <div className="absolute inset-0 bg-[#101C35]/10 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none group-hover:pointer-events-auto">
+        {/* Quick View Pill Overlay on Hover */}
+        <div className="absolute inset-0 bg-[#101C35]/15 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none group-hover:pointer-events-auto">
           <button
             type="button"
             onClick={handleSelect}
-            className="px-3 py-1.5 rounded-[3px] bg-white text-[#101C35] text-xs font-bold shadow-md hover:text-[#0877C9] transition-all transform hover:scale-105 flex items-center gap-1.5 focus:outline-none border border-white"
+            className="px-3 py-1.5 rounded-[4px] bg-white text-[#101C35] text-xs font-bold shadow-md hover:text-[#0877C9] transition-all transform hover:scale-105 flex items-center gap-1.5 focus:outline-none border border-white"
           >
             <Eye className="w-3.5 h-3.5 text-[#0877C9]" />
             <span>{t("Quick View", "বিস্তারিত")}</span>
@@ -118,21 +116,21 @@ export default function ProductCard({
         </div>
       </div>
 
-      {/* 2. MIDDLE SECTION: Category & 2-Line Clamped Title */}
-      <div className="mt-3 flex flex-col justify-between flex-grow">
+      {/* 2. CARD INFORMATION LAYOUT: Positioned Directly Below Photograph */}
+      <div className={`flex flex-col justify-between flex-grow ${compact ? 'p-2 sm:p-2.5' : 'p-2.5 sm:p-3'}`}>
         <div>
-          {/* Category Label (Restrained case, never loud all-caps) */}
+          {/* Category Label */}
           {showCategory && categoryLabel && (
-            <span className="text-[11px] font-semibold text-[#71849B] block truncate tracking-wide capitalize mb-1">
+            <span className="text-[10px] sm:text-[11px] font-semibold text-[#71849B] block truncate capitalize mb-0.5">
               {categoryLabel}
             </span>
           )}
 
-          {/* Product Title: Strict 2-line clamp with stable line height */}
+          {/* Product Name: Clamped strictly to 2 lines */}
           <h3
             onClick={handleSelect}
-            className={`font-semibold text-[#101C35] line-clamp-2 min-h-[2.6rem] cursor-pointer hover:text-[#0877C9] transition-colors leading-snug ${
-              compact ? 'text-[13px] sm:text-[14px]' : 'text-[14px]'
+            className={`font-semibold text-[#101C35] line-clamp-2 min-h-[2.4rem] sm:min-h-[2.6rem] cursor-pointer hover:text-[#0877C9] transition-colors leading-snug ${
+              compact ? 'text-[12px] sm:text-[13px]' : 'text-[13px] sm:text-[14px]'
             }`}
             title={product.name}
           >
@@ -140,36 +138,36 @@ export default function ProductCard({
           </h3>
         </div>
 
-        {/* 3. BOTTOM SECTION: Selling Price, Original Price, Stock Status & Sharp Cart Button */}
-        <div className="flex items-end justify-between gap-2 mt-auto pt-3 border-t border-white/70">
+        {/* 3. BOTTOM SECTION: Selling Price, Original Price, Stock Status & Compact Add to Cart */}
+        <div className="flex items-end justify-between gap-1.5 mt-2 pt-2 border-t border-slate-100/90">
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline gap-1.5 flex-wrap">
-              <span className={`font-black text-[#101C35] ${compact ? 'text-[16px]' : 'text-[17px] sm:text-[18px]'}`}>
+              <span className={`font-black text-[#101C35] ${compact ? 'text-[15px]' : 'text-[16px] sm:text-[17px]'}`}>
                 ৳{(product.price || 0).toLocaleString()}
               </span>
               {originalPrice && originalPrice > product.price && (
-                <span className="text-[11px] sm:text-[12px] text-[#71849B] line-through font-medium">
+                <span className="text-[10px] sm:text-[11px] text-[#71849B] line-through font-medium">
                   ৳{originalPrice.toLocaleString()}
                 </span>
               )}
             </div>
 
             <span
-              className={`text-[11px] font-semibold block truncate mt-0.5 ${
+              className={`text-[10px] sm:text-[11px] font-semibold block truncate mt-0.5 ${
                 isAvailable ? 'text-emerald-600' : 'text-rose-500'
               }`}
             >
-              {isAvailable ? t("In Stock", "স্টকে রয়েছে") : t("Out of Stock", "স্টক শেষ")}
+              {isAvailable ? t("In Stock", "স্টকে রয়েছে") : t("Out of Stock", "স্টক শেষ")}
             </span>
           </div>
 
-          {/* Add to Bag Action Button (Sharp 4px square corners) */}
+          {/* Compact Add to Cart Button */}
           <button
             type="button"
             onClick={handleAddToCart}
             disabled={!isAvailable}
             className={`rounded-[4px] flex items-center justify-center transition-all flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0877C9] ${
-              compact ? 'w-8.5 h-8.5' : 'w-9.5 h-9.5'
+              compact ? 'w-7.5 h-7.5' : 'w-8 h-8 sm:w-8.5 sm:h-8.5'
             } ${
               isAvailable
                 ? 'bg-gradient-to-r from-[#0877C9] to-[#2563EB] hover:from-[#076bb5] hover:to-[#1d4ed8] text-white shadow-xs hover:shadow-md hover:scale-105 active:scale-95'

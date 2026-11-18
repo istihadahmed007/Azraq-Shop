@@ -24,8 +24,8 @@ export default function Footer() {
   return (
     <footer id="footer-section" className="w-full max-w-full overflow-hidden pt-2 pb-10 select-none">
 
-      {/* Frosted Main Glass Footer Container */}
-      <div className="rounded-[32px] glass-panel p-6 sm:p-10">
+      {/* Frosted Main Glass Footer Container (Sharp 8px radius) */}
+      <div className="rounded-[8px] glass-panel p-6 sm:p-10 border border-white/95 shadow-sm">
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10">
 
@@ -125,7 +125,7 @@ export default function Footer() {
 
           <button
             onClick={scrollToTop}
-            className="flex items-center gap-2 px-4 py-2 rounded-full glass-button hover:text-[#0877C9] text-[#101C35] transition-all group"
+            className="flex items-center gap-2 px-4 py-2 rounded-[6px] glass-button hover:text-[#0877C9] text-[#101C35] transition-all group shadow-2xs"
           >
             <span>{t('Back to Top', 'উপরে যান')}</span>
             <ArrowUp className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform" />
