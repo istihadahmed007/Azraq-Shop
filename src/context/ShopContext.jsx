@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import initialCollectionsData from '../data/collections.json';
 import initialProductsData from '../data/initial_catalog.json';
 import initialReconciliationReport from '../data/reconciliation_report.json';
-import { 
-  getStoredItem, 
-  setStoredItem, 
-  validateCartItems, 
-  validateFavoritesList, 
-  validateOrdersList 
+import {
+  getStoredItem,
+  setStoredItem,
+  validateCartItems,
+  validateFavoritesList,
+  validateOrdersList
 } from '../utils/storage.js';
 import { generateProductSlug } from '../utils/productUtils.js';
 
@@ -49,6 +49,7 @@ export function ShopProvider({ children }) {
     totalUniqueProducts: initialProductsData.total_catalog_count || initialProductsData.products.length,
     isSyncing: false
   });
+  const [isCatalogHydrated, setIsCatalogHydrated] = useState(false);
 
   // Asynchronously hydrate full catalog without blocking initial paint or bloating initial bundle
   useEffect(() => {
@@ -67,6 +68,9 @@ export function ShopProvider({ children }) {
       })
       .catch(err => {
         console.warn('[Catalog Hydration Notice] Running with initial catalog:', err.message);
+      })
+      .finally(() => {
+        if (isMounted) setIsCatalogHydrated(true);
       });
     return () => { isMounted = false; };
   }, []);
@@ -339,7 +343,7 @@ export function ShopProvider({ children }) {
   const activeCollection = collections.find(c => c.slug === activeCollectionSlug) || collections[0];
 
   // Products belonging to active collection (many-to-many lookup)
-  const activeCollectionProducts = products.filter(p => 
+  const activeCollectionProducts = products.filter(p =>
     p.collection_ids && p.collection_ids.includes(activeCollection.id)
   );
 
@@ -359,6 +363,7 @@ export function ShopProvider({ children }) {
         activeCollectionProducts,
         navigateTo,
         syncStatus,
+        isCatalogHydrated,
         syncWithEasyDrop,
         updateCollection,
         updateProduct,

@@ -39,8 +39,10 @@ export default function ProductImage({
   if (aspectRatio === 'portrait') aspectClass = 'aspect-[3/4]';
   if (aspectRatio === 'auto') aspectClass = '';
 
-  // Fit class
-  const fitClass = fit === 'cover' ? 'object-cover' : 'object-contain';
+  // Fit class — for 'cover', fill the box edge-to-edge; for 'contain', stay within max-w/max-h without distortion
+  const fitClass = fit === 'cover' 
+    ? 'w-full h-full object-cover' 
+    : 'max-w-full max-h-full object-contain';
 
   // Fallback / Placeholder when no image or image failed to load
   if (!src || hasError) {
@@ -87,7 +89,7 @@ export default function ProductImage({
         decoding="async"
         onLoad={() => setIsLoaded(true)}
         onError={() => setHasError(true)}
-        className={`max-w-full max-h-full w-full h-full ${fitClass} transition-all duration-300 ${
+        className={`${fitClass} transition-all duration-300 ${
           isLoaded ? 'opacity-100' : 'opacity-0'
         } ${zoomOnHover ? 'group-hover:scale-105' : ''} ${className}`}
       />

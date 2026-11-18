@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useShop } from '../context/ShopContext';
+import ProductImage from './common/ProductImage';
 import { 
   createCheckoutSession, 
   verifyPaymentStatus, 
@@ -822,6 +823,46 @@ export default function CheckoutModal() {
                   </div>
                 </div>
               </div>
+
+              {/* Itemized Order Review */}
+              {cart.length > 0 && (
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2.5">
+                  <div className="flex items-center justify-between text-xs font-bold text-[#062B4F] pb-1.5 border-b border-slate-200/70">
+                    <span className="flex items-center gap-1.5">
+                      <ShoppingBag className="w-3.5 h-3.5 text-[#0877C9]" />
+                      <span>{t("Order Review", "অর্ডার রিভিউ")} ({cart.length} {t("items", "টি পণ্য")})</span>
+                    </span>
+                  </div>
+                  <div className="max-h-40 overflow-y-auto space-y-2 pr-1 no-scrollbar">
+                    {cart.map((item, idx) => (
+                      <div key={`${item.product?.id || idx}-${item.variant}-${idx}`} className="flex items-center gap-2.5 text-xs">
+                        <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 p-0.5 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                          <ProductImage
+                            src={item.product?.main_image}
+                            alt={item.product?.name || 'Product'}
+                            fit="contain"
+                            aspectRatio="square"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-slate-800 truncate" title={item.product?.name}>
+                            {item.product?.name || 'Item'}
+                          </p>
+                          <div className="flex items-center gap-2 text-[10px] text-slate-500 mt-0.5">
+                            <span className="px-1.5 py-0.2 rounded bg-slate-200 font-medium text-slate-700">
+                              {item.variant || 'Standard'}
+                            </span>
+                            <span>× {item.quantity}</span>
+                          </div>
+                        </div>
+                        <div className="text-right flex-shrink-0 font-bold text-[#0877C9]">
+                          ৳{((item.product?.price || 0) * item.quantity).toLocaleString()}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Order Summary Recap */}
               <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs space-y-2">

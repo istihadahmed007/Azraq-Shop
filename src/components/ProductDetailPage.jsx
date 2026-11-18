@@ -46,6 +46,7 @@ export default function ProductDetailPage() {
     favorites,
     toggleFavorite,
     setIsCheckoutOpen,
+    isCatalogHydrated,
     t
   } = useShop();
 
@@ -63,7 +64,29 @@ export default function ProductDetailPage() {
   const [selectedVariant, setSelectedVariant] = useState('Standard');
   const [quantity, setQuantity] = useState(1);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
+  const [zoomScale, setZoomScale] = useState(1);
   const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'specs' | 'delivery' | 'returns'
+
+  // Reset zoom scale when changing images or closing modal
+  useEffect(() => {
+    setZoomScale(1);
+  }, [activeImageIndex, isZoomOpen]);
+
+  // Keyboard navigation for full-screen zoom modal
+  useEffect(() => {
+    if (!isZoomOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsZoomOpen(false);
+      } else if (e.key === 'ArrowLeft' && images.length > 1) {
+        setActiveImageIndex(prev => (prev > 0 ? prev - 1 : images.length - 1));
+      } else if (e.key === 'ArrowRight' && images.length > 1) {
+        setActiveImageIndex(prev => (prev < images.length - 1 ? prev + 1 : 0));
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isZoomOpen, images.length]);
 
   // Update selected variant when product changes
   useEffect(() => {
@@ -105,7 +128,17 @@ export default function ProductDetailPage() {
     }
   }, [product]);
 
-  // If product not found in catalog, show clean 404 state
+  // Loading state while catalog hydrates in background (prevents momentary 404 flash on direct URL)
+  if (!product && !isCatalogHydrated) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center select-none">
+        <div className="w-10 h-10 rounded-full border-3 border-[#0877C9]/30 border-t-[#0877C9] animate-spin mb-3" />
+        <span className="text-xs text-[#6B7D93] font-medium">{t("Loading authentic catalog details...", "পণ্যের বিবরণ লোড হচ্ছে...")}</span>
+      </div>
+    );
+  }
+
+  // If product not found after full catalog hydration, show clean 404 state
   if (!product) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center select-none">
@@ -143,7 +176,7 @@ export default function ProductDetailPage() {
     : (product.discount_percent || null);
 
   // Associated Collection
-  const productCollection = collections.find(c => 
+  const productCollection = collections.find(c =>
     (product.collection_ids && product.collection_ids.includes(c.id)) ||
     c.name === product.category ||
     c.name === product.primary_collection_name
@@ -189,7 +222,7 @@ export default function ProductDetailPage() {
           {t("Home", "হোম")}
         </Link>
         <ChevronRight className="w-3.5 h-3.5 shrink-0 text-[#8CA0B6]" />
-        
+
         {productCollection && (
           <>
             <Link to={`/collection/${productCollection.slug}`} className="hover:text-[#0877C9] transition-colors">
@@ -212,19 +245,21 @@ export default function ProductDetailPage() {
           {/* LEFT COLUMN: PRODUCT IMAGE GALLERY (~55% width, col-span-7) */}
           {/* ========================================================= */}
           <div className="lg:col-span-7 flex flex-col gap-4">
-            
+
             {/* Primary Main Image Viewer */}
-            <div className="relative w-full aspect-square rounded-[22px] bg-white border border-[#D5E2EE]/80 overflow-hidden shadow-inner flex items-center justify-center group">
-              
-              {/* Product Photograph with object-contain to preserve 100% of the image */}
+            <div 
+              onClick={() => setIsZoomOpen(true)}
+              className="relative w-full aspect-square max-h-[560px] mx-auto rounded-[22px] bg-white border border-[#D5E2EE]/80 overflow-hidden shadow-inner flex items-center justify-center group cursor-zoom-in"
+            >
+
+              {/* Product Photograph with object-contain to preserve 100% of the image without distortion */}
               <ProductImage
                 src={activeImageUrl}
                 alt={product.name}
                 fit="contain"
                 aspectRatio="square"
                 priority={true}
-                className="p-4 sm:p-6"
-                onClick={() => setIsZoomOpen(true)}
+                containerClassName="p-3 sm:p-5"
               />
 
               {/* Prev / Next Controls if multiple images */}
@@ -233,7 +268,7 @@ export default function ProductDetailPage() {
                   <button
                     type="button"
                     onClick={handlePrevImage}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 hover:bg-white border border-[#D5E2EE] text-[#293B52] shadow-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 hover:bg-white border border-[#D5E2EE] text-[#293B52] shadow-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none z-10"
                     aria-label="Previous photo"
                   >
                     <ChevronLeft className="w-4 h-4" />
@@ -241,7 +276,7 @@ export default function ProductDetailPage() {
                   <button
                     type="button"
                     onClick={handleNextImage}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 hover:bg-white border border-[#D5E2EE] text-[#293B52] shadow-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 hover:bg-white border border-[#D5E2EE] text-[#293B52] shadow-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none z-10"
                     aria-label="Next photo"
                   >
                     <ChevronRight className="w-4 h-4" />
@@ -253,7 +288,10 @@ export default function ProductDetailPage() {
               <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
                 <button
                   type="button"
-                  onClick={() => setIsZoomOpen(true)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsZoomOpen(true);
+                  }}
                   className="w-8 h-8 rounded-full bg-white/90 hover:bg-white border border-[#D5E2EE] text-[#6B7D93] hover:text-[#0877C9] flex items-center justify-center shadow-xs transition-colors"
                   title={t("Zoom photo", "বড় করে দেখুন")}
                 >
@@ -270,9 +308,15 @@ export default function ProductDetailPage() {
                 </div>
               ) : null}
 
+              {/* Hover Zoom Pill Indicator */}
+              <div className="absolute bottom-3 left-3 bg-[#101C35]/75 text-white text-[11px] font-semibold px-3 py-1 rounded-full backdrop-blur-xs flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-sm z-10">
+                <ZoomIn className="w-3.5 h-3.5 text-[#69C5F5]" />
+                <span>{t("Click to Zoom", "বড় করে দেখুন")}</span>
+              </div>
+
               {/* Image counter indicator */}
               {images.length > 1 && (
-                <div className="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] font-mono px-2.5 py-0.5 rounded-full backdrop-blur-xs">
+                <div className="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] font-mono px-2.5 py-0.5 rounded-full backdrop-blur-xs z-10">
                   {activeImageIndex + 1} / {images.length}
                 </div>
               )}
@@ -286,11 +330,10 @@ export default function ProductDetailPage() {
                     key={idx}
                     type="button"
                     onClick={() => setActiveImageIndex(idx)}
-                    className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-[14px] bg-white border-2 flex items-center justify-center overflow-hidden shrink-0 transition-all ${
-                      activeImageIndex === idx
-                        ? 'border-[#0877C9] shadow-sm scale-102'
-                        : 'border-[#D5E2EE]/80 opacity-70 hover:opacity-100'
-                    }`}
+                    className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-[14px] bg-white border-2 flex items-center justify-center overflow-hidden shrink-0 transition-all ${activeImageIndex === idx
+                      ? 'border-[#0877C9] shadow-sm scale-102'
+                      : 'border-[#D5E2EE]/80 opacity-70 hover:opacity-100'
+                      }`}
                   >
                     <ProductImage
                       src={imgUrl}
@@ -372,11 +415,10 @@ export default function ProductDetailPage() {
                 {/* Stock Status Badge */}
                 <div className="text-right">
                   <span
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
-                      isAvailable
-                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                        : 'bg-red-100 text-red-800 border border-red-200'
-                    }`}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${isAvailable
+                      ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                      : 'bg-red-100 text-red-800 border border-red-200'
+                      }`}
                   >
                     <span className={`w-2 h-2 rounded-full ${isAvailable ? 'bg-emerald-600' : 'bg-red-600'}`} />
                     {isAvailable ? t("In Stock", "স্টকে আছে") : t("Out of Stock", "স্টক শেষ")}
@@ -396,11 +438,10 @@ export default function ProductDetailPage() {
                         key={variant}
                         type="button"
                         onClick={() => setSelectedVariant(variant)}
-                        className={`px-4 py-2 rounded-full text-xs font-bold transition-all border ${
-                          selectedVariant === variant
-                            ? 'bg-[#0877C9] text-white border-[#0877C9] shadow-sm'
-                            : 'bg-white text-[#293B52] border-[#D5E2EE] hover:border-[#0877C9]'
-                        }`}
+                        className={`px-4 py-2 rounded-full text-xs font-bold transition-all border ${selectedVariant === variant
+                          ? 'bg-[#0877C9] text-white border-[#0877C9] shadow-sm'
+                          : 'bg-white text-[#293B52] border-[#D5E2EE] hover:border-[#0877C9]'
+                          }`}
                       >
                         {variant}
                       </button>
@@ -441,7 +482,7 @@ export default function ProductDetailPage() {
 
               {/* Primary Action Buttons: Add to Bag & Buy Now */}
               <div className="flex flex-col sm:flex-row items-center gap-3 pt-3">
-                
+
                 {/* Add to Bag Button */}
                 <button
                   type="button"
@@ -468,11 +509,10 @@ export default function ProductDetailPage() {
                 <button
                   type="button"
                   onClick={() => toggleFavorite(product.id)}
-                  className={`w-12 h-12 rounded-full border flex items-center justify-center transition-all shrink-0 ${
-                    isFav
-                      ? 'bg-red-50 text-[#EE8056] border-[#EE8056] shadow-sm'
-                      : 'bg-white text-[#6B7D93] border-[#D5E2EE] hover:text-[#EE8056] hover:border-[#EE8056]'
-                  }`}
+                  className={`w-12 h-12 rounded-full border flex items-center justify-center transition-all shrink-0 ${isFav
+                    ? 'bg-red-50 text-[#EE8056] border-[#EE8056] shadow-sm'
+                    : 'bg-white text-[#6B7D93] border-[#D5E2EE] hover:text-[#EE8056] hover:border-[#EE8056]'
+                    }`}
                   title={isFav ? t("Remove from Wishlist", "পছন্দ থেকে সরান") : t("Save to Wishlist", "পছন্দের তালিকায় রাখুন")}
                   aria-label="Toggle wishlist"
                 >
@@ -507,46 +547,42 @@ export default function ProductDetailPage() {
 
       {/* 3. PRODUCT SPECIFICATIONS & DETAILS TABS */}
       <div className="rounded-[28px] bg-[#F7FAFD] border border-[#D5E2EE]/90 p-6 sm:p-8 shadow-[0_10px_30px_rgba(50,75,100,0.06)]">
-        
+
         {/* Tab Headers */}
         <div className="flex items-center gap-2 border-b border-[#D5E2EE] pb-3 overflow-x-auto no-scrollbar">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
-              activeTab === 'overview'
-                ? 'bg-[#0877C9] text-white shadow-2xs'
-                : 'text-[#6B7D93] hover:text-[#293B52]'
-            }`}
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${activeTab === 'overview'
+              ? 'bg-[#0877C9] text-white shadow-2xs'
+              : 'text-[#6B7D93] hover:text-[#293B52]'
+              }`}
           >
             {t("Overview & Description", "পণ্যের বিবরণ")}
           </button>
           <button
             onClick={() => setActiveTab('specs')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
-              activeTab === 'specs'
-                ? 'bg-[#0877C9] text-white shadow-2xs'
-                : 'text-[#6B7D93] hover:text-[#293B52]'
-            }`}
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${activeTab === 'specs'
+              ? 'bg-[#0877C9] text-white shadow-2xs'
+              : 'text-[#6B7D93] hover:text-[#293B52]'
+              }`}
           >
             {t("Specifications", "স্পেসিফিকেশন")}
           </button>
           <button
             onClick={() => setActiveTab('delivery')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
-              activeTab === 'delivery'
-                ? 'bg-[#0877C9] text-white shadow-2xs'
-                : 'text-[#6B7D93] hover:text-[#293B52]'
-            }`}
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${activeTab === 'delivery'
+              ? 'bg-[#0877C9] text-white shadow-2xs'
+              : 'text-[#6B7D93] hover:text-[#293B52]'
+              }`}
           >
             {t("Shipping & Logistics", "ডেলিভারি ও শিপিং")}
           </button>
           <button
             onClick={() => setActiveTab('returns')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
-              activeTab === 'returns'
-                ? 'bg-[#0877C9] text-white shadow-2xs'
-                : 'text-[#6B7D93] hover:text-[#293B52]'
-            }`}
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${activeTab === 'returns'
+              ? 'bg-[#0877C9] text-white shadow-2xs'
+              : 'text-[#6B7D93] hover:text-[#293B52]'
+              }`}
           >
             {t("Return Policy", "রিটার্ন পলিসি")}
           </button>
@@ -674,30 +710,127 @@ export default function ProductDetailPage() {
         </section>
       )}
 
-      {/* 5. FULL-SCREEN LIGHTBOX ZOOM MODAL */}
+      {/* 5. FULL-SCREEN LIGHTBOX ZOOM MODAL WITH MULTI-LEVEL ZOOM & THUMBNAILS */}
       {isZoomOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-[#101C35]/90 backdrop-blur-md flex flex-col justify-between p-3 sm:p-6 select-none animate-in fade-in duration-200"
           onClick={() => setIsZoomOpen(false)}
         >
-          <button
-            type="button"
-            onClick={() => setIsZoomOpen(false)}
-            className="absolute top-5 right-5 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center transition-all focus:outline-none"
-            aria-label="Close zoom"
-          >
-            <X className="w-5 h-5" />
-          </button>
-          
-          <div
-            className="relative max-w-4xl max-h-[90vh] w-full flex items-center justify-center"
+          {/* Top Bar: Title, Zoom Controls & Close */}
+          <div 
+            className="flex items-center justify-between gap-3 text-white z-20 pb-2 border-b border-white/10"
             onClick={(e) => e.stopPropagation()}
           >
-            <img
-              src={activeImageUrl}
-              alt={product.name}
-              className="max-w-full max-h-[85vh] object-contain rounded-[14px] shadow-2xl"
-            />
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="font-semibold text-xs sm:text-sm truncate max-w-xs sm:max-w-md">
+                {product.name}
+              </span>
+              {images.length > 1 && (
+                <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] font-mono shrink-0">
+                  {activeImageIndex + 1} / {images.length}
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              {/* Zoom Scale Multiplier Button */}
+              <button
+                type="button"
+                onClick={() => setZoomScale(prev => (prev === 1 ? 1.5 : prev === 1.5 ? 2 : 1))}
+                className="px-3 py-1 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-bold transition-all border border-white/20 flex items-center gap-1.5"
+                title="Toggle Zoom Level"
+              >
+                <ZoomIn className="w-3.5 h-3.5 text-[#69C5F5]" />
+                <span>{zoomScale}×</span>
+              </button>
+
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setIsZoomOpen(false)}
+                className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition-all focus:outline-none"
+                aria-label="Close zoom"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Center Stage: Constrained Zoom Viewer */}
+          <div
+            className="relative flex-1 flex items-center justify-center overflow-auto my-3 p-2 cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Prev Photo in Modal */}
+            {images.length > 1 && (
+              <button
+                type="button"
+                onClick={handlePrevImage}
+                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center shadow-lg transition-all z-20 focus:outline-none"
+                aria-label="Previous photo"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+            )}
+
+            <div 
+              className="max-w-4xl max-h-[75vh] flex items-center justify-center transition-transform duration-200"
+              style={{ transform: `scale(${zoomScale})` }}
+            >
+              <img
+                src={activeImageUrl}
+                alt={product.name}
+                className="max-w-full max-h-[72vh] object-contain rounded-[14px] shadow-2xl bg-white/5"
+              />
+            </div>
+
+            {/* Next Photo in Modal */}
+            {images.length > 1 && (
+              <button
+                type="button"
+                onClick={handleNextImage}
+                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center shadow-lg transition-all z-20 focus:outline-none"
+                aria-label="Next photo"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+
+          {/* Bottom Bar: Thumbnail Strip & Keyboard Hint */}
+          <div 
+            className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 border-t border-white/10 z-20"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span className="hidden sm:inline text-[11px] text-white/60">
+              {t("Tip: Use Arrow keys to navigate photos, Esc to close", "টিপ: কীবোর্ডের তীর বাটন দিয়ে ছবি পরিবর্তন করুন")}
+            </span>
+
+            {/* Thumbnail Strip */}
+            {images.length > 1 && (
+              <div className="flex items-center gap-2 overflow-x-auto pb-0.5 no-scrollbar mx-auto sm:mx-0">
+                {images.map((imgUrl, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`w-12 h-12 rounded-[10px] bg-white border-2 flex items-center justify-center overflow-hidden shrink-0 transition-all ${
+                      activeImageIndex === idx
+                        ? 'border-[#0877C9] scale-105 shadow-md'
+                        : 'border-white/40 opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <ProductImage
+                      src={imgUrl}
+                      alt={`Thumb ${idx + 1}`}
+                      fit="contain"
+                      aspectRatio="square"
+                      className="p-0.5"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

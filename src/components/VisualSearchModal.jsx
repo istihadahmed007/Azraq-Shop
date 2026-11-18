@@ -271,9 +271,9 @@ export default function VisualSearchModal() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-[#101C35]/50 backdrop-blur-md animate-in fade-in duration-200 select-none">
 
-      {/* Modal Dialog Window (Sharp 8px radius) */}
+      {/* Modal Dialog Window */}
       <div
-        className="relative w-full max-w-4xl glass-modal rounded-[8px] shadow-2xl border border-white/95 overflow-hidden my-4 max-h-[92vh] flex flex-col"
+        className="relative w-full max-w-5xl lg:max-w-6xl glass-modal rounded-[24px] shadow-2xl border border-white/95 overflow-hidden my-4 max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
 
@@ -702,7 +702,7 @@ export default function VisualSearchModal() {
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
                     {processedResults.bestMatches.map(product => {
                       const fullProduct = products.find(p => p.id === product.id) || product;
                       return (
@@ -743,7 +743,7 @@ export default function VisualSearchModal() {
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
                     {processedResults.similarProducts.map(product => {
                       const fullProduct = products.find(p => p.id === product.id) || product;
                       return (

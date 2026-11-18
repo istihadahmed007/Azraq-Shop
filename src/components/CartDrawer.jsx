@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Trash2, ArrowRight, ShoppingBag, Tag, CheckCircle2 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import ProductImage from './common/ProductImage';
@@ -8,6 +9,7 @@ import { generateProductSlug } from '../utils/productUtils';
  * AZRAQ Shop — Transparent Glassmorphism Cart Drawer
  */
 export default function CartDrawer() {
+  const navigate = useNavigate();
   const {
     cart,
     isCartOpen,
@@ -140,7 +142,7 @@ export default function CartDrawer() {
                     onClick={() => {
                       setIsCartOpen(false);
                       if (item.product) {
-                        window.location.href = `/product/${generateProductSlug(item.product)}`;
+                        navigate(`/product/${generateProductSlug(item.product)}`);
                       }
                     }}
                     className="w-16 h-16 rounded-[12px] bg-white border border-[#D5E2EE] flex-shrink-0 flex items-center justify-center p-1 overflow-hidden cursor-pointer shadow-inner"
@@ -161,7 +163,7 @@ export default function CartDrawer() {
                           onClick={() => {
                             setIsCartOpen(false);
                             if (item.product) {
-                              window.location.href = `/product/${generateProductSlug(item.product)}`;
+                              navigate(`/product/${generateProductSlug(item.product)}`);
                             }
                           }}
                           className="text-xs font-bold text-[#293B52] line-clamp-1 hover:text-[#0877C9] cursor-pointer transition-colors"

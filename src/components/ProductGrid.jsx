@@ -31,7 +31,7 @@ export default function ProductGrid() {
 
   const [sortBy, setSortBy] = useState('featured');
   const [inStockOnly, setInStockOnly] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(36);
+  const [visibleCount, setVisibleCount] = useState(35); // Exactly 7 rows of 5 cards on desktop
 
   // Dynamic priority ordered categories extracted from authentic database products
   const categories = useMemo(() => {
@@ -58,7 +58,7 @@ export default function ProductGrid() {
 
   // Reset pagination when category, search, or filters change
   React.useEffect(() => {
-    setVisibleCount(36);
+    setVisibleCount(35);
   }, [activeCategory, searchQuery, sortBy, inStockOnly]);
 
   const filteredAndSortedProducts = useMemo(() => {
@@ -74,14 +74,16 @@ export default function ProductGrid() {
       result = result.filter(p => p.in_stock !== false);
     }
 
-    // Search query filter
+    // Search query filter: safely handles all catalog text fields
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       result = result.filter(p =>
-        p.name.toLowerCase().includes(q) ||
+        (p.name && p.name.toLowerCase().includes(q)) ||
+        (p.name_bn && p.name_bn.toLowerCase().includes(q)) ||
         (p.category && p.category.toLowerCase().includes(q)) ||
-        (p.sku && p.sku.toLowerCase().includes(q)) ||
-        (p.id && p.id.toLowerCase().includes(q))
+        (p.primary_collection_name && p.primary_collection_name.toLowerCase().includes(q)) ||
+        (p.sku && String(p.sku).toLowerCase().includes(q)) ||
+        (p.id && String(p.id).toLowerCase().includes(q))
       );
     }
 
