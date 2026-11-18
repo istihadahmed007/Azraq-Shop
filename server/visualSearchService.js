@@ -101,37 +101,36 @@ export function predictProductCategory(queryFeatures, catalogEmbeddings) {
   const queryVector = queryFeatures.vector;
   const rawAspect = queryFeatures.rawAspectRatio || 1.0;
 
-  // A. Category Centroid Cosine Similarity
+  // A. Category Centroid Cosine Similarity (Primary Signal - weight 0.85)
   for (const [category, centroid] of Object.entries(categoryCentroids)) {
     const sim = cosineSimilarity(queryVector, centroid);
-    scores[category] = (scores[category] || 0) + Math.max(0, sim) * 0.50;
+    scores[category] = (scores[category] || 0) + Math.max(0, sim) * 0.85;
 
     // Aspect ratio bonus/penalty
     const expectedAspect = categoryAspectRatios[category] || 1.0;
     const aspectDiff = Math.abs(rawAspect - expectedAspect);
     if (aspectDiff < 0.20) {
-      scores[category] += 0.12;
+      scores[category] += 0.08;
     } else if (aspectDiff > 0.70) {
-      scores[category] -= 0.12;
+      scores[category] -= 0.08;
     }
   }
 
-  // B. Normalized k-NN Voting (Top 25 nearest catalog products)
+  // B. Normalized k-NN Voting (Secondary Signal - weight 0.15)
   const neighbors = catalogEmbeddings
     .map(p => ({
       category: p.category,
       sim: cosineSimilarity(queryVector, p.vector)
     }))
     .sort((a, b) => b.sim - a.sim)
-    .slice(0, 25);
+    .slice(0, 15);
 
   neighbors.forEach((n, idx) => {
-    if (n.sim > 0.10) {
-      // Normalize vote by square root of category population to prevent large categories from dominating
+    if (n.sim > 0.15) {
       const catCount = categoryCounts[n.category] || 1;
       const sizeWeight = 1 / Math.sqrt(catCount);
-      const rankWeight = (25 - idx) / 25;
-      const vote = n.sim * rankWeight * sizeWeight * 4.0;
+      const rankWeight = (15 - idx) / 15;
+      const vote = n.sim * rankWeight * sizeWeight * 0.15;
       scores[n.category] = (scores[n.category] || 0) + vote;
     }
   });

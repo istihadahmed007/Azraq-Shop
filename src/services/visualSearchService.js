@@ -379,11 +379,13 @@ async function runInBrowserSearch({ imageBase64, filters = {} }) {
 
     for (const [category, centroid] of Object.entries(centroids)) {
       const sim = cosineSimilarity(queryVector, centroid);
-      scores[category] = (scores[category] || 0) + Math.max(0, sim) * 0.50;
+      scores[category] = (scores[category] || 0) + Math.max(0, sim) * 0.85;
 
       const expectedAspect = aspectRatios[category] || 1.0;
       if (Math.abs(rawAspect - expectedAspect) < 0.20) {
-        scores[category] += 0.12;
+        scores[category] += 0.08;
+      } else if (Math.abs(rawAspect - expectedAspect) > 0.70) {
+        scores[category] -= 0.08;
       }
     }
 
