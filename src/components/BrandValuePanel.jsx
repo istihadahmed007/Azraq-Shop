@@ -42,27 +42,27 @@ export default function BrandValuePanel() {
   return (
     <section className="w-full select-none">
       
-      <div className="bg-white border border-gray-200 rounded-[4px] px-4 sm:px-6 py-4 flex flex-col lg:flex-row items-center justify-between gap-4 shadow-xs">
+      <div className="bg-[#F7FAFD] border border-[#D5E2EE]/90 rounded-[26px] px-5 sm:px-7 py-5 flex flex-col lg:flex-row items-center justify-between gap-5 shadow-[0_10px_30px_rgba(50,75,100,0.07)]">
         
         {/* 4 Benefits with Clean Dividers */}
-        <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-4 flex-1">
+        <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5 flex-1">
           {benefits.map((item, idx) => {
             const Icon = item.icon;
             return (
               <div 
                 key={idx}
                 className={`flex items-center gap-3 ${
-                  idx !== 0 ? 'md:border-l md:border-gray-100 md:pl-4' : ''
+                  idx !== 0 ? 'md:border-l md:border-[#E1EDF7] md:pl-5' : ''
                 }`}
               >
-                <div className="w-9 h-9 rounded-[3px] bg-blue-50 text-[#0877C9] flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-full bg-[#EDF4F9] text-[#0877C9] border border-[#D5E2EE] flex items-center justify-center shrink-0 shadow-2xs">
                   <Icon className="w-4.5 h-4.5" />
                 </div>
                 <div className="min-w-0">
-                  <h4 className="text-xs sm:text-[13px] font-bold text-[#212121] truncate leading-tight">
+                  <h4 className="text-xs sm:text-[13px] font-bold text-[#293B52] truncate leading-tight">
                     {item.title}
                   </h4>
-                  <p className="text-[11px] text-gray-500 truncate mt-0.5">
+                  <p className="text-[11px] text-[#6B7D93] truncate mt-0.5">
                     {item.desc}
                   </p>
                 </div>
@@ -72,12 +72,12 @@ export default function BrandValuePanel() {
         </div>
 
         {/* Social Icons on Far Right */}
-        <div className="flex items-center gap-2 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 lg:border-l lg:border-gray-100 lg:pl-4 w-full lg:w-auto justify-center lg:justify-end">
+        <div className="flex items-center gap-2.5 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 lg:border-l lg:border-[#E1EDF7] lg:pl-5 w-full lg:w-auto justify-center lg:justify-end">
           <a
             href="https://facebook.com"
             target="_blank"
             rel="noreferrer"
-            className="w-7.5 h-7.5 rounded-[3px] border border-gray-200 hover:border-[#0877C9] text-gray-500 hover:text-[#0877C9] flex items-center justify-center transition-colors"
+            className="w-9 h-9 rounded-full bg-[#EDF4F9] hover:bg-white border border-[#D5E2EE] text-[#6B7D93] hover:text-[#0877C9] flex items-center justify-center transition-all shadow-2xs"
             title="Facebook"
             aria-label="Facebook"
           >
@@ -87,7 +87,7 @@ export default function BrandValuePanel() {
             href="https://youtube.com"
             target="_blank"
             rel="noreferrer"
-            className="w-7.5 h-7.5 rounded-[3px] border border-gray-200 hover:border-[#0877C9] text-gray-500 hover:text-[#0877C9] flex items-center justify-center transition-colors"
+            className="w-9 h-9 rounded-full bg-[#EDF4F9] hover:bg-white border border-[#D5E2EE] text-[#6B7D93] hover:text-[#0877C9] flex items-center justify-center transition-all shadow-2xs"
             title="YouTube"
             aria-label="YouTube"
           >
@@ -97,7 +97,7 @@ export default function BrandValuePanel() {
             href="https://instagram.com"
             target="_blank"
             rel="noreferrer"
-            className="w-7.5 h-7.5 rounded-[3px] border border-gray-200 hover:border-[#0877C9] text-gray-500 hover:text-[#0877C9] flex items-center justify-center transition-colors"
+            className="w-9 h-9 rounded-full bg-[#EDF4F9] hover:bg-white border border-[#D5E2EE] text-[#6B7D93] hover:text-[#0877C9] flex items-center justify-center transition-all shadow-2xs"
             title="Instagram"
             aria-label="Instagram"
           >

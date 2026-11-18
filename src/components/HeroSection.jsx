@@ -1,184 +1,262 @@
 import React from 'react';
-import { ArrowRight, Truck, ShieldCheck, CreditCard, RotateCcw } from 'lucide-react';
+import { ArrowRight, Truck, ShieldCheck, CreditCard, RotateCcw, Heart, ShoppingBag, Sparkles } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 
 /**
- * AZRAQ Shop — Professional Retail E-Commerce Hero Banner
+ * AZRAQ Shop — Editorial Asymmetric Bento Hero Showcase
  * 
- * Shopee-inspired retail layout:
- * - 2/3 Main Promotional Banner on left showcasing authentic catalog products.
- * - 1/3 Stacked Promotional Banners on right with direct category shortcuts.
- * - 4-Column Service Guarantee Strip below the banners.
+ * Desktop composition:
+ * - Left section (~42% width): One large, high-quality featured product photograph,
+ *   product title, factual description, actual retail price in BDT, wishlist control, and prominent Shop Now button.
+ * - Right section (~58% width): Bento collection of New Arrivals & Featured products with
+ *   clean square product cards, consistent dimensions, and instant add-to-cart interactions.
  */
 export default function HeroSection() {
-  const { products, collections, navigateTo, t } = useShop();
+  const {
+    products,
+    favorites,
+    toggleFavorite,
+    setSelectedProduct,
+    addToCart,
+    navigateTo,
+    t
+  } = useShop();
 
-  // Authentic catalog products for promotional display
-  const heroProduct = products.find(p => p.id === 'AZQ-0001') || products[0];
-  const sideProduct1 = products.find(p => p.id === 'AZQ-0009' || p.id === 'AZQ-0035') || products[1];
-  const sideProduct2 = products.find(p => p.id === 'AZQ-0043' || p.id === 'AZQ-0049') || products[2];
+  // Authentic catalog products for the editorial showcase
+  const featuredProduct = products.find(p => p.id === 'AZQ-0001') || products[0];
+  const bentoProducts = products.slice(1, 5);
+
+  const isHeroFav = featuredProduct ? favorites.includes(featuredProduct.id) : false;
 
   return (
-    <section className="w-full select-none flex flex-col gap-3">
+    <section className="w-full select-none flex flex-col gap-6">
       
-      {/* 1. TOP BANNER GRID (2/3 Main Banner + 1/3 Stacked Banners) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch w-full">
+      {/* 1. ASYMMETRIC BENTO SHOWCASE GRID (42% Left + 58% Right) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-stretch w-full">
 
-        {/* Left: 2/3 Main Promotional Banner (lg:col-span-8) */}
-        <div className="lg:col-span-8 rounded-[4px] bg-[#FFFFFF] border border-gray-200 p-5 sm:p-7 flex flex-col justify-between relative overflow-hidden min-h-[300px] sm:min-h-[340px] shadow-xs">
+        {/* LEFT SECTION: ~42% Width (lg:col-span-5) — Large Editorial Feature Panel */}
+        <div className="lg:col-span-5 rounded-[28px] bg-[#F7FAFD] border border-[#D5E2EE]/90 p-6 sm:p-7 shadow-[0_10px_30px_rgba(50,75,100,0.08)] flex flex-col justify-between relative overflow-hidden group">
           
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center relative z-10 w-full flex-1">
-            
-            {/* Banner Text Content */}
-            <div className="md:col-span-7 flex flex-col items-start gap-2.5">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#0877C9] bg-blue-50 px-2 py-0.5 rounded-[2px] border border-blue-100">
-                {t('AZRAQ Official Store', 'আজরাক অফিসিয়াল স্টোর')}
+          {/* Top Metadata Row: Pill Badge + Wishlist Control */}
+          <div className="flex items-center justify-between gap-3 relative z-10">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EDF4F9] border border-[#D5E2EE] text-xs font-bold text-[#0877C9] shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 text-[#0877C9]" />
+              <span>{t('Editorial Spotlight', 'বাছাইকৃত স্পটলাইট')}</span>
+            </span>
+
+            {featuredProduct && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleFavorite(featuredProduct.id);
+                }}
+                className={`w-9 h-9 rounded-full bg-[#EDF4F9] hover:bg-white border border-[#D5E2EE] flex items-center justify-center transition-colors shadow-2xs ${
+                  isHeroFav ? 'text-[#EE8056]' : 'text-[#6B7D93] hover:text-[#EE8056]'
+                }`}
+                title={isHeroFav ? t("Remove from Wishlist", "পছন্দের তালিকা থেকে সরান") : t("Add to Wishlist", "পছন্দের তালিকায় যোগ করুন")}
+                aria-label="Wishlist featured product"
+              >
+                <Heart className={`w-4 h-4 ${isHeroFav ? 'fill-[#EE8056] stroke-[#EE8056]' : ''}`} />
+              </button>
+            )}
+          </div>
+
+          {/* Large Square Product Photograph: Edge-to-Edge Container */}
+          <div 
+            onClick={() => featuredProduct && setSelectedProduct(featuredProduct)}
+            className="w-full aspect-square rounded-[22px] overflow-hidden bg-white border border-[#E1EDF7] shadow-inner p-2 my-5 flex items-center justify-center cursor-pointer relative"
+          >
+            <img
+              src={featuredProduct?.main_image || "https://easydrop.asia/products/image-1794224164356-135288231.jpeg"}
+              alt={featuredProduct?.name || "Featured Product"}
+              className="w-full h-full object-cover rounded-[16px] group-hover:scale-104 transition-transform duration-300"
+            />
+          </div>
+
+          {/* Product Details & Actions */}
+          <div className="flex flex-col gap-3 relative z-10">
+            <div>
+              <span className="text-[11px] font-bold text-[#6B7D93] uppercase tracking-wider block mb-1">
+                {featuredProduct?.category || t('Flagship Technology', 'ফ্ল্যাগশিপ প্রযুক্তি')}
               </span>
-
-              <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-bold text-[#212121] tracking-tight leading-tight">
-                {t('Curated Everyday Goods & Gadgets', 'কিউরেটেড এভরিডে গুডস ও গ্যাজেটস')}
+              <h1 
+                onClick={() => featuredProduct && setSelectedProduct(featuredProduct)}
+                className="text-xl sm:text-2xl font-bold text-[#293B52] tracking-tight leading-snug hover:text-[#0877C9] cursor-pointer transition-colors"
+              >
+                {featuredProduct?.name || t('Premium Smart Device', 'প্রিমিয়াম স্মার্ট ডিভাইস')}
               </h1>
-
-              <p className="text-xs sm:text-sm text-[#757575] max-w-md leading-relaxed">
-                {t(
-                  'Authentic products with verified specifications, transparent BDT pricing, and fast nationwide delivery.',
-                  'আসল পণ্যের নিশ্চয়তা, বিডিটি (৳) মূল্য এবং সারা দেশে ক্যাশ অন ডেলিভারি।'
-                )}
+              <p className="text-xs sm:text-sm text-[#6B7D93] leading-relaxed line-clamp-2 mt-1">
+                {featuredProduct?.description?.slice(0, 110) || t('Authentic certified retail specification, verified durability, and fast nationwide delivery across Bangladesh.', 'আসল পণ্যের নিশ্চয়তা ও দ্রুততম হোম ডেলিভারি।')}
               </p>
-
-              <div className="flex items-center gap-3 pt-2">
-                <button
-                  onClick={() => {
-                    const el = document.getElementById('all-products') || document.getElementById('popular-products');
-                    el?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="px-5 py-2.5 rounded-[3px] bg-[#0877C9] hover:bg-[#0665AC] text-white text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-2xs transition-colors"
-                >
-                  <span>{t('Shop Now', 'এখনই কিনুন')}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-
-                <button
-                  onClick={() => navigateTo('collections')}
-                  className="px-4 py-2.5 rounded-[3px] border border-gray-300 hover:bg-gray-50 text-xs sm:text-sm font-semibold text-[#212121] transition-colors"
-                >
-                  {t('All 18 Collections', '১৮টি কালেকশন')}
-                </button>
-              </div>
             </div>
 
-            {/* Banner Product Photography */}
-            <div className="md:col-span-5 relative flex items-center justify-center min-h-[200px]">
-              <div className="w-full max-w-[240px] h-[200px] sm:h-[230px] flex items-center justify-center bg-gray-50/50 rounded-[4px] p-2 border border-gray-100">
-                <img
-                  src={heroProduct?.main_image || "https://easydrop.asia/products/image-1794224164356-135288231.jpeg"}
-                  alt={heroProduct?.name || "Featured Product"}
-                  className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
-                />
+            {/* Price & Primary CTA Row */}
+            <div className="flex items-center justify-between gap-4 pt-2 border-t border-[#E1EDF7]">
+              <div>
+                <span className="text-[10px] text-[#8CA0B6] font-semibold uppercase block">
+                  {t('Retail Price', 'খুচরা মূল্য')}
+                </span>
+                <span className="text-2xl font-extrabold text-[#0877C9] tracking-tight">
+                  ৳{(featuredProduct?.price || 0).toLocaleString()}
+                </span>
               </div>
-            </div>
 
+              <button
+                type="button"
+                onClick={() => {
+                  if (featuredProduct) {
+                    addToCart(featuredProduct, featuredProduct.variants?.[0] || 'Standard', 1);
+                  }
+                }}
+                className="px-6 py-3 rounded-full bg-[#0877C9] hover:bg-[#0665AC] text-white text-xs sm:text-sm font-bold flex items-center gap-2 shadow-md hover:shadow-lg transition-all active:scale-95"
+              >
+                <span>{t('Shop Now', 'এখনই অর্ডার করুন')}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
         </div>
 
-        {/* Right: 1/3 Two Stacked Category Promo Cards (lg:col-span-4) */}
-        <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3">
-
-          {/* Top Right Promo Card */}
-          <div
-            onClick={() => navigateTo('collections')}
-            className="flex-1 rounded-[4px] bg-[#FFFFFF] border border-gray-200 p-4 flex items-center justify-between gap-3 cursor-pointer hover:border-[#0877C9] transition-all group shadow-xs"
-          >
-            <div className="flex-1 min-w-0">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#0877C9] block mb-1">
-                {t('Smart Tech', 'স্মার্ট গ্যাজেটস')}
-              </span>
-              <h3 className="text-sm font-bold text-[#212121] leading-snug group-hover:text-[#0877C9] transition-colors">
-                {sideProduct1?.name ? sideProduct1.name.slice(0, 32) : t('Gadgets & Audio', 'গ্যাজেটস ও অডিও')}
-              </h3>
-              <p className="text-xs text-[#0877C9] font-bold mt-1">
-                ৳{(sideProduct1?.price || 650).toLocaleString()} BDT
+        {/* RIGHT SECTION: ~58% Width (lg:col-span-7) — Bento Grid of New Arrivals & Featured Products */}
+        <div className="lg:col-span-7 flex flex-col justify-between gap-4 sm:gap-5">
+          
+          {/* Header Row for Bento Showcase */}
+          <div className="flex items-center justify-between px-1">
+            <div>
+              <h2 className="text-base sm:text-lg font-bold text-[#293B52] tracking-tight">
+                {t('New Arrivals & Trending Tech', 'নতুন আগমন ও ট্রেন্ডিং গ্যাজেটস')}
+              </h2>
+              <p className="text-xs text-[#6B7D93]">
+                {t('Hand-picked authentic gadgets with verified specifications', 'যাচাইকৃত পণ্যের সেরা কালেকশন')}
               </p>
             </div>
-            <div className="w-20 h-20 shrink-0 rounded-[3px] bg-gray-50 border border-gray-100 p-1 flex items-center justify-center">
-              <img
-                src={sideProduct1?.main_image || "https://easydrop.asia/products/image-1794224164356-135288231.jpeg"}
-                alt=""
-                className="w-full h-full object-contain group-hover:scale-105 transition-transform"
-              />
-            </div>
+
+            <button
+              onClick={() => {
+                const el = document.getElementById('all-products') || document.getElementById('popular-products');
+                el?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="text-xs font-bold text-[#0877C9] hover:text-[#0665AC] flex items-center gap-1 transition-colors px-3 py-1.5 rounded-full bg-[#F7FAFD] border border-[#D5E2EE] shadow-2xs"
+            >
+              <span>{t('View All', 'সব দেখুন')}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
 
-          {/* Bottom Right Promo Card */}
-          <div
-            onClick={() => navigateTo('collections')}
-            className="flex-1 rounded-[4px] bg-[#FFFFFF] border border-gray-200 p-4 flex items-center justify-between gap-3 cursor-pointer hover:border-[#0877C9] transition-all group shadow-xs"
-          >
-            <div className="flex-1 min-w-0">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#EE4D2D] block mb-1">
-                {t('Lifestyle Picks', 'লাইফস্টাইল')}
-              </span>
-              <h3 className="text-sm font-bold text-[#212121] leading-snug group-hover:text-[#0877C9] transition-colors">
-                {sideProduct2?.name ? sideProduct2.name.slice(0, 32) : t('Home & Living', 'হোম ও লিভিং')}
-              </h3>
-              <p className="text-xs text-[#0877C9] font-bold mt-1">
-                ৳{(sideProduct2?.price || 1200).toLocaleString()} BDT
-              </p>
-            </div>
-            <div className="w-20 h-20 shrink-0 rounded-[3px] bg-gray-50 border border-gray-100 p-1 flex items-center justify-center">
-              <img
-                src={sideProduct2?.main_image || "https://easydrop.asia/products/image-1794224164356-135288231.jpeg"}
-                alt=""
-                className="w-full h-full object-contain group-hover:scale-105 transition-transform"
-              />
-            </div>
+          {/* 2x2 Bento Product Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
+            {bentoProducts.map((p) => {
+              const isFav = favorites.includes(p.id);
+              return (
+                <div
+                  key={p.id}
+                  onClick={() => setSelectedProduct(p)}
+                  className="rounded-[22px] bg-[#F7FAFD] border border-[#D5E2EE]/90 p-3.5 sm:p-4 shadow-[0_6px_20px_rgba(50,75,100,0.06)] hover:shadow-[0_12px_28px_rgba(50,75,100,0.11)] hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between group"
+                >
+                  {/* Top Square Image Well */}
+                  <div className="w-full aspect-square rounded-[18px] bg-white border border-[#E1EDF7] overflow-hidden relative flex items-center justify-center p-2 mb-3">
+                    <img
+                      src={p.main_image}
+                      alt={p.name}
+                      className="w-full h-full object-cover rounded-[14px] group-hover:scale-104 transition-transform duration-300"
+                    />
+
+                    {/* Wishlist Button */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFavorite(p.id);
+                      }}
+                      className={`absolute top-2 left-2 w-7 h-7 rounded-full bg-white/90 hover:bg-white border border-[#D5E2EE] flex items-center justify-center transition-colors shadow-2xs ${
+                        isFav ? 'text-[#EE8056]' : 'text-[#6B7D93] hover:text-[#EE8056]'
+                      }`}
+                      aria-label="Wishlist"
+                    >
+                      <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-[#EE8056] stroke-[#EE8056]' : ''}`} />
+                    </button>
+                  </div>
+
+                  {/* Information & Action Row */}
+                  <div className="flex flex-col gap-2">
+                    <div>
+                      <span className="text-[10px] font-semibold text-[#6B7D93] uppercase tracking-wider block truncate">
+                        {p.category}
+                      </span>
+                      <h3 className="text-xs sm:text-sm font-semibold text-[#293B52] line-clamp-2 leading-snug group-hover:text-[#0877C9] transition-colors min-h-[2.4rem]">
+                        {p.name}
+                      </h3>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-[#E1EDF7]">
+                      <span className="text-sm sm:text-base font-extrabold text-[#0877C9]">
+                        ৳{(p.price || 0).toLocaleString()}
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          addToCart(p, p.variants?.[0] || 'Standard', 1);
+                        }}
+                        className="w-8 h-8 rounded-full bg-[#0877C9] hover:bg-[#0665AC] text-white flex items-center justify-center shadow-xs transition-all active:scale-95"
+                        title={t("Add to Cart", "ব্যাগে যোগ করুন")}
+                      >
+                        <ShoppingBag className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
         </div>
 
       </div>
 
-      {/* 2. SHOPEE-STYLE 4-COLUMN SERVICE GUARANTEE STRIP */}
-      <div className="rounded-[4px] bg-white border border-gray-200 px-4 py-3 grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs shadow-2xs">
+      {/* 2. NEUMORPHIC 4-COLUMN SERVICE GUARANTEE STRIP */}
+      <div className="rounded-[24px] bg-[#F7FAFD] border border-[#D5E2EE]/90 px-5 sm:px-6 py-4 grid grid-cols-2 lg:grid-cols-4 gap-4 text-xs shadow-[0_6px_20px_rgba(50,75,100,0.06)]">
         
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-[3px] bg-blue-50 text-[#0877C9] flex items-center justify-center shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-[#EDF4F9] text-[#0877C9] border border-[#D5E2EE] flex items-center justify-center shrink-0 shadow-2xs">
             <Truck className="w-4 h-4" />
           </div>
-          <div>
-            <p className="font-bold text-[#212121]">{t('Nationwide Delivery', 'সারাদেশে ডেলিভারি')}</p>
-            <p className="text-[11px] text-[#757575]">{t('৳70 Dhaka / ৳130 Outside', 'ঢাকা ৭০৳ / বাইরে ১৩০৳')}</p>
+          <div className="min-w-0">
+            <p className="font-bold text-[#293B52] leading-tight truncate">{t('Nationwide Delivery', 'সারাদেশে ডেলিভারি')}</p>
+            <p className="text-[11px] text-[#6B7D93] truncate mt-0.5">{t('৳70 Dhaka / ৳130 Outside', 'ঢাকা ৭০৳ / বাইরে ১৩০৳')}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-[3px] bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-[#EDF4F9] text-emerald-600 border border-[#D5E2EE] flex items-center justify-center shrink-0 shadow-2xs">
             <ShieldCheck className="w-4 h-4" />
           </div>
-          <div>
-            <p className="font-bold text-[#212121]">{t('Cash on Delivery', 'ক্যাশ অন ডেলিভারি')}</p>
-            <p className="text-[11px] text-[#757575]">{t('Pay upon receiving goods', 'পণ্য বুঝে নিয়ে মূল্য দিন')}</p>
+          <div className="min-w-0">
+            <p className="font-bold text-[#293B52] leading-tight truncate">{t('Cash on Delivery', 'ক্যাশ অন ডেলিভারি')}</p>
+            <p className="text-[11px] text-[#6B7D93] truncate mt-0.5">{t('Pay upon receiving goods', 'পণ্য বুঝে নিয়ে মূল্য দিন')}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-[3px] bg-blue-50 text-[#0877C9] flex items-center justify-center shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-[#EDF4F9] text-[#0877C9] border border-[#D5E2EE] flex items-center justify-center shrink-0 shadow-2xs">
             <CreditCard className="w-4 h-4" />
           </div>
-          <div>
-            <p className="font-bold text-[#212121]">{t('Secure Payments', 'নিরাপদ পেমেন্ট')}</p>
-            <p className="text-[11px] text-[#757575]">{t('bKash, Nagad, Cards via Paymently', 'বিকাশ, নগদ ও কার্ড পেমেন্টলি')}</p>
+          <div className="min-w-0">
+            <p className="font-bold text-[#293B52] leading-tight truncate">{t('Secure Payments', 'নিরাপদ পেমেন্ট')}</p>
+            <p className="text-[11px] text-[#6B7D93] truncate mt-0.5">{t('bKash, Nagad, Cards via Paymently', 'বিকাশ, নগদ ও কার্ড পেমেন্টলি')}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-[3px] bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-[#EDF4F9] text-[#EE8056] border border-[#D5E2EE] flex items-center justify-center shrink-0 shadow-2xs">
             <RotateCcw className="w-4 h-4" />
           </div>
-          <div>
-            <p className="font-bold text-[#212121]">{t('7-Day Returns', '৭ দিনের রিটার্ন')}</p>
-            <p className="text-[11px] text-[#757575]">{t('Verified policy on defects', 'সহজ রিটার্ন পলিসি')}</p>
+          <div className="min-w-0">
+            <p className="font-bold text-[#293B52] leading-tight truncate">{t('7-Day Returns', '৭ দিনের রিটার্ন')}</p>
+            <p className="text-[11px] text-[#6B7D93] truncate mt-0.5">{t('Verified policy on defects', 'সহজ রিটার্ন পলিসি')}</p>
           </div>
         </div>
 

@@ -3,8 +3,8 @@ import { ChevronRight, Layers } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 
 /**
- * AZRAQ Shop — Shop by Collection Section (Shopee Retail Layout)
- * Clean retail cards featuring genuine EasyDrop collections.
+ * AZRAQ Shop — Shop by Collection Section
+ * Soft-neumorphic cards featuring genuine EasyDrop collections.
  */
 export default function ShopByCollectionSection() {
   const { collections, navigateTo, t } = useShop();
@@ -15,28 +15,35 @@ export default function ShopByCollectionSection() {
   return (
     <section id="shop-by-collection" className="w-full select-none">
       
-      <div className="bg-white border border-gray-200 rounded-[4px] p-4 sm:p-5 shadow-xs">
+      <div className="bg-[#F7FAFD] border border-[#D5E2EE]/90 rounded-[26px] p-5 sm:p-6 shadow-[0_10px_30px_rgba(50,75,100,0.07)]">
         
         {/* Section Header */}
-        <div className="flex items-center justify-between pb-3 mb-3.5 border-b border-gray-100">
-          <div className="flex items-center gap-2">
-            <Layers className="w-4 h-4 text-[#0877C9]" />
-            <h2 className="text-sm sm:text-base font-bold uppercase tracking-wider text-[#212121]">
-              {t('Catalog Collections', 'কালেকশন ক্যাটালগ')}
-            </h2>
+        <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-[#E1EDF7]">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-[#EDF4F9] text-[#0877C9] border border-[#D5E2EE] flex items-center justify-center shadow-2xs">
+              <Layers className="w-4 h-4 text-[#0877C9]" />
+            </div>
+            <div>
+              <h2 className="text-base sm:text-lg font-bold text-[#293B52] tracking-tight">
+                {t('Catalog Collections', 'কালেকশন ক্যাটালগ')}
+              </h2>
+              <p className="text-xs text-[#6B7D93]">
+                {t('Explore full themed departments across our complete product range', 'আসল পণ্য ও বিভাগের বিশেষ কালেকশন')}
+              </p>
+            </div>
           </div>
 
           <button
             onClick={() => navigateTo('collections')}
-            className="text-xs font-semibold text-[#0877C9] hover:text-[#0665AC] flex items-center gap-1 transition-colors"
+            className="text-xs font-bold text-[#0877C9] hover:text-[#0665AC] flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#EDF4F9] hover:bg-white border border-[#D5E2EE] shadow-2xs transition-all"
           >
             <span>{t('View All 18 Collections', 'সকল ১৮টি কালেকশন')}</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        {/* 3 or 6 Column Clean Collection Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
+        {/* 6-Column Clean Collection Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-3.5">
           {spotlightCollections.map(col => {
             const displayImage = col.cover_image || col.image_url || col.fallback_image;
             const count = col.imported_product_count ?? col.product_count ?? 0;
@@ -45,10 +52,10 @@ export default function ShopByCollectionSection() {
               <div
                 key={col.id}
                 onClick={() => navigateTo('collection-detail', col.slug)}
-                className="group cursor-pointer rounded-[3px] border border-gray-200 hover:border-[#0877C9] hover:shadow-xs p-2.5 flex flex-col justify-between transition-all bg-white"
+                className="group cursor-pointer rounded-[20px] border border-[#D5E2EE]/80 hover:border-[#0877C9] bg-[#EDF4F9] hover:bg-white p-3 flex flex-col justify-between transition-all duration-200 shadow-2xs hover:shadow-md hover:-translate-y-1"
               >
                 {/* Collection Image */}
-                <div className="relative w-full aspect-square bg-gray-50 rounded-[2px] p-2 flex items-center justify-center overflow-hidden mb-2">
+                <div className="relative w-full aspect-square bg-white rounded-[16px] border border-[#E1EDF7] p-2 flex items-center justify-center overflow-hidden mb-2.5">
                   <img
                     src={displayImage}
                     alt={col.name}
@@ -58,16 +65,16 @@ export default function ShopByCollectionSection() {
                         e.target.src = fallback;
                       }
                     }}
-                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
+                    className="w-full h-full object-cover rounded-[12px] group-hover:scale-105 transition-transform duration-200"
                   />
                 </div>
 
                 {/* Details */}
                 <div className="min-w-0">
-                  <h3 className="text-xs font-bold text-[#212121] truncate group-hover:text-[#0877C9] transition-colors">
+                  <h3 className="text-xs font-bold text-[#293B52] truncate group-hover:text-[#0877C9] transition-colors">
                     {col.name}
                   </h3>
-                  <p className="text-[11px] text-gray-500 mt-0.5">
+                  <p className="text-[11px] text-[#6B7D93] mt-0.5">
                     {count} {t('Products', 'পণ্য')}
                   </p>
                 </div>

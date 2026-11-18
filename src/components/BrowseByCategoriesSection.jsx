@@ -3,8 +3,8 @@ import { ArrowRight, ChevronRight, Grid } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 
 /**
- * AZRAQ Shop — Shop by Category Section (Shopee Retail Layout)
- * Displays authentic collections in a clean retail grid with genuine catalog photography.
+ * AZRAQ Shop — Shop by Category Section
+ * Soft-neumorphic cards featuring authentic catalog category photography.
  */
 export default function BrowseByCategoriesSection() {
   const { collections, navigateTo, t } = useShop();
@@ -24,29 +24,36 @@ export default function BrowseByCategoriesSection() {
   return (
     <section id="browse-categories" className="w-full select-none">
       
-      {/* Retail Category Box */}
-      <div className="bg-white border border-gray-200 rounded-[4px] p-4 sm:p-5 shadow-xs">
+      {/* Neumorphic Category Container */}
+      <div className="bg-[#F7FAFD] border border-[#D5E2EE]/90 rounded-[26px] p-5 sm:p-6 shadow-[0_10px_30px_rgba(50,75,100,0.07)]">
         
         {/* Section Header */}
-        <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
-          <div className="flex items-center gap-2">
-            <Grid className="w-4 h-4 text-[#0877C9]" />
-            <h2 className="text-sm sm:text-base font-bold uppercase tracking-wider text-[#212121]">
-              {t('Categories', 'ক্যাটাগরি')}
-            </h2>
+        <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-[#E1EDF7]">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-[#EDF4F9] text-[#0877C9] border border-[#D5E2EE] flex items-center justify-center shadow-2xs">
+              <Grid className="w-4 h-4" />
+            </div>
+            <div>
+              <h2 className="text-base sm:text-lg font-bold text-[#293B52] tracking-tight">
+                {t('Shop by Category', 'ক্যাটাগরি অনুযায়ী কিনুন')}
+              </h2>
+              <p className="text-xs text-[#6B7D93]">
+                {t('Explore curated collections across gadgets, lifestyle, and fashion', 'গ্যাজেট ও লাইফস্টাইলের সেরা ক্যাটাগরি')}
+              </p>
+            </div>
           </div>
 
           <button
             onClick={() => navigateTo('collections')}
-            className="text-xs font-semibold text-[#0877C9] hover:text-[#0665AC] flex items-center gap-1 transition-colors"
+            className="text-xs font-bold text-[#0877C9] hover:text-[#0665AC] flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#EDF4F9] hover:bg-white border border-[#D5E2EE] shadow-2xs transition-all"
           >
-            <span>{t('View All 18 Collections', 'সকল ১৮টি কালেকশন')}</span>
+            <span>{t('View All Collections', 'সব কালেকশন')}</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        {/* Clean Category Grid (2 rows or horizontal scroll on mobile, 5-8 cols on desktop) */}
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-8 gap-2.5 sm:gap-3">
+        {/* Clean Neumorphic Category Grid: 8 columns on desktop, 4 on tablet, 2 on mobile */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-3.5">
           {displayCategories.slice(0, 8).map((col) => {
             const displayImage = col.cover_image || col.image_url || col.fallback_image || 'https://easydrop.asia/products/image-1794224164356-135288231.jpeg';
             const shortTitle = col.name
@@ -61,10 +68,10 @@ export default function BrowseByCategoriesSection() {
               <button
                 key={col.id}
                 onClick={() => navigateTo('collection-detail', col.slug)}
-                className="group flex flex-col items-center p-2 rounded-[3px] border border-gray-100 hover:border-[#0877C9] hover:shadow-xs transition-all focus:outline-none bg-white text-center"
+                className="group flex flex-col items-center p-3 rounded-[20px] border border-[#D5E2EE]/80 hover:border-[#0877C9] bg-[#EDF4F9] hover:bg-white transition-all duration-200 focus:outline-none text-center shadow-2xs hover:shadow-md hover:-translate-y-1"
               >
-                {/* Clean Image Well */}
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[2px] bg-gray-50 flex items-center justify-center p-1.5 overflow-hidden mb-1.5 group-hover:scale-105 transition-transform duration-200">
+                {/* Image Well */}
+                <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-[16px] bg-white border border-[#E1EDF7] shadow-inner p-1.5 flex items-center justify-center overflow-hidden mb-2 group-hover:scale-106 transition-transform duration-200">
                   <img
                     src={displayImage}
                     alt={col.name}
@@ -74,17 +81,17 @@ export default function BrowseByCategoriesSection() {
                         e.target.src = fallback;
                       }
                     }}
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-cover rounded-[12px]"
                   />
                 </div>
 
                 {/* Category Label */}
-                <span className="text-[11px] sm:text-xs font-medium text-[#212121] group-hover:text-[#0877C9] transition-colors truncate max-w-full leading-tight">
+                <span className="text-xs font-bold text-[#293B52] group-hover:text-[#0877C9] transition-colors truncate max-w-full leading-tight">
                   {shortTitle}
                 </span>
 
                 {/* Item Count */}
-                <span className="text-[10px] text-gray-400 mt-0.5">
+                <span className="text-[10px] text-[#6B7D93] mt-0.5">
                   {count} {t('Items', 'টি')}
                 </span>
               </button>

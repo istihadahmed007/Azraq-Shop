@@ -90,7 +90,7 @@ export default function CollectionDetailPage() {
     <div className="w-full py-4 min-h-screen select-none">
       
       {/* Breadcrumb Navigation */}
-      <div className="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-4">
+      <div className="flex items-center gap-2 text-xs font-semibold text-[#6B7D93] mb-4">
         <button onClick={() => navigateTo('home')} className="hover:text-[#0877C9] transition-colors">
           {t("Home", "হোম")}
         </button>
@@ -99,33 +99,33 @@ export default function CollectionDetailPage() {
           {t("Collections", "কালেকশনসমূহ")}
         </button>
         <ChevronRight className="w-3.5 h-3.5" />
-        <span className="text-[#212121] font-bold">{activeCollection.name}</span>
+        <span className="text-[#293B52] font-bold">{activeCollection.name}</span>
       </div>
 
-      {/* Collection Hero Banner with Clean Retail Layout */}
-      <div className="rounded-[4px] bg-white border border-gray-200 p-5 sm:p-6 mb-4 shadow-xs">
+      {/* Collection Hero Banner with Clean Neumorphic Surface */}
+      <div className="rounded-[26px] bg-[#F7FAFD] border border-[#D5E2EE]/90 p-6 sm:p-8 mb-5 shadow-[0_10px_30px_rgba(50,75,100,0.07)]">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-2 text-center md:text-left max-w-xl">
-            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[2px] bg-blue-50 text-[#0877C9] text-xs font-bold border border-blue-100">
+          <div className="space-y-3 text-center md:text-left max-w-xl">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EBF4FA] text-[#0877C9] text-xs font-bold border border-[#D5E2EE]">
               <span>{t("COLLECTION", "কালেকশন")} #{activeCollection.id}</span>
             </div>
-            <h1 className="text-xl sm:text-3xl font-bold text-[#212121] tracking-tight">
+            <h1 className="text-xl sm:text-3xl font-extrabold text-[#293B52] tracking-tight">
               {activeCollection.name}
             </h1>
-            <p className="text-xs sm:text-sm text-[#757575] leading-relaxed">
+            <p className="text-xs sm:text-sm text-[#6B7D93] leading-relaxed">
               {t(activeCollection.description_en, activeCollection.description_bn)}
             </p>
             <div className="pt-1 flex flex-wrap items-center justify-center md:justify-start gap-2">
-              <span className="px-2.5 py-0.5 rounded-[2px] bg-gray-50 text-xs font-medium text-gray-600 border border-gray-200">
+              <span className="px-3 py-1 rounded-full bg-[#EDF4F9] text-xs font-semibold text-[#293B52] border border-[#D5E2EE]">
                 {activeCollectionProducts?.length || 0} {t("Products Available", "পণ্য অন্তর্ভুক্ত")}
               </span>
-              <span className="px-2.5 py-0.5 rounded-[2px] bg-emerald-50 text-xs font-medium text-emerald-800 border border-emerald-200">
+              <span className="px-3 py-1 rounded-full bg-emerald-50 text-xs font-semibold text-emerald-800 border border-emerald-200">
                 {t("100% Authentic Quality", "১০০% আসল পণ্য")}
               </span>
             </div>
           </div>
 
-          <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-[3px] bg-gray-50 border border-gray-200 p-2 flex items-center justify-center shrink-0 overflow-hidden">
+          <div className="w-32 h-32 sm:w-44 sm:h-44 rounded-[20px] bg-[#EDF4F9] border border-[#D5E2EE] p-3 flex items-center justify-center shrink-0 overflow-hidden shadow-inner">
             <img
               src={activeCollection.cover_image || activeCollection.image_url || activeCollection.fallback_image}
               alt={activeCollection.name}
@@ -142,17 +142,17 @@ export default function CollectionDetailPage() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 mb-4 p-3 rounded-[4px] bg-white border border-gray-200 shadow-2xs">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 mb-6 p-4 rounded-[22px] bg-[#F7FAFD] border border-[#D5E2EE]/90 shadow-[0_10px_30px_rgba(50,75,100,0.05)]">
         
         {/* Search within collection */}
         <div className="relative flex-1 md:max-w-xs">
-          <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-4 h-4 text-[#6B7D93] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             placeholder={t("Filter within collection...", "কালেকশনে খুঁজুন...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 rounded-[3px] border border-gray-200 text-xs text-[#212121] placeholder-gray-400 focus:outline-none focus:border-[#0877C9]"
+            className="w-full pl-10 pr-4 py-2 rounded-full bg-[#EDF4F9] border border-[#D5E2EE] text-xs text-[#293B52] placeholder-[#6B7D93] focus:outline-none focus:border-[#0877C9] transition-all font-medium"
           />
         </div>
 
@@ -160,15 +160,15 @@ export default function CollectionDetailPage() {
         <div className="flex flex-wrap items-center gap-2">
           
           {/* Price Quick Filter */}
-          <div className="flex items-center gap-1 text-xs">
+          <div className="flex items-center gap-1.5 text-xs">
             {['all', 'under-1500', '1500-3000', 'above-3000'].map((p) => (
               <button
                 key={p}
                 onClick={() => setPriceFilter(p)}
-                className={`px-2.5 py-1.5 rounded-[4px] font-bold transition-all border ${
+                className={`px-3 py-1.5 rounded-full font-bold transition-all text-xs ${
                   priceFilter === p 
-                    ? 'bg-[#0877C9] text-white border-[#0877C9] shadow-2xs' 
-                    : 'glass-button text-[#71849B] hover:text-[#101C35] border-white/90'
+                    ? 'bg-[#0877C9] text-white shadow-sm' 
+                    : 'bg-[#EDF4F9] text-[#6B7D93] hover:text-[#293B52] border border-[#D5E2EE]'
                 }`}
               >
                 {p === 'all' && t('All Prices', 'সব দাম')}
@@ -184,24 +184,24 @@ export default function CollectionDetailPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="appearance-none pl-3 pr-8 py-1.5 rounded-[6px] glass-input text-xs font-bold text-[#101C35] cursor-pointer border border-white/90 focus:border-[#0877C9]"
+              className="appearance-none pl-3.5 pr-8 py-1.5 rounded-full bg-[#EDF4F9] text-xs font-bold text-[#293B52] cursor-pointer border border-[#D5E2EE] focus:border-[#0877C9] focus:outline-none"
             >
               <option value="featured">{t("Featured", "সেরা")}</option>
               <option value="price-low">{t("Price: Low to High", "দাম: কম")}</option>
               <option value="price-high">{t("Price: High to Low", "দাম: বেশি")}</option>
               <option value="rating">{t("Top Rated", "রেটিং")}</option>
             </select>
-            <ArrowUpDown className="w-3.5 h-3.5 text-[#71849B] absolute right-2.5 pointer-events-none" />
+            <ArrowUpDown className="w-3.5 h-3.5 text-[#6B7D93] absolute right-3 pointer-events-none" />
           </div>
 
         </div>
 
       </div>
 
-      {/* Products Grid (Shopee-Inspired Proportions: 5-6 desktop, 3-4 tablet, 2 mobile) */}
+      {/* Products Grid — Exactly 5 Product Cards Per Row on Desktop */}
       {displayedProducts.length === 0 ? (
-        <div className="py-16 text-center rounded-[8px] glass-panel p-8 space-y-4 max-w-xl mx-auto border border-white/95">
-          <p className="text-base font-bold text-[#101C35]">
+        <div className="py-16 text-center rounded-[26px] bg-[#F7FAFD] border border-[#D5E2EE]/90 p-8 space-y-4 max-w-xl mx-auto shadow-xs">
+          <p className="text-base font-bold text-[#293B52]">
             {t("No products found matching your filters", "কোনো পণ্য খুঁজে পাওয়া যায়নি")}
           </p>
           <button
@@ -210,13 +210,13 @@ export default function CollectionDetailPage() {
               setPriceFilter('all');
               setInStockOnly(false);
             }}
-            className="px-5 py-2 rounded-[6px] glass-button-primary text-xs font-bold shadow-xs"
+            className="px-6 py-2 rounded-full bg-[#0877C9] text-white text-xs font-bold shadow-xs hover:bg-[#0768b0] transition-colors"
           >
             {t("Reset Filters", "ফিল্টার রিসেট করুন")}
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2.5 sm:gap-3.5 lg:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-4.5">
           {displayedProducts.map(product => (
             <ProductCard
               key={product.id}
@@ -235,8 +235,8 @@ export default function CollectionDetailPage() {
       {visibleCount < filteredProducts.length && (
         <div className="text-center pt-8">
           <button
-            onClick={() => setVisibleCount(prev => prev + 24)}
-            className="px-8 py-2.5 rounded-[6px] glass-button text-[#101C35] hover:text-[#0877C9] font-bold text-xs shadow-xs transition-all hover:scale-102"
+            onClick={() => setVisibleCount(prev => prev + 25)}
+            className="px-8 py-3 rounded-full bg-[#F7FAFD] border border-[#D5E2EE] text-[#293B52] hover:text-[#0877C9] hover:border-[#0877C9] font-bold text-xs shadow-sm hover:shadow transition-all"
           >
             {t(`Load More (${filteredProducts.length - visibleCount} remaining)`, `আরও দেখুন (${filteredProducts.length - visibleCount}টি বাকি)`)}
           </button>
