@@ -76,7 +76,7 @@ export function ShopProvider({ children }) {
     return getStoredItem('cart', [], validateCartItems);
   });
 
-  const [deliveryArea, setDeliveryArea] = useState('inside'); // 'inside' = ৳70, 'outside' = ৳130
+  const [deliveryArea, setDeliveryArea] = useState('inside'); // 'inside' = ৳80, 'outside' = ৳150
   const [appliedPromo, setAppliedPromo] = useState(null);
 
   // Favorites / Wishlist with validated resilient storage
@@ -231,7 +231,7 @@ export function ShopProvider({ children }) {
     0
   );
   const isFreeDelivery = cartSubtotal >= 3000;
-  const deliveryFee = cartSubtotal === 0 ? 0 : isFreeDelivery ? 0 : deliveryArea === 'inside' ? 70 : 130;
+  const deliveryFee = cartSubtotal === 0 ? 0 : isFreeDelivery ? 0 : deliveryArea === 'inside' ? 80 : 150;
   const promoDiscount = appliedPromo ? appliedPromo.discount : 0;
   const cartTotal = Math.max(0, cartSubtotal + deliveryFee - promoDiscount);
   const totalCartItems = cart.reduce((sum, item) => sum + item.quantity, 0);

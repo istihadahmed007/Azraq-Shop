@@ -63,15 +63,15 @@ export default function Header({ onToggleSidebar }) {
         <div className="flex items-center gap-4">
           <span className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_#10B981]" />
-            <span className="font-medium">{t("Nationwide Delivery: ৳70 Dhaka / ৳130 Outside", "সারাদেশে দ্রুত ডেলিভারি: ঢাকা ৭০৳ / বাইরে ১৩০৳")}</span>
+            <span className="font-medium">{t("Nationwide Delivery: ৳80 Dhaka / ৳150 Outside", "সারাদেশে দ্রুত ডেলিভারি: ঢাকা ৮০৳ / বাইরে ১৫০৳")}</span>
           </span>
           <span className="text-[#C3D4E4]">|</span>
           <button 
-            onClick={() => window.open('https://wa.me/8801711223344', '_blank')}
+            onClick={() => window.open('https://wa.me/8801851172032', '_blank')}
             className="hover:text-[#0877C9] flex items-center gap-1 transition-colors font-medium"
           >
             <Headphones className="w-3 h-3 text-[#0877C9]" />
-            <span>+880 1711-223344</span>
+            <span>+880 1851-172032</span>
           </button>
         </div>
 

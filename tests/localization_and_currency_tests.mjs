@@ -88,13 +88,13 @@ runTest('Consistency: server pricing calculation matches formatted output for In
     { id: 'AZQ-0013', quantity: 2 }
   ];
   const pricing = calculateServerOrderPricing({ items, deliveryArea: 'inside' });
-  // Subtotal = 1200 + 1300 = 2500. Delivery inside Dhaka < 3000 = 70. Total = 2570.
+  // Subtotal = 1200 + 1300 = 2500. Delivery inside Dhaka < 3000 = 80. Total = 2580.
   assert.strictEqual(pricing.subtotal, 2500);
-  assert.strictEqual(pricing.deliveryFee, 70);
-  assert.strictEqual(pricing.totalPayable, 2570);
+  assert.strictEqual(pricing.deliveryFee, 80);
+  assert.strictEqual(pricing.totalPayable, 2580);
 
   const formattedTotal = formatBdtAmount(pricing.totalPayable);
-  assert.strictEqual(formattedTotal, '৳2,570 BDT');
+  assert.strictEqual(formattedTotal, '৳2,580 BDT');
 });
 
 runTest('Consistency: free delivery triggered on subtotal >= 3000 BDT', () => {
@@ -108,15 +108,15 @@ runTest('Consistency: free delivery triggered on subtotal >= 3000 BDT', () => {
   assert.strictEqual(formatBdtAmount(pricing.totalPayable), '৳3,600 BDT');
 });
 
-runTest('Consistency: outside Dhaka delivery fee is exactly 130 BDT', () => {
+runTest('Consistency: outside Dhaka delivery fee is exactly 150 BDT', () => {
   const items = [
     { id: 'AZQ-0081', quantity: 1 }
   ];
   const pricing = calculateServerOrderPricing({ items, deliveryArea: 'outside' });
   assert.strictEqual(pricing.subtotal, 750);
-  assert.strictEqual(pricing.deliveryFee, 130);
-  assert.strictEqual(pricing.totalPayable, 880);
-  assert.strictEqual(formatBdtAmount(pricing.totalPayable), '৳880 BDT');
+  assert.strictEqual(pricing.deliveryFee, 150);
+  assert.strictEqual(pricing.totalPayable, 900);
+  assert.strictEqual(formatBdtAmount(pricing.totalPayable), '৳900 BDT');
 });
 
 runTest('Consistency: promo discount calculation with AZRAQNEW (৳200 discount)', () => {
@@ -124,12 +124,12 @@ runTest('Consistency: promo discount calculation with AZRAQNEW (৳200 discount)
     { id: 'AZQ-0078', quantity: 1 }
   ];
   const pricing = calculateServerOrderPricing({ items, deliveryArea: 'inside', promoCode: 'AZRAQNEW' });
-  // Subtotal 1000 + 70 delivery - 200 discount = 870 BDT
+  // Subtotal 1000 + 80 delivery - 200 discount = 880 BDT
   assert.strictEqual(pricing.subtotal, 1000);
-  assert.strictEqual(pricing.deliveryFee, 70);
+  assert.strictEqual(pricing.deliveryFee, 80);
   assert.strictEqual(pricing.discount, 200);
-  assert.strictEqual(pricing.totalPayable, 870);
-  assert.strictEqual(formatBdtAmount(pricing.totalPayable), '৳870 BDT');
+  assert.strictEqual(pricing.totalPayable, 880);
+  assert.strictEqual(formatBdtAmount(pricing.totalPayable), '৳880 BDT');
 });
 
 // 4. Bengali Typography & UI Text Invariants

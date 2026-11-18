@@ -490,8 +490,8 @@ export default function ProductDetailPage() {
                       {t("Delivery Timeline & Rates", "ডেলিভারি সময় ও চার্জ")}
                     </span>
                     <p className="text-[#6B7D93] text-[11px] leading-relaxed mt-0.5">
-                      • {t("Inside Dhaka: ৳70 (24–48 hours)", "ঢাকা সিটির ভেতরে: ৭০৳ (২৪–৪৮ ঘণ্টা)")}<br />
-                      • {t("Outside Dhaka: ৳130 (2–4 business days)", "ঢাকা সিটির বাইরে: ১৩০৳ (২–৪ কার্যদিবস)")}<br />
+                      • {t("Inside Dhaka: ৳80 (24–48 hours)", "ঢাকা সিটির ভেতরে: ৮০৳ (২৪–৪৮ ঘণ্টা)")}<br />
+                      • {t("Outside Dhaka: ৳150 (2–4 business days)", "ঢাকা সিটির বাইরে: ১৫০৳ (২–৪ কার্যদিবস)")}<br />
                       • <strong className="text-[#0877C9]">{t("FREE Delivery on orders over ৳3,000", "৩০০০৳ বা তদূর্ধ্ব অর্ডারে ফ্রি ডেলিভারি")}</strong>
                     </p>
                   </div>

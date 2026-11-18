@@ -47,7 +47,7 @@ export default function Footer() {
                 <div className="w-6 h-6 rounded-full bg-[#EDF4F9] border border-[#D5E2EE] flex items-center justify-center text-[#0877C9]">
                   <Phone className="w-3.5 h-3.5" />
                 </div>
-                <span className="font-semibold">+880 1711-223344</span>
+                <span className="font-semibold">+880 1851-172032</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <div className="w-6 h-6 rounded-full bg-[#EDF4F9] border border-[#D5E2EE] flex items-center justify-center text-[#0877C9]">
@@ -76,7 +76,7 @@ export default function Footer() {
                 </button>
               </li>
               <li>
-                <button onClick={() => window.open('https://wa.me/8801711223344', '_blank')} className="hover:text-[#0877C9] transition-colors">
+                <button onClick={() => window.open('https://wa.me/8801851172032', '_blank')} className="hover:text-[#0877C9] transition-colors">
                   {t('Help Center & Support', 'হেল্প সেন্টার ও সহায়তা')}
                 </button>
               </li>
@@ -140,8 +140,8 @@ export default function Footer() {
               <div className="pt-1">
                 <p className="font-semibold text-[#293B52] mb-1">{t('Delivery Areas', 'ডেলিভারি এরিয়া')}</p>
                 <p className="text-[11px] leading-relaxed">
-                  • {t('Dhaka: 24–48h (৳70)', 'ঢাকা: ২৪–৪৮ ঘণ্টা (৭০৳)')}<br />
-                  • {t('Outside: 48–72h (৳130)', 'বাইরে: ৪৮–৭২ ঘণ্টা (১৩০৳)')}<br />
+                  • {t('Dhaka: 24–48h (৳80)', 'ঢাকা: ২৪–৪৮ ঘণ্টা (৮০৳)')}<br />
+                  • {t('Outside: 48–72h (৳150)', 'বাইরে: ৪৮–৭২ ঘণ্টা (১৫০৳)')}<br />
                   • {t('Free over ৳3,000', '৩০০০৳ এর অর্ডারে ফ্রি')}
                 </p>
               </div>

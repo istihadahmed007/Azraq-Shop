@@ -270,7 +270,7 @@ export default function OrderTrackingModal() {
                 <span>{t("Need help with this order?", "এই অর্ডার নিয়ে কোনো সহায়তার প্রয়োজন?")}</span>
               </div>
               <a 
-                href="https://wa.me/8801711223344"
+                href="https://wa.me/8801851172032"
                 target="_blank"
                 rel="noreferrer"
                 className="px-3 py-1 rounded-[4px] glass-button text-[11px] font-bold text-[#0877C9] shadow-2xs"

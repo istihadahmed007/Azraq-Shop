@@ -53,24 +53,24 @@ console.log('🧪 AZRAQ SHOP COMPREHENSIVE STOREFRONT & ENGINE AUDIT');
 console.log('='.repeat(64));
 
 // 1. Delivery Pricing Invariants
-runTest('Inside Dhaka Delivery Fee is ৳70 when subtotal < ৳3,000', () => {
+runTest('Inside Dhaka Delivery Fee is ৳80 when subtotal < ৳3,000', () => {
   const result = calculateServerOrderPricing({
     items: [{ id: 'AZQ-0010', quantity: 1 }],
     deliveryArea: 'inside'
   });
   assert.strictEqual(result.subtotal, 1500);
-  assert.strictEqual(result.deliveryFee, 70);
-  assert.strictEqual(result.totalPayable, 1570);
+  assert.strictEqual(result.deliveryFee, 80);
+  assert.strictEqual(result.totalPayable, 1580);
 });
 
-runTest('Outside Dhaka Delivery Fee is ৳130 when subtotal < ৳3,000', () => {
+runTest('Outside Dhaka Delivery Fee is ৳150 when subtotal < ৳3,000', () => {
   const result = calculateServerOrderPricing({
     items: [{ id: 'AZQ-0010', quantity: 1 }],
     deliveryArea: 'outside'
   });
   assert.strictEqual(result.subtotal, 1500);
-  assert.strictEqual(result.deliveryFee, 130);
-  assert.strictEqual(result.totalPayable, 1630);
+  assert.strictEqual(result.deliveryFee, 150);
+  assert.strictEqual(result.totalPayable, 1650);
 });
 
 runTest('Nationwide Free Delivery unlocks on orders >= ৳3,000', () => {
@@ -97,7 +97,7 @@ runTest('Promo Code AZRAQNEW applies ৳200 flat discount', () => {
     promoCode: 'AZRAQNEW'
   });
   assert.strictEqual(result.discount, 200);
-  assert.strictEqual(result.totalPayable, 2000 - 200 + 70);
+  assert.strictEqual(result.totalPayable, 2000 - 200 + 80);
 });
 
 runTest('Promo Code AZRAQ10 applies 10% percentage discount', () => {
@@ -107,7 +107,7 @@ runTest('Promo Code AZRAQ10 applies 10% percentage discount', () => {
     promoCode: 'AZRAQ10'
   });
   assert.strictEqual(result.discount, 250);
-  assert.strictEqual(result.totalPayable, 2500 - 250 + 130);
+  assert.strictEqual(result.totalPayable, 2500 - 250 + 150);
 });
 
 // 3. COD Order Placement

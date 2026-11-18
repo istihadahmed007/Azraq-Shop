@@ -190,8 +190,8 @@ export default function ProductDetailModal() {
                     {t("Delivery Timeline & Rates", "ডেলিভারি সময় ও খরচ")}
                   </h4>
                   <p className="text-[#71849B] text-[11px] mt-0.5 leading-relaxed">
-                    • {t("Inside Dhaka: ৳70 (24–48 hours)", "ঢাকার ভেতরে: ৭০৳ (২৪–৪৮ ঘণ্টা)")}<br />
-                    • {t("Outside Dhaka: ৳130 (2–4 business days)", "ঢাকার বাইরে: ১৩০৳ (২–৪ কার্যদিবস)")}<br />
+                    • {t("Inside Dhaka: ৳80 (24–48 hours)", "ঢাকার ভেতরে: ৮০৳ (২৪–৪৮ ঘণ্টা)")}<br />
+                    • {t("Outside Dhaka: ৳150 (2–4 business days)", "ঢাকার বাইরে: ১৫০৳ (২–৪ কার্যদিবস)")}<br />
                     • <strong className="text-[#0877C9]">{t("FREE Nationwide Delivery on orders over ৳3,000", "৩০০০৳ এর অর্ডারে সারা দেশে ফ্রি হোম ডেলিভারি")}</strong>
                   </p>
                 </div>

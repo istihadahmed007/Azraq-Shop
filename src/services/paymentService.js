@@ -57,7 +57,7 @@ export function isStoreMaintenanceError(err) {
 
 /**
  * Calculate client-side order pricing authoritative with server pricing rules
- * Inside Dhaka = 70 BDT (Free if subtotal >= 3000 BDT), Outside Dhaka = 130 BDT
+ * Inside Dhaka = 80 BDT (Free if subtotal >= 3000 BDT), Outside Dhaka = 150 BDT
  */
 export function calculateClientOrderPricing({ items = [], deliveryArea = 'inside', promoCode = null }) {
   let subtotal = 0;
@@ -81,7 +81,7 @@ export function calculateClientOrderPricing({ items = [], deliveryArea = 'inside
   }
 
   const isFreeDelivery = subtotal >= 3000;
-  let deliveryFee = subtotal === 0 ? 0 : isFreeDelivery ? 0 : (deliveryArea === 'outside' ? 130 : 70);
+  let deliveryFee = subtotal === 0 ? 0 : isFreeDelivery ? 0 : (deliveryArea === 'outside' ? 150 : 80);
 
   let discount = 0;
   let validPromoCode = null;

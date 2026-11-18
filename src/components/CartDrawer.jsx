@@ -232,7 +232,7 @@ export default function CartDrawer() {
                       : 'glass-button text-[#101C35] border-white/90'
                       }`}
                   >
-                    {t("Inside Dhaka", "ঢাকার ভেতরে")} (৳70)
+                    {t("Inside Dhaka", "ঢাকার ভেতরে")} (৳80)
                   </button>
                   <button
                     onClick={() => setDeliveryArea('outside')}
@@ -241,7 +241,7 @@ export default function CartDrawer() {
                       : 'glass-button text-[#101C35] border-white/90'
                       }`}
                   >
-                    {t("Outside Dhaka", "ঢাকার বাইরে")} (৳130)
+                    {t("Outside Dhaka", "ঢাকার বাইরে")} (৳150)
                   </button>
                 </div>
               </div>

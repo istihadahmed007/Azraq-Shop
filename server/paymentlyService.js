@@ -140,9 +140,9 @@ export function calculateServerOrderPricing({ items = [], deliveryArea = 'inside
     });
   }
 
-  // Delivery Fee Calculation: Inside Dhaka = 70 BDT (Free if subtotal >= 3000), Outside = 130 BDT
+  // Delivery Fee Calculation: Inside Dhaka = 80 BDT (Free if subtotal >= 3000), Outside = 150 BDT
   const isFreeDelivery = subtotal >= 3000;
-  let deliveryFee = subtotal === 0 ? 0 : isFreeDelivery ? 0 : (deliveryArea === 'outside' ? 130 : 70);
+  let deliveryFee = subtotal === 0 ? 0 : isFreeDelivery ? 0 : (deliveryArea === 'outside' ? 150 : 80);
 
   // Promotional Discount Calculation (Server-Validated)
   let discount = 0;

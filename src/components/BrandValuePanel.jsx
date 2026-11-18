@@ -35,7 +35,7 @@ export default function BrandValuePanel() {
     {
       icon: Headphones,
       title: t('Dedicated Support', 'সার্বক্ষণিক সহায়তা'),
-      desc: t('+880 1711-223344 & WhatsApp', 'সরাসরি সহায়তা ও দ্রুত অর্ডার ট্র্যাকিং'),
+      desc: t('+880 1851-172032 & WhatsApp', 'সরাসরি সহায়তা ও দ্রুত অর্ডার ট্র্যাকিং'),
     },
   ];
 

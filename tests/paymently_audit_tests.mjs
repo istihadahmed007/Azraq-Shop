@@ -99,7 +99,7 @@ async function runAuditSuite() {
     if (!sessionRes.success || !sessionRes.payment_url || sessionRes.is_fallback_link) {
       throw new Error(`Expected successful dynamic session, got: ${JSON.stringify(sessionRes)}`);
     }
-    if (sessionRes.amount !== 2870 || sessionRes.invoice_id !== invoiceToken) {
+    if (sessionRes.amount !== 2880 || sessionRes.invoice_id !== invoiceToken) {
       throw new Error(`Mismatch in amount or invoiceId: ${JSON.stringify(sessionRes)}`);
     }
     const attempt = await getCheckoutAttempt(sessionRes.checkout_id);
@@ -565,7 +565,7 @@ async function runAuditSuite() {
       deliveryArea: 'inside'
     });
 
-    if (pricing.items[0].unit_price !== 2800 || pricing.totalPayable !== 2870) {
+    if (pricing.items[0].unit_price !== 2800 || pricing.totalPayable !== 2880) {
       throw new Error(`Price tampering not prevented! Got unit price ${pricing.items[0].unit_price}, total ${pricing.totalPayable}`);
     }
     console.log('  ✓ Client-tampered price ignored; authoritative catalog price ৳2,800 enforced');
@@ -578,13 +578,13 @@ async function runAuditSuite() {
   try {
     console.log('\n▶ TEST 16 — Promo Validation: Server strictly enforces valid discount codes:');
     const p1 = calculateServerOrderPricing({ items: sampleItems, promoCode: 'AZRAQNEW' });
-    if (p1.discount !== 200 || p1.totalPayable !== 2670) {
-      throw new Error(`AZRAQNEW expected discount 200, total 2670, got ${p1.discount}, ${p1.totalPayable}`);
+    if (p1.discount !== 200 || p1.totalPayable !== 2680) {
+      throw new Error(`AZRAQNEW expected discount 200, total 2680, got ${p1.discount}, ${p1.totalPayable}`);
     }
 
     const p2 = calculateServerOrderPricing({ items: sampleItems, promoCode: 'AZRAQ10' });
-    if (p2.discount !== 280 || p2.totalPayable !== 2590) {
-      throw new Error(`AZRAQ10 expected discount 280, total 2590, got ${p2.discount}, ${p2.totalPayable}`);
+    if (p2.discount !== 280 || p2.totalPayable !== 2600) {
+      throw new Error(`AZRAQ10 expected discount 280, total 2600, got ${p2.discount}, ${p2.totalPayable}`);
     }
     console.log('  ✓ Promo discounts validated server-side (AZRAQNEW: -৳200, AZRAQ10: -10%)');
     passed++;

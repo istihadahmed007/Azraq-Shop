@@ -235,7 +235,7 @@ export default function HeroSection() {
           </div>
           <div className="min-w-0">
             <p className="font-bold text-[#293B52] leading-tight truncate">{t('Nationwide Delivery', 'সারাদেশে ডেলিভারি')}</p>
-            <p className="text-[11px] text-[#6B7D93] truncate mt-0.5">{t('৳70 Dhaka / ৳130 Outside', 'ঢাকা ৭০৳ / বাইরে ১৩০৳')}</p>
+            <p className="text-[11px] text-[#6B7D93] truncate mt-0.5">{t('৳80 Dhaka / ৳150 Outside', 'ঢাকা ৮০৳ / বাইরে ১৫০৳')}</p>
           </div>
         </div>
 

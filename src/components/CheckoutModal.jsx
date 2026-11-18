@@ -694,7 +694,7 @@ export default function CheckoutModal() {
                             : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                         }`}
                       >
-                        {t("Inside Dhaka (৳70)", "ঢাকার ভেতর (৳৭০)")}
+                        {t("Inside Dhaka (৳80)", "ঢাকার ভেতর (৳৮০)")}
                       </button>
                       <button
                         type="button"
@@ -707,7 +707,7 @@ export default function CheckoutModal() {
                             : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                         }`}
                       >
-                        {t("Outside Dhaka (৳130)", "ঢাকার বাইরে (৳১৩০)")}
+                        {t("Outside Dhaka (৳150)", "ঢাকার বাইরে (৳১৫০)")}
                       </button>
                     </div>
                   </div>
