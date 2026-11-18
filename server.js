@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { handlePaymentRoutes } from './server/paymentRoutes.js';
 import searchByImageHandler from './api/search-by-image.js';
+import productsHandler from './api/products/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -62,6 +63,17 @@ const server = http.createServer(async (req, res) => {
 
   // 1. API Endpoints
   if (pathname.startsWith('/api/')) {
+    if (pathname === '/api/products' || pathname.startsWith('/api/products')) {
+      try {
+        await productsHandler(req, res);
+      } catch (err) {
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+      return;
+    }
+
     if (pathname === '/api/search-by-image') {
       try {
         await searchByImageHandler(req, res);

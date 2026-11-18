@@ -14,7 +14,86 @@ import {
   Toast
 } from './components';
 import Sidebar from './components/Sidebar';
-import { Package, ArrowRight } from 'lucide-react';
+import { Package, ArrowRight, RotateCcw, AlertTriangle } from 'lucide-react';
+
+// Route Error Boundary protecting against chunk load failures on new deployments
+class RouteErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('[RouteErrorBoundary Caught]:', error, errorInfo);
+    const isChunkError = 
+      error?.name === 'ChunkLoadError' ||
+      /Failed to fetch dynamically imported module/i.test(error?.message || '') ||
+      /Loading chunk [\d]+ failed/i.test(error?.message || '');
+
+    if (isChunkError && typeof window !== 'undefined') {
+      const reloaded = window.sessionStorage.getItem('chunk_reload');
+      if (!reloaded) {
+        window.sessionStorage.setItem('chunk_reload', 'true');
+        window.location.reload();
+      }
+    }
+  }
+
+  handleReload = () => {
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.removeItem('chunk_reload');
+      window.location.reload();
+    }
+  };
+
+  handleGoHome = () => {
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.removeItem('chunk_reload');
+      window.location.href = '/';
+    }
+  };
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="py-20 text-center select-none flex flex-col items-center justify-center p-6">
+          <div className="w-16 h-16 rounded-full bg-[#FFF1F0] border border-[#FFA39E] flex items-center justify-center mb-4 text-[#CF1322]">
+            <AlertTriangle className="w-8 h-8" />
+          </div>
+          <h2 className="text-2xl font-bold text-[#293B52] mb-2">
+            Something went wrong
+          </h2>
+          <p className="text-xs text-[#6B7D93] max-w-sm mb-6">
+            A temporary component loading error occurred. Please refresh the page or return to the storefront.
+          </p>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={this.handleReload}
+              className="px-6 py-2.5 rounded-full bg-[#0877C9] text-white font-bold text-xs shadow-md hover:bg-[#0665AC] transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <RotateCcw className="w-4 h-4" />
+              <span>Reload Page</span>
+            </button>
+            <button
+              type="button"
+              onClick={this.handleGoHome}
+              className="px-6 py-2.5 rounded-full bg-[#EDF4F9] border border-[#D5E2EE] text-[#293B52] font-semibold text-xs hover:bg-[#E4EEF5] transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <span>Back to Home</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 // Lazy-loaded routes & secondary overlays to optimize initial bundle size & TTI
 const CollectionsPage = lazy(() => import('./components/CollectionsPage'));
@@ -98,69 +177,71 @@ function StorefrontContent() {
 
         {/* Primary Route-Based View Container */}
         <main className="transition-all duration-200 flex flex-col gap-7 sm:gap-8 w-full min-w-0 max-w-full">
-          <Routes>
-            {/* 1. Home Page Route */}
-            <Route
-              path="/"
-              element={
-                <>
-                  {/* 1. Asymmetric Bento Hero Product Showcase */}
-                  <HeroSection />
+          <RouteErrorBoundary>
+            <Routes>
+              {/* 1. Home Page Route */}
+              <Route
+                path="/"
+                element={
+                  <>
+                    {/* 1. Asymmetric Bento Hero Product Showcase */}
+                    <HeroSection />
 
-                  {/* 2. Shop by Category (Neumorphic Category Grid with authentic photos) */}
-                  <BrowseByCategoriesSection />
+                    {/* 2. Shop by Category (Neumorphic Category Grid with authentic photos) */}
+                    <BrowseByCategoriesSection />
 
-                  {/* 3. Featured Products / Best Sellers (Strictly 5 product cards per row) */}
-                  <TrendingRightNowSection />
+                    {/* 3. Featured Products / Best Sellers (Strictly 5 product cards per row) */}
+                    <TrendingRightNowSection />
 
-                  {/* 4. Complete EasyDrop Collections Explorer */}
-                  <ShopByCollectionSection />
+                    {/* 4. Complete EasyDrop Collections Explorer */}
+                    <ShopByCollectionSection />
 
-                  {/* 5. Daily Discover Product Catalog Grid (Strictly 5 product cards per row) */}
-                  <ProductGrid />
+                    {/* 5. Daily Discover Product Catalog Grid (Strictly 5 product cards per row) */}
+                    <ProductGrid />
 
-                  {/* 6. Customer Assurance & Retail Guarantees */}
-                  <BrandValuePanel />
-                </>
-              }
-            />
+                    {/* 6. Customer Assurance & Retail Guarantees */}
+                    <BrandValuePanel />
+                  </>
+                }
+              />
 
-            {/* 2. All Collections Browser Route */}
-            <Route
-              path="/collections"
-              element={
-                <Suspense fallback={<LoadingFallback />}>
-                  <CollectionsPage />
-                </Suspense>
-              }
-            />
+              {/* 2. All Collections Browser Route */}
+              <Route
+                path="/collections"
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <CollectionsPage />
+                  </Suspense>
+                }
+              />
 
-            {/* 3. Individual Collection Detail Route */}
-            <Route
-              path="/collection/:slug"
-              element={
-                <Suspense fallback={<LoadingFallback />}>
-                  <CollectionDetailPage />
-                </Suspense>
-              }
-            />
+              {/* 3. Individual Collection Detail Route */}
+              <Route
+                path="/collection/:slug"
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <CollectionDetailPage />
+                  </Suspense>
+                }
+              />
 
-            {/* 4. Dedicated Individual Product Page Route */}
-            <Route
-              path="/product/:slug"
-              element={
-                <Suspense fallback={<LoadingFallback />}>
-                  <ProductDetailPage />
-                </Suspense>
-              }
-            />
+              {/* 4. Dedicated Individual Product Page Route */}
+              <Route
+                path="/product/:slug"
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <ProductDetailPage />
+                  </Suspense>
+                }
+              />
 
-            {/* 5. 404 Catch-All Route */}
-            <Route
-              path="*"
-              element={<NotFoundPage />}
-            />
-          </Routes>
+              {/* 5. 404 Catch-All Route */}
+              <Route
+                path="*"
+                element={<NotFoundPage />}
+              />
+            </Routes>
+          </RouteErrorBoundary>
         </main>
 
         {/* Professional E-Commerce Footer */}

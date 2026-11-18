@@ -53,7 +53,15 @@
       "destination": "/api/search-by-image"
     },
     {
-      "source": "/((?!api/|assets/|favicon.svg|favicon.ico).*)",
+      "source": "/api/products",
+      "destination": "/api/products/index"
+    },
+    {
+      "source": "/api/products/:path*",
+      "destination": "/api/products/index"
+    },
+    {
+      "source": "/((?!api/|assets/|data/|branding/|favicon.svg|favicon.ico).*)",
       "destination": "/index.html"
     }
   ]

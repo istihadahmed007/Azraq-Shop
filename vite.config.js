@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { searchProductsByImage } from './server/visualSearchService.js';
 import { handlePaymentRoutes } from './server/paymentRoutes.js';
+import productsHandler from './api/products/index.js';
 
 // Custom API route plugin for AI Visual Product Search & Paymently Gateway
 function azraqApiPlugin() {
@@ -11,6 +12,12 @@ function azraqApiPlugin() {
       if (req.url?.startsWith('/api/payments') || req.url?.startsWith('/api/orders') || req.url?.startsWith('/api/admin') || req.url?.startsWith('/payment-checkout')) {
         const handled = await handlePaymentRoutes(req, res);
         if (handled) return;
+      }
+
+      // 1b. Standalone Product Retrieval Endpoint
+      if (req.url?.startsWith('/api/products')) {
+        await productsHandler(req, res);
+        return;
       }
 
       // 2. Visual Search Health check endpoint

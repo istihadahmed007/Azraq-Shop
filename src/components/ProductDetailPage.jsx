@@ -16,12 +16,18 @@ import {
   Package,
   Layers,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  AlertCircle
 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import ProductImage from './common/ProductImage';
 import ProductCard from './common/ProductCard';
-import { findProductBySlug, generateProductSlug, normalizeProductImages } from '../utils/productUtils';
+import { 
+  findProductBySlug, 
+  generateProductSlug, 
+  normalizeProductImages,
+  fetchSingleProduct 
+} from '../utils/productUtils';
 import { formatBdtAmount } from '../services/paymentService';
 
 /**
@@ -46,14 +52,82 @@ export default function ProductDetailPage() {
     favorites,
     toggleFavorite,
     setIsCheckoutOpen,
+    catalogStatus,
+    catalogError,
+    retryCatalogHydration,
+    injectProduct,
     isCatalogHydrated,
     t
   } = useShop();
 
-  // Find product by slug or ID
-  const product = useMemo(() => {
+  // 1. Try to find product immediately from current in-memory products
+  const productFromContext = useMemo(() => {
     return findProductBySlug(slug, products);
   }, [slug, products]);
+
+  // Local state for single product resolution and retry triggering
+  const [fetchedProduct, setFetchedProduct] = useState(null);
+  const [fetchStatus, setFetchStatus] = useState('idle'); // 'idle' | 'loading' | 'success' | 'notFound' | 'error'
+  const [fetchError, setFetchError] = useState(null);
+  const [fetchAttempt, setFetchAttempt] = useState(0);
+
+  // Active product is either from context or from single product fetch
+  const product = productFromContext || fetchedProduct;
+
+  // Trigger individual product fetch if not found in current context products
+  useEffect(() => {
+    // If product is already found in context, mark as success
+    if (productFromContext) {
+      setFetchStatus('success');
+      return;
+    }
+
+    let isMounted = true;
+    const controller = new AbortController();
+
+    setFetchStatus('loading');
+    setFetchError(null);
+
+    fetchSingleProduct(slug, { signal: controller.signal, timeoutMs: 8000 })
+      .then(res => {
+        if (!isMounted) return;
+        if (res.product) {
+          setFetchedProduct(res.product);
+          setFetchStatus('success');
+          if (injectProduct) {
+            injectProduct(res.product);
+          }
+        } else if (res.isNotFound) {
+          if (catalogStatus === 'loading') {
+            setFetchStatus('loading');
+          } else {
+            setFetchStatus('notFound');
+          }
+        } else if (res.isError) {
+          setFetchStatus('error');
+          setFetchError(res.error || 'Failed to load product details');
+        }
+      })
+      .catch(err => {
+        if (!isMounted) return;
+        if (err.name === 'AbortError') return;
+        setFetchStatus('error');
+        setFetchError(err.message || 'Network error loading product');
+      });
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [slug, productFromContext, catalogStatus, fetchAttempt, injectProduct]);
+
+  // Handle retry
+  const handleRetry = () => {
+    setFetchAttempt(prev => prev + 1);
+    if (retryCatalogHydration) {
+      retryCatalogHydration();
+    }
+  };
 
   // Gallery state
   const images = useMemo(() => {
@@ -128,17 +202,54 @@ export default function ProductDetailPage() {
     }
   }, [product]);
 
-  // Loading state while catalog hydrates in background (prevents momentary 404 flash on direct URL)
-  if (!product && !isCatalogHydrated) {
+  // 1. Loading state: active when product is being loaded from single record or catalog
+  if (!product && (fetchStatus === 'loading' || fetchStatus === 'idle' || (fetchStatus !== 'error' && fetchStatus !== 'notFound' && catalogStatus === 'loading'))) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center select-none">
         <div className="w-10 h-10 rounded-full border-3 border-[#0877C9]/30 border-t-[#0877C9] animate-spin mb-3" />
-        <span className="text-xs text-[#6B7D93] font-medium">{t("Loading authentic catalog details...", "পণ্যের বিবরণ লোড হচ্ছে...")}</span>
+        <span className="text-xs text-[#6B7D93] font-medium">
+          {t("Loading authentic catalog details...", "পণ্যের বিবরণ লোড হচ্ছে...")}
+        </span>
       </div>
     );
   }
 
-  // If product not found after full catalog hydration, show clean 404 state
+  // 2. Recoverable Network Error state (CRITICAL: NEVER display 404 for network errors or timeouts)
+  if (!product && fetchStatus === 'error') {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center select-none">
+        <div className="w-16 h-16 rounded-full bg-[#FFF1F0] border border-[#FFA39E] flex items-center justify-center mb-4 text-[#CF1322]">
+          <AlertCircle className="w-8 h-8" />
+        </div>
+        <h1 className="text-2xl font-bold text-[#293B52] mb-2">
+          {t("Unable to Load Product", "পণ্যটি লোড করা সম্ভব হয়নি")}
+        </h1>
+        <p className="text-xs text-[#6B7D93] max-w-md mb-6">
+          {fetchError || t("A network connection or server timeout occurred while loading this product. Please check your connection and retry.", "সংযোগজনিত সমস্যার কারণে পণ্যটি লোড করা যায়নি। দয়া করে পুনরায় চেষ্টা করুন।")}
+        </p>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handleRetry}
+            className="px-6 py-2.5 rounded-full bg-[#0877C9] text-white font-bold text-xs shadow-md hover:bg-[#0665AC] transition-all flex items-center gap-2 cursor-pointer"
+          >
+            <RotateCcw className="w-4 h-4" />
+            <span>{t("Retry", "পুনরায় চেষ্টা করুন")}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="px-6 py-2.5 rounded-full bg-[#EDF4F9] border border-[#D5E2EE] text-[#293B52] font-semibold text-xs hover:bg-[#E4EEF5] transition-all flex items-center gap-2 cursor-pointer"
+          >
+            <span>{t("Back to Home", "হোমপেজে ফিরে যান")}</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. Genuine 404 (Not Found) state: shown only when single product resolution returns 404 AND full catalog check completes
   if (!product) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center select-none">
@@ -156,7 +267,7 @@ export default function ProductDetailPage() {
         </p>
         <button
           onClick={() => navigate('/')}
-          className="px-6 py-2.5 rounded-full bg-[#0877C9] text-white font-bold text-xs shadow-md hover:bg-[#0665AC] transition-all flex items-center gap-2"
+          className="px-6 py-2.5 rounded-full bg-[#0877C9] text-white font-bold text-xs shadow-md hover:bg-[#0665AC] transition-all flex items-center gap-2 cursor-pointer"
         >
           <span>{t("Browse All Products", "সব পণ্য দেখুন")}</span>
           <ArrowRight className="w-4 h-4" />

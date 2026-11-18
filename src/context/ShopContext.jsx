@@ -49,31 +49,80 @@ export function ShopProvider({ children }) {
     totalUniqueProducts: initialProductsData.total_catalog_count || initialProductsData.products.length,
     isSyncing: false
   });
-  const [isCatalogHydrated, setIsCatalogHydrated] = useState(false);
+  
+  // Explicit Catalog Hydration State Machine ('idle' | 'loading' | 'success' | 'error')
+  const [catalogStatus, setCatalogStatus] = useState('idle');
+  const [catalogError, setCatalogError] = useState(null);
+  const [hydrationTrigger, setHydrationTrigger] = useState(0);
+
+  const retryCatalogHydration = () => {
+    setHydrationTrigger(prev => prev + 1);
+  };
+
+  // Allows on-demand injection of a single product record (e.g. from /data/products/[id].json) into memory
+  const injectProduct = (singleProduct) => {
+    if (!singleProduct || !singleProduct.id) return;
+    setProducts(prev => {
+      const exists = prev.some(p => String(p.id).toLowerCase() === String(singleProduct.id).toLowerCase());
+      if (exists) return prev;
+      return [singleProduct, ...prev];
+    });
+  };
 
   // Asynchronously hydrate full catalog without blocking initial paint or bloating initial bundle
   useEffect(() => {
     let isMounted = true;
-    fetch('/data/central_products.json')
-      .then(res => res.ok ? res.json() : null)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s resilient timeout guard
+
+    setCatalogStatus('loading');
+    setCatalogError(null);
+
+    fetch('/data/central_products.json', { signal: controller.signal })
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status} fetching catalog`);
+        return res.json();
+      })
       .then(data => {
-        if (isMounted && data?.products && Array.isArray(data.products) && data.products.length > 0) {
-          setProducts(data.products);
+        clearTimeout(timeoutId);
+        if (!isMounted) return;
+        if (data?.products && Array.isArray(data.products) && data.products.length > 0) {
+          setProducts(prev => {
+            const existingMap = new Map();
+            data.products.forEach(p => existingMap.set(String(p.id).toLowerCase(), p));
+            prev.forEach(p => {
+              const k = String(p.id).toLowerCase();
+              if (!existingMap.has(k)) existingMap.set(k, p);
+            });
+            return Array.from(existingMap.values());
+          });
           setSyncStatus(prev => ({
             ...prev,
             lastSynced: data.synced_at || prev.lastSynced,
             totalUniqueProducts: data.products.length
           }));
+          setCatalogStatus('success');
+        } else {
+          throw new Error('Catalog payload empty or invalid');
         }
       })
       .catch(err => {
-        console.warn('[Catalog Hydration Notice] Running with initial catalog:', err.message);
-      })
-      .finally(() => {
-        if (isMounted) setIsCatalogHydrated(true);
+        clearTimeout(timeoutId);
+        if (!isMounted) return;
+        const msg = err.name === 'AbortError' ? 'Catalog loading timed out' : err.message;
+        console.warn('[Catalog Hydration Warning]:', msg);
+        setCatalogStatus('error');
+        setCatalogError(msg);
       });
-    return () => { isMounted = false; };
-  }, []);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [hydrationTrigger]);
+
+  const isCatalogHydrated = catalogStatus === 'success';
 
   // Cart state with validated resilient storage
   const [cart, setCart] = useState(() => {
@@ -363,6 +412,10 @@ export function ShopProvider({ children }) {
         activeCollectionProducts,
         navigateTo,
         syncStatus,
+        catalogStatus,
+        catalogError,
+        retryCatalogHydration,
+        injectProduct,
         isCatalogHydrated,
         syncWithEasyDrop,
         updateCollection,

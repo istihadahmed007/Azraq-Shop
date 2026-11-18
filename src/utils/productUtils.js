@@ -126,3 +126,100 @@ export function normalizeProductImages(product) {
 
   return normalized;
 }
+
+/**
+ * Extracts product ID from slug or direct ID string.
+ * Supports patterns like "AZQ-0028", "azq-0028", "name-azq-0028", etc.
+ */
+export function extractProductIdFromSlug(slugOrId) {
+  if (!slugOrId) return null;
+  const target = String(slugOrId).trim();
+  if (/^azq-[a-z0-9_-]+$/i.test(target)) {
+    return target.toUpperCase();
+  }
+  const match = target.match(/(azq-[a-z0-9_-]+)$/i) || target.match(/(azq-[0-9]+)/i);
+  if (match) {
+    return match[1].toUpperCase();
+  }
+  return null;
+}
+
+/**
+ * Fetches a single product record directly without needing the full monolithic catalog.
+ * Resolution chain:
+ * 1. Fast static lookup: /data/products/{ID}.json (~2.7 KB)
+ * 2. Dedicated API lookup: /api/products?id={ID} or ?slug={SLUG}
+ * 3. Graceful timeout and abort support.
+ */
+export async function fetchSingleProduct(slugOrId, options = {}) {
+  const { signal, timeoutMs = 8000, baseUrl = '' } = options;
+  if (!slugOrId) return { product: null, isNotFound: true, isError: false, error: null };
+
+  const extractedId = extractProductIdFromSlug(slugOrId);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  // Propagate external abort if provided
+  if (signal) {
+    if (signal.aborted) {
+      controller.abort();
+    } else {
+      signal.addEventListener('abort', () => controller.abort(), { once: true });
+    }
+  }
+
+  try {
+    // 1. Try static standalone record first if ID is recognized
+    if (extractedId) {
+      try {
+        const staticUrl = `${baseUrl}/data/products/${extractedId}.json`;
+        const res = await fetch(staticUrl, { signal: controller.signal });
+        if (res.ok) {
+          const product = await res.json();
+          if (product && product.id) {
+            clearTimeout(timeoutId);
+            return { product, isNotFound: false, isError: false, error: null };
+          }
+        }
+      } catch (err) {
+        if (err.name === 'AbortError' && signal?.aborted) throw err;
+        // Continue to API fallback on network/fetch failure
+      }
+    }
+
+    // 2. Fallback to serverless API endpoint (/api/products?id=... or ?slug=...)
+    const param = extractedId 
+      ? `id=${encodeURIComponent(extractedId)}` 
+      : `slug=${encodeURIComponent(slugOrId)}`;
+    const apiUrl = `${baseUrl}/api/products?${param}`;
+
+    const apiRes = await fetch(apiUrl, { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (apiRes.ok) {
+      const data = await apiRes.json();
+      if (data && data.product) {
+        return { product: data.product, isNotFound: false, isError: false, error: null };
+      }
+    } else if (apiRes.status === 404) {
+      return { product: null, isNotFound: true, isError: false, error: 'Product not found' };
+    }
+
+    return {
+      product: null,
+      isNotFound: apiRes.status === 404,
+      isError: apiRes.status !== 404,
+      error: `Server responded with status ${apiRes.status}`
+    };
+  } catch (err) {
+    clearTimeout(timeoutId);
+    const isTimeout = err.name === 'AbortError' && !signal?.aborted;
+    return {
+      product: null,
+      isNotFound: false,
+      isError: true,
+      isTimeout,
+      error: isTimeout ? 'Product loading timed out' : err.message
+    };
+  }
+}
