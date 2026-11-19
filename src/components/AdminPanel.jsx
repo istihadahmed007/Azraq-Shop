@@ -412,7 +412,7 @@ function AdminPanelInner({ isFullPage = false }) {
 
                                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                         <div>
-                                            <h3 className="text-sm font-black text-azraq-navy">EasyDrop Collections Inventory</h3>
+                                            <h3 className="text-sm font-black text-azraq-deep">EasyDrop Collections Inventory</h3>
                                             <p className="text-xs text-gray-500">
                                                 Manage all 18 supplier collections. Reorder, edit descriptions, feature, or toggle publication.
                                             </p>
@@ -456,12 +456,12 @@ function AdminPanelInner({ isFullPage = false }) {
                                                             </td>
 
                                                             <td className="p-3">
-                                                                <p className="font-bold text-azraq-navy">{col.name}</p>
+                                                                <p className="font-bold text-azraq-deep">{col.name}</p>
                                                                 {isEditing ? (
                                                                     <textarea
                                                                         value={editDesc}
                                                                         onChange={(e) => setEditDesc(e.target.value)}
-                                                                        className="w-full mt-1 p-2 border border-azraq-violet rounded text-xs"
+                                                                        className="w-full mt-1 p-2 border border-azraq-cyan rounded text-xs"
                                                                         rows={2}
                                                                     />
                                                                 ) : (
@@ -469,7 +469,7 @@ function AdminPanelInner({ isFullPage = false }) {
                                                                 )}
                                                             </td>
 
-                                                            <td className="p-3 font-mono font-bold text-azraq-navy">
+                                                            <td className="p-3 font-mono font-bold text-azraq-deep">
                                                                 {col.id}
                                                             </td>
 
@@ -515,7 +515,7 @@ function AdminPanelInner({ isFullPage = false }) {
                                                                 ) : (
                                                                     <button
                                                                         onClick={() => startEditCollection(col)}
-                                                                        className="p-1 text-gray-400 hover:text-azraq-navy"
+                                                                        className="p-1 text-gray-400 hover:text-azraq-deep"
                                                                         title="Edit Description"
                                                                     >
                                                                         <Edit2 className="w-3.5 h-3.5" />
@@ -632,7 +632,7 @@ function AdminPanelInner({ isFullPage = false }) {
                                             {reconciliationReport.collection_audit.map(item => (
                                                 <div key={item.collection_id} className="p-3.5 flex items-center justify-between">
                                                     <div>
-                                                        <span className="font-bold text-azraq-navy">Category #{item.collection_id}: {item.name}</span>
+                                                        <span className="font-bold text-azraq-deep">Category #{item.collection_id}: {item.name}</span>
                                                         <p className="text-[10px] text-gray-400">Taxonomy: Root Collection • Slug: /collections/collection-{item.collection_id}</p>
                                                     </div>
                                                     <div className="flex items-center gap-6">
@@ -653,7 +653,7 @@ function AdminPanelInner({ isFullPage = false }) {
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <h3 className="text-sm font-black text-azraq-navy">Master Central Products Database (257 SKUs)</h3>
+                                            <h3 className="text-sm font-black text-azraq-deep">Master Central Products Database (257 SKUs)</h3>
                                             <p className="text-xs text-gray-500">Deduplicated master items. View supplier base RM, converted BDT, retail price and stock.</p>
                                         </div>
                                     </div>
@@ -700,7 +700,7 @@ function AdminPanelInner({ isFullPage = false }) {
                             {/* TAB 4: Orders & Dropship Dispatch */}
                             {activeTab === 'orders' && (
                                 <div className="space-y-4">
-                                    <h3 className="text-sm font-black text-azraq-navy">Orders Pipeline & EasyDrop Dispatch</h3>
+                                    <h3 className="text-sm font-black text-azraq-deep">Orders Pipeline & EasyDrop Dispatch</h3>
                                     <div className="space-y-3">
                                         {orders.map(order => {
                                             if (!order) return null;
@@ -714,7 +714,7 @@ function AdminPanelInner({ isFullPage = false }) {
                                                 <div key={order.id} className="p-4 rounded-[6px] border border-slate-200/90 bg-[#F8FBFF] space-y-3 shadow-2xs">
                                                     <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-2">
                                                         <div>
-                                                            <span className="font-mono font-black text-azraq-navy">{order.id}</span>
+                                                            <span className="font-mono font-black text-azraq-deep">{order.id}</span>
                                                             <span className="text-xs text-gray-400 ml-2">• {customerName} ({customerPhone})</span>
                                                         </div>
                                                         <div className="flex items-center gap-2">

@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, ArrowRight, Heart, Eye, ShoppingBag, Sparkles } from 'lucide-react';
-import { useShop } from '../context/ShopContext';
+import { useShop } from '../../context/ShopContext';
+import ProductImage from '../common/ProductImage';
 
 export default function ProductCarouselSection() {
   const { 
@@ -20,15 +21,15 @@ export default function ProductCarouselSection() {
 
   const categories = [
     { id: 'All', label: t('All Top Picks', 'সকল সেরা পণ্য') },
-    { id: 'Shoulder Bags', label: t('Shoulder Bags', 'শোল্ডার ব্যাগ') },
-    { id: 'Luxury Handbags', label: t('Luxury Handbags', 'লাক্সারি হ্যান্ডব্যাগ') },
-    { id: 'Totes', label: t('Totes & Shoppers', 'টোট ব্যাগ') },
-    { id: 'Travel & Crossbody', label: t('Travel & Crossbody', 'ট্রাভেল ও ক্রসবাডি') },
+    { id: 'Gadgets & IT Accessories', label: t('Gadgets & IT', 'গ্যাজেট ও আইটি') },
+    { id: 'Health & Beauty', label: t('Health & Beauty', 'হেলথ ও বিউটি') },
+    { id: 'Home & Lifestyle', label: t('Home & Lifestyle', 'হোম ও লাইফস্টাইল') },
+    { id: 'Men Clothing', label: t('Men Fashion', 'পুরুষদের ফ্যাশন') },
   ];
 
   const filteredProducts = activeCategory === 'All' 
-    ? products 
-    : products.filter(p => p.category === activeCategory);
+    ? products.slice(0, 16) 
+    : products.filter(p => p.category === activeCategory || p.primary_collection_name === activeCategory).slice(0, 16);
 
   const handleScroll = () => {
     if (scrollContainerRef.current) {
@@ -46,189 +47,163 @@ export default function ProductCarouselSection() {
   };
 
   return (
-    <section id="top-picks" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
-      
-      {/* Header & Controls Row */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-        <div>
-          {/* Category Tagline */}
-          <div className="flex items-center gap-2 mb-2">
-            <span className="w-6 h-1 rounded-full bg-azraq-violet inline-block" />
-            <span className="text-xs font-black tracking-widest text-azraq-violet uppercase">
-              {t("EASYDROP CATEGORY 5 • 20 EDITIONS", "অনুমোদিত ড্রপশিপিং ক্যাটাগরি ৫")}
+    <section id="top-picks" className="w-full py-4 select-none">
+      <div className="rounded-[28px] bg-[#F8FBFF]/80 backdrop-blur-2xl border border-[rgba(130,170,205,0.28)] border-t-white/95 p-6 sm:p-8 shadow-[0_16px_40px_-10px_rgba(112,200,237,0.12),0_4px_16px_-2px_rgba(25,59,91,0.04)]">
+        
+        {/* Header & Controls Row */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+          <div>
+            <span className="text-[10px] font-mono text-[#0877C9] uppercase tracking-[0.18em] block font-bold mb-1">
+              + {t("CURATED CAROUSEL", "বাছাইকৃত গ্যালারি")}
             </span>
+            <h2 className="text-2xl sm:text-3xl font-black text-[#193B5B] tracking-tight">
+              {t("Explore Top Picks", "আমাদের সেরা পছন্দসমূহ")}
+            </h2>
+            <p className="text-xs text-[#718398] mt-1">
+              {t("Verified products with 4.8+ ratings and prompt doorstep delivery.", "যাচাইকৃত পণ্য ও দ্রুত হোম ডেলিভারি নিশ্চয়তা।")}
+            </p>
           </div>
 
-          {/* Section Heading (Matching Reference) */}
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-azraq-navy tracking-tight">
-            {t("EXPLORE OUR TOP PICKS", "আমাদের সেরা পছন্দসমূহ")}
-          </h2>
-        </div>
-
-        {/* Carousel Navigation Buttons (Matching Reference: Round White & Dark buttons) */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => scroll('left')}
-            disabled={!canScrollLeft}
-            className={`w-11 h-11 rounded-full border border-azraq-purple/20 bg-white flex items-center justify-center transition-all ${
-              canScrollLeft 
-                ? 'text-azraq-navy hover:bg-azraq-lavender hover:scale-105 active:scale-95 shadow-sm' 
-                : 'text-azraq-navy/25 cursor-not-allowed'
-            }`}
-            aria-label="Previous Products"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          
-          <button
-            onClick={() => scroll('right')}
-            disabled={!canScrollRight}
-            className={`w-11 h-11 rounded-full bg-azraq-navy text-white flex items-center justify-center transition-all shadow-md ${
-              canScrollRight 
-                ? 'hover:bg-azraq-charcoal hover:scale-105 active:scale-95' 
-                : 'bg-azraq-navy/40 cursor-not-allowed'
-            }`}
-            aria-label="Next Products"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-
-      {/* Category Filter Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 no-scrollbar">
-        {categories.map(cat => (
-          <button
-            key={cat.id}
-            onClick={() => setActiveCategory(cat.id)}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
-              activeCategory === cat.id
-                ? 'bg-azraq-navy text-white shadow-md'
-                : 'bg-white/80 hover:bg-white text-azraq-navy/70 border border-azraq-purple/20'
-            }`}
-          >
-            {cat.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Carousel Track */}
-      <div
-        ref={scrollContainerRef}
-        onScroll={handleScroll}
-        className="flex gap-6 overflow-x-auto pb-8 pt-2 scroll-smooth snap-x snap-mandatory no-scrollbar -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
-        style={{ scrollbarWidth: 'none' }}
-      >
-        {filteredProducts.map(product => {
-          const isFav = favorites.includes(product.id);
-          const shortName = product.name.split('—')[1] || product.name;
-
-          return (
-            <div
-              key={product.id}
-              className="flex-none w-[280px] sm:w-[310px] snap-start group"
+          {/* Carousel Navigation Buttons */}
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            <button
+              onClick={() => scroll('left')}
+              disabled={!canScrollLeft}
+              className={`w-9 h-9 rounded-full glass-card border border-[rgba(130,170,205,0.3)] flex items-center justify-center transition-all ${
+                canScrollLeft 
+                  ? 'text-[#193B5B] hover:bg-white hover:border-[#70C8ED] shadow-xs cursor-pointer' 
+                  : 'text-[#718398]/30 cursor-not-allowed opacity-50'
+              }`}
+              aria-label="Previous Products"
             >
-              {/* Product Card (Nexora Reference Layout Recreated) */}
-              <div className="rounded-none bg-white border border-azraq-purple/20 p-3 sm:p-4 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between h-[490px] sm:h-[510px] relative overflow-hidden">
-                
-                {/* Floating Wishlist Heart */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleFavorite(product.id);
-                  }}
-                  className={`absolute top-4 right-4 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                    isFav 
-                      ? 'bg-azraq-violet text-white shadow-md' 
-                      : 'bg-white/80 text-azraq-navy/40 hover:text-azraq-violet hover:bg-white'
-                  }`}
-                  title="Wishlist"
-                >
-                  <Heart className={`w-4 h-4 ${isFav ? 'fill-white' : ''}`} />
-                </button>
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            
+            <button
+              onClick={() => scroll('right')}
+              disabled={!canScrollRight}
+              className={`w-9 h-9 rounded-full bg-[#193B5B] text-white flex items-center justify-center transition-all shadow-md ${
+                canScrollRight 
+                  ? 'hover:bg-[#062B4F] hover:shadow-[0_4px_16px_rgba(25,59,91,0.3)] cursor-pointer' 
+                  : 'bg-[#193B5B]/30 cursor-not-allowed opacity-50'
+              }`}
+              aria-label="Next Products"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
 
-                {/* Badge */}
-                {product.badge && (
-                  <span className="absolute top-4 left-4 z-10 px-2.5 py-0.5 rounded-none bg-azraq-lavender text-azraq-violet text-[10px] font-extrabold uppercase tracking-wider">
-                    {product.badge}
-                  </span>
-                )}
+        {/* Category Filter Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-5 no-scrollbar">
+          {categories.map(cat => (
+            <button
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                activeCategory === cat.id
+                  ? 'bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] text-white shadow-xs'
+                  : 'bg-white/80 hover:bg-white text-[#718398] hover:text-[#193B5B] border border-[rgba(130,170,205,0.28)]'
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
 
-                {/* Product Image Area - 75-80% visual area, completely square corners */}
-                <div 
-                  onClick={() => setSelectedProduct(product)}
-                  className="relative w-full h-[370px] sm:h-[390px] rounded-none bg-gradient-to-b from-[#F7F8FC] to-white flex items-center justify-center p-2 sm:p-3 cursor-pointer overflow-hidden"
-                >
-                  <img
-                    src={product.main_image}
-                    alt={product.name}
-                    loading="lazy"
-                    decoding="async"
-                    width="600"
-                    height="600"
-                    onError={(e) => {
-                      if (!e.target.dataset.failed) {
-                        e.target.dataset.failed = 'true';
-                        e.target.src = 'https://easydrop.asia/products/image-1794224164356-135288231.jpeg';
-                      }
-                    }}
-                    className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
-                  />
+        {/* Carousel Track */}
+        <div
+          ref={scrollContainerRef}
+          onScroll={handleScroll}
+          className="flex gap-4 sm:gap-5 overflow-x-auto pb-4 pt-1 scroll-smooth snap-x snap-mandatory no-scrollbar"
+          style={{ scrollbarWidth: 'none' }}
+        >
+          {filteredProducts.map((product, idx) => {
+            const isFav = favorites.includes(product.id);
+            const indexStr = String(idx + 1).padStart(2, '0');
+
+            return (
+              <div
+                key={product.id}
+                className="flex-none w-[240px] sm:w-[260px] snap-start group"
+              >
+                {/* Product Card */}
+                <div className="rounded-[22px] bg-white/90 backdrop-blur-xl border border-[rgba(130,170,205,0.25)] border-t-white p-3.5 shadow-[0_8px_24px_rgba(112,200,237,0.1),0_2px_6px_rgba(25,59,91,0.03)] hover:shadow-[0_16px_36px_rgba(112,200,237,0.25)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between h-[360px] relative overflow-hidden">
                   
-                  {/* Quick View Overlay Pill */}
-                  <div className="absolute inset-0 bg-azraq-navy/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <button 
+                  {/* Top Row: Index Badge & Wishlist Heart */}
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-mono text-[10px] font-bold text-[#0877C9] px-2 py-0.5 rounded-full bg-[#DDEEFF]/70 border border-[rgba(130,170,205,0.28)]">
+                      {indexStr}
+                    </span>
+
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setSelectedProduct(product);
+                        toggleFavorite(product.id);
                       }}
-                      className="px-3.5 py-1.5 rounded-full bg-white text-azraq-navy text-xs font-bold shadow-lg flex items-center gap-1.5 hover:bg-azraq-lime transition-colors"
+                      className={`w-7 h-7 rounded-full glass-card border border-[rgba(130,170,205,0.3)] flex items-center justify-center transition-all ${
+                        isFav 
+                          ? 'bg-[#193B5B] text-white' 
+                          : 'text-[#718398] hover:text-[#193B5B] hover:bg-white'
+                      }`}
+                      title={isFav ? "Remove from wishlist" : "Add to wishlist"}
+                      aria-label="Wishlist"
                     >
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>{t("Quick View", "বিস্তারিত")}</span>
+                      <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-current' : ''}`} />
                     </button>
                   </div>
-                </div>
 
-                {/* Bottom Details Row (Matching Reference) */}
-                <div className="mt-3 pt-2 border-t border-gray-100 flex flex-col justify-between flex-1">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      {/* Name */}
+                  {/* Product Image Area - STRICT CONTAINMENT */}
+                  <div 
+                    onClick={() => setSelectedProduct(product)}
+                    className="card-image-wrapper relative w-full h-[180px] rounded-xl bg-gradient-to-b from-[#F1F7FC] to-white flex items-center justify-center p-2.5 cursor-pointer overflow-hidden border border-[rgba(130,170,205,0.18)]"
+                  >
+                    <ProductImage
+                      src={product.main_image}
+                      alt={product.name}
+                      fit="contain"
+                      aspectRatio="square"
+                      className="w-full h-full object-contain filter drop-shadow-sm transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+
+                  {/* Bottom Details Row */}
+                  <div className="mt-3 pt-2.5 border-t border-[rgba(130,170,205,0.18)] flex flex-col justify-between flex-1">
+                    <div>
+                      <span className="text-[9px] font-bold text-[#0877C9] block truncate uppercase tracking-wider">
+                        {product.category || product.primary_collection_name}
+                      </span>
                       <h3 
                         onClick={() => setSelectedProduct(product)}
-                        className="font-bold text-azraq-navy text-sm truncate cursor-pointer hover:text-azraq-violet transition-colors"
+                        className="font-bold text-xs sm:text-[13px] text-[#193B5B] truncate cursor-pointer hover:text-[#0877C9] transition-colors mt-0.5"
                         title={product.name}
                       >
-                        {shortName}
+                        {product.name}
                       </h3>
-                      {/* Price in BDT */}
-                      <div className="flex items-baseline gap-2 mt-1">
-                        <span className="text-base sm:text-lg font-black text-azraq-navy">
-                          ৳{product.price.toLocaleString()}
-                        </span>
-                      </div>
                     </div>
 
-                    {/* Neon Lime Action Button with Dark Arrow (Direct Reference Match) */}
-                    <button
-                      onClick={() => {
-                        addToCart(product, product.variants[0] || 'Standard', 1);
-                      }}
-                      className="w-9 h-9 rounded-full bg-azraq-lime hover:bg-[#bbf035] text-azraq-navy flex items-center justify-center shadow-glow-lime transition-all transform hover:scale-110 active:scale-95 flex-shrink-0"
-                      title={t("Add to Bag", "ব্যাগে যোগ করুন")}
-                    >
-                      <ArrowRight className="w-4 h-4 text-azraq-navy" />
-                    </button>
-                  </div>
-                </div>
+                    <div className="flex items-center justify-between pt-2 mt-auto">
+                      <span className="text-sm sm:text-base font-black text-[#193B5B]">
+                        ৳{product.price.toLocaleString()}
+                      </span>
 
+                      <button
+                        onClick={() => addToCart(product, product.variants?.[0] || 'Default', 1)}
+                        className="w-8 h-8 rounded-full bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] hover:from-[#5CBDE5] text-white flex items-center justify-center shadow-[0_4px_14px_rgba(112,200,237,0.4)] transition-all transform hover:scale-110 active:scale-95 flex-shrink-0 cursor-pointer"
+                        title={t("Add to Bag", "ব্যাগে যোগ করুন")}
+                      >
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+
       </div>
     </section>
   );
 }
-

@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, ArrowRight, Sparkles } from 'lucide-react';
-import { useShop } from '../context/ShopContext';
+import { useShop } from '../../context/ShopContext';
 
 export default function FeaturedCollectionsCarousel() {
   const { collections, navigateTo, t } = useShop();
@@ -26,101 +26,108 @@ export default function FeaturedCollectionsCarousel() {
   };
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-      <div className="flex items-end justify-between gap-4 mb-8">
-        <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="w-6 h-1 rounded-full bg-azraq-violet" />
-            <span className="text-xs font-black tracking-widest text-azraq-violet uppercase">
-              {t("CURATED HIGHLIGHTS", "সেরা হাইলাইটস")}
+    <section className="w-full py-4 select-none">
+      <div className="rounded-[28px] bg-[#F8FBFF]/80 backdrop-blur-2xl border border-[rgba(130,170,205,0.28)] border-t-white/95 p-6 sm:p-8 shadow-[0_16px_40px_-10px_rgba(112,200,237,0.12),0_4px_16px_-2px_rgba(25,59,91,0.04)]">
+        
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+          <div>
+            <span className="text-[10px] font-mono text-[#0877C9] uppercase tracking-[0.18em] block font-bold mb-1">
+              + {t("CURATED HIGHLIGHTS", "সেরা হাইলাইটস")}
             </span>
+            <h2 className="text-2xl sm:text-3xl font-black text-[#193B5B] tracking-tight">
+              {t("Featured Collections", "বাছাইকৃত কালেকশন")}
+            </h2>
+            <p className="text-xs text-[#718398] mt-1">
+              {t("Top-performing collections curated directly from verified suppliers.", "যাচাইকৃত প্রস্তুতকারকদের শীর্ষ কালেকশন।")}
+            </p>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-black text-azraq-navy tracking-tight">
-            {t("Featured Collections", "বাছাইকৃত কালেকশন")}
-          </h2>
-          <p className="text-xs sm:text-sm text-azraq-navy/60 mt-1">
-            {t("Top-performing collections curated directly from verified EasyDrop suppliers.", "যাচাইকৃত ইজিড্রপ প্রস্তুতকারকদের শীর্ষ কালেকশন।")}
-          </p>
-        </div>
 
-        {/* Carousel Arrow Controls */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => scroll('left')}
-            disabled={!canScrollLeft}
-            className={`w-10 h-10 rounded-full border border-azraq-purple/20 bg-white flex items-center justify-center transition-all ${
-              canScrollLeft ? 'text-azraq-navy hover:bg-azraq-lavender shadow-sm' : 'text-gray-300 cursor-not-allowed'
-            }`}
-            aria-label="Previous Collection"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button
-            onClick={() => scroll('right')}
-            disabled={!canScrollRight}
-            className={`w-10 h-10 rounded-full bg-azraq-navy text-white flex items-center justify-center transition-all shadow-md ${
-              canScrollRight ? 'hover:bg-azraq-charcoal' : 'bg-azraq-navy/40 cursor-not-allowed'
-            }`}
-            aria-label="Next Collection"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-
-      {/* Track */}
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        className="flex gap-6 overflow-x-auto pb-6 scroll-smooth snap-x snap-mandatory no-scrollbar -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
-        style={{ scrollbarWidth: 'none' }}
-      >
-        {featuredCols.map(col => {
-          const displayImage = col.cover_image || col.image_url || col.fallback_image;
-
-          return (
-            <div
-              key={col.id}
-              onClick={() => navigateTo('collection-detail', col.slug)}
-              className="flex-none w-[280px] sm:w-[320px] snap-start group cursor-pointer"
+          {/* Carousel Arrow Controls */}
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            <button
+              onClick={() => scroll('left')}
+              disabled={!canScrollLeft}
+              className={`w-9 h-9 rounded-full glass-card border border-[rgba(130,170,205,0.3)] flex items-center justify-center transition-all ${
+                canScrollLeft 
+                  ? 'text-[#193B5B] hover:bg-white hover:border-[#70C8ED] shadow-xs cursor-pointer' 
+                  : 'text-[#718398]/30 cursor-not-allowed opacity-50'
+              }`}
+              aria-label="Previous Collection"
             >
-              <div className="rounded-none bg-white border border-azraq-purple/20 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between h-[420px] sm:h-[440px] relative overflow-hidden">
-                <span className="absolute top-4 left-4 z-10 px-2.5 py-0.5 rounded-none bg-azraq-navy/90 text-white text-[10px] font-mono font-bold uppercase">
-                  {col.imported_product_count ?? col.product_count ?? 0} {t("Verified Items", "পণ্য")}
-                </span>
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => scroll('right')}
+              disabled={!canScrollRight}
+              className={`w-9 h-9 rounded-full bg-[#193B5B] text-white flex items-center justify-center transition-all shadow-md ${
+                canScrollRight 
+                  ? 'hover:bg-[#062B4F] cursor-pointer' 
+                  : 'bg-[#193B5B]/30 cursor-not-allowed opacity-50'
+              }`}
+              aria-label="Next Collection"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
 
-                <div className="relative w-full h-[290px] sm:h-[310px] rounded-none bg-gradient-to-b from-[#F7F8FC] to-white flex items-center justify-center p-4 overflow-hidden border-b border-gray-100">
-                  <img
-                    src={displayImage}
-                    alt={col.name}
-                    onError={(e) => {
-                      if (col.fallback_image && e.target.src !== col.fallback_image) {
-                        e.target.src = col.fallback_image;
-                      }
-                    }}
-                    className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-108"
-                    loading="lazy"
-                  />
-                </div>
+        {/* Track */}
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="flex gap-4 sm:gap-5 overflow-x-auto pb-4 pt-1 scroll-smooth snap-x snap-mandatory no-scrollbar"
+          style={{ scrollbarWidth: 'none' }}
+        >
+          {featuredCols.map(col => {
+            const displayImage = col.cover_image || col.image_url || col.fallback_image;
 
-                <div className="p-4 sm:p-5 bg-white flex items-center justify-between gap-3 flex-1">
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-extrabold text-sm sm:text-base text-azraq-navy truncate group-hover:text-azraq-violet transition-colors">
-                      {col.name}
-                    </h3>
-                    <p className="text-xs text-azraq-navy/60 line-clamp-1 mt-0.5">
-                      {t(col.description_en, col.description_bn)}
-                    </p>
+            return (
+              <div
+                key={col.id}
+                onClick={() => navigateTo('collection-detail', col.slug)}
+                className="flex-none w-[260px] sm:w-[280px] snap-start group cursor-pointer"
+              >
+                <div className="rounded-[22px] bg-white/90 backdrop-blur-xl border border-[rgba(130,170,205,0.25)] border-t-white p-3.5 shadow-[0_8px_24px_rgba(112,200,237,0.1),0_2px_6px_rgba(25,59,91,0.03)] hover:shadow-[0_16px_36px_rgba(112,200,237,0.25)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between h-[360px] relative overflow-hidden">
+                  
+                  {/* Verified Count Badge */}
+                  <span className="absolute top-4 left-4 z-10 px-2.5 py-0.5 rounded-full bg-[#193B5B]/90 backdrop-blur-md text-white text-[10px] font-mono font-bold uppercase shadow-xs">
+                    {col.imported_product_count ?? col.product_count ?? 0} {t("Verified Items", "পণ্য")}
+                  </span>
+
+                  {/* Contained Image Area */}
+                  <div className="card-image-wrapper relative w-full h-[220px] rounded-xl bg-gradient-to-b from-[#F1F7FC] to-white flex items-center justify-center p-3 overflow-hidden border border-[rgba(130,170,205,0.18)]">
+                    <img
+                      src={displayImage}
+                      alt={col.name}
+                      onError={(e) => {
+                        if (col.fallback_image && e.target.src !== col.fallback_image) {
+                          e.target.src = col.fallback_image;
+                        }
+                      }}
+                      className="w-full h-full object-contain filter drop-shadow-sm transition-transform duration-500 group-hover:scale-105"
+                      loading="lazy"
+                    />
                   </div>
 
-                  <div className="w-9 h-9 rounded-full bg-azraq-lime text-azraq-navy flex items-center justify-center shadow-glow-lime group-hover:scale-110 transition-transform flex-shrink-0">
-                    <ArrowRight className="w-4 h-4" />
+                  <div className="mt-3 pt-2.5 border-t border-[rgba(130,170,205,0.18)] flex items-center justify-between gap-2 flex-1">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-extrabold text-xs sm:text-sm text-[#193B5B] truncate group-hover:text-[#0877C9] transition-colors">
+                        {col.name}
+                      </h3>
+                      <p className="text-[11px] text-[#718398] line-clamp-1 mt-0.5">
+                        {t(col.description_en, col.description_bn)}
+                      </p>
+                    </div>
+
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] text-white flex items-center justify-center shadow-[0_4px_14px_rgba(112,200,237,0.4)] group-hover:scale-110 transition-transform flex-shrink-0">
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </section>
   );
