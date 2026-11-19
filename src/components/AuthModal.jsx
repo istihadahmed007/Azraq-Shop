@@ -61,7 +61,7 @@ export default function AuthModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200 select-none">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-azraq-deep/40 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200 select-none">
       
       {/* Backdrop click */}
       <div className="absolute inset-0" onClick={closeAuthModal} />
@@ -69,16 +69,16 @@ export default function AuthModal() {
       {/* Glassmorphism Modal Panel */}
       <div 
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-md rounded-2xl bg-white/85 backdrop-blur-2xl border border-white/90 shadow-[0_20px_60px_rgba(31,38,135,0.15)] p-6 sm:p-8 overflow-hidden z-10"
+        className="relative w-full max-w-md rounded-3xl glass-panel border border-[rgba(130,170,205,0.35)] shadow-[0_24px_64px_rgba(25,59,91,0.22)] p-6 sm:p-8 overflow-hidden z-10"
       >
         {/* Subtle Ambient Light Orbs inside modal */}
-        <div className="absolute -top-16 -right-16 w-36 h-36 bg-blue-500/15 rounded-full blur-2xl pointer-events-none" />
-        <div className="absolute -bottom-16 -left-16 w-36 h-36 bg-cyan-400/15 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -top-16 -right-16 w-36 h-36 bg-azraq-cyan/20 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -bottom-16 -left-16 w-36 h-36 bg-azraq-ice/30 rounded-full blur-2xl pointer-events-none" />
 
         {/* Close Button */}
         <button
           onClick={closeAuthModal}
-          className="absolute top-4 right-4 p-2 rounded-xl bg-white/60 hover:bg-white text-slate-500 hover:text-slate-800 border border-white/80 shadow-xs transition-colors"
+          className="absolute top-4 right-4 w-8 h-8 rounded-full glass-card hover:bg-white text-azraq-secondary hover:text-azraq-deep border border-[rgba(130,170,205,0.3)] shadow-xs transition-colors flex items-center justify-center"
           aria-label="Close modal"
         >
           <X className="w-4 h-4" />
@@ -89,10 +89,10 @@ export default function AuthModal() {
           <div className="flex justify-center">
             <img src="/branding/azraq-logo.png" alt="AZRAQ Shop" className="h-9 w-auto object-contain" />
           </div>
-          <h3 className="text-xl font-bold text-slate-900 tracking-tight">
+          <h3 className="text-xl font-bold text-azraq-deep tracking-tight">
             {isLogin ? t("Sign In to AZRAQ", "AZRAQ-এ লগইন করুন") : t("Create Customer Account", "নতুন অ্যাকাউন্ট তৈরি করুন")}
           </h3>
-          <p className="text-xs text-slate-500 max-w-xs mx-auto">
+          <p className="text-xs text-azraq-secondary max-w-xs mx-auto">
             {isLogin 
               ? t("Access your orders, saved wishlist, and faster checkout.", "আপনার অর্ডার ট্র্যাক করুন এবং দ্রুত চেকআউট করুন।")
               : t("Join verified shoppers across Bangladesh with genuine lifestyle goods.", "নিরাপদ ও আসল কেনাকাটায় আমাদের সাথে যুক্ত হোন।")}
@@ -101,7 +101,7 @@ export default function AuthModal() {
 
         {/* Error Notice */}
         {error && (
-          <div className="mb-4 p-3 rounded-xl bg-rose-50/90 border border-rose-200/90 text-rose-700 text-xs font-medium">
+          <div className="mb-4 p-3 rounded-2xl bg-rose-50/90 border border-rose-200 text-rose-700 text-xs font-medium">
             {error}
           </div>
         )}
@@ -111,7 +111,7 @@ export default function AuthModal() {
           type="button"
           onClick={handleGoogleLogin}
           disabled={isLoading}
-          className="w-full py-3 px-4 rounded-xl bg-white/90 hover:bg-white text-slate-800 font-bold text-xs sm:text-sm border border-slate-200/90 shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-3 active:scale-98 disabled:opacity-50"
+          className="w-full py-3 px-4 rounded-2xl glass-card hover:bg-white text-azraq-deep font-bold text-xs sm:text-sm border border-[rgba(130,170,205,0.3)] shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-3 active:scale-98 disabled:opacity-50"
         >
           {/* Authentic Google G SVG Icon */}
           <svg className="w-4 h-4" viewBox="0 0 24 24">
@@ -137,8 +137,8 @@ export default function AuthModal() {
 
         {/* Divider */}
         <div className="relative my-5 flex items-center justify-center">
-          <div className="w-full border-t border-slate-200/80" />
-          <span className="absolute px-3 bg-white/90 backdrop-blur-sm text-[11px] font-medium text-slate-400">
+          <div className="w-full border-t border-[rgba(130,170,205,0.22)]" />
+          <span className="absolute px-3 bg-[#F8FBFF] text-[11px] font-medium text-azraq-secondary">
             {t("or with phone / email", "অথবা ফোন / ইমেইল দিয়ে")}
           </span>
         </div>
@@ -147,17 +147,17 @@ export default function AuthModal() {
         <form onSubmit={handleSubmit} className="space-y-3.5">
           {!isLogin && (
             <div>
-              <label className="block text-[11px] font-bold text-slate-700 mb-1">
+              <label className="block text-[11px] font-bold text-azraq-deep mb-1">
                 {t("Full Name", "আপনার নাম")}
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <User className="w-4 h-4 text-azraq-secondary absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="e.g. Istihad Ahmed"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-50/80 border border-slate-200/90 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all shadow-inner"
+                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-white/80 border border-[rgba(130,170,205,0.3)] text-xs sm:text-sm text-azraq-deep focus:outline-none focus:border-azraq-cyan focus:ring-2 focus:ring-azraq-cyan/30 transition-all shadow-inner"
                   required
                 />
               </div>
@@ -165,34 +165,34 @@ export default function AuthModal() {
           )}
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-700 mb-1">
+            <label className="block text-[11px] font-bold text-azraq-deep mb-1">
               {t("Phone Number or Email", "ফোন নম্বর বা ইমেইল")}
             </label>
             <div className="relative">
-              <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Phone className="w-4 h-4 text-azraq-secondary absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="01851-XXXXXX or you@example.com"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-50/80 border border-slate-200/90 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all shadow-inner"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-white/80 border border-[rgba(130,170,205,0.3)] text-xs sm:text-sm text-azraq-deep focus:outline-none focus:border-azraq-cyan focus:ring-2 focus:ring-azraq-cyan/30 transition-all shadow-inner"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-700 mb-1">
+            <label className="block text-[11px] font-bold text-azraq-deep mb-1">
               {t("Password", "পাসওয়ার্ড")}
             </label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Lock className="w-4 h-4 text-azraq-secondary absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-50/80 border border-slate-200/90 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all shadow-inner"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-white/80 border border-[rgba(130,170,205,0.3)] text-xs sm:text-sm text-azraq-deep focus:outline-none focus:border-azraq-cyan focus:ring-2 focus:ring-azraq-cyan/30 transition-all shadow-inner"
                 required
               />
             </div>
@@ -201,7 +201,7 @@ export default function AuthModal() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-[#245BDB] to-[#1E40AF] hover:from-[#1E40AF] hover:to-[#172554] text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 active:scale-98 disabled:opacity-50"
+            className="w-full py-3.5 rounded-2xl btn-primary-icy text-azraq-deep font-bold text-xs sm:text-sm shadow-[0_8px_24px_rgba(112,200,237,0.35)] hover:shadow-[0_12px_32px_rgba(112,200,237,0.5)] transition-all flex items-center justify-center gap-2 active:scale-98 disabled:opacity-50"
           >
             <span>{isLogin ? t("Sign In", "লগইন করুন") : t("Create Account", "অ্যাকাউন্ট খুলুন")}</span>
             <ArrowRight className="w-4 h-4" />
@@ -209,14 +209,14 @@ export default function AuthModal() {
         </form>
 
         {/* Footer Toggle */}
-        <div className="mt-5 text-center text-xs text-slate-600">
+        <div className="mt-5 text-center text-xs text-azraq-secondary">
           {isLogin ? (
             <p>
               {t("Don't have an account?", "অ্যাকাউন্ট নেই?")}{' '}
               <button
                 type="button"
                 onClick={() => openAuthModal('register')}
-                className="font-bold text-blue-600 hover:text-blue-800 underline ml-1 cursor-pointer"
+                className="font-bold text-azraq-deep hover:text-azraq-cyan underline ml-1 cursor-pointer"
               >
                 {t("Register now", "এখনই রেজিস্ট্রেশন করুন")}
               </button>
@@ -227,7 +227,7 @@ export default function AuthModal() {
               <button
                 type="button"
                 onClick={() => openAuthModal('login')}
-                className="font-bold text-blue-600 hover:text-blue-800 underline ml-1 cursor-pointer"
+                className="font-bold text-azraq-deep hover:text-azraq-cyan underline ml-1 cursor-pointer"
               >
                 {t("Sign In", "লগইন করুন")}
               </button>
@@ -236,7 +236,7 @@ export default function AuthModal() {
         </div>
 
         {/* Trust Badge */}
-        <div className="mt-5 pt-3 border-t border-slate-200/60 flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
+        <div className="mt-5 pt-3 border-t border-[rgba(130,170,205,0.22)] flex items-center justify-center gap-1.5 text-[11px] text-azraq-secondary">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
           <span>{t("Verified Bangladesh E-Commerce Encryption", "নিরাপদ ও সুরক্ষিত গ্রাহক তথ্য")}</span>
         </div>

@@ -25,28 +25,28 @@ export default function BrandAssetsModal() {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#101C35]/50 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200 select-none">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-azraq-deep/40 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200 select-none">
       <div
-        className="relative w-full max-w-4xl glass-modal rounded-[8px] shadow-2xl border border-white/95 overflow-hidden my-4 max-h-[92vh] flex flex-col"
+        className="relative w-full max-w-4xl glass-panel rounded-3xl shadow-[0_24px_64px_rgba(25,59,91,0.24)] border border-[rgba(130,170,205,0.35)] overflow-hidden my-4 max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
 
         {/* Header Bar */}
-        <div className="p-5 sm:p-6 bg-white/85 backdrop-blur-md text-[#101C35] flex items-center justify-between border-b border-white/90">
+        <div className="p-5 sm:p-6 bg-[rgba(248,251,255,0.92)] backdrop-blur-xl text-azraq-deep flex items-center justify-between border-b border-[rgba(130,170,205,0.22)]">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-[6px] bg-[#D9EDFF] flex items-center justify-center text-[#0877C9] shadow-2xs">
-              <Sparkles className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-azraq-deep to-azraq-cyan flex items-center justify-center text-white shadow-xs">
+              <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-black text-[#101C35] tracking-tight">
+                <h2 className="text-base sm:text-lg font-black text-azraq-deep tracking-tight">
                   AZRAQ Brand Identity System & Design Book
                 </h2>
-                <span className="px-2 py-0.5 rounded-[4px] bg-[#0877C9] text-white text-[10px] font-black uppercase">
+                <span className="px-2.5 py-0.5 rounded-full bg-azraq-ice/80 text-azraq-deep text-[10px] font-bold uppercase tracking-wider border border-[rgba(130,170,205,0.3)]">
                   Official Assets
                 </span>
               </div>
-              <p className="text-xs text-[#71849B]">
+              <p className="text-xs text-azraq-secondary">
                 Wordmark • Geometric Monogram • Packaging • Mobile Icons • Social Brand Assets
               </p>
             </div>
@@ -54,17 +54,17 @@ export default function BrandAssetsModal() {
 
           <button
             onClick={() => setIsBrandAssetsOpen(false)}
-            className="w-8 h-8 rounded-[6px] glass-button text-[#101C35] hover:text-[#0877C9] flex items-center justify-center transition-colors shadow-2xs"
+            className="w-8 h-8 rounded-full glass-card hover:bg-white text-azraq-secondary hover:text-azraq-deep flex items-center justify-center transition-all border border-[rgba(130,170,205,0.3)]"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Modal Body */}
-        <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-10 bg-white">
+        <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-10 bg-[rgba(248,251,255,0.7)] backdrop-blur-md">
 
           {/* Brand Manifesto Section */}
-          <div className="p-6 rounded-3xl bg-azraq-cloud border border-azraq-purple/20 space-y-2">
+          <div className="p-6 rounded-3xl glass-card border border-[rgba(130,170,205,0.3)] shadow-xs space-y-2">
             <span className="text-xs font-mono font-bold text-azraq-violet uppercase tracking-widest">
               Brand Positioning & Ethos
             </span>

@@ -15,7 +15,7 @@ export default function Toast() {
 
   return (
     <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 duration-300 select-none">
-      <div className="flex items-center gap-2.5 px-4.5 py-3 rounded-[20px] glass-modal text-[#101C35] text-xs font-bold shadow-2xl border border-white/90">
+      <div className="flex items-center gap-3 px-5 py-3.5 rounded-2xl glass-card text-azraq-deep text-xs font-bold shadow-[0_12px_32px_rgba(25,59,91,0.16)] border border-[rgba(130,170,205,0.35)] backdrop-blur-xl">
         {icons[toast.type] || icons.success}
         <span>{toast.message}</span>
       </div>

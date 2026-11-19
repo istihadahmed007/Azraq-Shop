@@ -269,30 +269,30 @@ export default function VisualSearchModal() {
   if (!isVisualSearchOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-[#101C35]/50 backdrop-blur-md animate-in fade-in duration-200 select-none">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-azraq-deep/40 backdrop-blur-md animate-in fade-in duration-200 select-none">
 
       {/* Modal Dialog Window */}
       <div
-        className="relative w-full max-w-5xl lg:max-w-6xl glass-modal rounded-[24px] shadow-2xl border border-white/95 overflow-hidden my-4 max-h-[92vh] flex flex-col"
+        className="relative w-full max-w-5xl lg:max-w-6xl glass-panel rounded-3xl shadow-[0_24px_64px_rgba(25,59,91,0.24)] border border-[rgba(130,170,205,0.35)] overflow-hidden my-4 max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
 
         {/* Header Bar */}
-        <div className="p-4 sm:p-5 border-b border-white/90 bg-white/85 backdrop-blur-md flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-[6px] bg-[#0877C9] text-white flex items-center justify-center shadow-xs">
-              <Camera className="w-4 h-4 text-white" />
+        <div className="p-4 sm:p-5 border-b border-[rgba(130,170,205,0.22)] bg-[rgba(248,251,255,0.92)] backdrop-blur-xl flex items-center justify-between flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-azraq-deep to-azraq-cyan text-white flex items-center justify-center shadow-xs">
+              <Camera className="w-5 h-5 text-white" />
             </div>
             <div>
-              <div className="flex items-center gap-1.5">
-                <h2 className="text-base sm:text-lg font-black text-[#101C35] tracking-tight">
+              <div className="flex items-center gap-2">
+                <h2 className="text-base sm:text-lg font-black text-azraq-deep tracking-tight">
                   {t("AI Visual Product Search", "এআই ভিজ্যুয়াল প্রোডাক্ট সার্চ")}
                 </h2>
-                <span className="px-2 py-0.5 rounded-[4px] bg-[#D9EDFF] text-[#0877C9] text-[10px] font-black uppercase tracking-wider">
+                <span className="px-2.5 py-0.5 rounded-full bg-azraq-ice/80 text-azraq-deep text-[10px] font-bold uppercase tracking-wider border border-[rgba(130,170,205,0.3)]">
                   Visual Search
                 </span>
               </div>
-              <p className="text-xs text-[#71849B]">
+              <p className="text-xs text-azraq-secondary">
                 {t("Search by Image — Discover identical and visually matching products across our catalogue.", "ছবি দিয়ে সরাসরি পণ্য খুঁজুন।")}
               </p>
             </div>
@@ -300,7 +300,7 @@ export default function VisualSearchModal() {
 
           <button
             onClick={handleClose}
-            className="w-8 h-8 rounded-[6px] glass-button text-[#101C35] hover:text-[#0877C9] flex items-center justify-center transition-colors shadow-2xs"
+            className="w-8 h-8 rounded-full glass-card hover:bg-white text-azraq-secondary hover:text-azraq-deep flex items-center justify-center transition-all border border-[rgba(130,170,205,0.3)]"
             title="Close"
           >
             <X className="w-4 h-4" />
@@ -329,24 +329,24 @@ export default function VisualSearchModal() {
                 onDragOver={handleDrag}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className={`relative border-2 border-dashed rounded-2xl p-8 sm:p-12 text-center transition-all cursor-pointer ${dragActive
-                  ? 'border-[#0877C9] bg-[#EBF6FF] scale-[1.01] shadow-[0_0_25px_rgba(8,119,201,0.25)]'
-                  : 'border-[#69C5F5]/60 hover:border-[#0877C9] bg-gradient-to-b from-[#F8FCFF] to-[#F0F7FF]/70 hover:bg-[#F0F7FF]'
+                className={`relative border-2 border-dashed rounded-3xl p-8 sm:p-12 text-center transition-all cursor-pointer ${dragActive
+                  ? 'border-azraq-cyan bg-[#DDEEFF]/40 scale-[1.01] shadow-[0_0_30px_rgba(112,200,237,0.35)]'
+                  : 'border-[rgba(130,170,205,0.4)] hover:border-azraq-cyan bg-gradient-to-b from-white/80 to-[rgba(221,238,255,0.2)] hover:bg-white/90'
                   }`}
               >
                 {/* Floating ambient glow */}
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#0877C9]/10 text-[#0877C9] flex items-center justify-center mx-auto mb-4 border border-[#69C5F5]/30 shadow-inner group-hover:scale-110 transition-transform">
-                  <Upload className="w-8 h-8 sm:w-9 sm:h-9" />
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-azraq-ice/50 text-azraq-deep flex items-center justify-center mx-auto mb-4 border border-[rgba(130,170,205,0.3)] shadow-inner group-hover:scale-105 transition-transform">
+                  <Upload className="w-8 h-8 sm:w-9 sm:h-9 text-azraq-cyan" />
                 </div>
 
-                <h3 className="text-base sm:text-lg font-bold text-[#062B4F] mb-1">
+                <h3 className="text-base sm:text-lg font-bold text-azraq-deep mb-1">
                   {t("Drag and drop your image here, or browse files", "এখানে ছবি ড্র্যাগ করুন অথবা ক্লিক করে নির্বাচন করুন")}
                 </h3>
-                <p className="text-xs text-[#062B4F]/60 max-w-md mx-auto mb-4">
+                <p className="text-xs text-azraq-secondary max-w-md mx-auto mb-5">
                   {t("Supports JPG, JPEG, PNG, WEBP files up to 10 MB.", "সমর্থিত ফরম্যাট: JPG, JPEG, PNG, WEBP (সর্বোচ্চ ১০ এমবি)")}
                 </p>
 
-                <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#062B4F] hover:bg-[#0877C9] text-white text-xs font-bold shadow-md transition-all">
+                <div className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl btn-primary-icy text-azraq-deep text-xs font-bold shadow-[0_8px_24px_rgba(112,200,237,0.3)] transition-all">
                   <Upload className="w-3.5 h-3.5" />
                   <span>{t("Upload an Image", "ডিভাইস থেকে আপলোড")}</span>
                 </div>
@@ -545,9 +545,9 @@ export default function VisualSearchModal() {
                   <button
                     onClick={executeVisualSearch}
                     disabled={isScanning}
-                    className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-[#062B4F] to-[#0877C9] hover:from-[#0877C9] hover:to-[#062B4F] text-white font-black text-sm shadow-lg hover:shadow-[0_8px_25px_rgba(8,119,201,0.3)] transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5"
+                    className="w-full sm:w-auto px-8 py-3.5 rounded-2xl btn-primary-icy text-azraq-deep font-bold text-sm shadow-[0_8px_24px_rgba(112,200,237,0.35)] hover:shadow-[0_12px_32px_rgba(112,200,237,0.5)] transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5"
                   >
-                    <Sparkles className="w-4 h-4 text-[#50DDF0]" />
+                    <Sparkles className="w-4 h-4 text-azraq-deep" />
                     <span>{t("Find Similar Products", "সাদৃশ্যপূর্ণ পণ্য খুঁজুন")}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>

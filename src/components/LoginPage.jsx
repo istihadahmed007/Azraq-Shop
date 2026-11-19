@@ -75,16 +75,16 @@ export default function LoginPage() {
     <div className="min-h-[85vh] flex items-center justify-center py-10 px-4 relative overflow-hidden select-none">
       
       {/* Ambient glowing glass background orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-400/15 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse" />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-azraq-cyan/15 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-azraq-ice/30 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse" />
 
       {/* Main Glassmorphism Card */}
-      <div className="w-full max-w-md rounded-2xl bg-white/80 backdrop-blur-2xl border border-white/90 shadow-[0_20px_60px_rgba(31,38,135,0.12)] p-7 sm:p-9 relative">
+      <div className="w-full max-w-md rounded-3xl glass-panel border border-[rgba(130,170,205,0.35)] shadow-[0_24px_64px_rgba(25,59,91,0.22)] p-7 sm:p-9 relative">
         
         {/* Back Link */}
         <Link
           to="/"
-          className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-blue-600 transition-colors mb-6 font-medium"
+          className="inline-flex items-center gap-1.5 text-xs text-azraq-secondary hover:text-azraq-deep transition-colors mb-6 font-medium"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>{t("Back to Storefront", "স্টোরফ্রন্টে ফিরে যান")}</span>
@@ -95,10 +95,10 @@ export default function LoginPage() {
           <div className="flex justify-center">
             <img src="/branding/azraq-logo.png" alt="AZRAQ Shop" className="h-10 w-auto object-contain" />
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+          <h2 className="text-2xl font-bold text-azraq-deep tracking-tight">
             {isLogin ? t("Sign In to Your Account", "অ্যাকাউন্টে সাইন ইন করুন") : t("Create a Customer Account", "নতুন অ্যাকাউন্ট খুলুন")}
           </h2>
-          <p className="text-xs text-slate-500 max-w-xs mx-auto">
+          <p className="text-xs text-azraq-secondary max-w-xs mx-auto">
             {isLogin
               ? t("Track your orders, view saved wishlist, and checkout effortlessly.", "আপনার অর্ডার ট্র্যাক করুন এবং দ্রুত কেনাকাটা সম্পন্ন করুন।")
               : t("Join verified shoppers across Bangladesh with genuine lifestyle goods.", "১,২০০+ আসল পণ্যের কালেকশন ব্রাউজ ও অর্ডার করুন।")}
@@ -107,7 +107,7 @@ export default function LoginPage() {
 
         {/* Error notification */}
         {error && (
-          <div className="mb-4 p-3 rounded-xl bg-rose-50/90 border border-rose-200 text-rose-700 text-xs font-medium">
+          <div className="mb-4 p-3 rounded-2xl bg-rose-50/90 border border-rose-200 text-rose-700 text-xs font-medium">
             {error}
           </div>
         )}
@@ -117,7 +117,7 @@ export default function LoginPage() {
           type="button"
           onClick={handleGoogleLogin}
           disabled={isLoading}
-          className="w-full py-3 px-4 rounded-xl bg-white hover:bg-slate-50/90 text-slate-800 font-bold text-xs sm:text-sm border border-slate-200/90 shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-3 active:scale-98 disabled:opacity-50"
+          className="w-full py-3 px-4 rounded-2xl glass-card hover:bg-white text-azraq-deep font-bold text-xs sm:text-sm border border-[rgba(130,170,205,0.3)] shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-3 active:scale-98 disabled:opacity-50"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
             <path
@@ -142,8 +142,8 @@ export default function LoginPage() {
 
         {/* Divider */}
         <div className="relative my-6 flex items-center justify-center">
-          <div className="w-full border-t border-slate-200/80" />
-          <span className="absolute px-3 bg-white/90 backdrop-blur-sm text-[11px] font-medium text-slate-400">
+          <div className="w-full border-t border-[rgba(130,170,205,0.22)]" />
+          <span className="absolute px-3 bg-[#F8FBFF] text-[11px] font-medium text-azraq-secondary">
             {t("or with phone / email", "অথবা ফোন / ইমেইল দিয়ে")}
           </span>
         </div>
@@ -152,17 +152,17 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
             <div>
-              <label className="block text-[11px] font-bold text-slate-700 mb-1">
+              <label className="block text-[11px] font-bold text-azraq-deep mb-1">
                 {t("Full Name", "আপনার নাম")}
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <User className="w-4 h-4 text-azraq-secondary absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="e.g. Istihad Ahmed"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-50/80 border border-slate-200/90 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all shadow-inner"
+                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-white/80 border border-[rgba(130,170,205,0.3)] text-xs sm:text-sm text-azraq-deep focus:outline-none focus:border-azraq-cyan focus:ring-2 focus:ring-azraq-cyan/30 transition-all shadow-inner"
                   required
                 />
               </div>
@@ -170,34 +170,34 @@ export default function LoginPage() {
           )}
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-700 mb-1">
+            <label className="block text-[11px] font-bold text-azraq-deep mb-1">
               {t("Phone Number or Email", "ফোন নম্বর বা ইমেইল")}
             </label>
             <div className="relative">
-              <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Phone className="w-4 h-4 text-azraq-secondary absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="01851-XXXXXX or you@example.com"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-50/80 border border-slate-200/90 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all shadow-inner"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-white/80 border border-[rgba(130,170,205,0.3)] text-xs sm:text-sm text-azraq-deep focus:outline-none focus:border-azraq-cyan focus:ring-2 focus:ring-azraq-cyan/30 transition-all shadow-inner"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-700 mb-1">
+            <label className="block text-[11px] font-bold text-azraq-deep mb-1">
               {t("Password", "পাসওয়ার্ড")}
             </label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Lock className="w-4 h-4 text-azraq-secondary absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-50/80 border border-slate-200/90 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all shadow-inner"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-white/80 border border-[rgba(130,170,205,0.3)] text-xs sm:text-sm text-azraq-deep focus:outline-none focus:border-azraq-cyan focus:ring-2 focus:ring-azraq-cyan/30 transition-all shadow-inner"
                 required
               />
             </div>
@@ -206,7 +206,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-[#245BDB] to-[#1E40AF] hover:from-[#1E40AF] hover:to-[#172554] text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 active:scale-98 disabled:opacity-50"
+            className="w-full py-3.5 rounded-2xl btn-primary-icy text-azraq-deep font-bold text-xs sm:text-sm shadow-[0_8px_24px_rgba(112,200,237,0.35)] hover:shadow-[0_12px_32px_rgba(112,200,237,0.5)] transition-all flex items-center justify-center gap-2 active:scale-98 disabled:opacity-50"
           >
             <span>{isLogin ? t("Sign In", "লগইন করুন") : t("Create Account", "অ্যাকাউন্ট খুলুন")}</span>
             <ArrowRight className="w-4 h-4" />
@@ -214,14 +214,14 @@ export default function LoginPage() {
         </form>
 
         {/* Toggle Mode */}
-        <div className="mt-6 text-center text-xs text-slate-600">
+        <div className="mt-6 text-center text-xs text-azraq-secondary">
           {isLogin ? (
             <p>
               {t("New to AZRAQ?", "নতুন ক্রেতা?")}{' '}
               <button
                 type="button"
                 onClick={() => setIsLogin(false)}
-                className="font-bold text-blue-600 hover:text-blue-800 underline ml-1 cursor-pointer"
+                className="font-bold text-azraq-deep hover:text-azraq-cyan underline ml-1 cursor-pointer"
               >
                 {t("Create your account", "নতুন অ্যাকাউন্ট খুলুন")}
               </button>
@@ -232,7 +232,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setIsLogin(true)}
-                className="font-bold text-blue-600 hover:text-blue-800 underline ml-1 cursor-pointer"
+                className="font-bold text-azraq-deep hover:text-azraq-cyan underline ml-1 cursor-pointer"
               >
                 {t("Sign in to your account", "লগইন করুন")}
               </button>
@@ -241,7 +241,7 @@ export default function LoginPage() {
         </div>
 
         {/* Trust Badges */}
-        <div className="mt-6 pt-4 border-t border-slate-200/60 flex items-center justify-center gap-2 text-[11px] text-slate-400">
+        <div className="mt-6 pt-4 border-t border-[rgba(130,170,205,0.22)] flex items-center justify-center gap-2 text-[11px] text-azraq-secondary">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
           <span>{t("Verified Bangladesh E-Commerce Encryption", "নিরাপদ ও সুরক্ষিত গ্রাহক তথ্য")}</span>
         </div>

@@ -1,66 +1,91 @@
 import React from 'react';
-import { Box, Users, Star, Headphones } from 'lucide-react';
+import { Package, Truck, ShieldCheck, Headphones } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 
+/**
+ * AZRAQ Shop — Section B: Compact Horizontal Statistics & Trust Glass Panel
+ * 
+ * Accurately reproduces the reference screenshot's horizontal statistics panel:
+ * - Frosted translucent glass pill/panel with backdrop-blur-xl and delicate 1px border.
+ * - 4 compact statistic columns separated by subtle vertical hairlines.
+ * - Elegant typography with large bold numbers and muted secondary labels.
+ * - Right-hand side brand guarantee quote.
+ */
 export default function StatsRibbon() {
   const { t } = useShop();
 
   const stats = [
     {
-      icon: Box,
+      icon: Package,
       value: "1,200+",
       label: t("Curated Products", "কিউরেটেড পণ্য"),
-      sub: t("18 Verified Collections", "১৮টি অনুমোদিত ক্যাটাগরি")
+      sub: t("Verified Catalog", "ভেরিফাইড পণ্যতালিকা")
     },
     {
-      icon: Users,
-      value: "25,000+",
-      label: t("Happy Customers", "সন্তুষ্ট ক্রেতা"),
-      sub: t("Nationwide in BD", "সারা বাংলাদেশে")
+      icon: Truck,
+      value: "64",
+      label: t("Districts Covered", "জেলায় হোম ডেলিভারি"),
+      sub: t("Nationwide Reach", "সারা বাংলাদেশে")
     },
     {
-      icon: Star,
-      value: "98%",
-      label: t("Satisfaction Rate", "সন্তোষজনক মান"),
-      sub: t("Verified Reviews", "প্রমাণিত রিভিউ")
+      icon: ShieldCheck,
+      value: "100%",
+      label: t("Authentic Guarantee", "আসল পণ্যের নিশ্চয়তা"),
+      sub: t("Direct Import Quality", "ডাইরেক্ট ইমপোর্ট")
     },
     {
       icon: Headphones,
       value: "24/7",
-      label: t("Expert Support", "সার্বক্ষণিক সহায়তা"),
-      sub: t("Dedicated Care", "ডেডিকেটেড কেয়ার")
+      label: t("Support Hotline", "সার্বক্ষণিক সহায়তা"),
+      sub: t("WhatsApp Assistance", "হোয়াটসঅ্যাপ সাপোর্ট")
     }
   ];
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-      <div className="rounded-2xl bg-gradient-to-r from-[#062B4F] via-[#0A3D6E] to-[#062B4F] p-8 sm:p-10 text-white shadow-xl border border-[#69C5F5]/30 relative overflow-hidden">
-        {/* Subtle decorative glow */}
-        <div className="absolute top-0 right-1/4 w-64 h-64 bg-[#50DDF0]/10 rounded-full blur-2xl pointer-events-none" />
-
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 items-center relative z-10">
+    <section className="w-full select-none">
+      <div className="w-full bg-[#F8FBFF]/75 backdrop-blur-2xl border border-[rgba(130,170,205,0.25)] border-t-white/95 rounded-[28px] p-5 sm:p-6 shadow-[0_12px_36px_-8px_rgba(112,200,237,0.12),0_2px_8px_-1px_rgba(25,59,91,0.03)] flex flex-col lg:flex-row items-center justify-between gap-6 transition-all">
+        
+        {/* 4 Compact Stat Columns */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 flex-1 w-full divide-y sm:divide-y-0 sm:divide-x divide-[rgba(130,170,205,0.2)]">
           {stats.map((stat, idx) => {
             const Icon = stat.icon;
             return (
-              <div key={idx} className="flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-xl bg-white/10 border border-[#69C5F5]/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:bg-[#0877C9] transition-all">
-                  <Icon className="w-6 h-6 text-[#50DDF0] group-hover:text-white transition-colors" />
+              <div 
+                key={idx} 
+                className={`flex flex-col items-center sm:items-start text-center sm:text-left ${
+                  idx > 0 ? 'sm:pl-6' : ''
+                } ${idx >= 2 ? 'pt-3 sm:pt-0' : ''}`}
+              >
+                <div className="w-8 h-8 rounded-full bg-white/80 border border-[rgba(130,170,205,0.3)] text-[#0877C9] flex items-center justify-center mb-2 shadow-2xs">
+                  <Icon className="w-4 h-4" />
                 </div>
-                <div>
-                  <div className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-                    {stat.value}
-                  </div>
-                  <div className="text-xs sm:text-sm font-bold text-white/90">
-                    {stat.label}
-                  </div>
-                  <div className="text-[11px] text-white/60">
-                    {stat.sub}
-                  </div>
+                <div className="text-2xl sm:text-[26px] font-black text-[#193B5B] tracking-tight">
+                  {stat.value}
+                </div>
+                <div className="text-xs font-bold text-[#193B5B] mt-0.5">
+                  {stat.label}
+                </div>
+                <div className="text-[10px] text-[#718398] font-medium">
+                  {stat.sub}
                 </div>
               </div>
             );
           })}
         </div>
+
+        {/* Right Quote / Guarantee (Identical in composition to reference) */}
+        <div className="w-full lg:w-80 shrink-0 border-t lg:border-t-0 lg:border-l border-[rgba(130,170,205,0.2)] pt-4 lg:pt-0 lg:pl-8 flex flex-col justify-center">
+          <p className="text-xs text-[#193B5B] font-medium leading-relaxed italic">
+            "{t(
+              "Authentic quality is not just what it looks and feels like. Authentic quality is how it works.",
+              "আসল মান কেবল দেখতে বা ছুঁতে কেমন তা নয়, আসল মান হলো এটি ব্যবহারে কতটা নির্ভরতা দেয়।"
+            )}"
+          </p>
+          <span className="text-[10px] font-mono uppercase tracking-wider text-[#718398] font-bold mt-1.5 block">
+            — {t("Azraq Direct Promise", "আজরাক ডিরেক্ট নিশ্চয়তা")}
+          </span>
+        </div>
+
       </div>
     </section>
   );

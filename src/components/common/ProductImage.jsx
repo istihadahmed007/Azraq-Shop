@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Package, ImageOff } from 'lucide-react';
+import { Package } from 'lucide-react';
 import { AzraqBrandSymbol } from '../AzraqLogo';
 
 // Global cache of image URLs already verified and loaded during this session
@@ -9,11 +9,11 @@ const loadedImageUrls = new Set();
  * AZRAQ Shop — High-Performance Product Image Component
  * 
  * Features & Optimizations:
- * 1. Instant display for cached/preloaded images with zero skeleton flash.
- * 2. High network priority (`fetchPriority="high"`, `loading="eager"`) for priority views.
- * 3. Pre-connected to image CDN (easydrop.asia) for zero DNS/TLS negotiation lag.
- * 4. Preserves 100% authentic aspect ratio without distortion or unintended flex clipping.
- * 5. Immediate progressive rendering (no blocking with opacity-0 when priority is set).
+ * 1. Strictly conforms to Requirement 5: object-fit: contain, object-position: center, 100% visible picture.
+ * 2. Instant display for cached/preloaded images with zero skeleton flash.
+ * 3. High network priority (`fetchPriority="high"`, `loading="eager"`) for priority views.
+ * 4. Preserves 100% authentic aspect ratio without distortion or unintended clipping.
+ * 5. Frosted crystal background with translucent border matching glassmorphic aesthetic.
  */
 export default function ProductImage({
   src,
@@ -62,26 +62,26 @@ export default function ProductImage({
   if (aspectRatio === 'portrait') aspectClass = 'aspect-[3/4]';
   if (aspectRatio === 'auto') aspectClass = '';
 
-  // Fit class — for 'cover', fill the box edge-to-edge; for 'contain', stay within max-w/max-h without distortion
+  // Fit class — strictly object-contain & object-center for genuine products
   const fitClass = fit === 'cover' 
-    ? 'w-full h-full object-cover' 
-    : 'max-w-full max-h-full object-contain';
+    ? 'w-full h-full object-cover object-center block' 
+    : 'w-full h-full object-contain object-center block';
 
   // Fallback / Placeholder when no image or image failed to load
   if (!src || hasError) {
     return (
       <div
-        className={`relative w-full ${aspectClass} bg-[#EDF4F9] border border-[#D5E2EE]/60 rounded-[14px] flex flex-col items-center justify-center p-4 select-none text-[#6B7D93] overflow-hidden ${containerClassName}`}
+        className={`relative w-full ${aspectClass} bg-[#F8FBFF] border border-[#82AACD]/25 rounded-[16px] flex flex-col items-center justify-center p-4 select-none text-[#718398] overflow-hidden ${containerClassName}`}
         role="img"
         aria-label={alt}
       >
-        <div className="w-12 h-12 rounded-full bg-[#E2ECF4] border border-[#D5E2EE] flex items-center justify-center mb-2 shadow-inner">
-          <AzraqBrandSymbol className="w-6 h-6 text-[#0877C9] opacity-80" />
+        <div className="w-12 h-12 rounded-full bg-[#DDEEFF]/60 border border-[#82AACD]/30 flex items-center justify-center mb-2 shadow-xs">
+          <AzraqBrandSymbol className="w-6 h-6 text-[#193B5B] opacity-80" />
         </div>
-        <span className="text-[10px] font-bold text-[#6B7D93] uppercase tracking-wider text-center">
+        <span className="text-[10px] font-bold text-[#193B5B] uppercase tracking-wider text-center">
           AZRAQ Authentic
         </span>
-        <span className="text-[9px] text-[#8CA0B6] text-center mt-0.5">
+        <span className="text-[9px] text-[#718398] text-center mt-0.5">
           Photo Verified in Catalog
         </span>
       </div>
@@ -91,20 +91,20 @@ export default function ProductImage({
   return (
     <div
       onClick={onClick}
-      className={`relative w-full ${aspectClass} flex items-center justify-center overflow-hidden bg-white select-none ${containerClassName} ${
+      className={`relative w-full ${aspectClass} flex items-center justify-center overflow-hidden bg-white/70 backdrop-blur-xs select-none rounded-[16px] ${containerClassName} ${
         onClick ? 'cursor-pointer' : ''
       }`}
     >
       {/* Loading Skeleton: only shown when image is not yet loaded and not priority */}
       {!isLoaded && showSkeleton && !priority && (
-        <div className="absolute inset-0 bg-gradient-to-r from-[#EDF4F9] via-[#F7FAFD] to-[#EDF4F9] animate-pulse flex items-center justify-center z-0">
-          <div className="w-8 h-8 rounded-full bg-[#E2ECF4] flex items-center justify-center opacity-60">
-            <Package className="w-4 h-4 text-[#8CA0B6]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#DDEEFF]/40 via-[#F8FBFF] to-[#DDEEFF]/40 animate-pulse flex items-center justify-center z-0">
+          <div className="w-8 h-8 rounded-full bg-[#DDEEFF]/80 flex items-center justify-center opacity-60">
+            <Package className="w-4 h-4 text-[#718398]" />
           </div>
         </div>
       )}
 
-      {/* Main Product Image — High-speed loading without artificial opacity delay */}
+      {/* Main Product Image — Strictly contain & center to guarantee full visibility */}
       <img
         ref={imgRef}
         src={src}
@@ -117,9 +117,9 @@ export default function ProductImage({
           setIsLoaded(true);
         }}
         onError={() => setHasError(true)}
-        className={`${fitClass} transition-opacity duration-150 ${
+        className={`${fitClass} transition-all duration-300 ${
           isLoaded || priority ? 'opacity-100' : 'opacity-0'
-        } ${zoomOnHover ? 'group-hover:scale-105' : ''} ${className}`}
+        } ${zoomOnHover ? 'group-hover:scale-[1.03]' : ''} ${className}`}
       />
     </div>
   );

@@ -9,14 +9,14 @@ import { useShop } from '../context/ShopContext';
 import { useAuth } from '../context/AuthContext';
 
 /**
- * AZRAQ Shop — Transparent Glassy Retail Header
+ * AZRAQ Shop — Futuristic Icy-Blue Glassmorphic Header
  * 
  * Features:
- * 1. Ultra-modern Glassmorphism with backdrop-blur-2xl & specular edge highlights.
+ * 1. Crystal translucent surface with backdrop-blur-2xl and fine icy border.
  * 2. Top utility micro-bar with delivery transparency, WhatsApp hotline, order tracking & Admin portal.
  * 3. Customer Account button with Google login avatar / Sign In modal trigger.
- * 4. Embedded AI Visual Image Search trigger and instant search input.
- * 5. Horizontal department navigation strip with glassy pills.
+ * 4. Embedded AI Visual Image Search trigger and crystal search input.
+ * 5. Horizontal department navigation strip with translucent glass pills.
  */
 export default function Header({ onToggleSidebar }) {
   const {
@@ -62,25 +62,25 @@ export default function Header({ onToggleSidebar }) {
   ];
 
   return (
-    <header className="w-full glass-header bg-white/80 backdrop-blur-2xl border border-white/90 rounded-2xl shadow-[0_10px_30px_0_rgba(31,38,135,0.06)] select-none sticky top-2 z-40 transition-all">
+    <header className="w-full bg-[#F8FBFF]/80 backdrop-blur-2xl border border-[rgba(130,170,205,0.25)] border-t-white/95 rounded-[24px] shadow-[0_12px_36px_-8px_rgba(112,200,237,0.12),0_2px_8px_-1px_rgba(25,59,91,0.03)] select-none sticky top-2.5 z-40 transition-all">
 
       {/* 1. TOP UTILITY MICRO BAR (Desktop & Tablet) */}
-      <div className="hidden sm:flex items-center justify-between px-5 sm:px-6 py-2 border-b border-white/80 text-[11px] text-slate-500 bg-white/40 rounded-t-2xl">
+      <div className="hidden sm:flex items-center justify-between px-5 sm:px-6 py-2 border-b border-[rgba(130,170,205,0.18)] text-[11px] text-[#718398] bg-white/40 rounded-t-[24px]">
         <div className="flex items-center gap-4">
           <span className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-medium text-slate-800 tracking-tight">
+            <span className="w-2 h-2 rounded-full bg-[#70C8ED] shadow-[0_0_8px_#70C8ED] animate-pulse" />
+            <span className="font-semibold text-[#193B5B] tracking-tight">
               {t("Delivery: ৳80 Dhaka • ৳150 Outside • Free on orders over ৳3,000", "ডেলিভারি: ঢাকা ৮০৳ • বাইরে ১৫০৳ • ৩০০০৳ অর্ডারে ফ্রি ডেলিভারি")}
             </span>
           </span>
-          <span className="text-slate-300">/</span>
+          <span className="text-[#82AACD]/40">/</span>
           <a
             href="https://wa.me/8801851172032"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-blue-600 flex items-center gap-1.5 transition-colors font-medium text-slate-700"
+            className="hover:text-[#0877C9] flex items-center gap-1.5 transition-colors font-medium text-[#193B5B]"
           >
-            <Headphones className="w-3 h-3 text-[#245BDB]" />
+            <Headphones className="w-3 h-3 text-[#70C8ED]" />
             <span>+880 1851-172032</span>
           </a>
         </div>
@@ -89,31 +89,31 @@ export default function Header({ onToggleSidebar }) {
           {/* Order Tracking */}
           <button
             onClick={() => setIsTrackingOpen(true)}
-            className="hover:text-blue-600 flex items-center gap-1 transition-colors font-semibold text-slate-700 cursor-pointer"
+            className="hover:text-[#0877C9] flex items-center gap-1 transition-colors font-semibold text-[#193B5B] cursor-pointer"
           >
-            <Package className="w-3.5 h-3.5 text-[#245BDB]" />
+            <Package className="w-3.5 h-3.5 text-[#70C8ED]" />
             <span>{t("Track Order", "অর্ডার ট্র্যাক")}</span>
           </button>
 
-          <span className="text-slate-300">/</span>
+          <span className="text-[#82AACD]/40">/</span>
 
           {/* Language Toggle */}
           <button
             onClick={() => setLanguage(language === 'bn' ? 'en' : 'bn')}
-            className="hover:text-blue-600 flex items-center gap-1 transition-colors font-semibold text-slate-700 cursor-pointer"
+            className="hover:text-[#0877C9] flex items-center gap-1 transition-colors font-semibold text-[#193B5B] cursor-pointer"
           >
-            <Globe className="w-3.5 h-3.5 text-[#245BDB]" />
+            <Globe className="w-3.5 h-3.5 text-[#70C8ED]" />
             <span>{language === 'bn' ? 'English' : 'বাংলা'}</span>
           </button>
 
-          <span className="text-slate-300">/</span>
+          <span className="text-[#82AACD]/40">/</span>
 
           {/* Admin Operations Access */}
           <button
             onClick={() => setIsAdminOpen(true)}
-            className="hover:text-blue-600 flex items-center gap-1 transition-colors font-semibold text-slate-700 cursor-pointer"
+            className="hover:text-[#0877C9] flex items-center gap-1 transition-colors font-semibold text-[#193B5B] cursor-pointer"
           >
-            <Shield className="w-3.5 h-3.5 text-[#245BDB]" />
+            <Shield className="w-3.5 h-3.5 text-[#70C8ED]" />
             <span>{t("Admin", "অ্যাডমিন")}</span>
           </button>
         </div>
@@ -126,7 +126,7 @@ export default function Header({ onToggleSidebar }) {
         <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={onToggleSidebar}
-            className="w-9 h-9 rounded-xl border border-white/90 bg-white/70 hover:bg-white flex items-center justify-center text-slate-800 hover:text-blue-600 shadow-xs transition-all focus:outline-none cursor-pointer"
+            className="w-9 h-9 rounded-full border border-[rgba(130,170,205,0.3)] bg-white/75 hover:bg-white flex items-center justify-center text-[#193B5B] hover:text-[#0877C9] shadow-xs transition-all focus:outline-none cursor-pointer"
             title={t("Browse All Categories", "সকল ক্যাটাগরি")}
             aria-label="Toggle navigation menu"
           >
@@ -144,21 +144,21 @@ export default function Header({ onToggleSidebar }) {
         {/* Center: Wide Search Box with Embedded Image-Search Control (Desktop & Tablet) */}
         <div className="hidden sm:block flex-1 min-w-0 max-w-xl mx-auto">
           <form onSubmit={handleSearchSubmit} className="relative flex items-center w-full">
-            <div className="relative w-full flex items-center bg-slate-50/80 border border-slate-200/90 rounded-xl focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20 transition-all shadow-inner">
-              <Search className="w-4 h-4 text-slate-400 ml-3.5 shrink-0 pointer-events-none" />
+            <div className="relative w-full flex items-center bg-white/80 border border-[rgba(130,170,205,0.28)] rounded-full focus-within:border-[#70C8ED] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#70C8ED]/20 transition-all shadow-inner">
+              <Search className="w-4 h-4 text-[#718398] ml-4 shrink-0 pointer-events-none" />
               <input
                 type="text"
                 placeholder={t("Search across 1,200+ curated products, brands, categories...", "১২০০+ আসল পণ্য ও কালেকশন খুঁজুন...")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-2.5 pr-20 py-2.5 text-xs sm:text-[13px] text-slate-900 placeholder-slate-400 bg-transparent focus:outline-none"
+                className="w-full pl-2.5 pr-20 py-2.5 text-xs sm:text-[13px] text-[#193B5B] placeholder-[#718398] bg-transparent focus:outline-none font-medium"
               />
 
               {/* AI Visual Image Search Button */}
               <button
                 type="button"
                 onClick={() => setIsVisualSearchOpen(true)}
-                className="absolute right-10 p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
+                className="absolute right-10 p-1.5 rounded-full text-[#718398] hover:text-[#0877C9] hover:bg-[#DDEEFF]/40 transition-colors cursor-pointer"
                 title={t("Search by Image", "ছবি দিয়ে পণ্য খুঁজুন")}
                 aria-label="Search by image"
               >
@@ -168,7 +168,7 @@ export default function Header({ onToggleSidebar }) {
               {/* Search Submit Button */}
               <button
                 type="submit"
-                className="w-8 h-8 mr-1 bg-gradient-to-r from-[#245BDB] to-[#1E40AF] hover:from-[#1E40AF] hover:to-[#172554] text-white rounded-lg flex items-center justify-center transition-colors shrink-0 shadow-xs cursor-pointer"
+                className="w-8 h-8 mr-1 bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] hover:from-[#5CBDE5] hover:to-[#2563EB] text-white rounded-full flex items-center justify-center transition-all shrink-0 shadow-[0_2px_8px_rgba(112,200,237,0.4)] cursor-pointer"
                 title={t("Search", "অনুসন্ধান")}
                 aria-label="Submit search"
               >
@@ -186,29 +186,29 @@ export default function Header({ onToggleSidebar }) {
             <div className="relative">
               <button
                 onClick={() => setIsUserMenuOpen(prev => !prev)}
-                className="h-9 px-2.5 sm:px-3 rounded-xl bg-white/70 hover:bg-white border border-white/90 text-slate-800 flex items-center gap-2 shadow-xs transition-all cursor-pointer"
+                className="h-9 px-2.5 sm:px-3 rounded-full bg-white/75 hover:bg-white border border-[rgba(130,170,205,0.3)] text-[#193B5B] flex items-center gap-2 shadow-xs transition-all cursor-pointer"
                 title={user.name}
               >
                 <img
                   src={user.avatar}
                   alt={user.name}
-                  className="w-5 h-5 rounded-full object-cover border border-blue-500/40"
+                  className="w-5 h-5 rounded-full object-cover border border-[#70C8ED]"
                 />
-                <span className="hidden lg:inline text-xs font-bold text-slate-800 max-w-[85px] truncate">
+                <span className="hidden lg:inline text-xs font-bold text-[#193B5B] max-w-[85px] truncate">
                   {user.name.split(' ')[0]}
                 </span>
               </button>
 
               {isUserMenuOpen && (
                 <div 
-                  className="absolute right-0 mt-2 w-56 rounded-2xl bg-white/95 backdrop-blur-2xl border border-white/95 shadow-2xl p-2 z-50 animate-in fade-in duration-150"
+                  className="absolute right-0 mt-2 w-56 rounded-2xl bg-white/95 backdrop-blur-2xl border border-[rgba(130,170,205,0.3)] shadow-[0_16px_40px_rgba(25,59,91,0.12)] p-2 z-50 animate-in fade-in duration-150"
                   onMouseLeave={() => setIsUserMenuOpen(false)}
                 >
-                  <div className="p-3 border-b border-slate-100 mb-1">
-                    <p className="text-xs font-bold text-slate-900 truncate">{user.name}</p>
-                    <p className="text-[11px] text-slate-500 truncate">{user.email || user.phone}</p>
+                  <div className="p-3 border-b border-[rgba(130,170,205,0.15)] mb-1">
+                    <p className="text-xs font-bold text-[#193B5B] truncate">{user.name}</p>
+                    <p className="text-[11px] text-[#718398] truncate">{user.email || user.phone}</p>
                     {user.provider === 'google' && (
-                      <span className="inline-block mt-1 px-1.5 py-0.5 rounded bg-blue-50 text-[10px] text-blue-700 font-semibold">
+                      <span className="inline-block mt-1 px-1.5 py-0.5 rounded-full bg-[#DDEEFF] text-[10px] text-[#193B5B] font-semibold">
                         Google Verified
                       </span>
                     )}
@@ -219,9 +219,9 @@ export default function Header({ onToggleSidebar }) {
                       setIsUserMenuOpen(false);
                       setIsTrackingOpen(true);
                     }}
-                    className="w-full text-left px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 rounded-lg flex items-center gap-2 transition-colors cursor-pointer"
+                    className="w-full text-left px-3 py-2 text-xs font-medium text-[#193B5B] hover:bg-[#DDEEFF]/40 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
                   >
-                    <Package className="w-3.5 h-3.5 text-blue-600" />
+                    <Package className="w-3.5 h-3.5 text-[#0877C9]" />
                     <span>{t("Track My Orders", "আমার অর্ডারসমূহ")}</span>
                   </button>
 
@@ -230,20 +230,20 @@ export default function Header({ onToggleSidebar }) {
                       setIsUserMenuOpen(false);
                       setIsAdminOpen(true);
                     }}
-                    className="w-full text-left px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 rounded-lg flex items-center gap-2 transition-colors cursor-pointer"
+                    className="w-full text-left px-3 py-2 text-xs font-medium text-[#193B5B] hover:bg-[#DDEEFF]/40 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
                   >
-                    <Shield className="w-3.5 h-3.5 text-blue-600" />
+                    <Shield className="w-3.5 h-3.5 text-[#0877C9]" />
                     <span>{t("Admin Operations", "অ্যাডমিন পোর্টাল")}</span>
                   </button>
 
-                  <div className="border-t border-slate-100 my-1" />
+                  <div className="border-t border-[rgba(130,170,205,0.15)] my-1" />
 
                   <button
                     onClick={() => {
                       setIsUserMenuOpen(false);
                       logout();
                     }}
-                    className="w-full text-left px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 rounded-lg flex items-center gap-2 transition-colors cursor-pointer"
+                    className="w-full text-left px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     <span>{t("Sign Out", "লগআউট")}</span>
@@ -254,10 +254,10 @@ export default function Header({ onToggleSidebar }) {
           ) : (
             <button
               onClick={() => openAuthModal('login')}
-              className="h-9 px-3 rounded-xl bg-white/70 hover:bg-white border border-white/90 text-slate-800 hover:text-blue-600 flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer focus:outline-none"
+              className="h-9 px-3.5 rounded-full bg-white/75 hover:bg-white border border-[rgba(130,170,205,0.3)] text-[#193B5B] hover:text-[#0877C9] flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer focus:outline-none"
               title={t("Customer Sign In", "গ্রাহক লগইন")}
             >
-              <User className="w-3.5 h-3.5 text-[#245BDB]" />
+              <User className="w-3.5 h-3.5 text-[#70C8ED]" />
               <span className="hidden md:inline text-xs font-bold">{t("Sign In", "লগইন")}</span>
             </button>
           )}
@@ -270,29 +270,29 @@ export default function Header({ onToggleSidebar }) {
                 document.getElementById('popular-products')?.scrollIntoView({ behavior: 'smooth' });
               }, 100);
             }}
-            className="h-9 px-3 rounded-xl bg-white/70 hover:bg-white border border-white/90 text-slate-800 flex items-center justify-center gap-1.5 transition-all relative focus:outline-none cursor-pointer shadow-xs"
+            className="h-9 px-3 rounded-full bg-white/75 hover:bg-white border border-[rgba(130,170,205,0.3)] text-[#193B5B] flex items-center justify-center gap-1.5 transition-all relative focus:outline-none cursor-pointer shadow-xs"
             title={t("Wishlist", "পছন্দের তালিকা")}
             aria-label="Wishlist"
           >
-            <Heart className={`w-3.5 h-3.5 ${favorites.length > 0 ? 'fill-[#E53935] text-[#E53935]' : 'text-slate-400'}`} />
+            <Heart className={`w-3.5 h-3.5 ${favorites.length > 0 ? 'fill-[#E53935] text-[#E53935]' : 'text-[#718398]'}`} />
             <span className="hidden md:inline text-xs font-semibold">{t("Saved", "পছন্দ")}</span>
             {favorites.length > 0 && (
-              <span className="w-4 h-4 rounded-full bg-[#101C35] text-white text-[9px] font-bold flex items-center justify-center">
+              <span className="w-4 h-4 rounded-full bg-[#193B5B] text-white text-[9px] font-bold flex items-center justify-center">
                 {favorites.length}
               </span>
             )}
           </button>
 
-          {/* Shopping Cart Button */}
+          {/* Shopping Bag Button (Icy-Blue Gradient Pill with Counter) */}
           <button
             onClick={() => setIsCartOpen(true)}
-            className="h-9 px-3.5 rounded-xl bg-gradient-to-r from-[#245BDB] to-[#1E40AF] hover:from-[#1E40AF] hover:to-[#172554] text-white shadow-md hover:shadow-lg flex items-center justify-center gap-2 transition-all relative focus:outline-none active:scale-98 cursor-pointer"
+            className="h-9 px-4 rounded-full bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] hover:from-[#5CBDE5] hover:to-[#2563EB] text-white shadow-[0_6px_20px_rgba(112,200,237,0.45)] hover:shadow-[0_8px_26px_rgba(112,200,237,0.6)] flex items-center justify-center gap-2 transition-all relative focus:outline-none active:scale-98 cursor-pointer"
             title={t("Shopping Cart", "শপিং ব্যাগ")}
             aria-label="Shopping Cart"
           >
             <ShoppingBag className="w-3.5 h-3.5" />
-            <span className="text-xs font-semibold">{t("Bag", "ব্যাগ")}</span>
-            <span className="min-w-4 h-4 px-1 rounded-full bg-white text-[#245BDB] text-[9px] font-mono font-bold flex items-center justify-center shadow-2xs">
+            <span className="text-xs font-bold">{t("Bag", "ব্যাগ")}</span>
+            <span className="min-w-4 h-4 px-1 rounded-full bg-white text-[#193B5B] text-[9px] font-mono font-bold flex items-center justify-center shadow-xs">
               {totalCartItems > 99 ? '99+' : totalCartItems}
             </span>
           </button>
@@ -301,24 +301,24 @@ export default function Header({ onToggleSidebar }) {
 
       </div>
 
-      {/* 2b. MOBILE SEARCH BAR ROW (Always visible and usable on small viewports) */}
+      {/* 2b. MOBILE SEARCH BAR ROW */}
       <div className="sm:hidden px-4 pb-3 pt-0.5">
         <form onSubmit={handleSearchSubmit} className="relative flex items-center w-full">
-          <div className="relative w-full flex items-center bg-slate-50/80 border border-slate-200/90 rounded-xl focus-within:border-blue-500 focus-within:bg-white transition-all shadow-inner">
-            <Search className="w-3.5 h-3.5 text-slate-400 ml-3 shrink-0 pointer-events-none" />
+          <div className="relative w-full flex items-center bg-white/80 border border-[rgba(130,170,205,0.28)] rounded-full focus-within:border-[#70C8ED] focus-within:bg-white transition-all shadow-inner">
+            <Search className="w-3.5 h-3.5 text-[#718398] ml-3.5 shrink-0 pointer-events-none" />
             <input
               type="text"
               placeholder={t("Search 1,200+ products...", "পণ্য বা কালেকশন খুঁজুন...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-2 pr-16 py-2 text-xs text-slate-900 placeholder-slate-400 bg-transparent focus:outline-none"
+              className="w-full pl-2 pr-16 py-2 text-xs text-[#193B5B] placeholder-[#718398] bg-transparent focus:outline-none font-medium"
             />
 
             {/* AI Visual Image Search Button */}
             <button
               type="button"
               onClick={() => setIsVisualSearchOpen(true)}
-              className="absolute right-8 p-1 text-slate-500 hover:text-blue-600"
+              className="absolute right-8 p-1 text-[#718398] hover:text-[#0877C9]"
               title={t("Search by Image", "ছবি দিয়ে খুঁজুন")}
             >
               <Camera className="w-3.5 h-3.5" />
@@ -327,7 +327,7 @@ export default function Header({ onToggleSidebar }) {
             {/* Search Submit Button */}
             <button
               type="submit"
-              className="w-6 h-6 mr-1 bg-gradient-to-r from-[#245BDB] to-[#1E40AF] text-white rounded-lg flex items-center justify-center shrink-0 shadow-2xs"
+              className="w-6 h-6 mr-1 bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] text-white rounded-full flex items-center justify-center shrink-0 shadow-xs"
               title={t("Search", "অনুসন্ধান")}
             >
               <Search className="w-3 h-3" />
@@ -337,16 +337,16 @@ export default function Header({ onToggleSidebar }) {
       </div>
 
       {/* 3. CATEGORY NAVIGATION STRIP */}
-      <div className="flex items-center gap-1.5 px-4 sm:px-6 py-2 border-t border-white/80 bg-white/40 rounded-b-2xl overflow-x-auto no-scrollbar">
+      <div className="flex items-center gap-1.5 px-4 sm:px-6 py-2 border-t border-[rgba(130,170,205,0.18)] bg-white/40 rounded-b-[24px] overflow-x-auto no-scrollbar">
         <button
           onClick={() => navigateTo('collections')}
-          className="text-xs font-bold text-slate-800 hover:text-blue-600 flex items-center gap-1 px-3 py-1 rounded-xl bg-white/70 border border-white/90 hover:border-blue-300 whitespace-nowrap shadow-2xs transition-all shrink-0 cursor-pointer"
+          className="text-xs font-bold text-[#193B5B] hover:text-[#0877C9] flex items-center gap-1 px-3 py-1 rounded-full bg-white/75 border border-[rgba(130,170,205,0.3)] hover:border-[#70C8ED] whitespace-nowrap shadow-xs transition-all shrink-0 cursor-pointer"
         >
           <span>{t("All 18 Collections", "১৮টি কালেকশন")}</span>
-          <ChevronRight className="w-3 h-3 text-slate-400" />
+          <ChevronRight className="w-3 h-3 text-[#718398]" />
         </button>
 
-        <span className="text-slate-300 mx-1 shrink-0">|</span>
+        <span className="text-[#82AACD]/40 mx-1 shrink-0">|</span>
 
         {navCategories.map((item, idx) => {
           const isSelected = (item.cat === 'All' && activeCategory === 'All') || activeCategory === item.cat;
@@ -360,10 +360,11 @@ export default function Header({ onToggleSidebar }) {
                   document.getElementById('all-products')?.scrollIntoView({ behavior: 'smooth' });
                 }, 100);
               }}
-              className={`text-xs font-medium px-3 py-1 rounded-xl whitespace-nowrap transition-all border shrink-0 cursor-pointer ${isSelected
-                ? 'bg-gradient-to-r from-[#245BDB] to-[#1E40AF] text-white border-blue-600 font-semibold shadow-xs'
-                : 'bg-white/40 hover:bg-white text-slate-600 hover:text-slate-900 border-white/60 hover:border-white/90'
-                }`}
+              className={`text-xs font-medium px-3.5 py-1 rounded-full whitespace-nowrap transition-all border shrink-0 cursor-pointer ${
+                isSelected
+                  ? 'bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] text-white border-transparent font-bold shadow-[0_2px_10px_rgba(112,200,237,0.4)]'
+                  : 'bg-white/50 hover:bg-white text-[#718398] hover:text-[#193B5B] border-[rgba(130,170,205,0.2)] hover:border-[rgba(130,170,205,0.4)]'
+              }`}
             >
               {item.label}
             </button>

@@ -40,27 +40,27 @@ export default function BrandValuePanel() {
   ];
 
   return (
-    <section className="w-full select-none border border-white/90 bg-white/75 backdrop-blur-2xl rounded-2xl shadow-[0_12px_36px_0_rgba(31,38,135,0.06)] px-5 sm:px-7 py-5 flex flex-col lg:flex-row items-center justify-between gap-5">
+    <section className="w-full select-none border border-[rgba(130,170,205,0.25)] border-t-white/95 bg-[#F8FBFF]/75 backdrop-blur-2xl rounded-[28px] shadow-[0_16px_40px_-10px_rgba(112,200,237,0.12),0_4px_16px_-2px_rgba(25,59,91,0.04)] px-6 sm:px-8 py-5 flex flex-col lg:flex-row items-center justify-between gap-5 transition-all">
 
       {/* 4 Benefits with Clean Dividers */}
-      <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5 flex-1">
+      <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 flex-1">
         {benefits.map((item, idx) => {
           const Icon = item.icon;
           return (
             <div
               key={idx}
               className={`flex items-center gap-3 ${
-                idx !== 0 ? 'md:border-l md:border-white/80 md:pl-5' : ''
+                idx !== 0 ? 'md:border-l md:border-[rgba(130,170,205,0.2)] md:pl-6' : ''
               }`}
             >
-              <div className="w-9 h-9 rounded-xl bg-white/80 text-blue-600 border border-white/90 shadow-2xs flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-full bg-white/80 text-[#0877C9] border border-[rgba(130,170,205,0.3)] shadow-xs flex items-center justify-center shrink-0">
                 <Icon className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <h4 className="text-xs sm:text-[13px] font-bold text-slate-900 truncate leading-tight">
+                <h4 className="text-xs sm:text-[13px] font-bold text-[#193B5B] truncate leading-tight">
                   {item.title}
                 </h4>
-                <p className="text-[11px] text-slate-500 truncate mt-0.5 font-medium">
+                <p className="text-[11px] text-[#718398] truncate mt-0.5 font-medium">
                   {item.desc}
                 </p>
               </div>
@@ -69,13 +69,13 @@ export default function BrandValuePanel() {
         })}
       </div>
 
-      {/* Social Icons on Far Right */}
-      <div className="flex items-center gap-2 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 lg:border-l lg:border-white/80 lg:pl-5 w-full lg:w-auto justify-center lg:justify-end">
+      {/* Social Icons in Circular Glass Buttons */}
+      <div className="flex items-center gap-2 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 lg:border-l lg:border-[rgba(130,170,205,0.2)] lg:pl-6 w-full lg:w-auto justify-center lg:justify-end">
         <a
           href="https://facebook.com"
           target="_blank"
           rel="noreferrer"
-          className="w-8 h-8 rounded-xl bg-white/80 hover:bg-white border border-white/90 text-slate-500 hover:text-blue-600 shadow-2xs flex items-center justify-center transition-colors"
+          className="w-8 h-8 rounded-full bg-white/80 hover:bg-white border border-[rgba(130,170,205,0.3)] text-[#718398] hover:text-[#0877C9] shadow-xs flex items-center justify-center transition-all hover:scale-105"
           title="Facebook"
           aria-label="Facebook"
         >
@@ -85,7 +85,7 @@ export default function BrandValuePanel() {
           href="https://youtube.com"
           target="_blank"
           rel="noreferrer"
-          className="w-8 h-8 rounded-xl bg-white/80 hover:bg-white border border-white/90 text-slate-500 hover:text-rose-600 shadow-2xs flex items-center justify-center transition-colors"
+          className="w-8 h-8 rounded-full bg-white/80 hover:bg-white border border-[rgba(130,170,205,0.3)] text-[#718398] hover:text-rose-600 shadow-xs flex items-center justify-center transition-all hover:scale-105"
           title="YouTube"
           aria-label="YouTube"
         >
@@ -95,7 +95,7 @@ export default function BrandValuePanel() {
           href="https://instagram.com"
           target="_blank"
           rel="noreferrer"
-          className="w-8 h-8 rounded-xl bg-white/80 hover:bg-white border border-white/90 text-slate-500 hover:text-pink-600 shadow-2xs flex items-center justify-center transition-colors"
+          className="w-8 h-8 rounded-full bg-white/80 hover:bg-white border border-[rgba(130,170,205,0.3)] text-[#718398] hover:text-pink-600 shadow-xs flex items-center justify-center transition-all hover:scale-105"
           title="Instagram"
           aria-label="Instagram"
         >

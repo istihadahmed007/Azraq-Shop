@@ -24,6 +24,7 @@ export { default as ProductDemonstrationSection } from './ProductDemonstrationSe
 export { default as RecentlyViewedSection } from './RecentlyViewedSection.jsx';
 export { default as BrandValuePanel } from './BrandValuePanel.jsx';
 export { default as StatsRibbon } from './StatsRibbon.jsx';
+export { default as StoreArchitectureSection } from './StoreArchitectureSection.jsx';
 export { default as EditorialCtaSection } from './EditorialCtaSection.jsx';
 
 // ==========================================
