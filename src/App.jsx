@@ -179,48 +179,39 @@ function StorefrontContent() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F1F7FC] text-[#193B5B] selection:bg-[#70C8ED]/30 selection:text-[#193B5B] font-sans relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#EAF5FF] text-[#193B5B] selection:bg-[#70C8ED]/30 selection:text-[#193B5B] font-sans relative overflow-x-hidden">
       <RouteSynchronizer />
 
-      {/* Main Container (Spacious ~1380px with delicate architectural glass rhythm) */}
-      <div className="max-w-[1380px] w-full mx-auto px-3 sm:px-5 lg:px-6 py-3 sm:py-5 flex flex-col gap-5 sm:gap-6 relative">
+      {/* Main Container (Spacious ~1600px desktop layout matching reference proportions) */}
+      <div className="max-w-[1620px] w-full mx-auto px-3 sm:px-5 lg:px-6 py-3 sm:py-4 flex flex-col gap-4 sm:gap-5 relative">
 
-        {/* Top Header (Floating Crystal Glass Header) */}
+        {/* Top Header (Premium Two-Row Translucent Glass Header) */}
         <Header
           onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
         />
 
         {/* Primary Route-Based View Container */}
-        <main className="transition-all duration-150 flex flex-col gap-5 sm:gap-6 w-full min-w-0 max-w-full">
+        <main className="transition-all duration-150 flex flex-col gap-4 sm:gap-5 w-full min-w-0 max-w-full">
           <RouteErrorBoundary>
             <Routes>
-              {/* 1. Home Page Route */}
+              {/* 1. Home Page Route: Exact Reference First-Screen Composition */}
               <Route
                 path="/"
                 element={
                   <>
-                    {/* Section A: Main Futuristic Hero Showcase */}
+                    {/* Section B: Main Hero Section (Three-part composition with 3D pedestal & stacked cards) */}
                     <HeroSection />
 
-                    {/* Section B: Horizontal Statistics & Trust Glass Panel */}
-                    <StatsRibbon />
-
-                    {/* Section C: Featured Curations (Reference Style: 3 Large Cinematic Cards with < > Carousel) */}
-                    <TrendingRightNowSection />
-
-                    {/* Section D: Supporting Content 3-Column Glass Arrangement */}
-                    <StoreArchitectureSection />
-
-                    {/* Department Discovery Mosaic (All 18 Collections) */}
+                    {/* Section C: Horizontal Shop by Category Rail */}
                     <BrowseByCategoriesSection />
 
-                    {/* Daily Discover Product Catalog Grid (1,200+ Products) */}
+                    {/* Section D: Popular Products Section (6 cards + delivery promo & full catalog) */}
                     <ProductGrid />
 
                     {/* Browsing History (Active only when history exists) */}
                     <RecentlyViewedSection />
 
-                    {/* Customer Assurance Guarantees */}
+                    {/* Section E: Bottom Trust Ribbon (Compact horizontal glass strip) */}
                     <BrandValuePanel />
                   </>
                 }
