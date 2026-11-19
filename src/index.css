@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --azraq-bg: #EAF5FF;
+  --azraq-bg: #F1F6FD;
   --azraq-surface: #F8FBFF;
   --azraq-ice: #DDEEFF;
   --azraq-cyan: #70C8ED;
@@ -11,10 +11,15 @@
   --azraq-secondary: #718398;
   --azraq-border: rgba(130, 170, 205, 0.25);
   --azraq-border-glass: rgba(255, 255, 255, 0.85);
-  --azraq-card-bg: rgba(255, 255, 255, 0.75);
-  --azraq-primary-blue: #0877C9;
-  --azraq-blue: #0877C9;
-  --azraq-blue-hover: #0665AC;
+  --azraq-card-bg: rgba(255, 255, 255, 0.8);
+  --azraq-primary-blue: #245BDB;
+  --azraq-blue: #245BDB;
+  --azraq-blue-hover: #1C4BB8;
+  --azraq-azure: #245BDB;
+  --azraq-violet: #6366F1;
+  --azraq-purple: #7C3AED;
+  --azraq-lavender: #EEF2FF;
+  --azraq-lime: #10B981;
   --azraq-muted: #718398;
 }
 
@@ -22,17 +27,17 @@
   html {
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
-    background-color: #EAF5FF;
+    background-color: #F1F6FD;
     color: #193B5B;
   }
 
   body {
-    background-color: #EAF5FF;
+    background-color: #F1F6FD;
     background-image: 
-      radial-gradient(circle at 15% 10%, rgba(112, 200, 237, 0.22) 0%, transparent 45%),
-      radial-gradient(circle at 85% 8%, rgba(221, 238, 255, 0.85) 0%, transparent 40%),
+      radial-gradient(circle at 12% 8%, rgba(99, 102, 241, 0.09) 0%, transparent 40%),
+      radial-gradient(circle at 88% 10%, rgba(36, 91, 219, 0.1) 0%, transparent 45%),
       radial-gradient(circle at 50% 45%, rgba(112, 200, 237, 0.12) 0%, transparent 50%),
-      radial-gradient(circle at 85% 90%, rgba(112, 200, 237, 0.18) 0%, transparent 42%);
+      radial-gradient(circle at 85% 90%, rgba(124, 58, 237, 0.07) 0%, transparent 42%);
     background-attachment: fixed;
     color: #193B5B;
     font-family: 'Manrope', 'Hind Siliguri', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;

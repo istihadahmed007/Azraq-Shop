@@ -57,8 +57,8 @@ export default function HeroSection() {
     <section className="w-full select-none border border-[rgba(130,170,205,0.25)] border-t-white/95 bg-white/70 backdrop-blur-2xl rounded-[28px] sm:rounded-[32px] shadow-[0_16px_40px_-10px_rgba(112,200,237,0.14),0_2px_8px_-1px_rgba(25,59,91,0.03)] p-4 sm:p-6 lg:p-8 transition-all relative overflow-hidden">
 
       {/* Ambient background glow dots matching reference */}
-      <div className="absolute top-1/4 left-1/3 w-64 h-64 bg-[#70C8ED]/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-10 right-1/4 w-80 h-80 bg-[#3B82F6]/08 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 left-1/3 w-72 h-72 bg-[#6366F1]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-10 right-1/4 w-80 h-80 bg-[#245BDB]/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Three-Column Horizontal Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-stretch relative z-10">
@@ -67,8 +67,8 @@ export default function HeroSection() {
         <div className="lg:col-span-4 flex flex-col justify-center items-start space-y-4 sm:space-y-5 lg:pr-2">
 
           {/* Premium Shopping Badge */}
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#DDEEFF]/80 border border-[#70C8ED]/30 text-[#0877C9] shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5 text-[#0877C9]" />
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#EEF2FF] border border-[#6366F1]/25 text-[#4F46E5] shadow-2xs">
+            <Sparkles className="w-3.5 h-3.5 text-[#6366F1]" />
             <span className="text-[11px] font-bold tracking-tight">
               {t("👑 Premium Accessories & Essentials", "👑 প্রিমিয়াম সিলেকশন")}
             </span>
@@ -78,7 +78,7 @@ export default function HeroSection() {
           <h1 className="text-3xl sm:text-4xl lg:text-[46px] xl:text-[52px] font-black text-[#193B5B] tracking-tight leading-[1.08]">
             {t("Discover Better.", "ডিসকভার বেটার।")}
             <br />
-            <span className="bg-gradient-to-r from-[#0877C9] via-[#245BDB] to-[#3B82F6] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#245BDB] via-[#6366F1] to-[#7C3AED] bg-clip-text text-transparent">
               {t("Live Better.", "লিভ বেটার।")}
             </span>
           </h1>
@@ -91,12 +91,12 @@ export default function HeroSection() {
             )}
           </p>
 
-          {/* Strong Blue Shop Now Button */}
+          {/* Strong Blue/Violet Shop Now Button */}
           <div className="pt-2">
             <button
               type="button"
               onClick={handleShopNow}
-              className="inline-flex items-center gap-2.5 px-7 py-3 rounded-full bg-gradient-to-r from-[#0877C9] to-[#3B82F6] hover:from-[#0665AC] hover:to-[#2563EB] text-white text-xs sm:text-sm font-bold shadow-[0_8px_24px_rgba(8,119,201,0.38)] hover:shadow-[0_12px_28px_rgba(8,119,201,0.5)] transition-all cursor-pointer active:scale-98"
+              className="inline-flex items-center gap-2.5 px-7 py-3 rounded-full bg-gradient-to-r from-[#245BDB] via-[#3B82F6] to-[#6366F1] hover:from-[#1C4BB8] hover:via-[#2563EB] hover:to-[#4F46E5] text-white text-xs sm:text-sm font-bold shadow-[0_8px_24px_rgba(36,91,219,0.38)] hover:shadow-[0_12px_28px_rgba(99,102,241,0.45)] transition-all cursor-pointer active:scale-98"
             >
               <span>{t("Shop Now", "এখনই কিনুন")}</span>
               <ArrowRight className="w-4 h-4" />

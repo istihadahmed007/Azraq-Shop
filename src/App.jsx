@@ -179,7 +179,7 @@ function StorefrontContent() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#EAF5FF] text-[#193B5B] selection:bg-[#70C8ED]/30 selection:text-[#193B5B] font-sans relative overflow-x-hidden">
+    <div className="min-h-screen bg-transparent text-[#193B5B] selection:bg-[#6366F1]/25 selection:text-[#193B5B] font-sans relative overflow-x-hidden">
       <RouteSynchronizer />
 
       {/* Main Container (Spacious ~1600px desktop layout matching reference proportions) */}
@@ -207,6 +207,9 @@ function StorefrontContent() {
 
                     {/* Section D: Popular Products Section (6 cards + delivery promo & full catalog) */}
                     <ProductGrid />
+
+                    {/* Section: Featured Collection Carousel (Screenshot-2: Gadgets & IT Accessories) */}
+                    <TrendingRightNowSection />
 
                     {/* Browsing History (Active only when history exists) */}
                     <RecentlyViewedSection />

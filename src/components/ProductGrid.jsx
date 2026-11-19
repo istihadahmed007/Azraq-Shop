@@ -209,69 +209,16 @@ export default function ProductGrid() {
         {/* 7-Item Grid on Desktop: 6 Product Cards + 1 Delivery Banner */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-3.5 items-stretch">
 
-          {/* 6 PRODUCT CARDS */}
-          {popularProducts.map((p) => {
-            const isFav = favorites.includes(p.id);
-            const isAvailable = p.stock !== 0 && p.status !== 'out_of_stock';
-
-            return (
-              <div
-                key={p.id}
-                onClick={() => handleOpenProduct(p)}
-                className="bg-white/80 hover:bg-white rounded-[20px] p-3 sm:p-3.5 border border-[rgba(130,170,205,0.25)] hover:border-[#70C8ED]/60 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between h-full group relative cursor-pointer"
-              >
-                {/* Wishlist Heart Button (Top-Right) */}
-                <button
-                  type="button"
-                  onClick={(e) => handleToggleFav(e, p.id)}
-                  className="absolute top-2.5 right-2.5 z-10 w-7 h-7 rounded-full bg-white/80 hover:bg-white border border-[rgba(130,170,205,0.25)] flex items-center justify-center text-[#718398] hover:text-[#E53935] shadow-2xs transition-colors cursor-pointer"
-                  title={isFav ? t("Remove from Wishlist", "পছন্দ থেকে সরান") : t("Save to Wishlist", "পছন্দে রাখুন")}
-                  aria-label={`Wishlist ${p.name}`}
-                >
-                  <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-[#E53935] text-[#E53935]' : ''}`} />
-                </button>
-
-                {/* Product Image strictly contained */}
-                <div className="w-full aspect-square rounded-[16px] bg-[#F8FBFF]/70 p-2 flex items-center justify-center overflow-hidden mb-2">
-                  <ProductImage
-                    src={p.main_image}
-                    alt={p.name}
-                    fit="contain"
-                    aspectRatio="square"
-                    className="group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-
-                {/* Product Meta */}
-                <div className="flex flex-col justify-between flex-grow">
-                  <h3
-                    className="text-[12px] sm:text-[13px] font-bold text-[#193B5B] group-hover:text-[#0877C9] transition-colors line-clamp-1 leading-snug mb-1"
-                    title={p.name}
-                  >
-                    {p.name}
-                  </h3>
-
-                  {/* Price & Quick Add Button Row */}
-                  <div className="mt-2 pt-2 border-t border-[rgba(130,170,205,0.18)] flex items-center justify-between gap-1.5">
-                    <span className="text-xs sm:text-[14px] font-extrabold text-[#193B5B]">
-                      ৳{(p.price || 0).toLocaleString()}
-                    </span>
-
-                    <button
-                      type="button"
-                      onClick={(e) => handleQuickAdd(e, p)}
-                      disabled={!isAvailable}
-                      className="w-7 h-7 rounded-full bg-gradient-to-r from-[#0877C9] to-[#3B82F6] hover:from-[#0665AC] hover:to-[#2563EB] text-white flex items-center justify-center shadow-xs transition-transform hover:scale-105 active:scale-95 cursor-pointer shrink-0"
-                      title={t("Add to Cart", "ব্যাগে যোগ করুন")}
-                      aria-label={`Add ${p.name} to cart`}
-                    >
-                      <ShoppingBag className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {/* 6 PRODUCT CARDS (Screenshot-2 Image-First Style) */}
+          {popularProducts.map((p, idx) => (
+            <div key={p.id} className="h-full">
+              <ProductCard
+                product={p}
+                showCategory={false}
+                priority={idx < 4}
+              />
+            </div>
+          ))}
 
           {/* 7. PROMOTIONAL DELIVERY BANNER (On the far right of the 7-item desktop row) */}
           <div
@@ -279,12 +226,12 @@ export default function ProductGrid() {
               const el = document.getElementById('brand-value-ribbon');
               el?.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="col-span-2 sm:col-span-1 lg:col-span-1 bg-gradient-to-br from-[#DDEEFF]/90 via-[#E8F4FD]/85 to-[#CFE5F8]/90 border border-[rgba(130,170,205,0.32)] rounded-[20px] p-3.5 sm:p-4 flex flex-col justify-between items-center text-center shadow-2xs hover:shadow-xs transition-all relative overflow-hidden group cursor-pointer"
+            className="col-span-2 sm:col-span-1 lg:col-span-1 bg-gradient-to-br from-[#EEF2FF]/95 via-[#E8F4FD]/90 to-[#DDEEFF]/95 border border-[#6366F1]/20 hover:border-[#6366F1]/45 rounded-[22px] p-3.5 sm:p-4 flex flex-col justify-between items-center text-center shadow-2xs hover:shadow-sm hover:-translate-y-0.5 transition-all relative overflow-hidden group cursor-pointer"
           >
             {/* Top Shield & Delivery Claim */}
             <div className="flex flex-col items-center">
-              <div className="w-9 h-9 rounded-full bg-white/90 border border-[rgba(130,170,205,0.3)] flex items-center justify-center text-[#0877C9] shadow-2xs mb-2">
-                <ShieldCheck className="w-5 h-5 text-[#0877C9]" />
+              <div className="w-9 h-9 rounded-full bg-white/95 border border-[#6366F1]/25 flex items-center justify-center text-[#245BDB] shadow-2xs mb-2 group-hover:scale-105 transition-transform">
+                <ShieldCheck className="w-5 h-5 text-[#245BDB]" />
               </div>
               <span className="text-xs sm:text-[13px] font-black text-[#193B5B] uppercase tracking-tight leading-tight">
                 {t("100% FREE", "১০০% ফ্রি")}
@@ -293,7 +240,7 @@ export default function ProductGrid() {
                 <br />
                 {t("DELIVERY", "ডেলিভারি")}
               </span>
-              <span className="text-[10px] font-bold text-[#0877C9] mt-1 bg-white/70 px-2 py-0.5 rounded-full border border-[#70C8ED]/30">
+              <span className="text-[10px] font-bold text-[#245BDB] mt-1 bg-white/80 px-2 py-0.5 rounded-full border border-[#6366F1]/20">
                 {t("Orders > ৳3,000", "৩০০০৳+ অর্ডারে")}
               </span>
             </div>

@@ -6,20 +6,23 @@ import { useShop } from '../../context/ShopContext';
 import { generateProductSlug } from '../../utils/productUtils';
 
 /**
- * AZRAQ Shop — Futuristic Icy-Blue Glassmorphic Product Card
+ * AZRAQ Shop — Image-First Product Card (Reference-Matched to Screenshot 2)
  * 
- * Design Features (Inspired by reference):
- * - Translucent crystal glass surface with backdrop-blur-md & delicate 1px border.
- * - Requirement 5 strictly enforced: 100% full image containment, zero cropping or distortion.
- * - Index pill support ("01", "02", etc.) matching the reference aesthetic.
- * - Deep navy typography (#193B5B), muted secondary details (#718398).
- * - Primary action: Glowing icy-blue gradient pill button.
+ * Features:
+ * - Prominent near-square image area with smooth rounded corners (rounded-[18px] to rounded-[20px]).
+ * - Clean framing with object-fit: contain so full authentic packaging and product are 100% visible and uncropped.
+ * - Below image: authentic product title with tidy 2-line clamping.
+ * - Real BDT price (৳{price.toLocaleString()}) and compare-at strikethrough if discounted.
+ * - Subtle AZRAQ-colored hover states (azure & violet glow: hover:border-[#6366F1]/40).
+ * - Clear clickable affordance navigating to /product/${slug}.
+ * - Floating circular glass wishlist button and quick add-to-bag button.
  */
 export default function ProductCard({
   product,
   onAddToCart,
   onToggleFavorite,
   isFavorite = false,
+  isFav: isFavProp,
   showCategory = true,
   priority = false,
   compact = false,
@@ -27,11 +30,11 @@ export default function ProductCard({
   className = ''
 }) {
   const navigate = useNavigate();
-  const { favorites, t } = useShop();
+  const { favorites, addToCart, toggleFavorite, t } = useShop();
 
   if (!product) return null;
 
-  const isFav = isFavorite || (favorites && favorites.includes(product.id));
+  const isFav = isFavorite || isFavProp || (favorites && favorites.includes(product.id));
   const isAvailable = product.stock !== 0 && product.status !== 'out_of_stock';
 
   // Authentic discount calculation
@@ -49,15 +52,18 @@ export default function ProductCard({
     try {
       const slug = generateProductSlug(product);
       navigate(`/product/${slug}`);
-    } catch (e) {
+    } catch {
       navigate(`/product/${product.id}`);
     }
   };
 
   const handleAddToCart = (e) => {
     e?.stopPropagation?.();
-    if (isAvailable && onAddToCart) {
+    if (!isAvailable) return;
+    if (onAddToCart) {
       onAddToCart(product, product.variants?.[0] || 'Standard', 1);
+    } else if (addToCart) {
+      addToCart(product, product.variants?.[0] || 'Standard', 1);
     }
   };
 
@@ -65,26 +71,28 @@ export default function ProductCard({
     e?.stopPropagation?.();
     if (onToggleFavorite) {
       onToggleFavorite(product.id);
+    } else if (toggleFavorite) {
+      toggleFavorite(product.id);
     }
   };
 
   return (
     <div
       onClick={handleNavigateToProduct}
-      className={`group relative flex flex-col justify-between h-full bg-white/75 backdrop-blur-md border border-[rgba(130,170,205,0.25)] border-t-white/95 rounded-[22px] shadow-[0_8px_24px_-4px_rgba(112,200,237,0.1),0_2px_8px_-1px_rgba(25,59,91,0.03)] hover:border-[#70C8ED]/60 hover:bg-white/95 hover:shadow-[0_20px_44px_-6px_rgba(112,200,237,0.25),0_6px_16px_0_rgba(25,59,91,0.06)] hover:-translate-y-1 transition-all duration-250 select-none cursor-pointer overflow-hidden ${className}`}
+      className={`group relative flex flex-col justify-between h-full bg-white/80 hover:bg-white backdrop-blur-xl border border-[rgba(130,170,205,0.25)] hover:border-[#6366F1]/40 rounded-[22px] shadow-[0_4px_16px_-2px_rgba(25,59,91,0.04)] hover:shadow-[0_16px_36px_-6px_rgba(99,102,241,0.18),0_4px_12px_rgba(36,91,219,0.08)] hover:-translate-y-1 transition-all duration-250 select-none cursor-pointer overflow-hidden p-2.5 sm:p-3 ${className}`}
     >
-      {/* 1. PHOTOGRAPH CONTAINER (Strictly Full Image Fit, 1:1 Aspect Ratio) */}
-      <div className="relative w-full aspect-square bg-[#F8FBFF]/80 border-b border-[rgba(130,170,205,0.2)] p-3 flex items-center justify-center overflow-hidden">
+      {/* 1. LARGE PROMINENT NEAR-SQUARE IMAGE AREA (Matching Screenshot 2) */}
+      <div className="relative w-full aspect-square rounded-[18px] sm:rounded-[20px] bg-[#F8FAFF] border border-slate-200/60 p-2 sm:p-2.5 flex items-center justify-center overflow-hidden mb-2 sm:mb-2.5">
 
-        {/* Index Badge (e.g., 01, 02) or Discount Pill */}
-        <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5 pointer-events-none">
+        {/* Index Badge or Discount Pill */}
+        <div className="absolute top-2 left-2 z-10 flex items-center gap-1.5 pointer-events-none">
           {indexLabel && (
             <span className="px-2 py-0.5 rounded-full bg-[#193B5B]/85 backdrop-blur-xs text-[#70C8ED] text-[10px] font-mono font-bold tracking-wider shadow-xs">
               {indexLabel}
             </span>
           )}
           {discountPercent && discountPercent > 0 ? (
-            <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] text-white text-[10px] font-mono font-bold tracking-tight shadow-xs">
+            <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-[#245BDB] to-[#6366F1] text-white text-[10px] font-mono font-bold tracking-tight shadow-xs">
               -{discountPercent}%
             </span>
           ) : null}
@@ -94,7 +102,7 @@ export default function ProductCard({
         <button
           type="button"
           onClick={handleToggleFav}
-          className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-all bg-white/80 backdrop-blur-md hover:bg-white border border-[rgba(130,170,205,0.3)] shadow-xs focus:outline-none ${
+          className={`absolute top-2 right-2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all bg-white/85 backdrop-blur-md hover:bg-white border border-[rgba(130,170,205,0.3)] shadow-xs focus:outline-none ${
             isFav ? 'text-[#E53935] border-[#E53935]/40' : 'text-[#718398] hover:text-[#193B5B]'
           }`}
           title={isFav ? t("Remove from Wishlist", "পছন্দ থেকে সরান") : t("Save to Wishlist", "পছন্দে রাখুন")}
@@ -103,36 +111,36 @@ export default function ProductCard({
           <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-[#E53935] stroke-[#E53935]' : ''}`} />
         </button>
 
-        {/* Product Photograph: Preserves 100% full view inside image frame */}
-        <div className="card-image-wrapper w-full h-full">
+        {/* Product Photograph: 100% full contain visibility, centered */}
+        <div className="card-image-wrapper w-full h-full flex items-center justify-center">
           <ProductImage
             src={product.main_image}
             alt={product.name || 'Product'}
             fit="contain"
             aspectRatio="square"
             priority={priority}
-            className="p-1 transition-transform duration-300 group-hover:scale-[1.03]"
+            className="transition-transform duration-300 group-hover:scale-[1.04]"
             zoomOnHover={false}
           />
         </div>
       </div>
 
-      {/* 2. PRODUCT METADATA & PRICING */}
-      <div className={`flex flex-col justify-between flex-grow ${compact ? 'p-3' : 'p-3.5'}`}>
+      {/* 2. PRODUCT METADATA & TIDY LINE-CLAMPED TITLE */}
+      <div className="flex flex-col justify-between flex-grow px-0.5">
         <div>
-          {/* Department / Category Pill Tag */}
+          {/* Category Pill Tag (Optional) */}
           {showCategory && categoryLabel && (
-            <div className="flex items-center gap-1.5 mb-1.5">
-              <span className="inline-block px-2 py-0.5 rounded-md bg-[#DDEEFF]/60 border border-[rgba(130,170,205,0.25)] text-[9px] font-mono uppercase tracking-[0.12em] text-[#193B5B] font-semibold truncate max-w-full">
+            <div className="flex items-center gap-1.5 mb-1">
+              <span className="inline-block px-2 py-0.5 rounded-md bg-[#EEF2FF] border border-[#6366F1]/20 text-[9px] font-mono uppercase tracking-[0.1em] text-[#4F46E5] font-semibold truncate max-w-full">
                 {categoryLabel}
               </span>
             </div>
           )}
 
-          {/* Product Title: Deep navy, strictly 2 lines */}
+          {/* Product Title: Authentic name with tidy 2-line clamping */}
           <h3
-            className={`font-bold text-[#193B5B] line-clamp-2 min-h-[2.4rem] sm:min-h-[2.5rem] group-hover:text-[#0877C9] transition-colors leading-snug ${
-              compact ? 'text-[12px]' : 'text-[13px]'
+            className={`font-bold text-[#193B5B] line-clamp-2 min-h-[2.4rem] sm:min-h-[2.5rem] group-hover:text-[#245BDB] transition-colors leading-snug ${
+              compact ? 'text-[12px]' : 'text-xs sm:text-[13px]'
             }`}
             title={product.name}
           >
@@ -140,11 +148,11 @@ export default function ProductCard({
           </h3>
         </div>
 
-        {/* 3. PRICE & QUICK ADD INTERACTION */}
-        <div className="mt-3 pt-2.5 border-t border-[rgba(130,170,205,0.2)] flex items-center justify-between gap-2">
+        {/* 3. REAL BDT PRICE & QUICK ADD INTERACTION */}
+        <div className="mt-2.5 pt-2 border-t border-[rgba(130,170,205,0.18)] flex items-center justify-between gap-1.5">
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline gap-1.5 flex-wrap">
-              <span className={`font-extrabold text-[#193B5B] ${compact ? 'text-[13px]' : 'text-[14px] sm:text-[15px]'}`}>
+              <span className={`font-black text-[#193B5B] ${compact ? 'text-[13px]' : 'text-xs sm:text-[14px]'}`}>
                 ৳{(product.price || 0).toLocaleString()}
               </span>
               {originalPrice && originalPrice > product.price && (
@@ -159,14 +167,14 @@ export default function ProductCard({
             </span>
           </div>
 
-          {/* Quick Add to Bag Action (Icy-Blue Gradient Pill Button) */}
+          {/* Quick Add Button with AZRAQ Azure-to-Violet Gradient */}
           <button
             type="button"
             onClick={handleAddToCart}
             disabled={!isAvailable}
-            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all shrink-0 focus:outline-none ${
+            className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all shrink-0 focus:outline-none ${
               isAvailable
-                ? 'bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] hover:from-[#5CBDE5] hover:to-[#2563EB] text-white shadow-[0_4px_14px_rgba(112,200,237,0.4)] active:scale-95 cursor-pointer'
+                ? 'bg-gradient-to-r from-[#245BDB] to-[#6366F1] hover:from-[#1C4BB8] hover:to-[#4F46E5] text-white shadow-[0_4px_12px_rgba(36,91,219,0.35)] active:scale-95 cursor-pointer'
                 : 'bg-slate-100 text-slate-300 cursor-not-allowed'
             }`}
             title={t("Add to Bag", "ব্যাগে যোগ করুন")}

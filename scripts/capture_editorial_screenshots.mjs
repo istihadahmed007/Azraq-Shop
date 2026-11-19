@@ -121,6 +121,12 @@ async function run() {
       viewport: { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false }
     },
     {
+      name: '01b_products_section_desktop.png',
+      url: `http://127.0.0.1:${PORT}/`,
+      viewport: { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false },
+      scroll: '#popular-products'
+    },
+    {
       name: '02_storefront_mobile.png',
       url: `http://127.0.0.1:${PORT}/`,
       viewport: { width: 390, height: 844, deviceScaleFactor: 2, mobile: true }
@@ -154,6 +160,13 @@ async function run() {
 
     // Wait for page to render and images/fonts to settle
     await new Promise(r => setTimeout(r, 2500));
+
+    if (t.scroll) {
+      await send('Runtime.evaluate', {
+        expression: `document.querySelector('${t.scroll}')?.scrollIntoView({ behavior: 'instant', block: 'start' });`
+      });
+      await new Promise(r => setTimeout(r, 1200));
+    }
 
     const screenshot = await send('Page.captureScreenshot', { format: 'png' });
     const outPath = path.join(SCREENSHOT_DIR, t.name);
