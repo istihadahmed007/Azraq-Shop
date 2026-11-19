@@ -22,10 +22,23 @@
   RewriteRule ^api/search-by-image/?$ api/search-by-image.php [L,QSA]
   RewriteRule ^api/products/?$ api/products/index.php [L,QSA]
 
+  # Normalize nested relative asset and data requests (e.g. /product/*/assets/* -> /assets/*)
+  RewriteRule ^(?:product|collection|collections)/[^/]+/assets/(.*)$ assets/$1 [L]
+  RewriteRule ^(?:product|collection|collections)/assets/(.*)$ assets/$1 [L]
+  RewriteRule ^(?:product|collection|collections)/[^/]+/data/(.*)$ data/$1 [L]
+  RewriteRule ^(?:product|collection|collections)/data/(.*)$ data/$1 [L]
+  RewriteRule ^(?:product|collection|collections)/[^/]+/branding/(.*)$ branding/$1 [L]
+  RewriteRule ^(?:product|collection|collections)/branding/(.*)$ branding/$1 [L]
+
   # Missing assets return 404 text, NEVER fall through to index.html
   RewriteCond %{REQUEST_URI} ^/assets/
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteRule ^assets/.*$ - [R=404,L]
+
+  # Missing asset files with known extensions return 404, NEVER fall through to index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule \.(js|mjs|css|json|png|jpe?g|gif|svg|ico|webp|woff2?|ttf|map)$ - [R=404,L]
 
   # Unhandled API routes return JSON 404, NEVER fall through to index.html
   RewriteCond %{REQUEST_URI} ^/api/

@@ -65,7 +65,7 @@ function azraqApiPlugin() {
 }
 
 export default defineConfig({
-  base: './',
+  base: '/',
   plugins: [react(), azraqApiPlugin()],
   server: {
     port: 3000,

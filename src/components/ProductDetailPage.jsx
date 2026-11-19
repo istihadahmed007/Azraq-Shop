@@ -101,10 +101,12 @@ export default function ProductDetailPage() {
             injectProduct(res.product);
           }
         } else if (res.isNotFound) {
-          if (catalogStatus === 'loading') {
-            setFetchStatus('loading');
-          } else {
+          // If catalog is already hydrated or not actively loading, confirm 404 immediately
+          if (isCatalogHydrated || catalogStatus !== 'loading') {
             setFetchStatus('notFound');
+          } else {
+            // Wait for catalog hydration to finish before confirming notFound
+            setFetchStatus('loading');
           }
         } else if (res.isServerError) {
           setFetchStatus('serverError');
@@ -119,7 +121,6 @@ export default function ProductDetailPage() {
       })
       .catch(err => {
         if (!isMounted) return;
-        if (err.name === 'AbortError') return;
         setFetchStatus('networkError');
         setFetchError(err.message || 'Network error loading product');
       });
@@ -128,7 +129,33 @@ export default function ProductDetailPage() {
       isMounted = false;
       controller.abort();
     };
-  }, [slug, productFromContext, catalogStatus, fetchAttempt, injectProduct]);
+  }, [slug, productFromContext, catalogStatus, isCatalogHydrated, fetchAttempt, injectProduct]);
+
+  // Safety watchdog timer: guarantees loading never stays active indefinitely
+  useEffect(() => {
+    if (!product && (fetchStatus === 'loading' || fetchStatus === 'idle')) {
+      const watchdog = setTimeout(() => {
+        if (!product && fetchStatus !== 'notFound') {
+          setFetchStatus('networkError');
+          setFetchError('Loading timed out. Please check your connection and retry.');
+        }
+      }, 10000);
+      return () => clearTimeout(watchdog);
+    }
+  }, [product, fetchStatus, fetchAttempt]);
+
+  // If waiting on catalog hydration for a not-found product, resolve once catalog finishes
+  useEffect(() => {
+    if (!product && fetchStatus === 'loading' && catalogStatus !== 'loading') {
+      const p = findProductBySlug(slug, products);
+      if (p) {
+        setFetchedProduct(p);
+        setFetchStatus('success');
+      } else if (isCatalogHydrated || catalogStatus === 'success' || catalogStatus === 'error') {
+        setFetchStatus('notFound');
+      }
+    }
+  }, [slug, product, fetchStatus, catalogStatus, isCatalogHydrated, products]);
 
   // Handle retry
   const handleRetry = () => {

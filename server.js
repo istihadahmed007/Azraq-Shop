@@ -77,7 +77,13 @@ const server = http.createServer(async (req, res) => {
   }
 
   const url = new URL(req.url, `http://${req.headers.host || 'localhost:' + PORT}`);
-  const pathname = decodeURIComponent(url.pathname);
+  let pathname = decodeURIComponent(url.pathname);
+
+  // Normalize nested relative asset and data paths (defense-in-depth against nested relative fetches)
+  const nestedAssetMatch = pathname.match(/^\/(?:product|collection|collections)\/[^/]+\/(assets|data|branding)\/(.*)$/i);
+  if (nestedAssetMatch) {
+    pathname = `/${nestedAssetMatch[1]}/${nestedAssetMatch[2]}`;
+  }
 
   // =========================================================================
   // 1. Health-Check Endpoints (Safe, no sensitive secrets exposed)
