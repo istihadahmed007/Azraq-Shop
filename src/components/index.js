@@ -21,6 +21,7 @@ export { default as PromotionalBannersSection } from './PromotionalBannersSectio
 export { default as FeaturedCollectionsSection } from './FeaturedCollectionsSection.jsx';
 export { default as ShopByCollectionSection } from './ShopByCollectionSection.jsx';
 export { default as ProductDemonstrationSection } from './ProductDemonstrationSection.jsx';
+export { default as RecentlyViewedSection } from './RecentlyViewedSection.jsx';
 export { default as BrandValuePanel } from './BrandValuePanel.jsx';
 export { default as StatsRibbon } from './StatsRibbon.jsx';
 export { default as EditorialCtaSection } from './EditorialCtaSection.jsx';

@@ -8,6 +8,8 @@ import {
   TrendingRightNowSection,
   ShopByCollectionSection,
   ProductGrid,
+  PromotionalBannersSection,
+  RecentlyViewedSection,
   BrandValuePanel,
   Footer,
   CartDrawer,
@@ -108,7 +110,7 @@ const VisualSearchModal = lazy(() => import('./components/VisualSearchModal'));
 function LoadingFallback() {
   return (
     <div className="w-full min-h-[40vh] flex items-center justify-center">
-      <div className="w-10 h-10 rounded-full border-3 border-[#0877C9]/30 border-t-[#0877C9] animate-spin" />
+      <div className="w-10 h-10 rounded-full border-3 border-[#245BDB]/20 border-t-[#245BDB] animate-spin" />
     </div>
   );
 }
@@ -117,18 +119,18 @@ function NotFoundPage() {
   const { t } = useShop();
   return (
     <div className="py-20 text-center select-none flex flex-col items-center justify-center">
-      <div className="w-16 h-16 rounded-full bg-[#EDF4F9] border border-[#D5E2EE] flex items-center justify-center mb-4 text-[#0877C9]">
+      <div className="w-16 h-16 rounded-[12px] bg-white border border-[#E5E3DA] flex items-center justify-center mb-4 text-[#245BDB] shadow-sm">
         <Package className="w-8 h-8 opacity-70" />
       </div>
-      <h2 className="text-2xl font-bold text-[#293B52] mb-2">
+      <h2 className="text-2xl font-bold text-[#172333] mb-2 tracking-tight">
         {t("Page Not Found (404)", "পৃষ্ঠাটি পাওয়া যায়নি (৪০৪)")}
       </h2>
-      <p className="text-xs text-[#6B7D93] max-w-sm mb-6">
+      <p className="text-xs text-[#667085] max-w-sm mb-6 leading-relaxed">
         {t("The page or product you requested could not be found or has been relocated.", "আপনার অনুরোধকৃত পেজটি পাওয়া যায়নি।")}
       </p>
       <Link
         to="/"
-        className="px-6 py-2.5 rounded-full bg-[#0877C9] text-white text-xs font-bold shadow-md hover:bg-[#0665AC] transition-all flex items-center gap-2"
+        className="px-6 py-2.5 rounded-[8px] bg-[#245BDB] text-white text-xs font-bold shadow-sm hover:bg-[#1C4BB8] transition-all flex items-center gap-2 cursor-pointer"
       >
         <span>{t("Back to Home", "হোমপেজে ফিরে যান")}</span>
         <ArrowRight className="w-4 h-4" />
@@ -171,13 +173,13 @@ function StorefrontContent() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#E4EEF5] text-[#293B52] selection:bg-[#0877C9]/20 selection:text-[#0877C9] font-sans relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#F5F4EF] text-[#172333] selection:bg-[#245BDB]/15 selection:text-[#245BDB] font-sans relative overflow-x-hidden">
       <RouteSynchronizer />
 
       {/* Main Desktop Container (Maximum content width ~1360px with generous spacing) */}
       <div className="max-w-[1360px] w-full mx-auto px-3 sm:px-5 lg:px-6 py-3 sm:py-5 flex flex-col gap-7 sm:gap-8 relative">
 
-        {/* Top Header (Minimal Premium Soft Neumorphic Header) */}
+        {/* Top Header (Clean Modern Editorial Header) */}
         <Header
           onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
         />
@@ -191,22 +193,28 @@ function StorefrontContent() {
                 path="/"
                 element={
                   <>
-                    {/* 1. Asymmetric Bento Hero Product Showcase */}
+                    {/* 1. Asymmetric Editorial Bento Hero Product Showcase */}
                     <HeroSection />
 
-                    {/* 2. Shop by Category (Neumorphic Category Grid with authentic photos) */}
+                    {/* 2. Shop by Department (Photographic Category Grid with authentic catalog photos) */}
                     <BrowseByCategoriesSection />
 
-                    {/* 3. Featured Products / Best Sellers (Strictly 5 product cards per row) */}
+                    {/* 3. Featured & Best Sellers (Strictly 5 product cards per row) */}
                     <TrendingRightNowSection />
 
-                    {/* 4. Complete EasyDrop Collections Explorer */}
+                    {/* 4. The AZRAQ Edit / Signature EasyDrop Collections Explorer */}
                     <ShopByCollectionSection />
 
-                    {/* 5. Daily Discover Product Catalog Grid (Strictly 5 product cards per row) */}
+                    {/* 5. Promotional Editorial Campaign Banner */}
+                    <PromotionalBannersSection />
+
+                    {/* 6. Daily Discover Product Catalog Grid (Strictly 5 product cards per row) */}
                     <ProductGrid />
 
-                    {/* 6. Customer Assurance & Retail Guarantees */}
+                    {/* 7. Recently Viewed Products (Active only when history exists) */}
+                    <RecentlyViewedSection />
+
+                    {/* 8. Customer Assurance & Verified Retail Guarantees */}
                     <BrandValuePanel />
                   </>
                 }

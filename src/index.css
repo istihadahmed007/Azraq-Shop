@@ -3,29 +3,39 @@
 @tailwind utilities;
 
 :root {
-  --azraq-bg: #E4EEF5;
-  --azraq-card-bg: #F7FAFD;
-  --azraq-surface-secondary: #EDF4F9;
-  --azraq-primary-blue: #0877C9;
-  --azraq-dark-navy: #101C35;
-  --azraq-accent-orange: #EE8056;
-  --azraq-text-main: #293B52;
-  --azraq-text-secondary: #6B7D93;
-  --azraq-border: #D5E2EE;
+  --azraq-ivory: #F5F4EF;
+  --azraq-ink: #172333;
+  --azraq-blue: #245BDB;
+  --azraq-blue-hover: #1C4BB8;
+  --azraq-lime: #D7ED78;
+  --azraq-border: #E5E3DA;
+  --azraq-muted: #667085;
+  --azraq-surface: #FFFFFF;
+  --azraq-surface-subtle: #FAF9F5;
+
+  /* Backward compatibility variables */
+  --azraq-bg: #F5F4EF;
+  --azraq-card-bg: #FFFFFF;
+  --azraq-surface-secondary: #FAF9F5;
+  --azraq-primary-blue: #245BDB;
+  --azraq-dark-navy: #172333;
+  --azraq-accent-orange: #245BDB;
+  --azraq-text-main: #172333;
+  --azraq-text-secondary: #667085;
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
-    background-color: #E4EEF5;
-    color: #293B52;
+    background-color: #F5F4EF;
+    color: #172333;
   }
 
   body {
-    background-color: #E4EEF5;
-    color: #293B52;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, 'Plus Jakarta Sans', sans-serif;
+    background-color: #F5F4EF;
+    color: #172333;
+    font-family: 'Manrope', 'Hind Siliguri', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
   }
@@ -33,7 +43,7 @@
   /* Bengali Typography enhancements */
   [lang="bn"],
   .font-bengali {
-    font-family: 'Hind Siliguri', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Hind Siliguri', 'Manrope', -apple-system, sans-serif;
     line-height: 1.5;
   }
 }
@@ -45,16 +55,16 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #E4EEF5;
+  background: #F5F4EF;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #C4D5E4;
+  background: #D8D5C8;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #A0B6CB;
+  background: #BCB8A8;
 }
 
 /* Hide scrollbar for category bars and carousels */
@@ -68,158 +78,182 @@
 }
 
 /* ========================================================
-   PREMIUM SOFT-NEUMORPHIC DESIGN SYSTEM CLASSES
-   Pale icy-blue background, soft shadows, rounded surfaces
+   AZRAQ — THE MODERN EVERYDAY EDIT DESIGN SYSTEM
+   Warm Ivory, Deep Ink, AZRAQ Blue, and Soft Lime
+   Clean Editorial Layouts with Crisp Borders & Restrained Radii
    ======================================================== */
 
-/* 1. Neumorphic Large Panel (Sections, Large wrappers, Headers) */
-.glass-panel {
-  background: #F7FAFD;
-  border: 1px solid rgba(213, 226, 238, 0.85);
-  border-radius: 26px;
-  box-shadow: 0 10px 30px rgba(50, 75, 100, 0.08), 0 2px 6px rgba(50, 75, 100, 0.03);
+/* 1. Editorial Large Panel (Sections, Main Wrappers, Headers) */
+.glass-panel,
+.editorial-panel {
+  background: #FFFFFF;
+  border: 1px solid #E5E3DA;
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(23, 35, 51, 0.04);
 }
 
-/* 2. Neumorphic Standard Card (Category Cards, Showcase Cards) */
-.glass-card {
-  background: #F7FAFD;
-  border: 1px solid rgba(213, 226, 238, 0.85);
-  border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(50, 75, 100, 0.07), 0 2px 6px rgba(50, 75, 100, 0.03);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
-}
-
-.glass-card:hover {
-  transform: translateY(-3px);
-  border-color: #0877C9;
-  box-shadow: 0 16px 36px rgba(50, 75, 100, 0.13), 0 4px 10px rgba(50, 75, 100, 0.05);
-}
-
-/* 2b. Five-Per-Row Neumorphic Product Card */
-.glass-product {
-  background: #F7FAFD;
-  border: 1px solid rgba(213, 226, 238, 0.85);
-  border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(50, 75, 100, 0.07), 0 2px 6px rgba(50, 75, 100, 0.03);
+/* 2. Editorial Product Card */
+.glass-card,
+.glass-product,
+.editorial-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E3DA;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(23, 35, 51, 0.03);
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
   overflow: hidden;
 }
 
-.glass-product:hover {
-  transform: translateY(-3px);
-  border-color: #0877C9;
-  box-shadow: 0 16px 36px rgba(50, 75, 100, 0.13), 0 4px 10px rgba(50, 75, 100, 0.05);
+.glass-card:hover,
+.glass-product:hover,
+.editorial-card:hover {
+  transform: translateY(-2px);
+  border-color: #245BDB;
+  box-shadow: 0 8px 24px rgba(23, 35, 51, 0.08);
 }
 
-/* 3. Neumorphic Floating Header */
-.glass-header {
-  background: #F7FAFD;
-  border: 1px solid rgba(213, 226, 238, 0.9);
-  border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(50, 75, 100, 0.08), 0 2px 8px rgba(50, 75, 100, 0.04);
-}
-
-/* 4. Neumorphic Sidebar Drawer */
-.glass-sidebar {
-  background: #F7FAFD;
-  border-left: 1px solid rgba(213, 226, 238, 0.9);
-  box-shadow: -10px 0 36px rgba(50, 75, 100, 0.14);
-}
-
-/* 5. Neumorphic Soft Button (Secondary actions, pills, icons) */
-.glass-button {
-  background: #EDF4F9;
-  border: 1px solid rgba(213, 226, 238, 0.8);
-  border-radius: 9999px;
-  color: #293B52;
-  box-shadow: 0 4px 12px rgba(50, 75, 100, 0.06);
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.glass-button:hover {
+/* 3. Editorial Header */
+.glass-header,
+.editorial-header {
   background: #FFFFFF;
-  border-color: #0877C9;
-  color: #0877C9;
-  box-shadow: 0 6px 18px rgba(50, 75, 100, 0.1);
-  transform: translateY(-1px);
+  border: 1px solid #E5E3DA;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(23, 35, 51, 0.04);
 }
 
-.glass-button:active {
-  transform: translateY(0);
-  box-shadow: inset 0 2px 4px rgba(50, 75, 100, 0.08);
+/* 4. Editorial Drawer */
+.glass-sidebar,
+.glass-drawer,
+.editorial-drawer {
+  background: #FFFFFF;
+  border-left: 1px solid #E5E3DA;
+  box-shadow: -8px 0 32px rgba(23, 35, 51, 0.08);
 }
 
-/* 6. Primary Action Button */
-.glass-button-primary {
-  background: #0877C9;
-  border: 1px solid #0877C9;
-  border-radius: 9999px;
-  color: #FFFFFF;
-  box-shadow: 0 6px 18px rgba(8, 119, 201, 0.28);
+/* 5. Editorial Secondary / Neutral Button (Restrained 8px radius) */
+.glass-button,
+.editorial-btn-secondary {
+  background: #FAF9F5;
+  border: 1px solid #E5E3DA;
+  border-radius: 8px;
+  color: #172333;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(23, 35, 51, 0.03);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.glass-button-primary:hover {
-  background: #0665AC;
-  border-color: #0665AC;
-  box-shadow: 0 8px 24px rgba(8, 119, 201, 0.36);
+.glass-button:hover,
+.editorial-btn-secondary:hover {
+  background: #FFFFFF;
+  border-color: #245BDB;
+  color: #245BDB;
+  box-shadow: 0 2px 8px rgba(36, 91, 219, 0.12);
   transform: translateY(-1px);
 }
 
-.glass-button-primary:active {
+.glass-button:active,
+.editorial-btn-secondary:active {
+  transform: translateY(0);
+  box-shadow: inset 0 1px 2px rgba(23, 35, 51, 0.05);
+}
+
+/* 6. Editorial Primary Action Button (AZRAQ Blue, Restrained 8px radius) */
+.glass-button-primary,
+.editorial-btn-primary {
+  background: #245BDB;
+  border: 1px solid #245BDB;
+  border-radius: 8px;
+  color: #FFFFFF;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(36, 91, 219, 0.25);
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-button-primary:hover,
+.editorial-btn-primary:hover {
+  background: #1C4BB8;
+  border-color: #1C4BB8;
+  box-shadow: 0 4px 14px rgba(36, 91, 219, 0.35);
+  transform: translateY(-1px);
+}
+
+.glass-button-primary:active,
+.editorial-btn-primary:active {
   transform: translateY(0);
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-/* 7. Neumorphic Recessed Form Input */
-.glass-input {
-  background: #EDF4F9;
-  border: 1px solid rgba(213, 226, 238, 0.85);
-  border-radius: 9999px;
-  color: #293B52;
-  box-shadow: inset 0 2px 5px rgba(50, 75, 100, 0.06);
-  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+/* 6b. Editorial Dark Button (Deep Ink) */
+.editorial-btn-dark {
+  background: #172333;
+  border: 1px solid #172333;
+  border-radius: 8px;
+  color: #FFFFFF;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(23, 35, 51, 0.15);
+  transition: all 0.18s ease;
 }
 
-.glass-input:focus {
+.editorial-btn-dark:hover {
+  background: #24354C;
+  border-color: #24354C;
+  transform: translateY(-1px);
+}
+
+/* 7. Editorial Form Input */
+.glass-input,
+.editorial-input {
+  background: #FFFFFF;
+  border: 1px solid #E5E3DA;
+  border-radius: 8px;
+  color: #172333;
+  box-shadow: inset 0 1px 2px rgba(23, 35, 51, 0.02);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.glass-input:focus,
+.editorial-input:focus {
   outline: none;
   background-color: #FFFFFF;
-  border-color: #0877C9;
-  box-shadow: 0 0 0 3px rgba(8, 119, 201, 0.16), inset 0 1px 2px rgba(50, 75, 100, 0.04);
+  border-color: #245BDB;
+  box-shadow: 0 0 0 3px rgba(36, 91, 219, 0.12);
 }
 
-.glass-input::placeholder {
-  color: #8CA0B6;
+.glass-input::placeholder,
+.editorial-input::placeholder {
+  color: #8C99A8;
 }
 
-/* 8. Neumorphic Modal Dialog */
-.glass-modal {
-  background: #F7FAFD;
-  border: 1px solid rgba(213, 226, 238, 0.95);
-  border-radius: 26px;
-  box-shadow: 0 20px 50px rgba(50, 75, 100, 0.18), 0 4px 14px rgba(50, 75, 100, 0.06);
+/* 8. Editorial Modal Dialog */
+.glass-modal,
+.editorial-modal {
+  background: #FFFFFF;
+  border: 1px solid #E5E3DA;
+  border-radius: 16px;
+  box-shadow: 0 20px 48px rgba(23, 35, 51, 0.14), 0 4px 12px rgba(23, 35, 51, 0.05);
 }
 
-/* 8b. Neumorphic Drawer */
-.glass-drawer {
-  background: #F7FAFD;
-  border-left: 1px solid rgba(213, 226, 238, 0.95);
-  box-shadow: -10px 0 36px rgba(50, 75, 100, 0.14);
+/* 9. Editorial Feature / Bento Surface */
+.glass-feature,
+.editorial-feature {
+  background: #FAF9F5;
+  border: 1px solid #E5E3DA;
+  border-radius: 12px;
 }
 
-/* 9. Neumorphic Feature Surface */
-.glass-feature {
-  background: #EDF4F9;
-  border: 1px solid rgba(213, 226, 238, 0.8);
-  border-radius: 22px;
-  box-shadow: 0 6px 18px rgba(50, 75, 100, 0.06);
+/* 10. Editorial Badge Styles */
+.neu-pill,
+.editorial-badge {
+  background: #FAF9F5;
+  border: 1px solid #E5E3DA;
+  border-radius: 6px;
 }
 
-/* 10. Floating Pill Badges */
-.neu-pill {
-  background: #EDF4F9;
-  border: 1px solid rgba(213, 226, 238, 0.85);
-  box-shadow: 0 3px 8px rgba(50, 75, 100, 0.05);
+.editorial-badge-lime {
+  background: #D7ED78;
+  color: #172333;
+  border-radius: 6px;
+  font-weight: 700;
 }
 
 /* Respect reduced-motion preferences */

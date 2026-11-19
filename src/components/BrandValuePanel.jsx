@@ -11,7 +11,7 @@ import {
 import { useShop } from '../context/ShopContext';
 
 /**
- * AZRAQ Shop — Retail Customer Assurance & Social Bar
+ * AZRAQ Shop — Retail Customer Assurance & Verified Service Guarantees
  */
 export default function BrandValuePanel() {
   const { t } = useShop();
@@ -19,8 +19,8 @@ export default function BrandValuePanel() {
   const benefits = [
     {
       icon: Truck,
-      title: t('Free Delivery', 'ফ্রি ডেলিভারি'),
-      desc: t('On orders over ৳3,000 nationwide', '৩,০০০৳ বা তদূর্ধ্ব অর্ডারে সারা দেশে'),
+      title: t('Nationwide Delivery', 'সারাদেশে ডেলিভারি'),
+      desc: t('Dhaka ৳80 • Outside ৳150', 'ঢাকা ৮০৳ • বাইরে ১৫০৳'),
     },
     {
       icon: ShieldCheck,
@@ -34,7 +34,7 @@ export default function BrandValuePanel() {
     },
     {
       icon: Headphones,
-      title: t('Dedicated Support', 'সার্বক্ষণিক সহায়তা'),
+      title: t('Dedicated Hotline', 'সার্বক্ষণিক সহায়তা'),
       desc: t('+880 1851-172032 & WhatsApp', 'সরাসরি সহায়তা ও দ্রুত অর্ডার ট্র্যাকিং'),
     },
   ];
@@ -42,7 +42,7 @@ export default function BrandValuePanel() {
   return (
     <section className="w-full select-none">
       
-      <div className="bg-[#F7FAFD] border border-[#D5E2EE]/90 rounded-[26px] px-5 sm:px-7 py-5 flex flex-col lg:flex-row items-center justify-between gap-5 shadow-[0_10px_30px_rgba(50,75,100,0.07)]">
+      <div className="bg-white border border-[#E5E3DA] rounded-[16px] px-5 sm:px-7 py-5 flex flex-col lg:flex-row items-center justify-between gap-5 shadow-[0_4px_20px_rgba(23,35,51,0.04)]">
         
         {/* 4 Benefits with Clean Dividers */}
         <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5 flex-1">
@@ -52,17 +52,17 @@ export default function BrandValuePanel() {
               <div 
                 key={idx}
                 className={`flex items-center gap-3 ${
-                  idx !== 0 ? 'md:border-l md:border-[#E1EDF7] md:pl-5' : ''
+                  idx !== 0 ? 'md:border-l md:border-[#E5E3DA] md:pl-5' : ''
                 }`}
               >
-                <div className="w-10 h-10 rounded-full bg-[#EDF4F9] text-[#0877C9] border border-[#D5E2EE] flex items-center justify-center shrink-0 shadow-2xs">
+                <div className="w-10 h-10 rounded-[8px] bg-[#FAF9F5] text-[#245BDB] border border-[#E5E3DA] flex items-center justify-center shrink-0">
                   <Icon className="w-4.5 h-4.5" />
                 </div>
                 <div className="min-w-0">
-                  <h4 className="text-xs sm:text-[13px] font-bold text-[#293B52] truncate leading-tight">
+                  <h4 className="text-xs sm:text-[13px] font-bold text-[#172333] truncate leading-tight">
                     {item.title}
                   </h4>
-                  <p className="text-[11px] text-[#6B7D93] truncate mt-0.5">
+                  <p className="text-[11px] text-[#667085] truncate mt-0.5 font-medium">
                     {item.desc}
                   </p>
                 </div>
@@ -72,12 +72,12 @@ export default function BrandValuePanel() {
         </div>
 
         {/* Social Icons on Far Right */}
-        <div className="flex items-center gap-2.5 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 lg:border-l lg:border-[#E1EDF7] lg:pl-5 w-full lg:w-auto justify-center lg:justify-end">
+        <div className="flex items-center gap-2.5 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 lg:border-l lg:border-[#E5E3DA] lg:pl-5 w-full lg:w-auto justify-center lg:justify-end">
           <a
             href="https://facebook.com"
             target="_blank"
             rel="noreferrer"
-            className="w-9 h-9 rounded-full bg-[#EDF4F9] hover:bg-white border border-[#D5E2EE] text-[#6B7D93] hover:text-[#0877C9] flex items-center justify-center transition-all shadow-2xs"
+            className="w-9 h-9 rounded-[8px] bg-[#FAF9F5] hover:bg-white border border-[#E5E3DA] text-[#667085] hover:text-[#245BDB] flex items-center justify-center transition-all shadow-xs"
             title="Facebook"
             aria-label="Facebook"
           >
@@ -87,7 +87,7 @@ export default function BrandValuePanel() {
             href="https://youtube.com"
             target="_blank"
             rel="noreferrer"
-            className="w-9 h-9 rounded-full bg-[#EDF4F9] hover:bg-white border border-[#D5E2EE] text-[#6B7D93] hover:text-[#0877C9] flex items-center justify-center transition-all shadow-2xs"
+            className="w-9 h-9 rounded-[8px] bg-[#FAF9F5] hover:bg-white border border-[#E5E3DA] text-[#667085] hover:text-[#245BDB] flex items-center justify-center transition-all shadow-xs"
             title="YouTube"
             aria-label="YouTube"
           >
@@ -97,7 +97,7 @@ export default function BrandValuePanel() {
             href="https://instagram.com"
             target="_blank"
             rel="noreferrer"
-            className="w-9 h-9 rounded-full bg-[#EDF4F9] hover:bg-white border border-[#D5E2EE] text-[#6B7D93] hover:text-[#0877C9] flex items-center justify-center transition-all shadow-2xs"
+            className="w-9 h-9 rounded-[8px] bg-[#FAF9F5] hover:bg-white border border-[#E5E3DA] text-[#667085] hover:text-[#245BDB] flex items-center justify-center transition-all shadow-xs"
             title="Instagram"
             aria-label="Instagram"
           >

@@ -23,19 +23,19 @@ export default function TrendingRightNowSection() {
   return (
     <section id="popular-products" className="w-full select-none">
       
-      <div className="bg-[#F7FAFD] border border-[#D5E2EE]/90 rounded-[26px] p-5 sm:p-6 shadow-[0_10px_30px_rgba(50,75,100,0.07)]">
+      <div className="bg-white border border-[#E5E3DA] rounded-[16px] p-5 sm:p-7 shadow-[0_4px_20px_rgba(23,35,51,0.04)]">
         
         {/* Section Heading & Link */}
-        <div className="flex items-center justify-between pb-3.5 mb-5 border-b border-[#E1EDF7]">
+        <div className="flex items-center justify-between pb-3.5 mb-5 border-b border-[#E5E3DA]">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-[#EDF4F9] text-[#EE8056] border border-[#D5E2EE] flex items-center justify-center shadow-2xs">
-              <Flame className="w-4 h-4 fill-[#EE8056] text-[#EE8056]" />
+            <div className="w-8 h-8 rounded-[8px] bg-[#FAF9F5] text-[#245BDB] border border-[#E5E3DA] flex items-center justify-center shadow-xs">
+              <Flame className="w-4 h-4 fill-[#245BDB] text-[#245BDB]" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-[#293B52] tracking-tight">
+              <h2 className="text-base sm:text-lg font-bold text-[#172333] tracking-tight">
                 {t('Featured & Best Sellers', 'জনপ্রিয় ও বেস্ট সেলার')}
               </h2>
-              <p className="text-xs text-[#6B7D93]">
+              <p className="text-xs text-[#667085]">
                 {t('Top-selling customer favorites with verified reviews and nationwide delivery', 'গ্রাহকদের পছন্দের সেরা ১০টি গ্যাজেট ও লাইফস্টাইল পণ্য')}
               </p>
             </div>
@@ -46,7 +46,7 @@ export default function TrendingRightNowSection() {
               const el = document.getElementById('all-products');
               el?.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="text-xs font-bold text-[#0877C9] hover:text-[#0665AC] flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#EDF4F9] hover:bg-white border border-[#D5E2EE] shadow-2xs transition-all"
+            className="text-xs font-bold text-[#245BDB] hover:text-[#1C4BB8] flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] bg-[#FAF9F5] hover:bg-white border border-[#E5E3DA] hover:border-[#245BDB] transition-all"
           >
             <span>{t('View All', 'সব দেখুন')}</span>
             <ChevronRight className="w-3.5 h-3.5" />

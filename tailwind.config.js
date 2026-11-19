@@ -7,41 +7,40 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Transparent Glassmorphism Global Palette
-        'azraq-bg': '#E8F2FC',
-        'azraq-bg-secondary': '#F3F8FF',
-        'azraq-frost': '#D9EDFF',
-        'azraq-primary': '#0877C9',
-        'azraq-soft-blue': '#69C5F5',
-        'azraq-text': '#101C35',
-        'azraq-muted': '#71849B',
-        azraq: {
-          // Brand Color System (Official Palette)
-          midnight: '#101C35',   // Midnight Navy (Primary)
-          deepBlue: '#183B70',   // Deep Blue (Secondary)
-          cobalt: '#2563EB',     // Cobalt Blue (Brand Accent)
-          white: '#FFFFFF',      // Pure White
-          softGray: '#F5F7FA',   // Soft Gray Background
+        // AZRAQ — The Modern Everyday Edit Palette
+        'azraq-ivory': '#F5F4EF',       // Warm Ivory (Primary background)
+        'azraq-ink': '#172333',         // Deep Ink (Primary text & dark surfaces)
+        'azraq-blue': '#245BDB',        // AZRAQ Blue (Primary actions & brand)
+        'azraq-blue-hover': '#1C4BB8',  // Darker action blue
+        'azraq-lime': '#D7ED78',        // Soft Lime (Occasional accent)
+        'azraq-white': '#FFFFFF',       // Pure White (Product surfaces)
+        'azraq-border': '#E5E3DA',      // Neutral Grey Border
+        'azraq-muted': '#667085',       // Secondary muted text
+        'azraq-surface': '#FFFFFF',     // Clean card surface
+        'azraq-surface-subtle': '#FAF9F5', // Subtle warm container
 
-          // Semantic Theme Mappings
-          navy: '#101C35',       // Primary Brand Midnight Navy
-          azure: '#0877C9',      // Primary Blue
-          glass: '#69C5F5',      // Glass Azure Accent
-          sky: '#D9EDFF',        // Frost Blue
-          ice: '#F3F8FF',        // Secondary Background
-          cyan: '#50DDF0',       // Subtle Cyan Accent
-          lime: '#C9F34A',       // Neon Highlight Accent
-          cloud: '#E8F2FC',      // Main Background
-          charcoal: '#0D172A',   // Deepest Midnight Surface
-          dark: '#0A1324',
-          card: '#101C35',
-          purple: '#2563EB',     // Cobalt Blue
-          violet: '#183B70',     // Deep Blue
-          lavender: '#E2E8F0',   // Slate Soft
+        // Backward compatibility mappings
+        'azraq-bg': '#F5F4EF',
+        'azraq-bg-secondary': '#FAF9F5',
+        'azraq-frost': '#EBE8DF',
+        'azraq-primary': '#245BDB',
+        'azraq-soft-blue': '#4D7DF0',
+        'azraq-text': '#172333',
+        azraq: {
+          navy: '#172333',
+          midnight: '#172333',
+          azure: '#245BDB',
+          blue: '#245BDB',
+          ivory: '#F5F4EF',
+          lime: '#D7ED78',
+          border: '#E5E3DA',
+          muted: '#667085',
+          white: '#FFFFFF'
         }
       },
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', '"Inter"', 'system-ui', 'sans-serif'],
+        sans: ['"Manrope"', '"Hind Siliguri"', '"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        editorial: ['"Manrope"', 'sans-serif'],
         serif: ['"DM Serif Display"', 'Georgia', 'serif'],
         bengali: ['"Hind Siliguri"', 'sans-serif'],
       },
