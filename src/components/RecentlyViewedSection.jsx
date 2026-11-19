@@ -48,22 +48,17 @@ export default function RecentlyViewedSection() {
 
   return (
     <section id="recently-viewed" className="w-full select-none">
-      <div className="bg-white border border-[#E5E3DA] rounded-[16px] p-5 sm:p-7 shadow-[0_4px_20px_rgba(23,35,51,0.04)]">
+      <div className="bg-white border border-[#E5E3DA] rounded-[6px] p-5 sm:p-7 shadow-[0_1px_3px_rgba(23,35,51,0.03)]">
         
         {/* Section Heading */}
         <div className="flex items-center justify-between pb-3.5 mb-5 border-b border-[#E5E3DA]">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-[8px] bg-[#FAF9F5] text-[#245BDB] border border-[#E5E3DA] flex items-center justify-center shadow-xs">
-              <History className="w-4 h-4" />
-            </div>
-            <div>
-              <h2 className="text-base sm:text-lg font-bold text-[#172333] tracking-tight">
-                {t('Recently Viewed', 'সম্প্রতি দেখা পণ্য')}
-              </h2>
-              <p className="text-xs text-[#667085]">
-                {t('Products you recently browsed in AZRAQ Shop', 'আপনার সম্প্রতি ব্রাউজ করা পণ্যের তালিকা')}
-              </p>
-            </div>
+          <div>
+            <span className="text-[10px] font-mono text-[#667085] uppercase tracking-[0.16em] block font-semibold">
+              {t("BROWSING HISTORY", "ব্রাউজিং হিস্ট্রি")}
+            </span>
+            <h2 className="text-lg sm:text-xl font-bold text-[#172333] tracking-tight mt-0.5">
+              {t('Recently Viewed', 'সম্প্রতি দেখা পণ্য')}
+            </h2>
           </div>
 
           <button
@@ -75,14 +70,14 @@ export default function RecentlyViewedSection() {
                 // Ignore
               }
             }}
-            className="text-xs font-semibold text-[#667085] hover:text-[#CF1322] transition-colors"
+            className="text-xs font-semibold text-[#667085] hover:text-[#172333] transition-colors"
           >
             {t('Clear History', 'মুছে ফেলুন')}
           </button>
         </div>
 
         {/* 5-Column Responsive Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-4.5 items-stretch">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-3.5 items-stretch">
           {recentProducts.map((product) => (
             <div key={product.id} className="h-full">
               <ProductCard

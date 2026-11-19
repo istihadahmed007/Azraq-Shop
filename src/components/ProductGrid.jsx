@@ -104,24 +104,29 @@ export default function ProductGrid() {
   return (
     <section id="all-products" className="w-full select-none flex flex-col gap-6">
 
-      <div className="bg-white border border-[#E5E3DA] rounded-[16px] p-5 sm:p-7 shadow-[0_4px_20px_rgba(23,35,51,0.04)] flex flex-col gap-5">
+      <div className="bg-white border border-[#E5E3DA] rounded-[6px] p-5 sm:p-7 shadow-[0_1px_3px_rgba(23,35,51,0.03)] flex flex-col gap-5">
         
         {/* Section Header Row */}
         <div className="flex items-center justify-between pb-3.5 border-b border-[#E5E3DA]">
-          <div className="flex items-center gap-3">
-            <h2 className="text-base sm:text-lg font-bold text-[#172333] tracking-tight">
-              {t("Selected Products", "বাছাইকৃত পণ্য")}
-            </h2>
-            <span className="text-xs font-bold text-[#245BDB] bg-[#FAF9F5] border border-[#E5E3DA] px-2.5 py-0.5 rounded-[4px]">
-              {filteredAndSortedProducts.length} {t("Products", "পণ্য")}
+          <div>
+            <span className="text-[10px] font-mono text-[#667085] uppercase tracking-[0.16em] block font-semibold">
+              {t("CATALOGUE DIRECTORY", "ক্যাটালগ ডিরেক্টরি")}
             </span>
+            <div className="flex items-center gap-3 mt-0.5">
+              <h2 className="text-lg sm:text-xl font-bold text-[#172333] tracking-tight">
+                {t("Selected Products", "বাছাইকৃত পণ্য")}
+              </h2>
+              <span className="text-xs font-mono font-semibold text-[#667085] bg-[#FAF9F5] border border-[#E5E3DA] px-2 py-0.5 rounded-[3px]">
+                {filteredAndSortedProducts.length} {t("Items", "টি")}
+              </span>
+            </div>
           </div>
 
           {/* Sync Status Badge */}
           <button
             onClick={syncWithEasyDrop}
             disabled={syncStatus.isSyncing}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] text-xs font-semibold text-[#667085] hover:text-[#245BDB] bg-[#FAF9F5] hover:bg-white border border-[#E5E3DA] transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[3px] text-xs font-semibold text-[#667085] hover:text-[#172333] bg-[#FAF9F5] hover:bg-white border border-[#E5E3DA] hover:border-[#172333] transition-colors"
             title="Sync with EasyDrop API"
           >
             <RefreshCw className={`w-3.5 h-3.5 text-[#245BDB] ${syncStatus.isSyncing ? 'animate-spin' : ''}`} />
@@ -133,7 +138,7 @@ export default function ProductGrid() {
         <div className="flex flex-col gap-3.5">
           
           {/* Category Tabs Strip */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
             {categories.map((cat) => {
               const isActive = activeCategory === cat;
               const displayName = cat === 'All' ? t('All Products', 'সকল পণ্য') : cat;
@@ -142,10 +147,10 @@ export default function ProductGrid() {
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`px-3.5 py-1.5 rounded-[6px] text-xs font-semibold whitespace-nowrap transition-all border ${
+                  className={`px-3 py-1.5 rounded-[3px] text-xs font-semibold whitespace-nowrap transition-all border ${
                     isActive
                       ? 'bg-[#172333] text-white border-[#172333]'
-                      : 'bg-[#FAF9F5] hover:bg-white text-[#172333] hover:text-[#245BDB] border-[#E5E3DA]'
+                      : 'bg-[#FAF9F5] hover:bg-white text-[#556170] hover:text-[#172333] border-[#E5E3DA]'
                   }`}
                 >
                   {displayName}
@@ -165,7 +170,7 @@ export default function ProductGrid() {
                 placeholder={t("Filter within catalog...", "পণ্য ফিল্টার করুন...")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-8 py-2 text-xs text-[#172333] placeholder-[#8C99A8] rounded-[6px] bg-[#FAF9F5] border border-[#E5E3DA] focus:outline-none focus:border-[#245BDB] focus:bg-white"
+                className="w-full pl-8 pr-7 py-1.5 text-xs text-[#172333] placeholder-[#8C99A8] rounded-[3px] bg-[#FAF9F5] border border-[#E5E3DA] focus:outline-none focus:border-[#172333] focus:bg-white transition-colors"
               />
               {searchQuery && (
                 <button
@@ -179,12 +184,12 @@ export default function ProductGrid() {
             </div>
 
             {/* Sort Buttons & In-stock Checkbox */}
-            <div className="flex items-center gap-2 flex-wrap text-xs">
-              <span className="text-[#667085] font-semibold hidden md:inline">{t("Sort by:", "সাজান:")}</span>
+            <div className="flex items-center gap-1.5 flex-wrap text-xs">
+              <span className="text-[#667085] font-medium hidden md:inline text-[11px] uppercase tracking-wider">{t("Sort:", "সাজান:")}</span>
 
               <button
                 onClick={() => setSortBy('featured')}
-                className={`px-3 py-1.5 rounded-[6px] font-semibold border transition-all ${
+                className={`px-2.5 py-1.5 rounded-[3px] font-semibold border transition-all text-xs ${
                   sortBy === 'featured'
                     ? 'bg-[#172333] text-white border-[#172333]'
                     : 'bg-[#FAF9F5] hover:bg-white text-[#172333] border-[#E5E3DA]'
@@ -195,7 +200,7 @@ export default function ProductGrid() {
 
               <button
                 onClick={() => setSortBy('price-low')}
-                className={`px-3 py-1.5 rounded-[6px] font-semibold border transition-all ${
+                className={`px-2.5 py-1.5 rounded-[3px] font-semibold border transition-all text-xs ${
                   sortBy === 'price-low'
                     ? 'bg-[#172333] text-white border-[#172333]'
                     : 'bg-[#FAF9F5] hover:bg-white text-[#172333] border-[#E5E3DA]'
@@ -206,7 +211,7 @@ export default function ProductGrid() {
 
               <button
                 onClick={() => setSortBy('price-high')}
-                className={`px-3 py-1.5 rounded-[6px] font-semibold border transition-all ${
+                className={`px-2.5 py-1.5 rounded-[3px] font-semibold border transition-all text-xs ${
                   sortBy === 'price-high'
                     ? 'bg-[#172333] text-white border-[#172333]'
                     : 'bg-[#FAF9F5] hover:bg-white text-[#172333] border-[#E5E3DA]'
@@ -216,12 +221,12 @@ export default function ProductGrid() {
               </button>
 
               {/* In-Stock Toggle */}
-              <label className="flex items-center gap-1.5 ml-1 cursor-pointer font-semibold text-[#172333] select-none px-2 py-1 rounded-[6px] hover:bg-[#FAF9F5] transition-colors">
+              <label className="flex items-center gap-1.5 ml-1 cursor-pointer font-medium text-[#172333] select-none px-2 py-1 rounded-[3px] hover:bg-[#FAF9F5] transition-colors text-xs">
                 <input
                   type="checkbox"
                   checked={inStockOnly}
                   onChange={(e) => setInStockOnly(e.target.checked)}
-                  className="w-3.5 h-3.5 text-[#245BDB] rounded border-[#E5E3DA] focus:ring-0"
+                  className="w-3.5 h-3.5 text-[#245BDB] rounded-[2px] border-[#E5E3DA] focus:ring-0"
                 />
                 <span>{t("In Stock Only", "স্টকে আছে")}</span>
               </label>
@@ -233,7 +238,7 @@ export default function ProductGrid() {
 
         {/* 3. STRICTLY FIVE PRODUCT CARDS PER ROW ON DESKTOP */}
         {displayedProducts.length === 0 ? (
-          <div className="bg-[#FAF9F5] border border-[#E5E3DA] rounded-[12px] p-10 text-center text-[#667085]">
+          <div className="bg-[#FAF9F5] border border-[#E5E3DA] rounded-[4px] p-10 text-center text-[#667085]">
             <p className="text-sm font-semibold">{t("No products found matching your filter.", "কোন পণ্য পাওয়া যায়নি।")}</p>
             <button
               onClick={() => {
@@ -241,13 +246,13 @@ export default function ProductGrid() {
                 setSearchQuery('');
                 setInStockOnly(false);
               }}
-              className="mt-3 px-5 py-2 rounded-[6px] bg-[#245BDB] text-white text-xs font-bold hover:bg-[#1C4BB8] shadow-xs transition-all"
+              className="mt-3 px-4 py-2 rounded-[3px] bg-[#172333] text-white text-xs font-semibold hover:bg-[#245BDB] transition-colors"
             >
               {t("Reset Filters", "ফিল্টার রিসেট করুন")}
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-4.5 items-stretch">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-3.5 items-stretch">
             {displayedProducts.map((product, idx) => (
               <div key={product.id} className="h-full">
                 <ProductCard
@@ -267,12 +272,12 @@ export default function ProductGrid() {
 
         {/* 4. "SEE MORE" EDITORIAL PAGINATION BUTTON */}
         {visibleCount < filteredAndSortedProducts.length && (
-          <div className="flex justify-center mt-3 pt-3 border-t border-[#E5E3DA]">
+          <div className="flex justify-center mt-3 pt-4 border-t border-[#E5E3DA]">
             <button
               onClick={() => setVisibleCount(prev => prev + 25)}
-              className="px-8 py-2.5 bg-[#FAF9F5] hover:bg-white border border-[#E5E3DA] hover:border-[#245BDB] hover:text-[#245BDB] text-[#172333] text-xs sm:text-sm font-bold rounded-[8px] transition-all active:scale-95 shadow-xs"
+              className="px-8 py-2.5 bg-[#FAF9F5] hover:bg-white border border-[#E5E3DA] hover:border-[#172333] hover:text-[#172333] text-[#172333] text-xs sm:text-sm font-semibold rounded-[4px] transition-colors active:scale-98 shadow-xs"
             >
-              {t("See More Products", "আরও পণ্য দেখুন")} ({filteredAndSortedProducts.length - visibleCount} {t("remaining", "বাকি")})
+              {t("Load More Products", "আরও পণ্য দেখুন")} ({filteredAndSortedProducts.length - visibleCount} {t("remaining", "বাকি")})
             </button>
           </div>
         )}

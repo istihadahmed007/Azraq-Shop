@@ -31,12 +31,12 @@ export default function AzraqLogo({
   const heightClass = sizeClasses[size] || sizeClasses.md;
 
   if (isLight) {
-    // When rendered on a dark background (such as Midnight Navy #101C35):
-    // Wrap inside a refined, frosted white pill so the navy wordmark remains 100% legible,
+    // When rendered on a dark background (such as Deep Ink #172333):
+    // Wrap inside a refined white container so the wordmark remains 100% legible,
     // authentic, and with crisp contrast, strictly preserving the original artwork.
     return (
       <div 
-        className={`inline-flex items-center bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/20 shadow-sm transition-transform duration-200 hover:scale-[1.02] ${className}`}
+        className={`inline-flex items-center bg-white px-3 py-1.5 rounded-[4px] border border-white/30 shadow-xs transition-opacity duration-150 hover:opacity-95 ${className}`}
       >
         <img
           src="/branding/azraq-logo.png"

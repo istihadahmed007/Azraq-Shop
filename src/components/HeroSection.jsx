@@ -1,23 +1,19 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Truck, ShieldCheck, CreditCard, RotateCcw, Heart, ShoppingBag, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Truck, ShieldCheck, CreditCard, RotateCcw, Heart, ShoppingBag, ChevronRight } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import ProductImage from './common/ProductImage';
 import { generateProductSlug } from '../utils/productUtils';
 
 /**
- * AZRAQ Shop — The Modern Everyday Edit Hero Showcase
+ * AZRAQ Shop — Art-Directed Editorial Hero Showcase
  * 
- * Asymmetric editorial composition:
- * - Left column:
- *   - Campaign label: THE EVERYDAY EDIT (Soft Lime #D7ED78)
- *   - Headline: "Better choices. Everyday living."
- *   - Editorial statement & verified delivery rates
- *   - Primary CTA ("Explore Collection") & Secondary CTA ("Shop Now")
- * - Right column:
- *   - Flagship authentic product photograph (AZQ-0001) in pure white square-edged showcase
- *   - Balanced secondary editorial product cards (AZQ-0002, AZQ-0003)
- * - Service guarantee strip: Inside Dhaka ৳80, Outside Dhaka ৳150, COD, Paymently, 7-day returns
+ * Inspired by contemporary Japanese and independent European lifestyle retail:
+ * - Architectural layout with crisp hairline framing (#E5E3DA).
+ * - Restrained editorial typography: "Everyday objects, thoughtfully chosen."
+ * - Large, prominent authentic catalog photography with edge-to-edge breathing room.
+ * - Asymmetric merchandising featuring 3 curated catalog pieces.
+ * - Integrated, seamless customer guarantee strip without floating card noise.
  */
 export default function HeroSection() {
   const navigate = useNavigate();
@@ -26,15 +22,17 @@ export default function HeroSection() {
     favorites,
     toggleFavorite,
     addToCart,
-    navigateTo,
     t
   } = useShop();
 
-  // Authentic catalog products for the editorial showcase
-  const featuredProduct = products.find(p => p.id === 'AZQ-0001') || products[0];
-  const secondaryProducts = products.filter(p => p.id !== (featuredProduct?.id)).slice(0, 2);
+  // Curated authentic catalog products for the editorial showcase
+  // 1. Standout flagship product (Awei Overhead Earphone or Baseus Box)
+  const flagshipProduct = products.find(p => p.id === 'AZQ-0009') || products[0];
+  // 2. Companion pieces from distinct categories (Console, Diffuser)
+  const companionOne = products.find(p => p.id === 'AZQ-0043') || products[1];
+  const companionTwo = products.find(p => p.id === 'AZQ-0010') || products[2];
 
-  const isHeroFav = featuredProduct ? favorites.includes(featuredProduct.id) : false;
+  const isFlagshipFav = flagshipProduct ? favorites.includes(flagshipProduct.id) : false;
 
   const handleOpenProduct = (p) => {
     if (!p) return;
@@ -42,119 +40,121 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="w-full select-none flex flex-col gap-6">
+    <section className="w-full select-none flex flex-col gap-0 border border-[#E5E3DA] bg-white rounded-[6px] shadow-[0_1px_3px_rgba(23,35,51,0.03)] overflow-hidden">
 
-      {/* 1. ASYMMETRIC EDITORIAL HERO GRID */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-stretch w-full">
+      {/* 1. EDITORIAL TOP TICKER / CAMPAIGN RUNNER */}
+      <div className="flex items-center justify-between px-5 sm:px-8 py-2.5 border-b border-[#E5E3DA] bg-[#FAF9F5] text-[11px] text-[#667085]">
+        <div className="flex items-center gap-3">
+          <span className="font-mono text-[10px] font-bold text-[#172333] uppercase tracking-[0.16em]">
+            AZRAQ / STOREFRONT 2026
+          </span>
+          <span className="hidden sm:inline text-[#E5E3DA]">|</span>
+          <span className="hidden sm:inline font-medium text-[#172333]">
+            {t("Verified Catalog of 1,200+ Everyday Lifestyle Goods", "১২০০+ আসল পণ্যের ভেরিফাইড রিটেইল ক্যাটালগ")}
+          </span>
+        </div>
 
-        {/* LEFT SECTION: lg:col-span-6 — Editorial Campaign Statement */}
-        <div className="lg:col-span-6 rounded-[16px] bg-white border border-[#E5E3DA] p-6 sm:p-8 lg:p-10 shadow-[0_4px_20px_rgba(23,35,51,0.04)] flex flex-col justify-between relative overflow-hidden">
-          
-          <div className="flex flex-col gap-5 relative z-10">
-            {/* Campaign Pill Badge */}
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[6px] bg-[#D7ED78] text-[#172333] text-xs font-bold uppercase tracking-wider shadow-xs">
-                <Sparkles className="w-3.5 h-3.5 text-[#172333]" />
-                <span>THE EVERYDAY EDIT</span>
+        <div className="flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#245BDB]" />
+          <span className="font-semibold text-[#172333] text-[10px] tracking-wider uppercase">
+            {t("Authentic Inventory", "আসল পণ্য")}
+          </span>
+        </div>
+      </div>
+
+      {/* 2. MAIN EDITORIAL SHOWCASE COMPOSITION */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-[#E5E3DA]">
+
+        {/* LEFT / LEAD SECTION: Headline, Identity & Merchandising Statement (col-span-5) */}
+        <div className="lg:col-span-5 p-6 sm:p-8 lg:p-10 flex flex-col justify-between bg-white">
+          <div className="space-y-4 sm:space-y-6">
+            <span className="inline-block text-[11px] font-mono uppercase tracking-[0.18em] text-[#667085] font-semibold">
+              {t("CURATED RETAIL • DHAKA, BD", "বাছাইকৃত রিটেইল • ঢাকা")}
+            </span>
+
+            <h1 className="text-3xl sm:text-4xl lg:text-[42px] font-bold text-[#172333] tracking-tight leading-[1.12]">
+              {t("Everyday objects,", "দৈনন্দিন পণ্য,")}<br />
+              <span className="text-[#245BDB]">{t("thoughtfully chosen.", "যাচাইকৃত মান।")}</span>
+            </h1>
+
+            <p className="text-xs sm:text-[13px] text-[#556170] leading-relaxed max-w-md">
+              {t(
+                "A distinctive collection of genuine electronics, home appliances, kitchen tools, and lifestyle accessories — transparently priced in BDT and fulfilled directly across Bangladesh.",
+                "আসল গ্যাজেটস, হোম অ্যাপ্লায়েন্স ও দৈনন্দিন লাইফস্টাইল পণ্য। স্বচ্ছ মূল্য, দ্রুততম ক্যাশ অন ডেলিভারি ও সহজ রিটার্ন।"
+              )}
+            </p>
+
+            {/* Direct Merchandising Highlights */}
+            <div className="pt-2 flex flex-wrap gap-2 text-[11px]">
+              <span className="px-2.5 py-1 bg-[#FAF9F5] border border-[#E5E3DA] rounded-[3px] text-[#172333] font-medium">
+                {t("৳80 Inside Dhaka", "ঢাকা ৮০৳")}
               </span>
-              <span className="text-xs text-[#667085] font-medium hidden sm:inline">
-                • {t("Issue 2026", "সংস্করণ ২০২৬")}
+              <span className="px-2.5 py-1 bg-[#FAF9F5] border border-[#E5E3DA] rounded-[3px] text-[#172333] font-medium">
+                {t("৳150 Nationwide", "সারাদেশে ১৫০৳")}
               </span>
-            </div>
-
-            {/* Editorial Headline */}
-            <div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#172333] tracking-tight leading-[1.15]">
-                {t("Better choices.", "সেরা পছন্দ।")}<br />
-                <span className="text-[#245BDB]">{t("Everyday living.", "সহজ জীবন।")}</span>
-              </h1>
-              <p className="text-sm sm:text-base text-[#667085] leading-relaxed mt-3 max-w-lg">
-                {t(
-                  "Curated lifestyle essentials, authentic electronics, everyday kitchenware and accessories — verified for genuine quality and delivered fast across Bangladesh.",
-                  "বাছাইকৃত গ্যাজেটস, লাইফস্টাইল ও গৃহস্থালি পণ্য। আসল পণ্যের নিশ্চয়তা ও দ্রুততম হোম ডেলিভারি।"
-                )}
-              </p>
-            </div>
-
-            {/* Delivery Highlights Strip */}
-            <div className="flex flex-wrap items-center gap-3 pt-2 text-xs text-[#172333]">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] bg-[#FAF9F5] border border-[#E5E3DA] font-semibold">
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span>{t("Dhaka ৳80", "ঢাকা ৮০৳")}</span>
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] bg-[#FAF9F5] border border-[#E5E3DA] font-semibold">
-                <span className="w-2 h-2 rounded-full bg-blue-500" />
-                <span>{t("Outside Dhaka ৳150", "ঢাকার বাইরে ১৫০৳")}</span>
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] bg-[#FAF9F5] border border-[#E5E3DA] font-semibold text-[#667085]">
-                <span>{t("1,200+ Products", "১২০০+ পণ্য")}</span>
-              </div>
+              <span className="px-2.5 py-1 bg-[#FAF9F5] border border-[#E5E3DA] rounded-[3px] text-[#245BDB] font-semibold">
+                {t("Free Delivery > ৳3,000", "৩০০০৳+ অর্ডারে ফ্রি ডেলিভারি")}
+              </span>
             </div>
           </div>
 
-          {/* Action Row: Dual CTAs */}
-          <div className="flex items-center gap-3.5 pt-8 mt-4 border-t border-[#E5E3DA] relative z-10 flex-wrap">
-            <button
-              type="button"
-              onClick={() => {
-                const el = document.getElementById('shop-by-collection') || document.getElementById('browse-categories');
-                el?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="px-6 py-3 rounded-[8px] bg-[#245BDB] hover:bg-[#1C4BB8] text-white text-xs sm:text-sm font-bold flex items-center gap-2 shadow-xs transition-all active:scale-95"
-            >
-              <span>{t("Explore Collection", "কালেকশন দেখুন")}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-
+          {/* Action Triggers */}
+          <div className="pt-8 sm:pt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <button
               type="button"
               onClick={() => {
                 const el = document.getElementById('all-products') || document.getElementById('popular-products');
                 el?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="px-6 py-3 rounded-[8px] bg-[#172333] hover:bg-[#245BDB] text-white text-xs sm:text-sm font-bold flex items-center gap-2 transition-all active:scale-95"
+              className="px-6 py-3 bg-[#172333] hover:bg-[#245BDB] text-white text-xs sm:text-[13px] font-semibold rounded-[4px] transition-colors flex items-center justify-center gap-2 active:scale-98 shadow-xs"
             >
-              <span>{t("Shop Now", "এখনই কেনাকাটা")}</span>
+              <span>{t("Browse Catalogue", "সকল পণ্য দেখুন")}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const el = document.getElementById('browse-categories') || document.getElementById('shop-by-collection');
+                el?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="px-5 py-3 bg-[#FAF9F5] hover:bg-white text-[#172333] hover:text-[#245BDB] border border-[#E5E3DA] hover:border-[#172333] text-xs sm:text-[13px] font-semibold rounded-[4px] transition-colors flex items-center justify-center gap-1.5 active:scale-98"
+            >
+              <span>{t("Explore Departments", "ক্যাটাগরি দেখুন")}</span>
+              <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
-
         </div>
 
-        {/* RIGHT SECTION: lg:col-span-6 — Photographic Showcase Grid */}
-        <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-12 gap-4">
-
-          {/* Primary Featured Product Panel (sm:col-span-7) */}
+        {/* CENTER / PRIMARY PHOTOGRAPHIC SPOTLIGHT (col-span-4) */}
+        {flagshipProduct && (
           <div 
-            onClick={() => handleOpenProduct(featuredProduct)}
-            className="sm:col-span-7 rounded-[16px] bg-white border border-[#E5E3DA] p-5 shadow-[0_4px_20px_rgba(23,35,51,0.04)] flex flex-col justify-between group cursor-pointer hover:border-[#245BDB] transition-all"
+            onClick={() => handleOpenProduct(flagshipProduct)}
+            className="lg:col-span-4 p-6 sm:p-7 flex flex-col justify-between group cursor-pointer hover:bg-[#FAF9F5]/60 transition-colors bg-white relative"
           >
-            {/* Top Tag & Wishlist */}
-            <div className="flex items-center justify-between gap-2 mb-3">
-              <span className="text-[11px] font-bold text-[#667085] uppercase tracking-wider truncate">
-                {featuredProduct?.category || t("Spotlight", "স্পটলাইট")}
+            {/* Header / Meta */}
+            <div className="flex items-center justify-between pb-3 mb-2 border-b border-[#E5E3DA]">
+              <span className="text-[10px] font-mono uppercase tracking-[0.16em] text-[#667085] font-semibold truncate max-w-[200px]">
+                {flagshipProduct.category}
               </span>
-              {featuredProduct && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleFavorite(featuredProduct.id);
-                  }}
-                  className={`w-8 h-8 rounded-[6px] bg-[#FAF9F5] hover:bg-white border border-[#E5E3DA] flex items-center justify-center transition-colors ${
-                    isHeroFav ? 'text-[#E53935]' : 'text-[#667085] hover:text-[#E53935]'
-                  }`}
-                  aria-label="Wishlist featured product"
-                >
-                  <Heart className={`w-3.5 h-3.5 ${isHeroFav ? 'fill-[#E53935] stroke-[#E53935]' : ''}`} />
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleFavorite(flagshipProduct.id);
+                }}
+                className="w-7 h-7 rounded-[3px] border border-[#E5E3DA] bg-white hover:border-[#172333] flex items-center justify-center transition-colors text-[#667085]"
+                aria-label="Save to wishlist"
+              >
+                <Heart className={`w-3.5 h-3.5 ${isFlagshipFav ? 'fill-[#E53935] text-[#E53935]' : ''}`} />
+              </button>
             </div>
 
-            {/* Edge-to-Edge Authentic Photograph Container */}
-            <div className="w-full aspect-square rounded-[10px] bg-[#FAF9F5] border border-[#E5E3DA] overflow-hidden p-3 flex items-center justify-center mb-4">
+            {/* Generous Authentic Product Photograph Viewer */}
+            <div className="w-full aspect-square my-2 p-4 flex items-center justify-center bg-[#FAF9F5] border border-[#E5E3DA] rounded-[4px] overflow-hidden">
               <ProductImage
-                src={featuredProduct?.main_image}
-                alt={featuredProduct?.name || "Featured Product"}
+                src={flagshipProduct.main_image}
+                alt={flagshipProduct.name}
                 fit="contain"
                 aspectRatio="square"
                 priority={true}
@@ -162,82 +162,86 @@ export default function HeroSection() {
               />
             </div>
 
-            {/* Product Meta */}
-            <div>
-              <h2 className="text-sm sm:text-base font-bold text-[#172333] group-hover:text-[#245BDB] transition-colors line-clamp-2 leading-snug min-h-[2.4rem]">
-                {featuredProduct?.name}
+            {/* Product Meta & Pricing */}
+            <div className="pt-3">
+              <span className="text-[10px] font-mono text-[#8C99A8] block uppercase">
+                SKU: {flagshipProduct.sku || flagshipProduct.id}
+              </span>
+              <h2 className="text-sm font-bold text-[#172333] group-hover:text-[#245BDB] transition-colors line-clamp-2 leading-snug mt-1 min-h-[2.5rem]">
+                {flagshipProduct.name}
               </h2>
+
               <div className="flex items-center justify-between pt-3 mt-2 border-t border-[#E5E3DA]">
                 <div>
-                  <span className="text-[10px] text-[#667085] block uppercase font-semibold">{t("Price", "মূল্য")}</span>
-                  <span className="text-lg font-extrabold text-[#245BDB]">
-                    ৳{(featuredProduct?.price || 0).toLocaleString()}
+                  <span className="text-[10px] uppercase font-mono text-[#8C99A8] block">BDT</span>
+                  <span className="text-lg font-bold text-[#172333]">
+                    ৳{(flagshipProduct.price || 0).toLocaleString()}
                   </span>
                 </div>
-                <span className="text-xs font-bold text-[#172333] group-hover:text-[#245BDB] flex items-center gap-1 transition-colors">
+                <span className="text-xs font-semibold text-[#245BDB] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
                   <span>{t("View Details", "বিস্তারিত")}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </div>
             </div>
           </div>
+        )}
 
-          {/* Secondary Stacked Product Panels (sm:col-span-5) */}
-          <div className="sm:col-span-5 flex flex-col gap-4">
-            {secondaryProducts.map((p, idx) => (
-              <div
-                key={p.id}
-                onClick={() => handleOpenProduct(p)}
-                className="flex-1 rounded-[16px] bg-white border border-[#E5E3DA] p-4 shadow-[0_4px_20px_rgba(23,35,51,0.04)] flex flex-col justify-between group cursor-pointer hover:border-[#245BDB] transition-all"
-              >
-                <div className="w-full aspect-[4/3] rounded-[8px] bg-[#FAF9F5] border border-[#E5E3DA] overflow-hidden p-2 flex items-center justify-center mb-2.5">
-                  <ProductImage
-                    src={p.main_image}
-                    alt={p.name}
-                    fit="contain"
-                    aspectRatio="square"
-                    priority={idx === 0}
-                    className="group-hover:scale-104 transition-transform duration-300"
-                  />
-                </div>
-                <div>
-                  <span className="text-[10px] text-[#667085] uppercase tracking-wider block truncate font-medium">
-                    {p.category}
+        {/* RIGHT / SECONDARY COMPANION STACK (col-span-3) */}
+        <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 divide-y sm:divide-y-0 lg:divide-y divide-[#E5E3DA] bg-[#FAF9F5]/40">
+          {[companionOne, companionTwo].filter(Boolean).map((prod) => (
+            <div
+              key={prod.id}
+              onClick={() => handleOpenProduct(prod)}
+              className="p-5 flex flex-col justify-between group cursor-pointer hover:bg-white transition-colors"
+            >
+              <div className="w-full aspect-[4/3] bg-white border border-[#E5E3DA] rounded-[3px] p-2 flex items-center justify-center overflow-hidden mb-2.5">
+                <ProductImage
+                  src={prod.main_image}
+                  alt={prod.name}
+                  fit="contain"
+                  aspectRatio="square"
+                  className="group-hover:scale-104 transition-transform duration-300"
+                />
+              </div>
+
+              <div>
+                <span className="text-[9px] font-mono text-[#8C99A8] uppercase tracking-wider block truncate">
+                  {prod.category}
+                </span>
+                <h3 className="text-xs font-semibold text-[#172333] line-clamp-1 group-hover:text-[#245BDB] transition-colors mt-0.5">
+                  {prod.name}
+                </h3>
+
+                <div className="flex items-center justify-between pt-2 mt-2 border-t border-[#E5E3DA]">
+                  <span className="text-xs font-bold text-[#172333]">
+                    ৳{(prod.price || 0).toLocaleString()}
                   </span>
-                  <h3 className="text-xs font-bold text-[#172333] line-clamp-1 group-hover:text-[#245BDB] transition-colors mt-0.5">
-                    {p.name}
-                  </h3>
-                  <div className="flex items-center justify-between pt-2 mt-1.5 border-t border-[#E5E3DA]">
-                    <span className="text-xs font-extrabold text-[#245BDB]">
-                      ৳{(p.price || 0).toLocaleString()}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        addToCart(p, p.variants?.[0] || 'Standard', 1);
-                      }}
-                      className="p-1.5 rounded-[6px] bg-[#172333] hover:bg-[#245BDB] text-white transition-colors"
-                      title={t("Add to Bag", "ব্যাগে যোগ করুন")}
-                    >
-                      <ShoppingBag className="w-3 h-3" />
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addToCart(prod, prod.variants?.[0] || 'Standard', 1);
+                    }}
+                    className="p-1.5 rounded-[3px] bg-[#172333] hover:bg-[#245BDB] text-white transition-colors"
+                    title={t("Add to Bag", "ব্যাগে যোগ করুন")}
+                  >
+                    <ShoppingBag className="w-3 h-3" />
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-
+            </div>
+          ))}
         </div>
 
       </div>
 
-      {/* 2. RESTRAINED 4-COLUMN TRUST & SERVICE STRIP */}
-      <div className="rounded-[14px] bg-white border border-[#E5E3DA] px-5 sm:px-6 py-4 grid grid-cols-2 lg:grid-cols-4 gap-4 text-xs shadow-[0_2px_10px_rgba(23,35,51,0.03)]">
+      {/* 3. INTEGRATED CUSTOMER GUARANTEE STRIP */}
+      <div className="border-t border-[#E5E3DA] bg-[#FAF9F5] px-5 sm:px-8 py-3.5 grid grid-cols-2 lg:grid-cols-4 gap-4 text-xs divide-y sm:divide-y-0 divide-[#E5E3DA]">
 
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-[8px] bg-[#FAF9F5] text-[#245BDB] border border-[#E5E3DA] flex items-center justify-center shrink-0">
-            <Truck className="w-4 h-4" />
+        <div className="flex items-center gap-3 pt-2 sm:pt-0">
+          <div className="w-8 h-8 rounded-[3px] bg-white text-[#172333] border border-[#E5E3DA] flex items-center justify-center shrink-0">
+            <Truck className="w-4 h-4 text-[#245BDB]" />
           </div>
           <div className="min-w-0">
             <p className="font-bold text-[#172333] leading-tight truncate">{t('Nationwide Delivery', 'সারাদেশে ডেলিভারি')}</p>
@@ -245,33 +249,33 @@ export default function HeroSection() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-[8px] bg-[#FAF9F5] text-emerald-600 border border-[#E5E3DA] flex items-center justify-center shrink-0">
+        <div className="flex items-center gap-3 pt-2 sm:pt-0">
+          <div className="w-8 h-8 rounded-[3px] bg-white text-emerald-700 border border-[#E5E3DA] flex items-center justify-center shrink-0">
             <ShieldCheck className="w-4 h-4" />
           </div>
           <div className="min-w-0">
             <p className="font-bold text-[#172333] leading-tight truncate">{t('Cash on Delivery', 'ক্যাশ অন ডেলিভারি')}</p>
-            <p className="text-[11px] text-[#667085] truncate mt-0.5">{t('Pay upon receiving parcel', 'পণ্য দেখে মূল্য পরিশোধ')}</p>
+            <p className="text-[11px] text-[#667085] truncate mt-0.5">{t('Pay upon parcel inspection', 'পণ্য দেখে মূল্য পরিশোধ')}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-[8px] bg-[#FAF9F5] text-[#245BDB] border border-[#E5E3DA] flex items-center justify-center shrink-0">
-            <CreditCard className="w-4 h-4" />
+        <div className="flex items-center gap-3 pt-2 sm:pt-0">
+          <div className="w-8 h-8 rounded-[3px] bg-white text-[#172333] border border-[#E5E3DA] flex items-center justify-center shrink-0">
+            <CreditCard className="w-4 h-4 text-[#245BDB]" />
           </div>
           <div className="min-w-0">
-            <p className="font-bold text-[#172333] leading-tight truncate">{t('Secure Payments', 'নিরাপদ পেমেন্ট')}</p>
-            <p className="text-[11px] text-[#667085] truncate mt-0.5">{t('bKash, Nagad, Cards via Paymently', 'বিকাশ, নগদ ও কার্ড পেমেন্টলি')}</p>
+            <p className="font-bold text-[#172333] leading-tight truncate">{t('Secure Payments', 'নিরাপদ ডিজিটাল পেমেন্ট')}</p>
+            <p className="text-[11px] text-[#667085] truncate mt-0.5">{t('bKash, Nagad & Cards', 'বিকাশ, নগদ ও কার্ড')}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-[8px] bg-[#FAF9F5] text-[#172333] border border-[#E5E3DA] flex items-center justify-center shrink-0">
+        <div className="flex items-center gap-3 pt-2 sm:pt-0">
+          <div className="w-8 h-8 rounded-[3px] bg-white text-[#172333] border border-[#E5E3DA] flex items-center justify-center shrink-0">
             <RotateCcw className="w-4 h-4" />
           </div>
           <div className="min-w-0">
-            <p className="font-bold text-[#172333] leading-tight truncate">{t('7-Day Returns', '৭ দিনের রিটার্ন')}</p>
-            <p className="text-[11px] text-[#667085] truncate mt-0.5">{t('Verified replacement policy', 'সহজ রিটার্ন পলিসি')}</p>
+            <p className="font-bold text-[#172333] leading-tight truncate">{t('7-Day Replacement', '৭ দিনের রিপ্লেসমেন্ট')}</p>
+            <p className="text-[11px] text-[#667085] truncate mt-0.5">{t('Straightforward exchange', 'সহজ রিটার্ন পলিসি')}</p>
           </div>
         </div>
 

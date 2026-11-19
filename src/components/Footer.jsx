@@ -31,10 +31,10 @@ export default function Footer() {
   return (
     <footer id="footer-section" className="w-full pt-4 pb-8 select-none">
 
-      <div className="bg-[#172333] border border-[#2B3B4E] rounded-[16px] p-6 sm:p-8 md:p-10 shadow-[0_12px_40px_rgba(23,35,51,0.12)] text-[#F5F4EF]">
+      <div className="bg-[#172333] border border-[#233346] rounded-[6px] p-6 sm:p-8 md:p-10 shadow-[0_4px_20px_rgba(23,35,51,0.08)] text-[#F5F4EF]">
 
         {/* 4-Column Retail Footer Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-8 border-b border-[#2B3B4E]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-8 border-b border-[#233346]">
 
           {/* 1. Brand & Contact (lg:col-span-4) */}
           <div className="lg:col-span-4 flex flex-col items-start gap-4">
@@ -47,9 +47,9 @@ export default function Footer() {
               )}
             </p>
 
-            <div className="flex flex-col gap-2.5 pt-1 text-xs text-[#E5E3DA]">
+            <div className="flex flex-col gap-2 pt-1 text-xs text-[#E5E3DA]">
               <div id="footer-contact" className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-[6px] bg-[#223145] border border-[#2B3B4E] flex items-center justify-center text-[#245BDB]">
+                <div className="w-7 h-7 rounded-[3px] bg-[#223145] border border-[#2B3B4E] flex items-center justify-center text-[#245BDB]">
                   <Phone className="w-3.5 h-3.5" />
                 </div>
                 <a href="tel:+8801851172032" className="font-semibold hover:text-[#245BDB] transition-colors">
@@ -57,7 +57,7 @@ export default function Footer() {
                 </a>
               </div>
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-[6px] bg-[#223145] border border-[#2B3B4E] flex items-center justify-center text-[#245BDB]">
+                <div className="w-7 h-7 rounded-[3px] bg-[#223145] border border-[#2B3B4E] flex items-center justify-center text-[#245BDB]">
                   <Mail className="w-3.5 h-3.5" />
                 </div>
                 <a href="mailto:support@azraqtrips.com" className="hover:text-[#245BDB] transition-colors">
@@ -65,7 +65,7 @@ export default function Footer() {
                 </a>
               </div>
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-[6px] bg-[#223145] border border-[#2B3B4E] flex items-center justify-center text-[#245BDB]">
+                <div className="w-7 h-7 rounded-[3px] bg-[#223145] border border-[#2B3B4E] flex items-center justify-center text-[#245BDB]">
                   <MapPin className="w-3.5 h-3.5" />
                 </div>
                 <span>Dhaka, Bangladesh</span>
@@ -75,7 +75,7 @@ export default function Footer() {
 
           {/* 2. Customer Care (lg:col-span-3) */}
           <div className="lg:col-span-3 flex flex-col gap-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">
+            <h4 className="text-xs font-mono font-bold uppercase tracking-[0.16em] text-white">
               {t('Customer Care', 'গ্রাহক সেবা')}
             </h4>
             <ul className="flex flex-col gap-2.5 text-xs text-[#A8B3CF]">
@@ -85,9 +85,9 @@ export default function Footer() {
                 </button>
               </li>
               <li>
-                <button onClick={() => window.open('https://wa.me/8801851172032', '_blank')} className="hover:text-white transition-colors text-left">
+                <a href="https://wa.me/8801851172032" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors text-left inline-block">
                   {t('Help Center & Support', 'হেল্প সেন্টার ও সহায়তা')}
-                </button>
+                </a>
               </li>
               <li>
                 <button onClick={() => navigateTo('home')} className="hover:text-white transition-colors text-left">
@@ -104,7 +104,7 @@ export default function Footer() {
 
           {/* 3. Top Categories (lg:col-span-3) */}
           <div className="lg:col-span-3 flex flex-col gap-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">
+            <h4 className="text-xs font-mono font-bold uppercase tracking-[0.16em] text-white">
               {t('Catalog Collections', 'ক্যাটালগ কালেকশন')}
             </h4>
             <ul className="flex flex-col gap-2.5 text-xs text-[#A8B3CF]">
@@ -131,18 +131,18 @@ export default function Footer() {
 
           {/* 4. Payment & Delivery (lg:col-span-2) */}
           <div className="lg:col-span-2 flex flex-col gap-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">
+            <h4 className="text-xs font-mono font-bold uppercase tracking-[0.16em] text-white">
               {t('Payment & Delivery', 'পেমেন্ট ও ডেলিভারি')}
             </h4>
             <div className="flex flex-col gap-3 text-xs text-[#A8B3CF]">
               <div>
                 <p className="font-semibold text-white mb-1.5">{t('Payment Methods', 'পেমেন্ট মেথড')}</p>
                 <div className="flex flex-wrap gap-1.5 text-[11px] font-medium text-[#F5F4EF]">
-                  <span className="px-2 py-0.5 bg-[#223145] border border-[#2B3B4E] rounded-[4px]">Paymently</span>
-                  <span className="px-2 py-0.5 bg-[#223145] border border-[#2B3B4E] rounded-[4px]">bKash</span>
-                  <span className="px-2 py-0.5 bg-[#223145] border border-[#2B3B4E] rounded-[4px]">Nagad</span>
-                  <span className="px-2 py-0.5 bg-[#223145] border border-[#2B3B4E] rounded-[4px]">Cards</span>
-                  <span className="px-2 py-0.5 bg-[#D7ED78] text-[#172333] rounded-[4px] font-bold">COD</span>
+                  <span className="px-2 py-0.5 bg-[#223145] border border-[#2B3B4E] rounded-[3px]">Paymently</span>
+                  <span className="px-2 py-0.5 bg-[#223145] border border-[#2B3B4E] rounded-[3px]">bKash</span>
+                  <span className="px-2 py-0.5 bg-[#223145] border border-[#2B3B4E] rounded-[3px]">Nagad</span>
+                  <span className="px-2 py-0.5 bg-[#223145] border border-[#2B3B4E] rounded-[3px]">Cards</span>
+                  <span className="px-2 py-0.5 bg-white text-[#172333] rounded-[3px] font-bold">COD</span>
                 </div>
               </div>
 
@@ -161,11 +161,11 @@ export default function Footer() {
 
         {/* Bottom Bar: Copyright & Back to Top */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#A8B3CF]">
-          <p>© {new Date().getFullYear()} AZRAQ. {t('All rights reserved. EasyDrop Official Retail Partner.', 'সর্বস্বত্ব সংরক্ষিত। ইজিড্রপ অফিসিয়াল রিটেইল পার্টনার।')}</p>
+          <p>© {new Date().getFullYear()} AZRAQ Shop. {t('All rights reserved. EasyDrop Official Retail Partner.', 'সর্বস্বত্ব সংরক্ষিত। ইজিড্রপ অফিসিয়াল রিটেইল পার্টনার।')}</p>
 
           <button
             onClick={scrollToTop}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-[6px] bg-[#223145] border border-[#2B3B4E] hover:border-[#245BDB] text-white hover:text-[#245BDB] transition-all font-semibold shadow-xs"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[3px] bg-[#223145] border border-[#2B3B4E] hover:border-white text-white transition-colors font-semibold shadow-xs"
           >
             <span>{t('Back to Top', 'উপরে যান')}</span>
             <ArrowUp className="w-3.5 h-3.5" />

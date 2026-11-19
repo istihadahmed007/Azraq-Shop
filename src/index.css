@@ -78,9 +78,9 @@
 }
 
 /* ========================================================
-   AZRAQ — THE MODERN EVERYDAY EDIT DESIGN SYSTEM
-   Warm Ivory, Deep Ink, AZRAQ Blue, and Soft Lime
-   Clean Editorial Layouts with Crisp Borders & Restrained Radii
+   AZRAQ — THE MODERN ARCHITECTURAL RETAIL DESIGN SYSTEM
+   Warm Ivory (#F5F4EF), Deep Ink (#172333), AZRAQ Blue (#245BDB),
+   Crisp Architectural Borders (#E5E3DA) & Restrained Geometry (2-6px)
    ======================================================== */
 
 /* 1. Editorial Large Panel (Sections, Main Wrappers, Headers) */
@@ -88,8 +88,8 @@
 .editorial-panel {
   background: #FFFFFF;
   border: 1px solid #E5E3DA;
-  border-radius: 14px;
-  box-shadow: 0 4px 20px rgba(23, 35, 51, 0.04);
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(23, 35, 51, 0.03);
 }
 
 /* 2. Editorial Product Card */
@@ -98,9 +98,9 @@
 .editorial-card {
   background: #FFFFFF;
   border: 1px solid #E5E3DA;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(23, 35, 51, 0.03);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(23, 35, 51, 0.02);
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s ease;
   overflow: hidden;
 }
 
@@ -108,8 +108,8 @@
 .glass-product:hover,
 .editorial-card:hover {
   transform: translateY(-2px);
-  border-color: #245BDB;
-  box-shadow: 0 8px 24px rgba(23, 35, 51, 0.08);
+  border-color: #172333;
+  box-shadow: 0 6px 18px rgba(23, 35, 51, 0.06);
 }
 
 /* 3. Editorial Header */
@@ -117,8 +117,8 @@
 .editorial-header {
   background: #FFFFFF;
   border: 1px solid #E5E3DA;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(23, 35, 51, 0.04);
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(23, 35, 51, 0.04);
 }
 
 /* 4. Editorial Drawer */
@@ -127,27 +127,27 @@
 .editorial-drawer {
   background: #FFFFFF;
   border-left: 1px solid #E5E3DA;
-  box-shadow: -8px 0 32px rgba(23, 35, 51, 0.08);
+  box-shadow: -4px 0 24px rgba(23, 35, 51, 0.06);
 }
 
-/* 5. Editorial Secondary / Neutral Button (Restrained 8px radius) */
+/* 5. Editorial Secondary / Neutral Button (Restrained 4px radius) */
 .glass-button,
 .editorial-btn-secondary {
   background: #FAF9F5;
   border: 1px solid #E5E3DA;
-  border-radius: 8px;
+  border-radius: 4px;
   color: #172333;
   font-weight: 600;
-  box-shadow: 0 1px 3px rgba(23, 35, 51, 0.03);
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px rgba(23, 35, 51, 0.02);
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-button:hover,
 .editorial-btn-secondary:hover {
   background: #FFFFFF;
-  border-color: #245BDB;
-  color: #245BDB;
-  box-shadow: 0 2px 8px rgba(36, 91, 219, 0.12);
+  border-color: #172333;
+  color: #172333;
+  box-shadow: 0 2px 6px rgba(23, 35, 51, 0.06);
   transform: translateY(-1px);
 }
 
@@ -157,23 +157,23 @@
   box-shadow: inset 0 1px 2px rgba(23, 35, 51, 0.05);
 }
 
-/* 6. Editorial Primary Action Button (AZRAQ Blue, Restrained 8px radius) */
+/* 6. Editorial Primary Action Button (AZRAQ Blue, Restrained 4px radius) */
 .glass-button-primary,
 .editorial-btn-primary {
   background: #245BDB;
   border: 1px solid #245BDB;
-  border-radius: 8px;
+  border-radius: 4px;
   color: #FFFFFF;
   font-weight: 700;
-  box-shadow: 0 2px 8px rgba(36, 91, 219, 0.25);
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(36, 91, 219, 0.2);
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-button-primary:hover,
 .editorial-btn-primary:hover {
   background: #1C4BB8;
   border-color: #1C4BB8;
-  box-shadow: 0 4px 14px rgba(36, 91, 219, 0.35);
+  box-shadow: 0 3px 10px rgba(36, 91, 219, 0.28);
   transform: translateY(-1px);
 }
 
@@ -187,16 +187,16 @@
 .editorial-btn-dark {
   background: #172333;
   border: 1px solid #172333;
-  border-radius: 8px;
+  border-radius: 4px;
   color: #FFFFFF;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(23, 35, 51, 0.15);
-  transition: all 0.18s ease;
+  box-shadow: 0 1px 3px rgba(23, 35, 51, 0.12);
+  transition: all 0.15s ease;
 }
 
 .editorial-btn-dark:hover {
-  background: #24354C;
-  border-color: #24354C;
+  background: #23344a;
+  border-color: #23344a;
   transform: translateY(-1px);
 }
 
@@ -205,18 +205,18 @@
 .editorial-input {
   background: #FFFFFF;
   border: 1px solid #E5E3DA;
-  border-radius: 8px;
+  border-radius: 4px;
   color: #172333;
   box-shadow: inset 0 1px 2px rgba(23, 35, 51, 0.02);
-  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .glass-input:focus,
 .editorial-input:focus {
   outline: none;
   background-color: #FFFFFF;
-  border-color: #245BDB;
-  box-shadow: 0 0 0 3px rgba(36, 91, 219, 0.12);
+  border-color: #172333;
+  box-shadow: 0 0 0 2px rgba(23, 35, 51, 0.08);
 }
 
 .glass-input::placeholder,
@@ -229,16 +229,16 @@
 .editorial-modal {
   background: #FFFFFF;
   border: 1px solid #E5E3DA;
-  border-radius: 16px;
-  box-shadow: 0 20px 48px rgba(23, 35, 51, 0.14), 0 4px 12px rgba(23, 35, 51, 0.05);
+  border-radius: 8px;
+  box-shadow: 0 16px 40px rgba(23, 35, 51, 0.12), 0 2px 6px rgba(23, 35, 51, 0.04);
 }
 
-/* 9. Editorial Feature / Bento Surface */
+/* 9. Editorial Feature / Architectural Surface */
 .glass-feature,
 .editorial-feature {
   background: #FAF9F5;
   border: 1px solid #E5E3DA;
-  border-radius: 12px;
+  border-radius: 6px;
 }
 
 /* 10. Editorial Badge Styles */
@@ -246,13 +246,15 @@
 .editorial-badge {
   background: #FAF9F5;
   border: 1px solid #E5E3DA;
-  border-radius: 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .editorial-badge-lime {
   background: #D7ED78;
   color: #172333;
-  border-radius: 6px;
+  border-radius: 3px;
   font-weight: 700;
 }
 

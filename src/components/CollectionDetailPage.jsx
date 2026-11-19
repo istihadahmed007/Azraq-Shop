@@ -138,105 +138,100 @@ export default function CollectionDetailPage() {
         <span className="text-[#172333] font-bold">{activeCollection.name}</span>
       </div>
 
-      {/* Collection Hero Banner with Clean Editorial Surface */}
-      <div className="rounded-[16px] bg-white border border-[#E5E3DA] p-6 sm:p-8 mb-5 shadow-[0_4px_20px_rgba(23,35,51,0.04)]">
+      {/* Collection Hero Banner with Clean Architectural Surface */}
+      <div className="rounded-[6px] bg-white border border-[#E5E3DA] p-6 sm:p-8 mb-5 shadow-[0_1px_3px_rgba(23,35,51,0.03)]">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-3 text-center md:text-left max-w-xl">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[4px] bg-[#FAF9F5] text-[#172333] text-xs font-bold border border-[#E5E3DA]">
-              <span>{t("COLLECTION", "কালেকশন")} #{activeCollection.id}</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#172333] tracking-tight">
+            <span className="text-[10px] font-mono text-[#667085] uppercase tracking-[0.16em] block font-semibold">
+              {t("DEPARTMENT ARCHIVE", "বিভাগীয় ক্যাটালগ")} #{activeCollection.id}
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#172333] tracking-tight">
               {activeCollection.name}
             </h1>
-            <p className="text-xs sm:text-sm text-[#667085] leading-relaxed">
+            <p className="text-xs sm:text-[13px] text-[#556170] leading-relaxed">
               {t(activeCollection.description_en, activeCollection.description_bn)}
             </p>
             <div className="pt-1 flex flex-wrap items-center justify-center md:justify-start gap-2">
-              <span className="px-3 py-1 rounded-[6px] bg-[#FAF9F5] text-xs font-semibold text-[#172333] border border-[#E5E3DA]">
+              <span className="px-2.5 py-1 rounded-[3px] bg-[#FAF9F5] text-xs font-mono font-semibold text-[#172333] border border-[#E5E3DA]">
                 {collectionProducts?.length || 0} {t("Products Available", "পণ্য অন্তর্ভুক্ত")}
               </span>
-              <span className="px-3 py-1 rounded-[6px] bg-emerald-50 text-xs font-semibold text-emerald-800 border border-emerald-200">
+              <span className="px-2.5 py-1 rounded-[3px] bg-emerald-50 text-xs font-semibold text-emerald-800 border border-emerald-200">
                 {t("100% Authentic Quality", "১০০% আসল পণ্য")}
               </span>
             </div>
           </div>
 
-          <div className="w-32 h-32 sm:w-44 sm:h-44 rounded-[12px] bg-[#FAF9F5] border border-[#E5E3DA] p-3 flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
-            <img
+          <div className="w-32 h-32 sm:w-44 sm:h-44 rounded-[4px] bg-[#FAF9F5] border border-[#E5E3DA] p-3 flex items-center justify-center shrink-0 overflow-hidden">
+            <ProductImage
               src={activeCollection.cover_image || activeCollection.image_url || activeCollection.fallback_image}
               alt={activeCollection.name}
-              onError={(e) => {
-                const fallback = activeCollection.fallback_image || 'https://easydrop.asia/products/image-1794224164356-135288231.jpeg';
-                if (e.target.src !== fallback) {
-                  e.target.src = fallback;
-                }
-              }}
-              className="w-full h-full object-contain"
+              fit="contain"
+              aspectRatio="square"
             />
           </div>
         </div>
-      </div>
 
-      {/* Filter and Search Bar */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 mb-6 p-4 rounded-[12px] bg-white border border-[#E5E3DA] shadow-[0_2px_12px_rgba(23,35,51,0.03)]">
-        
-        {/* Search within collection */}
-        <div className="relative flex-1 md:max-w-xs">
-          <Search className="w-4 h-4 text-[#8C99A8] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="text"
-            placeholder={t("Filter within collection...", "কালেকশনে খুঁজুন...")}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-[6px] bg-[#FAF9F5] border border-[#E5E3DA] text-xs text-[#172333] placeholder-[#8C99A8] focus:outline-none focus:border-[#245BDB] transition-all font-medium"
-          />
-        </div>
-
-        {/* Filter Badges & Sort */}
-        <div className="flex flex-wrap items-center gap-2">
+        {/* Filter and Search Bar inside the header container */}
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 mt-6 pt-5 border-t border-[#E5E3DA]">
           
-          {/* Price Quick Filter */}
-          <div className="flex items-center gap-1.5 text-xs">
-            {['all', 'under-1500', '1500-3000', 'above-3000'].map((p) => (
-              <button
-                key={p}
-                onClick={() => setPriceFilter(p)}
-                className={`px-3 py-1.5 rounded-[6px] font-bold transition-all text-xs border ${
-                  priceFilter === p 
-                    ? 'bg-[#172333] text-white border-[#172333] shadow-xs' 
-                    : 'bg-[#FAF9F5] text-[#667085] hover:text-[#172333] border-[#E5E3DA]'
-                }`}
-              >
-                {p === 'all' && t('All Prices', 'সব দাম')}
-                {p === 'under-1500' && '< ৳1,500'}
-                {p === '1500-3000' && '৳1.5K - 3K'}
-                {p === 'above-3000' && '> ৳3,000'}
-              </button>
-            ))}
+          {/* Search within collection */}
+          <div className="relative flex-1 md:max-w-xs">
+            <Search className="w-3.5 h-3.5 text-[#8C99A8] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder={t("Filter within department...", "কালেকশনে খুঁজুন...")}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-8 pr-4 py-1.5 rounded-[3px] bg-[#FAF9F5] border border-[#E5E3DA] text-xs text-[#172333] placeholder-[#8C99A8] focus:outline-none focus:border-[#172333] focus:bg-white transition-colors"
+            />
           </div>
 
-          {/* Sort Dropdown */}
-          <div className="relative flex items-center">
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="appearance-none pl-3.5 pr-8 py-1.5 rounded-[6px] bg-[#FAF9F5] text-xs font-bold text-[#172333] cursor-pointer border border-[#E5E3DA] focus:border-[#245BDB] focus:outline-none"
-            >
-              <option value="featured">{t("Featured", "সেরা")}</option>
-              <option value="price-low">{t("Price: Low to High", "দাম: কম")}</option>
-              <option value="price-high">{t("Price: High to Low", "দাম: বেশি")}</option>
-              <option value="rating">{t("Top Rated", "রেটিং")}</option>
-            </select>
-            <ArrowUpDown className="w-3.5 h-3.5 text-[#667085] absolute right-3 pointer-events-none" />
+          {/* Filter Badges & Sort */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            
+            {/* Price Quick Filter */}
+            <div className="flex items-center gap-1 text-xs">
+              {['all', 'under-1500', '1500-3000', 'above-3000'].map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPriceFilter(p)}
+                  className={`px-2.5 py-1.5 rounded-[3px] font-semibold transition-all text-xs border ${
+                    priceFilter === p 
+                      ? 'bg-[#172333] text-white border-[#172333] shadow-xs' 
+                      : 'bg-[#FAF9F5] text-[#556170] hover:text-[#172333] border-[#E5E3DA]'
+                  }`}
+                >
+                  {p === 'all' && t('All Prices', 'সব দাম')}
+                  {p === 'under-1500' && '< ৳1,500'}
+                  {p === '1500-3000' && '৳1.5K - 3K'}
+                  {p === 'above-3000' && '> ৳3,000'}
+                </button>
+              ))}
+            </div>
+
+            {/* Sort Dropdown */}
+            <div className="relative flex items-center">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="appearance-none pl-3 pr-7 py-1.5 rounded-[3px] bg-[#FAF9F5] text-xs font-semibold text-[#172333] cursor-pointer border border-[#E5E3DA] focus:border-[#172333] focus:outline-none transition-colors"
+              >
+                <option value="featured">{t("Featured", "সেরা")}</option>
+                <option value="price-low">{t("Price: Low to High", "দাম: কম")}</option>
+                <option value="price-high">{t("Price: High to Low", "দাম: বেশি")}</option>
+                <option value="rating">{t("Top Rated", "রেটিং")}</option>
+              </select>
+              <ArrowUpDown className="w-3 h-3 text-[#667085] absolute right-2 pointer-events-none" />
+            </div>
+
           </div>
 
         </div>
-
       </div>
 
       {/* Products Grid — Exactly 5 Product Cards Per Row on Desktop */}
       {displayedProducts.length === 0 ? (
-        <div className="py-16 text-center rounded-[14px] bg-[#FAF9F5] border border-[#E5E3DA] p-8 space-y-4 max-w-xl mx-auto shadow-xs">
+        <div className="py-16 text-center rounded-[4px] bg-[#FAF9F5] border border-[#E5E3DA] p-8 space-y-4 max-w-xl mx-auto shadow-xs">
           <p className="text-base font-bold text-[#172333]">
             {t("No products found matching your filters", "কোনো পণ্য খুঁজে পাওয়া যায়নি")}
           </p>
@@ -246,13 +241,13 @@ export default function CollectionDetailPage() {
               setPriceFilter('all');
               setInStockOnly(false);
             }}
-            className="px-6 py-2 rounded-[6px] bg-[#245BDB] text-white text-xs font-bold shadow-xs hover:bg-[#1C4BB8] transition-colors"
+            className="px-5 py-2 rounded-[3px] bg-[#172333] hover:bg-[#245BDB] text-white text-xs font-semibold transition-colors"
           >
             {t("Reset Filters", "ফিল্টার রিসেট করুন")}
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-4.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-3.5">
           {displayedProducts.map(product => (
             <ProductCard
               key={product.id}
@@ -272,7 +267,7 @@ export default function CollectionDetailPage() {
         <div className="text-center pt-8">
           <button
             onClick={() => setVisibleCount(prev => prev + 25)}
-            className="px-8 py-2.5 rounded-[8px] bg-white border border-[#E5E3DA] text-[#172333] hover:text-[#245BDB] hover:border-[#245BDB] font-bold text-xs shadow-xs transition-all active:scale-95"
+            className="px-8 py-2.5 rounded-[4px] bg-white border border-[#E5E3DA] hover:border-[#172333] text-[#172333] hover:text-[#172333] font-semibold text-xs transition-colors active:scale-98 shadow-xs"
           >
             {t(`Load More (${filteredProducts.length - visibleCount} remaining)`, `আরও দেখুন (${filteredProducts.length - visibleCount}টি বাকি)`)}
           </button>

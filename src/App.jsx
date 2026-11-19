@@ -176,16 +176,16 @@ function StorefrontContent() {
     <div className="min-h-screen bg-[#F5F4EF] text-[#172333] selection:bg-[#245BDB]/15 selection:text-[#245BDB] font-sans relative overflow-x-hidden">
       <RouteSynchronizer />
 
-      {/* Main Desktop Container (Maximum content width ~1360px with generous spacing) */}
-      <div className="max-w-[1360px] w-full mx-auto px-3 sm:px-5 lg:px-6 py-3 sm:py-5 flex flex-col gap-7 sm:gap-8 relative">
+      {/* Main Desktop Container (Architectural content width ~1360px with deliberate rhythm) */}
+      <div className="max-w-[1360px] w-full mx-auto px-3 sm:px-5 lg:px-6 py-2.5 sm:py-4 flex flex-col gap-5 sm:gap-6 relative">
 
-        {/* Top Header (Clean Modern Editorial Header) */}
+        {/* Top Header (Clean Architectural Retail Header) */}
         <Header
           onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
         />
 
         {/* Primary Route-Based View Container */}
-        <main className="transition-all duration-200 flex flex-col gap-7 sm:gap-8 w-full min-w-0 max-w-full">
+        <main className="transition-all duration-150 flex flex-col gap-5 sm:gap-6 w-full min-w-0 max-w-full">
           <RouteErrorBoundary>
             <Routes>
               {/* 1. Home Page Route */}
