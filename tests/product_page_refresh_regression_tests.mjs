@@ -252,6 +252,124 @@ try {
     assert.strictEqual(notFoundRes.product, null);
   });
 
+  // Test 8: Startup Boot Watchdog & Error Recovery Fallback in production HTML
+  await runTest('dist/index.html includes boot watchdog, error container, and reload trigger', async () => {
+    const html = fs.readFileSync(DIST_INDEX_PATH, 'utf8');
+    assert.ok(html.includes('id="azraq-loader-progress"'), 'Must have loader progress element');
+    assert.ok(html.includes('id="azraq-boot-error-ui"'), 'Must have resilient boot error container');
+    assert.ok(html.includes('id="azraq-boot-reload-btn"'), 'Must have boot reload button');
+    assert.ok(html.includes('window.__azraqShowBootError'), 'Must define global boot error trigger');
+    assert.ok(html.includes('window.__azraqBootRetry'), 'Must define global boot retry handler');
+    assert.ok(html.includes('window.__AZRAQ_BOOTED__'), 'Must define boot completion flag');
+    assert.ok(html.includes('bootTimer = setTimeout'), 'Must define boot watchdog timer');
+  });
+
+  // Test 9: Boot Error Handler simulation — hides progress bar and displays recovery UI
+  await runTest('Boot error handler transitions from spinner to recovery UI on startup failure', async () => {
+    const html = fs.readFileSync(DIST_INDEX_PATH, 'utf8');
+    // Extract the inline watchdog script
+    const scriptMatch = html.match(/<script>\s*(\(function\(\)\s*\{[\s\S]*?\}\)\(\);)\s*<\/script>/);
+    assert.ok(scriptMatch, 'Must find inline boot script in dist/index.html');
+    const bootScriptCode = scriptMatch[1];
+
+    // Minimal DOM environment simulation to test boot script logic
+    const dom = {
+      progressDisplay: 'block',
+      errorUiDisplay: 'none',
+      errorDescText: '',
+      elements: {
+        'azraq-loader-progress': { style: { get display() { return dom.progressDisplay; }, set display(v) { dom.progressDisplay = v; } } },
+        'azraq-boot-error-ui': { style: { get display() { return dom.errorUiDisplay; }, set display(v) { dom.errorUiDisplay = v; } } },
+        'azraq-boot-error-desc': { textContent: '', set textContent(v) { dom.errorDescText = v; } }
+      }
+    };
+
+    const listeners = {};
+    const mockWindow = {
+      addEventListener: (evt, fn) => { listeners[evt] = fn; },
+      sessionStorage: { removeItem: () => {} },
+      location: { reload: () => {} }
+    };
+    const mockDocument = {
+      getElementById: (id) => dom.elements[id] || null
+    };
+
+    // Execute boot script in isolated context
+    const fn = new Function('window', 'document', 'setTimeout', 'clearTimeout', bootScriptCode);
+    let capturedTimeoutFn = null;
+    let capturedTimeoutDelay = 0;
+    fn(mockWindow, mockDocument, (cb, d) => {
+      capturedTimeoutFn = cb;
+      capturedTimeoutDelay = d;
+      return 123;
+    }, () => {});
+
+    assert.strictEqual(mockWindow.__AZRAQ_BOOTED__, false, 'Initial boot flag must be false');
+    assert.strictEqual(capturedTimeoutDelay, 8000, 'Watchdog timeout must be 8000ms');
+
+    // Simulate script load failure
+    listeners.error({
+      target: { tagName: 'SCRIPT', src: 'https://azraq.azraqtrips.com/assets/stale-chunk-missing.js' }
+    });
+
+    assert.strictEqual(dom.progressDisplay, 'none', 'Spinner must be hidden on boot error');
+    assert.strictEqual(dom.errorUiDisplay, 'flex', 'Boot error UI must be shown on boot error');
+    assert.ok(dom.errorDescText.includes('stale-chunk-missing.js'), 'Error message must reflect the failed asset');
+  });
+
+  // Test 10: Watchdog timeout simulation — triggers recovery UI if app takes longer than 8s
+  await runTest('Boot watchdog timer triggers recovery UI if app takes longer than 8s without booting', async () => {
+    const html = fs.readFileSync(DIST_INDEX_PATH, 'utf8');
+    const scriptMatch = html.match(/<script>\s*(\(function\(\)\s*\{[\s\S]*?\}\)\(\);)\s*<\/script>/);
+    const bootScriptCode = scriptMatch[1];
+
+    const dom = {
+      progressDisplay: 'block',
+      errorUiDisplay: 'none',
+      errorDescText: '',
+      elements: {
+        'azraq-loader-progress': { style: { set display(v) { dom.progressDisplay = v; } } },
+        'azraq-boot-error-ui': { style: { set display(v) { dom.errorUiDisplay = v; } } },
+        'azraq-boot-error-desc': { set textContent(v) { dom.errorDescText = v; } }
+      }
+    };
+
+    const mockWindow = {
+      addEventListener: () => {},
+      sessionStorage: { removeItem: () => {} },
+      location: { reload: () => {} }
+    };
+    const mockDocument = {
+      getElementById: (id) => dom.elements[id] || null
+    };
+
+    let timerCb = null;
+    const fn = new Function('window', 'document', 'setTimeout', 'clearTimeout', bootScriptCode);
+    fn(mockWindow, mockDocument, (cb) => { timerCb = cb; return 456; }, () => {});
+
+    // Simulate watchdog firing after 8s when React did NOT mount
+    assert.ok(timerCb, 'Watchdog timer callback must be set');
+    timerCb();
+
+    assert.strictEqual(dom.progressDisplay, 'none', 'Spinner must be hidden on watchdog timeout');
+    assert.strictEqual(dom.errorUiDisplay, 'flex', 'Boot error UI must be displayed on watchdog timeout');
+    assert.ok(dom.errorDescText.includes('took too long to start'), 'Watchdog message must advise reloading');
+  });
+
+  // Test 11: Product fetch failure (500/network) transitions to recoverable error with retry
+  await runTest('Failed product data fetch transitions to recoverable networkError, never 404', async () => {
+    // Test with server endpoint returning 500
+    const failRes = await fetchSingleProduct('AZQ-0002', {
+      baseUrl: 'http://127.0.0.1:9999', // invalid port to simulate network failure
+      timeoutMs: 1500
+    });
+
+    assert.strictEqual(failRes.product, null);
+    assert.strictEqual(failRes.isNotFound, false, 'Connection failure must NOT be classified as 404');
+    assert.strictEqual(failRes.isNetworkError, true, 'Connection failure must be classified as networkError');
+    assert.ok(failRes.error, 'Must provide informative error message');
+  });
+
 } finally {
   stopServer();
 }

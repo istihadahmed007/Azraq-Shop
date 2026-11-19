@@ -163,6 +163,13 @@ function RouteSynchronizer() {
 function StorefrontContent() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // Clear startup boot watchdog once React storefront has successfully mounted into the DOM
+  useEffect(() => {
+    if (typeof window !== 'undefined' && typeof window.__AZRAQ_CLEAR_BOOT_TIMER__ === 'function') {
+      window.__AZRAQ_CLEAR_BOOT_TIMER__();
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#E4EEF5] text-[#293B52] selection:bg-[#0877C9]/20 selection:text-[#0877C9] font-sans relative overflow-x-hidden">
       <RouteSynchronizer />
@@ -273,10 +280,12 @@ function StorefrontContent() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <ShopProvider>
-        <StorefrontContent />
-      </ShopProvider>
-    </BrowserRouter>
+    <RouteErrorBoundary>
+      <BrowserRouter>
+        <ShopProvider>
+          <StorefrontContent />
+        </ShopProvider>
+      </BrowserRouter>
+    </RouteErrorBoundary>
   );
 }

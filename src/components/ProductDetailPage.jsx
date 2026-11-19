@@ -240,8 +240,8 @@ export default function ProductDetailPage() {
 
   // 1. Loading state: active when product is being loaded from single record or catalog
   const isStillLoading = !product && (
-    fetchStatus === 'loading' || 
-    fetchStatus === 'idle' || 
+    fetchStatus === 'loading' ||
+    fetchStatus === 'idle' ||
     (fetchStatus !== 'error' && fetchStatus !== 'networkError' && fetchStatus !== 'serverError' && fetchStatus !== 'notFound' && catalogStatus === 'loading')
   );
 
