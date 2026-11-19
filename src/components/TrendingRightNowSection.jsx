@@ -25,15 +25,15 @@ export default function TrendingRightNowSection() {
   const featuredList = heroExcluded.slice(0, 10);
 
   return (
-    <section id="popular-products" className="w-full select-none border border-[#E5E3DA] bg-white rounded-[6px] shadow-[0_1px_3px_rgba(23,35,51,0.03)] p-5 sm:p-7">
+    <section id="popular-products" className="w-full select-none border border-white/90 bg-white/75 backdrop-blur-2xl rounded-2xl shadow-[0_12px_36px_0_rgba(31,38,135,0.06)] p-5 sm:p-7">
       
       {/* Section Header */}
-      <div className="flex items-center justify-between pb-3.5 mb-5 border-b border-[#E5E3DA]">
+      <div className="flex items-center justify-between pb-3.5 mb-5 border-b border-white/80">
         <div>
-          <span className="text-[10px] font-mono text-[#667085] uppercase tracking-[0.16em] block font-semibold">
+          <span className="text-[10px] font-mono text-blue-600 uppercase tracking-[0.16em] block font-bold">
             {t("CURATED ARCHIVE", "বাছাইকৃত সংগ্রহ")}
           </span>
-          <h2 className="text-lg sm:text-xl font-bold text-[#172333] tracking-tight mt-0.5">
+          <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight mt-0.5">
             {t('Featured & Best Sellers', 'জনপ্রিয় ও বেস্ট সেলার')}
           </h2>
         </div>
@@ -43,10 +43,10 @@ export default function TrendingRightNowSection() {
             const el = document.getElementById('all-products');
             el?.scrollIntoView({ behavior: 'smooth' });
           }}
-          className="text-xs font-semibold text-[#172333] hover:text-[#245BDB] flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] bg-[#FAF9F5] hover:bg-white border border-[#E5E3DA] hover:border-[#172333] transition-colors"
+          className="text-xs font-bold text-slate-800 hover:text-blue-600 flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/80 hover:bg-white border border-white/90 shadow-2xs transition-all cursor-pointer"
         >
           <span>{t('View All Products', 'সব পণ্য দেখুন')}</span>
-          <ChevronRight className="w-3.5 h-3.5 text-[#667085]" />
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
         </button>
       </div>
 

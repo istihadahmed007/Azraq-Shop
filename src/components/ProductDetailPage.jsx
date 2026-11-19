@@ -465,7 +465,7 @@ export default function ProductDetailPage() {
       </nav>
 
       {/* 2. MAIN PRODUCT DETAIL SHOWCASE (55% Gallery Left / 45% Information Right) */}
-      <div className="rounded-[6px] bg-white border border-[#E5E3DA] p-5 sm:p-8 md:p-10 shadow-[0_1px_3px_rgba(23,35,51,0.03)]">
+      <div className="rounded-2xl bg-white/75 backdrop-blur-2xl border border-white/90 p-5 sm:p-8 md:p-10 shadow-[0_12px_36px_0_rgba(31,38,135,0.06)]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
 
           {/* ========================================================= */}
@@ -476,7 +476,7 @@ export default function ProductDetailPage() {
             {/* Primary Main Image Viewer */}
             <div
               onClick={() => setIsZoomOpen(true)}
-              className="relative w-full aspect-square max-h-[560px] mx-auto rounded-[4px] bg-[#FAF9F5] border border-[#E5E3DA] overflow-hidden flex items-center justify-center group cursor-zoom-in"
+              className="relative w-full aspect-square max-h-[560px] mx-auto rounded-2xl bg-white/80 backdrop-blur-md border border-white/90 overflow-hidden flex items-center justify-center group cursor-zoom-in shadow-inner"
             >
 
               {/* Product Photograph with object-contain to preserve 100% of the image without distortion */}
@@ -777,7 +777,7 @@ export default function ProductDetailPage() {
       </div>
 
       {/* 3. PRODUCT SPECIFICATIONS & DETAILS TABS */}
-      <div className="rounded-[6px] bg-white border border-[#E5E3DA] p-6 sm:p-8 shadow-[0_1px_3px_rgba(23,35,51,0.03)]">
+      <div className="rounded-2xl bg-white/75 backdrop-blur-2xl border border-white/90 p-6 sm:p-8 shadow-[0_12px_36px_0_rgba(31,38,135,0.06)]">
 
         {/* Tab Headers */}
         <div className="flex items-center gap-1.5 border-b border-[#E5E3DA] pb-3 overflow-x-auto no-scrollbar">
@@ -899,7 +899,7 @@ export default function ProductDetailPage() {
 
       {/* 4. RELATED PRODUCTS SECTION (Strictly 5 Product Cards per Row on Desktop) */}
       {relatedProducts.length > 0 && (
-        <section className="rounded-[6px] bg-white border border-[#E5E3DA] p-5 sm:p-7 shadow-[0_1px_3px_rgba(23,35,51,0.03)]">
+        <section className="rounded-2xl bg-white/75 backdrop-blur-2xl border border-white/90 p-5 sm:p-7 shadow-[0_12px_36px_0_rgba(31,38,135,0.06)]">
           <div className="flex items-center justify-between pb-3.5 mb-5 border-b border-[#E5E3DA]">
             <div>
               <span className="text-[10px] font-mono text-[#667085] uppercase tracking-[0.16em] block font-semibold">

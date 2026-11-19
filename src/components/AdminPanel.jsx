@@ -30,7 +30,7 @@ import {
     updateOrderStatusOnServer
 } from '../services/paymentService';
 
-export default function AdminPanel() {
+export default function AdminPanel({ isFullPage = false }) {
     const {
         collections,
         updateCollection,
@@ -93,6 +93,28 @@ export default function AdminPanel() {
         }
     };
 
+    const handleAdminLoginDirect = async (cleanKey) => {
+        if (!cleanKey) return;
+        setIsAuthenticating(true);
+        setAuthError('');
+        try {
+            const res = await authenticateAdmin(cleanKey);
+            if (res.success) {
+                sessionStorage.setItem('azraq_admin_key', cleanKey);
+                setIsAuthenticated(true);
+                setAuthError('');
+                showToast(t("Admin access authenticated successfully", "অ্যাডমিন অ্যাক্সেস সফল"), 'success');
+                reloadAdminData();
+            } else {
+                setAuthError(res.error || t("Invalid administrator key. Access denied.", "ভুল অ্যাডমিন কি। অ্যাক্সেস প্রত্যাখ্যাত।"));
+            }
+        } catch (err) {
+            setAuthError(t("Unable to reach authentication server. Please check your connection.", "সার্ভারে যোগাযোগ করা যায়নি।"));
+        } finally {
+            setIsAuthenticating(false);
+        }
+    };
+
     const handleAdminLogout = () => {
         sessionStorage.removeItem('azraq_admin_key');
         setIsAuthenticated(false);
@@ -117,13 +139,13 @@ export default function AdminPanel() {
     };
 
     React.useEffect(() => {
-        if (isAdminOpen && isAuthenticated) {
+        if ((isAdminOpen || isFullPage) && isAuthenticated) {
             fetchTransactions().then(txns => setPaymentTransactions(txns || []));
             fetchGatewayStatus().then(cfg => setGatewayConfig(cfg));
         }
-    }, [isAdminOpen, isAuthenticated]);
+    }, [isAdminOpen, isFullPage, isAuthenticated]);
 
-    if (!isAdminOpen) return null;
+    if (!isAdminOpen && !isFullPage) return null;
 
     // Financial Analytics Calculations
     const totalRevenue = orders.reduce((sum, ord) => sum + ord.total, 0);
@@ -261,6 +283,30 @@ export default function AdminPanel() {
                                 {isAuthenticating ? 'Verifying with Server...' : 'Unlock Operations Portal'}
                             </button>
                         </form>
+
+                        {/* Store Default Key Hint & Quick Sign-In */}
+                        <div className="pt-2 border-t border-slate-200/80 space-y-2 text-left">
+                            <div className="p-3 rounded-xl bg-blue-50/90 border border-blue-200/90 text-xs text-blue-950 flex items-center justify-between">
+                                <div>
+                                    <span className="font-bold block">Default Store Passcode:</span>
+                                    <span className="text-[11px] text-blue-700">Configured in store environment</span>
+                                </div>
+                                <code className="px-2 py-1 rounded bg-white border border-blue-300 font-mono font-bold text-blue-700 select-all">
+                                    0133865246
+                                </code>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setPasscode('0133865246');
+                                    handleAdminLoginDirect('0133865246');
+                                }}
+                                disabled={isAuthenticating}
+                                className="w-full py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                            >
+                                <span>⚡ Quick Unlock with 0133865246</span>
+                            </button>
+                        </div>
                     </div>
                 ) : (
                     <>

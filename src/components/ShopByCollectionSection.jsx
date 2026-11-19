@@ -40,25 +40,25 @@ export default function ShopByCollectionSection() {
   };
 
   return (
-    <section id="shop-by-collection" className="w-full select-none border border-[#E5E3DA] bg-white rounded-[6px] shadow-[0_1px_3px_rgba(23,35,51,0.03)] p-5 sm:p-7">
+    <section id="shop-by-collection" className="w-full select-none border border-white/90 bg-white/75 backdrop-blur-2xl rounded-2xl shadow-[0_12px_36px_0_rgba(31,38,135,0.06)] p-5 sm:p-7">
       
       {/* Section Header */}
-      <div className="flex items-center justify-between pb-3.5 mb-5 border-b border-[#E5E3DA]">
+      <div className="flex items-center justify-between pb-3.5 mb-5 border-b border-white/80">
         <div>
-          <span className="text-[10px] font-mono text-[#667085] uppercase tracking-[0.16em] block font-semibold">
+          <span className="text-[10px] font-mono text-blue-600 uppercase tracking-[0.16em] block font-bold">
             {t("SIGNATURE SERIES", "সিগনেচার সিরিজ")}
           </span>
-          <h2 className="text-lg sm:text-xl font-bold text-[#172333] tracking-tight mt-0.5">
+          <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight mt-0.5">
             {t('The AZRAQ Edit', 'আজরাক স্পেশাল এডিট')}
           </h2>
         </div>
 
         <button
           onClick={() => navigateTo('collections')}
-          className="text-xs font-semibold text-[#172333] hover:text-[#245BDB] flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] bg-[#FAF9F5] hover:bg-white border border-[#E5E3DA] hover:border-[#172333] transition-colors"
+          className="text-xs font-bold text-slate-800 hover:text-blue-600 flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/80 hover:bg-white border border-white/90 shadow-2xs transition-all cursor-pointer"
         >
           <span>{t('View All Collections', 'সব কালেকশন')}</span>
-          <ChevronRight className="w-3.5 h-3.5 text-[#667085]" />
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
         </button>
       </div>
 
@@ -73,38 +73,38 @@ export default function ShopByCollectionSection() {
             <div
               key={col.id}
               onClick={() => navigateTo('collection-detail', col.slug)}
-              className="group cursor-pointer rounded-[4px] border border-[#E5E3DA] hover:border-[#172333] bg-[#FAF9F5] hover:bg-white p-4 flex flex-col justify-between transition-all duration-150"
+              className="group cursor-pointer rounded-2xl border border-white/90 hover:border-blue-400/50 bg-white/70 hover:bg-white backdrop-blur-md p-4 flex flex-col justify-between shadow-2xs hover:shadow-lg transition-all duration-200"
             >
               <div>
                 {/* Image Showcase */}
-                <div className="relative w-full aspect-square bg-white rounded-[3px] border border-[#E5E3DA] p-3 flex items-center justify-center overflow-hidden mb-3">
+                <div className="relative w-full aspect-square bg-white/80 backdrop-blur-md rounded-xl border border-white/90 p-3 flex items-center justify-center overflow-hidden mb-3 shadow-inner">
                   <ProductImage
                     src={displayImage}
                     alt={col.name}
                     fit="contain"
                     aspectRatio="square"
-                    className="group-hover:scale-104 transition-transform duration-300"
+                    className="group-hover:scale-105 transition-transform duration-300"
                   />
-                  <span className="absolute top-2 left-2 px-1.5 py-0.5 rounded-[2px] bg-[#172333] text-white text-[9px] font-mono uppercase tracking-wider font-semibold">
+                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded-lg bg-slate-900/90 text-white text-[9px] font-mono uppercase tracking-wider font-bold shadow-xs">
                     {meta.badge}
                   </span>
                 </div>
 
                 {/* Details */}
-                <span className="text-[10px] font-mono text-[#8C99A8] block">
+                <span className="text-[10px] font-mono text-slate-400 block font-semibold">
                   {count} {t('Catalog Items', 'টি পণ্য')}
                 </span>
-                <h3 className="text-sm font-bold text-[#172333] group-hover:text-[#245BDB] transition-colors mt-0.5 truncate">
+                <h3 className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 transition-colors mt-0.5 truncate">
                   {col.name}
                 </h3>
-                <p className="text-[11px] text-[#667085] mt-1 line-clamp-2 leading-relaxed">
+                <p className="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed">
                   {meta.subtitle}
                 </p>
               </div>
 
-              <div className="pt-3 mt-3 border-t border-[#E5E3DA] flex items-center justify-between text-xs font-semibold text-[#172333] group-hover:text-[#245BDB] transition-colors">
+              <div className="pt-3 mt-3 border-t border-white/80 flex items-center justify-between text-xs font-bold text-slate-800 group-hover:text-blue-600 transition-colors">
                 <span>{t("Shop Collection", "কালেকশন দেখুন")}</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
           );

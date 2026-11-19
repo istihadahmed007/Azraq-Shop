@@ -33,15 +33,27 @@ export default function CheckoutModal() {
     t
   } = useShop();
 
-  // Form inputs
+  // Form inputs (Pre-fills from authenticated customer if signed in)
   const [fullName, setFullName] = useState(() => {
-    try { return localStorage.getItem('azraq_customer_name') || ''; } catch (e) { return ''; }
+    try {
+      const user = JSON.parse(localStorage.getItem('azraq_customer_user') || 'null');
+      if (user?.name) return user.name;
+      return localStorage.getItem('azraq_customer_name') || '';
+    } catch (e) { return ''; }
   });
   const [email, setEmail] = useState(() => {
-    try { return localStorage.getItem('azraq_customer_email') || ''; } catch (e) { return ''; }
+    try {
+      const user = JSON.parse(localStorage.getItem('azraq_customer_user') || 'null');
+      if (user?.email) return user.email;
+      return localStorage.getItem('azraq_customer_email') || '';
+    } catch (e) { return ''; }
   });
   const [phone, setPhone] = useState(() => {
-    try { return localStorage.getItem('azraq_customer_phone') || ''; } catch (e) { return ''; }
+    try {
+      const user = JSON.parse(localStorage.getItem('azraq_customer_user') || 'null');
+      if (user?.phone) return user.phone;
+      return localStorage.getItem('azraq_customer_phone') || '';
+    } catch (e) { return ''; }
   });
   const [address, setAddress] = useState(() => {
     try { return localStorage.getItem('azraq_customer_address') || ''; } catch (e) { return ''; }

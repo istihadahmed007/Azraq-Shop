@@ -40,7 +40,7 @@ export default function BrandValuePanel() {
   ];
 
   return (
-    <section className="w-full select-none border border-[#E5E3DA] bg-white rounded-[6px] shadow-[0_1px_3px_rgba(23,35,51,0.03)] px-5 sm:px-7 py-5 flex flex-col lg:flex-row items-center justify-between gap-5">
+    <section className="w-full select-none border border-white/90 bg-white/75 backdrop-blur-2xl rounded-2xl shadow-[0_12px_36px_0_rgba(31,38,135,0.06)] px-5 sm:px-7 py-5 flex flex-col lg:flex-row items-center justify-between gap-5">
 
       {/* 4 Benefits with Clean Dividers */}
       <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5 flex-1">
@@ -50,17 +50,17 @@ export default function BrandValuePanel() {
             <div 
               key={idx}
               className={`flex items-center gap-3 ${
-                idx !== 0 ? 'md:border-l md:border-[#E5E3DA] md:pl-5' : ''
+                idx !== 0 ? 'md:border-l md:border-white/80 md:pl-5' : ''
               }`}
             >
-              <div className="w-8 h-8 rounded-[3px] bg-[#FAF9F5] text-[#172333] border border-[#E5E3DA] flex items-center justify-center shrink-0">
-                <Icon className="w-4 h-4 text-[#245BDB]" />
+              <div className="w-9 h-9 rounded-xl bg-white/80 text-blue-600 border border-white/90 shadow-2xs flex items-center justify-center shrink-0">
+                <Icon className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <h4 className="text-xs sm:text-[13px] font-bold text-[#172333] truncate leading-tight">
+                <h4 className="text-xs sm:text-[13px] font-bold text-slate-900 truncate leading-tight">
                   {item.title}
                 </h4>
-                <p className="text-[11px] text-[#667085] truncate mt-0.5 font-medium">
+                <p className="text-[11px] text-slate-500 truncate mt-0.5 font-medium">
                   {item.desc}
                 </p>
               </div>
@@ -70,12 +70,12 @@ export default function BrandValuePanel() {
       </div>
 
       {/* Social Icons on Far Right */}
-      <div className="flex items-center gap-2 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 lg:border-l lg:border-[#E5E3DA] lg:pl-5 w-full lg:w-auto justify-center lg:justify-end">
+      <div className="flex items-center gap-2 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 lg:border-l lg:border-white/80 lg:pl-5 w-full lg:w-auto justify-center lg:justify-end">
         <a
           href="https://facebook.com"
           target="_blank"
           rel="noreferrer"
-          className="w-8 h-8 rounded-[3px] bg-[#FAF9F5] hover:bg-white border border-[#E5E3DA] text-[#667085] hover:text-[#172333] hover:border-[#172333] flex items-center justify-center transition-colors"
+          className="w-8 h-8 rounded-xl bg-white/80 hover:bg-white border border-white/90 text-slate-500 hover:text-blue-600 shadow-2xs flex items-center justify-center transition-colors"
           title="Facebook"
           aria-label="Facebook"
         >
@@ -85,7 +85,7 @@ export default function BrandValuePanel() {
           href="https://youtube.com"
           target="_blank"
           rel="noreferrer"
-          className="w-8 h-8 rounded-[3px] bg-[#FAF9F5] hover:bg-white border border-[#E5E3DA] text-[#667085] hover:text-[#172333] hover:border-[#172333] flex items-center justify-center transition-colors"
+          className="w-8 h-8 rounded-xl bg-white/80 hover:bg-white border border-white/90 text-slate-500 hover:text-rose-600 shadow-2xs flex items-center justify-center transition-colors"
           title="YouTube"
           aria-label="YouTube"
         >
@@ -95,7 +95,7 @@ export default function BrandValuePanel() {
           href="https://instagram.com"
           target="_blank"
           rel="noreferrer"
-          className="w-8 h-8 rounded-[3px] bg-[#FAF9F5] hover:bg-white border border-[#E5E3DA] text-[#667085] hover:text-[#172333] hover:border-[#172333] flex items-center justify-center transition-colors"
+          className="w-8 h-8 rounded-xl bg-white/80 hover:bg-white border border-white/90 text-slate-500 hover:text-pink-600 shadow-2xs flex items-center justify-center transition-colors"
           title="Instagram"
           aria-label="Instagram"
         >

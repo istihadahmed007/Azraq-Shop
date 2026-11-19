@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { ShopProvider, useShop } from './context/ShopContext';
+import { AuthProvider } from './context/AuthContext';
 import {
   Header,
   HeroSection,
@@ -101,9 +102,12 @@ class RouteErrorBoundary extends React.Component {
 const CollectionsPage = lazy(() => import('./components/CollectionsPage'));
 const CollectionDetailPage = lazy(() => import('./components/CollectionDetailPage'));
 const ProductDetailPage = lazy(() => import('./components/ProductDetailPage'));
+const LoginPage = lazy(() => import('./components/LoginPage'));
+const AdminPage = lazy(() => import('./components/AdminPage'));
 const CheckoutModal = lazy(() => import('./components/CheckoutModal'));
 const OrderTrackingModal = lazy(() => import('./components/OrderTrackingModal'));
 const AdminPanel = lazy(() => import('./components/AdminPanel'));
+const AuthModal = lazy(() => import('./components/AuthModal'));
 const BrandAssetsModal = lazy(() => import('./components/BrandAssetsModal'));
 const VisualSearchModal = lazy(() => import('./components/VisualSearchModal'));
 
@@ -250,7 +254,35 @@ function StorefrontContent() {
                 }
               />
 
-              {/* 5. 404 Catch-All Route */}
+              {/* 5. Customer Login & Registration Routes */}
+              <Route
+                path="/login"
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <LoginPage />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <LoginPage />
+                  </Suspense>
+                }
+              />
+
+              {/* 6. Operations & Admin Portal Dedicated Route */}
+              <Route
+                path="/admin"
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <AdminPage />
+                  </Suspense>
+                }
+              />
+
+              {/* 7. 404 Catch-All Route */}
               <Route
                 path="*"
                 element={<NotFoundPage />}
@@ -278,6 +310,7 @@ function StorefrontContent() {
         <CheckoutModal />
         <OrderTrackingModal />
         <AdminPanel />
+        <AuthModal />
         <BrandAssetsModal />
         <VisualSearchModal />
       </Suspense>
@@ -290,9 +323,11 @@ export default function App() {
   return (
     <RouteErrorBoundary>
       <BrowserRouter>
-        <ShopProvider>
-          <StorefrontContent />
-        </ShopProvider>
+        <AuthProvider>
+          <ShopProvider>
+            <StorefrontContent />
+          </ShopProvider>
+        </AuthProvider>
       </BrowserRouter>
     </RouteErrorBoundary>
   );

@@ -31,41 +31,41 @@ export default function Footer() {
   return (
     <footer id="footer-section" className="w-full pt-4 pb-8 select-none">
 
-      <div className="bg-[#172333] border border-[#233346] rounded-[6px] p-6 sm:p-8 md:p-10 shadow-[0_4px_20px_rgba(23,35,51,0.08)] text-[#F5F4EF]">
+      <div className="bg-slate-900/95 backdrop-blur-2xl border border-slate-800/80 rounded-2xl p-6 sm:p-8 md:p-10 shadow-[0_16px_40px_rgba(15,23,42,0.15)] text-slate-100">
 
         {/* 4-Column Retail Footer Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-8 border-b border-[#233346]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-8 border-b border-slate-800/80">
 
           {/* 1. Brand & Contact (lg:col-span-4) */}
           <div className="lg:col-span-4 flex flex-col items-start gap-4">
             <AzraqLogo variant="light" size="md" showDescriptor={false} />
 
-            <p className="text-xs text-[#A8B3CF] max-w-sm leading-relaxed">
+            <p className="text-xs text-slate-400 max-w-sm leading-relaxed">
               {t(
                 'AZRAQ Shop is your trusted online retail destination for authentic gadgets, kitchen essentials, and curated everyday lifestyle goods in Bangladesh.',
                 'আজরাক শপ — বাংলাদেশের নির্ভরযোগ্য অনলাইন রিটেইল শপ। আসল পণ্যের নিশ্চয়তা ও দ্রুততম হোম ডেলিভারি।'
               )}
             </p>
 
-            <div className="flex flex-col gap-2 pt-1 text-xs text-[#E5E3DA]">
+            <div className="flex flex-col gap-2 pt-1 text-xs text-slate-300">
               <div id="footer-contact" className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-[3px] bg-[#223145] border border-[#2B3B4E] flex items-center justify-center text-[#245BDB]">
+                <div className="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700/80 flex items-center justify-center text-blue-400">
                   <Phone className="w-3.5 h-3.5" />
                 </div>
-                <a href="tel:+8801851172032" className="font-semibold hover:text-[#245BDB] transition-colors">
+                <a href="tel:+8801851172032" className="font-semibold hover:text-blue-400 transition-colors">
                   +880 1851-172032
                 </a>
               </div>
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-[3px] bg-[#223145] border border-[#2B3B4E] flex items-center justify-center text-[#245BDB]">
+                <div className="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700/80 flex items-center justify-center text-blue-400">
                   <Mail className="w-3.5 h-3.5" />
                 </div>
-                <a href="mailto:support@azraqtrips.com" className="hover:text-[#245BDB] transition-colors">
+                <a href="mailto:support@azraqtrips.com" className="hover:text-blue-400 transition-colors">
                   support@azraqtrips.com
                 </a>
               </div>
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-[3px] bg-[#223145] border border-[#2B3B4E] flex items-center justify-center text-[#245BDB]">
+                <div className="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700/80 flex items-center justify-center text-blue-400">
                   <MapPin className="w-3.5 h-3.5" />
                 </div>
                 <span>Dhaka, Bangladesh</span>
@@ -78,11 +78,16 @@ export default function Footer() {
             <h4 className="text-xs font-mono font-bold uppercase tracking-[0.16em] text-white">
               {t('Customer Care', 'গ্রাহক সেবা')}
             </h4>
-            <ul className="flex flex-col gap-2.5 text-xs text-[#A8B3CF]">
+            <ul className="flex flex-col gap-2.5 text-xs text-slate-400">
               <li>
-                <button onClick={() => setIsTrackingOpen(true)} className="hover:text-white transition-colors text-left">
+                <button onClick={() => setIsTrackingOpen(true)} className="hover:text-white transition-colors text-left cursor-pointer">
                   {t('Track Your Order', 'অর্ডার ট্র্যাক করুন')}
                 </button>
+              </li>
+              <li>
+                <a href="/login" className="hover:text-white transition-colors text-left cursor-pointer">
+                  {t('Customer Sign In / Register', 'গ্রাহক অ্যাকাউন্ট / লগইন')}
+                </a>
               </li>
               <li>
                 <a href="https://wa.me/8801851172032" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors text-left inline-block">
@@ -90,14 +95,9 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <button onClick={() => navigateTo('home')} className="hover:text-white transition-colors text-left">
-                  {t('Shipping & Delivery Policy', 'ডেলিভারি পলিসি')}
-                </button>
-              </li>
-              <li>
-                <button onClick={() => setIsAdminOpen(true)} className="hover:text-white transition-colors text-left">
+                <a href="/admin" className="hover:text-blue-400 transition-colors text-left font-bold cursor-pointer">
                   {t('Merchant & Admin Portal', 'অ্যাডমিন পোর্টাল')}
-                </button>
+                </a>
               </li>
             </ul>
           </div>

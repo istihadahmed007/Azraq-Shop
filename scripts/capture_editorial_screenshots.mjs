@@ -134,6 +134,16 @@ async function run() {
       name: '04_product_detail_desktop.png',
       url: `http://127.0.0.1:${PORT}/product/yonex-astrox-100-zz-yonex-mastet-copy-azq-0002`,
       viewport: { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false }
+    },
+    {
+      name: '07_login_page_desktop.png',
+      url: `http://127.0.0.1:${PORT}/login`,
+      viewport: { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false }
+    },
+    {
+      name: '08_admin_portal_desktop.png',
+      url: `http://127.0.0.1:${PORT}/admin`,
+      viewport: { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false }
     }
   ];
 
