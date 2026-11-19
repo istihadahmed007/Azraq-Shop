@@ -260,7 +260,7 @@ export default function ProductGrid() {
           ======================================================== */}
       {shouldShowFullCatalog && (
         <div id="all-products-catalog" className="border border-[rgba(130,170,205,0.25)] border-t-white/95 bg-white/75 backdrop-blur-2xl rounded-[28px] p-5 sm:p-7 shadow-[0_16px_40px_-10px_rgba(112,200,237,0.12),0_4px_16px_-2px_rgba(25,59,91,0.04)] flex flex-col gap-5 animate-in fade-in duration-200">
-          
+
           {/* Section Header */}
           <div className="flex items-center justify-between pb-3.5 border-b border-[rgba(130,170,205,0.18)]">
             <div>
@@ -291,7 +291,7 @@ export default function ProductGrid() {
 
           {/* Category Tabs & Filter Toolbar */}
           <div className="flex flex-col gap-3.5">
-            
+
             {/* Category Tabs Strip */}
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
               {categories.map((cat) => {
@@ -302,11 +302,10 @@ export default function ProductGrid() {
                   <button
                     key={cat}
                     onClick={() => setActiveCategory(cat)}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border cursor-pointer ${
-                      isActive
-                        ? 'bg-gradient-to-r from-[#0877C9] to-[#3B82F6] text-white border-transparent shadow-[0_4px_14px_rgba(8,119,201,0.4)]'
-                        : 'bg-white/70 hover:bg-white text-[#718398] hover:text-[#193B5B] border-[rgba(130,170,205,0.22)]'
-                    }`}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border cursor-pointer ${isActive
+                      ? 'bg-gradient-to-r from-[#0877C9] to-[#3B82F6] text-white border-transparent shadow-[0_4px_14px_rgba(8,119,201,0.4)]'
+                      : 'bg-white/70 hover:bg-white text-[#718398] hover:text-[#193B5B] border-[rgba(130,170,205,0.22)]'
+                      }`}
                   >
                     {displayName}
                   </button>
@@ -316,7 +315,7 @@ export default function ProductGrid() {
 
             {/* Filter Controls Row: Search + Sort + In-stock */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 border-t border-[rgba(130,170,205,0.18)]">
-              
+
               {/* Search input */}
               <div className="relative flex-1 sm:max-w-xs">
                 <Search className="w-3.5 h-3.5 text-[#718398] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -346,33 +345,30 @@ export default function ProductGrid() {
 
                 <button
                   onClick={() => setSortBy('featured')}
-                  className={`px-3 py-1.5 rounded-full font-bold border transition-all text-xs cursor-pointer ${
-                    sortBy === 'featured'
-                      ? 'bg-gradient-to-r from-[#0877C9] to-[#3B82F6] text-white border-transparent shadow-xs'
-                      : 'bg-white/70 hover:bg-white text-[#193B5B] border-[rgba(130,170,205,0.25)]'
-                  }`}
+                  className={`px-3 py-1.5 rounded-full font-bold border transition-all text-xs cursor-pointer ${sortBy === 'featured'
+                    ? 'bg-gradient-to-r from-[#0877C9] to-[#3B82F6] text-white border-transparent shadow-xs'
+                    : 'bg-white/70 hover:bg-white text-[#193B5B] border-[rgba(130,170,205,0.25)]'
+                    }`}
                 >
                   {t("Featured", "সেরা")}
                 </button>
 
                 <button
                   onClick={() => setSortBy('price-low')}
-                  className={`px-3 py-1.5 rounded-full font-bold border transition-all text-xs cursor-pointer ${
-                    sortBy === 'price-low'
-                      ? 'bg-gradient-to-r from-[#0877C9] to-[#3B82F6] text-white border-transparent shadow-xs'
-                      : 'bg-white/70 hover:bg-white text-[#193B5B] border-[rgba(130,170,205,0.25)]'
-                  }`}
+                  className={`px-3 py-1.5 rounded-full font-bold border transition-all text-xs cursor-pointer ${sortBy === 'price-low'
+                    ? 'bg-gradient-to-r from-[#0877C9] to-[#3B82F6] text-white border-transparent shadow-xs'
+                    : 'bg-white/70 hover:bg-white text-[#193B5B] border-[rgba(130,170,205,0.25)]'
+                    }`}
                 >
                   {t("Price: Low to High", "দাম: কম")}
                 </button>
 
                 <button
                   onClick={() => setSortBy('price-high')}
-                  className={`px-3 py-1.5 rounded-full font-bold border transition-all text-xs cursor-pointer ${
-                    sortBy === 'price-high'
-                      ? 'bg-gradient-to-r from-[#0877C9] to-[#3B82F6] text-white border-transparent shadow-xs'
-                      : 'bg-white/70 hover:bg-white text-[#193B5B] border-[rgba(130,170,205,0.25)]'
-                  }`}
+                  className={`px-3 py-1.5 rounded-full font-bold border transition-all text-xs cursor-pointer ${sortBy === 'price-high'
+                    ? 'bg-gradient-to-r from-[#0877C9] to-[#3B82F6] text-white border-transparent shadow-xs'
+                    : 'bg-white/70 hover:bg-white text-[#193B5B] border-[rgba(130,170,205,0.25)]'
+                    }`}
                 >
                   {t("Price: High to Low", "দাম: বেশি")}
                 </button>
