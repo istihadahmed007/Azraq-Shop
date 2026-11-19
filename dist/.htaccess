@@ -56,7 +56,7 @@
 # Browser Caching & Cache Busting
 <IfModule mod_headers.c>
   # Never cache index.html or root
-  <FilesMatch "^(index\.html)?$">
+  <FilesMatch "\.(html|htm)$">
     Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
     Header set Pragma "no-cache"
     Header set Expires "0"

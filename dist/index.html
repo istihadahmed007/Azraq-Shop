@@ -42,10 +42,10 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap"
     rel="stylesheet">
-  <script type="module" crossorigin src="/assets/index-CL-jNTRV-v3.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/vendor-react-D3JIya7G-v3.js">
-  <link rel="modulepreload" crossorigin href="/assets/vendor-icons-BCrcbBrK-v3.js">
-  <link rel="stylesheet" crossorigin href="/assets/index-jePWE-Az-v3.css">
+  <script type="module" crossorigin src="/assets/index-D1Z1g1pC-v4.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/vendor-react-D3JIya7G-v4.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-icons-DoAdgl1b-v4.js">
+  <link rel="stylesheet" crossorigin href="/assets/index-DL3hMj4S-v4.css">
 </head>
 
 <body class="bg-[#F1F7FC] text-[#193B5B] font-sans antialiased selection:bg-[#70C8ED]/30 selection:text-[#193B5B]">
@@ -102,6 +102,20 @@
   <!-- Boot watchdog and error capture script (runs prior to module execution) -->
   <script>
     (function() {
+      // Cache-Busting Version Sync: Clears stale cache storage on deployment of new versions
+      try {
+        var APP_BUILD_VER = '2026.11.19.v4';
+        var prevVer = localStorage.getItem('azraq_build_ver');
+        if (prevVer !== APP_BUILD_VER) {
+          localStorage.setItem('azraq_build_ver', APP_BUILD_VER);
+          if ('caches' in window) {
+            caches.keys().then(function(keys) {
+              keys.forEach(function(k) { caches.delete(k); });
+            });
+          }
+        }
+      } catch(e) {}
+
       window.__AZRAQ_BOOTED__ = false;
       var bootTimer = null;
       var capturedErrors = [];

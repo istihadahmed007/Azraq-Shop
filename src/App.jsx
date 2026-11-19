@@ -205,22 +205,16 @@ function StorefrontContent() {
                     {/* Section B: Horizontal Statistics & Trust Glass Panel */}
                     <StatsRibbon />
 
-                    {/* Section C: Featured Cards & Best Sellers (Strictly 5 per row) */}
+                    {/* Section C: Featured Curations (Reference Style: 3 Large Cinematic Cards with < > Carousel) */}
                     <TrendingRightNowSection />
-
-                    {/* Department Discovery Mosaic */}
-                    <BrowseByCategoriesSection />
-
-                    {/* The AZRAQ Edit: Signature Collections */}
-                    <ShopByCollectionSection />
 
                     {/* Section D: Supporting Content 3-Column Glass Arrangement */}
                     <StoreArchitectureSection />
 
-                    {/* Curated Editorial Campaign Highlights */}
-                    <PromotionalBannersSection />
+                    {/* Department Discovery Mosaic (All 18 Collections) */}
+                    <BrowseByCategoriesSection />
 
-                    {/* Daily Discover Product Catalog Grid (Strictly 5 per row) */}
+                    {/* Daily Discover Product Catalog Grid (1,200+ Products) */}
                     <ProductGrid />
 
                     {/* Browsing History (Active only when history exists) */}

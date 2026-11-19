@@ -98,6 +98,20 @@
   <!-- Boot watchdog and error capture script (runs prior to module execution) -->
   <script>
     (function() {
+      // Cache-Busting Version Sync: Clears stale cache storage on deployment of new versions
+      try {
+        var APP_BUILD_VER = '2026.11.19.v4';
+        var prevVer = localStorage.getItem('azraq_build_ver');
+        if (prevVer !== APP_BUILD_VER) {
+          localStorage.setItem('azraq_build_ver', APP_BUILD_VER);
+          if ('caches' in window) {
+            caches.keys().then(function(keys) {
+              keys.forEach(function(k) { caches.delete(k); });
+            });
+          }
+        }
+      } catch(e) {}
+
       window.__AZRAQ_BOOTED__ = false;
       var bootTimer = null;
       var capturedErrors = [];
