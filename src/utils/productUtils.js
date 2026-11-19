@@ -180,7 +180,8 @@ async function safeParseResponse(res) {
  * 3. Graceful timeout, request deduplication, and safe error classification.
  */
 export async function fetchSingleProduct(slugOrId, options = {}) {
-  const { signal, timeoutMs = 8000, baseUrl = '' } = options;
+  const defaultBase = typeof window !== 'undefined' && window.location.pathname.startsWith('/Azraq-Shop') ? '/Azraq-Shop' : '';
+  const { signal, timeoutMs = 8000, baseUrl = defaultBase } = options;
   if (!slugOrId) {
     return { product: null, isNotFound: true, isError: false, isServerError: false, isNetworkError: false, error: null };
   }

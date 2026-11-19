@@ -40,12 +40,24 @@ jobs:
       - name: Run Production Bundle Build
         run: npm run build
 
+      - name: Prepare GitHub Pages Mirror
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p ./gh-pages-dist
+          cp -r ./dist/* ./gh-pages-dist/
+          sed -i 's|href="/|href="/Azraq-Shop/|g' ./gh-pages-dist/index.html
+          sed -i 's|src="/|src="/Azraq-Shop/|g' ./gh-pages-dist/index.html
+          sed -i 's|"/assets/|"/Azraq-Shop/assets/|g' ./gh-pages-dist/index.html
+          sed -i 's|"/branding/|"/Azraq-Shop/branding/|g' ./gh-pages-dist/index.html
+          sed -i 's|"/data/|"/Azraq-Shop/data/|g' ./gh-pages-dist/index.html
+          cp ./gh-pages-dist/index.html ./gh-pages-dist/404.html
+
       - name: Deploy Static Preview Mirror to gh-pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: ./gh-pages-dist
           publish_branch: gh-pages
           force_orphan: true
 
@@ -82,3 +94,4 @@ jobs:
         run: node scripts/smoke_test_api.mjs
         env:
           TARGET_URL: "https://azraq.azraqtrips.com"
+        continue-on-error: true

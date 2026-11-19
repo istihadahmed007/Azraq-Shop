@@ -328,9 +328,11 @@ function StorefrontContent() {
 }
 
 export default function App() {
+  const basename = typeof window !== 'undefined' && window.location.pathname.startsWith('/Azraq-Shop') ? '/Azraq-Shop' : '';
+
   return (
     <RouteErrorBoundary>
-      <BrowserRouter>
+      <BrowserRouter basename={basename}>
         <AuthProvider>
           <ShopProvider>
             <StorefrontContent />

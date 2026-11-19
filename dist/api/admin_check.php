@@ -4,6 +4,17 @@ function checkAdminAuth() {
     $key = $_SERVER['HTTP_X_ADMIN_KEY'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? '';
     $key = preg_replace('/^Bearer\s+/i', '', trim($key));
 
+    // Invariant: Unauthenticated requests MUST be rejected with 401 first
+    if (empty($key)) {
+        http_response_code(401);
+        echo json_encode([
+            'success' => false,
+            'code' => 'UNAUTHORIZED_ADMIN',
+            'error' => 'Administrative authentication credentials are required.'
+        ]);
+        exit;
+    }
+
     $expectedKey = getenv('ADMIN_API_KEY') ?: getenv('ADMIN_SECRET') ?: '';
     $envFile = __DIR__ . '/../../.env';
     if (empty($expectedKey) && file_exists($envFile)) {
