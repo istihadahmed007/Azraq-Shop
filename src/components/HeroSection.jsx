@@ -81,6 +81,7 @@ export default function HeroSection() {
               alt={featuredProduct?.name || "Featured Product"}
               fit="contain"
               aspectRatio="square"
+              priority={true}
               className="p-3 group-hover:scale-104 transition-transform duration-300"
             />
           </div>
@@ -154,7 +155,7 @@ export default function HeroSection() {
 
           {/* 2x2 Bento Product Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
-            {bentoProducts.map((p) => {
+            {bentoProducts.map((p, idx) => {
               const isFav = favorites.includes(p.id);
               return (
                 <div
@@ -169,6 +170,7 @@ export default function HeroSection() {
                       alt={p.name}
                       fit="cover"
                       aspectRatio="square"
+                      priority={idx < 2}
                       className="rounded-[14px] group-hover:scale-104 transition-transform duration-300"
                     />
 

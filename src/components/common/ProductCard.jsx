@@ -26,6 +26,7 @@ export default function ProductCard({
   onAddToCart,
   showCategory = true,
   compact = false,
+  priority = false,
   className = ''
 }) {
   const { t } = useShop();
@@ -105,6 +106,7 @@ export default function ProductCard({
           alt={product.name || 'Product'}
           fit="cover"
           aspectRatio="square"
+          priority={priority}
           className="transition-transform duration-300 group-hover:scale-104"
           zoomOnHover={true}
         />

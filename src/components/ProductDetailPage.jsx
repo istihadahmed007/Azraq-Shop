@@ -233,10 +233,34 @@ export default function ProductDetailPage() {
       }
       setMeta('og:url', window.location.href);
 
+      // Preload primary photograph with high priority
+      const targetImage = images[activeImageIndex] || product.main_image;
+      if (targetImage) {
+        let preloadLink = document.querySelector(`link[rel="preload"][href="${targetImage}"]`);
+        if (!preloadLink) {
+          preloadLink = document.createElement('link');
+          preloadLink.rel = 'preload';
+          preloadLink.as = 'image';
+          preloadLink.href = targetImage;
+          preloadLink.fetchPriority = 'high';
+          document.head.appendChild(preloadLink);
+        }
+      }
+
+      // Pre-cache other gallery thumbnails in browser memory
+      if (images && images.length > 1) {
+        images.forEach((url, i) => {
+          if (i !== activeImageIndex && url) {
+            const img = new Image();
+            img.src = url;
+          }
+        });
+      }
+
       // Scroll smoothly to top on navigation
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, [product]);
+  }, [product, images, activeImageIndex]);
 
   // 1. Loading state: active when product is being loaded from single record or catalog
   const isStillLoading = !product && (

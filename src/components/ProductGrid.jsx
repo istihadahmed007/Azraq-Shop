@@ -249,7 +249,7 @@ export default function ProductGrid() {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-4.5 items-stretch">
-            {displayedProducts.map((product) => (
+            {displayedProducts.map((product, idx) => (
               <div key={product.id} className="h-full">
                 <ProductCard
                   product={product}
@@ -259,6 +259,7 @@ export default function ProductGrid() {
                   onAddToCart={addToCart}
                   compact={false}
                   showCategory={true}
+                  priority={idx < 5}
                 />
               </div>
             ))}
