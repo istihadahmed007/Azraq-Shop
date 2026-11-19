@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import AzraqLogo from './AzraqLogo';
 import { useShop } from '../context/ShopContext';
+import { useAuth } from '../context/AuthContext';
 
 /**
  * AZRAQ Shop — Deep Ink Modern Editorial Footer (The Everyday Edit)
@@ -23,6 +24,7 @@ import { useShop } from '../context/ShopContext';
  */
 export default function Footer() {
   const { collections, navigateTo, setIsTrackingOpen, setIsAdminOpen, t } = useShop();
+  const { openAuthModal } = useAuth();
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -85,9 +87,13 @@ export default function Footer() {
                 </button>
               </li>
               <li>
-                <a href="/login" className="hover:text-white transition-colors text-left cursor-pointer">
+                <button
+                  type="button"
+                  onClick={openAuthModal}
+                  className="hover:text-white transition-colors text-left cursor-pointer"
+                >
                   {t('Customer Sign In / Register', 'গ্রাহক অ্যাকাউন্ট / লগইন')}
-                </a>
+                </button>
               </li>
               <li>
                 <a href="https://wa.me/8801851172032" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors text-left inline-block">
@@ -95,9 +101,13 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="/admin" className="hover:text-blue-400 transition-colors text-left font-bold cursor-pointer">
+                <button
+                  type="button"
+                  onClick={() => setIsAdminOpen(true)}
+                  className="hover:text-blue-400 transition-colors text-left font-bold cursor-pointer"
+                >
                   {t('Merchant & Admin Portal', 'অ্যাডমিন পোর্টাল')}
-                </a>
+                </button>
               </li>
             </ul>
           </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Truck, 
+  Truck,
   ShieldCheck,
   RotateCcw,
   Headphones,
@@ -47,7 +47,7 @@ export default function BrandValuePanel() {
         {benefits.map((item, idx) => {
           const Icon = item.icon;
           return (
-            <div 
+            <div
               key={idx}
               className={`flex items-center gap-3 ${
                 idx !== 0 ? 'md:border-l md:border-white/80 md:pl-5' : ''

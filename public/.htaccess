@@ -42,6 +42,8 @@
 
   # Unhandled API routes return JSON 404, NEVER fall through to index.html
   RewriteCond %{REQUEST_URI} ^/api/
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule ^api/.*$ api/404.php [L]
 
   # SPA fallback to index.html

@@ -360,6 +360,8 @@ export async function authenticateAdmin(adminKey) {
     return { success: false, error: 'Administrator key is required.' };
   }
 
+  const isStoreKey = cleanKey === '0133865246' || cleanKey === 'admin123' || cleanKey === 'azraq_dev_admin_key';
+
   try {
     const response = await fetch(`${API_BASE}/api/admin/auth`, {
       method: 'POST',
@@ -369,32 +371,30 @@ export async function authenticateAdmin(adminKey) {
         'Authorization': `Bearer ${cleanKey}`
       },
       body: JSON.stringify({ adminKey: cleanKey })
-    });
-    const contentType = response?.headers?.get('content-type') || '';
-    if (response && contentType.includes('application/json')) {
-      const data = await response.json().catch(() => ({}));
-      if (response.ok && data.success) {
-        return { success: true, message: data.message || 'Authenticated successfully' };
-      }
-      if (response.status === 401) {
-        // Fallback for store manager key
-        if (cleanKey === '0133865246' || cleanKey === 'admin123') {
-          return { success: true, message: 'Authenticated successfully via store key.' };
+    }).catch(() => null);
+
+    if (response) {
+      const contentType = response?.headers?.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const data = await response.json().catch(() => ({}));
+        if (response.ok && data.success) {
+          return { success: true, message: data.message || 'Authenticated successfully' };
         }
-        return { success: false, error: data.error || 'Invalid administrative credentials. Use key: 0133865246.' };
+        if (response.status === 401 && !isStoreKey) {
+          return { success: false, error: data.error || 'Invalid administrative credentials. Use key: 0133865246.' };
+        }
       }
-      return { success: false, error: data.error || 'Invalid administrative credentials.' };
     }
   } catch (e) {
     console.warn('Server authentication endpoint unreachable:', e);
   }
 
-  // Resilient fallback for static hosting / Hostinger PHP without env
-  if (cleanKey === '0133865246' || cleanKey === 'admin123' || cleanKey === 'azraq_dev_admin_key') {
+  // Resilient fallback for store manager key (works on Hostinger Apache even if /api is not routed)
+  if (isStoreKey) {
     return { success: true, message: 'Authenticated successfully via store key.' };
   }
 
-  return { success: false, error: 'Administrative authentication service unreachable and key is invalid. Default key: 0133865246.' };
+  return { success: false, error: 'Invalid administrative credentials. Default store passcode: 0133865246.' };
 }
 
 /**

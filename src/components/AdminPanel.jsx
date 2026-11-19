@@ -30,7 +30,7 @@ import {
     updateOrderStatusOnServer
 } from '../services/paymentService';
 
-export default function AdminPanel({ isFullPage = false }) {
+function AdminPanelInner({ isFullPage = false }) {
     const {
         collections,
         updateCollection,
@@ -147,25 +147,30 @@ export default function AdminPanel({ isFullPage = false }) {
 
     if (!isAdminOpen && !isFullPage) return null;
 
-    // Financial Analytics Calculations
-    const totalRevenue = orders.reduce((sum, ord) => sum + ord.total, 0);
-    const totalOrdersCount = orders.length;
-    const totalSupplierCostEst = orders.reduce((sum, ord) => {
-        return sum + ord.items.reduce((itemSum, item) => {
-            const prod = products.find(p => p.id === item.id);
-            const baseRM = prod ? prod.supplier_base_rm : 40;
-            return itemSum + (baseRM * 27 * item.quantity);
+    // Financial Analytics Calculations (Defensive against empty/undefined order records)
+    const validOrders = Array.isArray(orders) ? orders.filter(Boolean) : [];
+    const validProducts = Array.isArray(products) ? products.filter(Boolean) : [];
+    const totalRevenue = validOrders.reduce((sum, ord) => sum + (Number(ord.total) || Number(ord.total_amount) || 0), 0);
+    const totalOrdersCount = validOrders.length;
+    const totalSupplierCostEst = validOrders.reduce((sum, ord) => {
+        const items = Array.isArray(ord.items) ? ord.items : [];
+        return sum + items.reduce((itemSum, item) => {
+            const prod = validProducts.find(p => p.id === item?.id);
+            const baseRM = prod ? (Number(prod.supplier_base_rm) || 40) : 40;
+            return itemSum + (baseRM * 27 * (Number(item?.quantity) || 1));
         }, 0);
     }, 0);
     const grossProfit = totalRevenue - totalSupplierCostEst;
     const marginPercent = totalRevenue > 0 ? Math.round((grossProfit / totalRevenue) * 100) : 0;
 
     const startEditCollection = (col) => {
+        if (!col) return;
         setEditingCollectionId(col.id);
-        setEditDesc(col.description_en);
+        setEditDesc(col.description_en || '');
     };
 
     const saveCollectionEdit = (col) => {
+        if (!col) return;
         updateCollection({
             ...col,
             description_en: editDesc
@@ -174,6 +179,7 @@ export default function AdminPanel({ isFullPage = false }) {
     };
 
     const togglePublishCollection = (col) => {
+        if (!col) return;
         const nextStatus = col.publication_status === 'published' ? 'draft' : 'published';
         updateCollection({
             ...col,
@@ -182,6 +188,7 @@ export default function AdminPanel({ isFullPage = false }) {
     };
 
     const toggleFeaturedCollection = (col) => {
+        if (!col) return;
         updateCollection({
             ...col,
             featured: !col.featured
@@ -189,27 +196,32 @@ export default function AdminPanel({ isFullPage = false }) {
     };
 
     const copyEasyDropPayload = (order) => {
+        if (!order) return;
+        const customer = order.customer || {};
+        const items = Array.isArray(order.items) ? order.items : [];
         const payload = {
             source: "AZRAQ Curated Store",
             partner: "EasyDrop BD",
             order_id: order.id,
             customer_info: {
-                name: order.customer.name,
-                phone: order.customer.phone,
-                address: order.customer.address,
-                district: order.customer.area === 'inside' ? 'Dhaka' : 'Outside Dhaka'
+                name: customer.name || order.customer_name || 'Customer',
+                phone: customer.phone || order.customer_phone || '',
+                address: customer.address || order.customer_address || '',
+                district: (customer.area || order.deliveryArea) === 'inside' ? 'Dhaka' : 'Outside Dhaka'
             },
-            items: order.items.map(it => ({
-                sku: it.supplier_sku || it.sku || it.id,
-                name: it.name,
-                collection: it.collection || it.category || 'General',
-                qty: it.quantity
+            items: items.map(it => ({
+                sku: it?.supplier_sku || it?.sku || it?.id || 'SKU',
+                name: it?.name || 'Item',
+                collection: it?.collection || it?.category || 'General',
+                qty: Number(it?.quantity || 1)
             })),
-            collectable_amount_bdt: order.paymentMethod === 'COD' ? order.total : 0,
-            delivery_charge: order.deliveryFee
+            collectable_amount_bdt: order.paymentMethod === 'COD' ? (Number(order.total) || 0) : 0,
+            delivery_charge: Number(order.deliveryFee || 0)
         };
 
-        navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+        if (typeof navigator !== 'undefined' && navigator.clipboard) {
+            navigator.clipboard.writeText(JSON.stringify(payload, null, 2)).catch(() => {});
+        }
         showToast(`EasyDrop payload for ${order.id} copied to clipboard!`, 'success');
     };
 
@@ -671,11 +683,11 @@ export default function AdminPanel({ isFullPage = false }) {
                                                                 <span className="font-semibold text-[#101C35] truncate max-w-xs">{p.name}</span>
                                                             </div>
                                                         </td>
-                                                        <td className="p-3 text-slate-600">{p.primary_collection_name}</td>
-                                                        <td className="p-3 font-mono text-slate-500">৳{(p.supplier_buying_price || 0).toLocaleString()}</td>
-                                                        <td className="p-3 font-mono font-bold text-[#101C35]">৳{p.price.toLocaleString()}</td>
-                                                        <td className="p-3 font-mono font-bold text-emerald-600">৳{(p.price - (p.supplier_buying_price || 0)).toLocaleString()}</td>
-                                                        <td className="p-3 font-mono text-slate-700">{p.stock} pcs</td>
+                                                        <td className="p-3 text-slate-600">{p.primary_collection_name || 'General'}</td>
+                                                        <td className="p-3 font-mono text-slate-500">৳{Number(p.supplier_buying_price || 0).toLocaleString()}</td>
+                                                        <td className="p-3 font-mono font-bold text-[#101C35]">৳{Number(p.price || 0).toLocaleString()}</td>
+                                                        <td className="p-3 font-mono font-bold text-emerald-600">৳{(Number(p.price || 0) - Number(p.supplier_buying_price || 0)).toLocaleString()}</td>
+                                                        <td className="p-3 font-mono text-slate-700">{p.stock ?? 0} pcs</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -690,46 +702,55 @@ export default function AdminPanel({ isFullPage = false }) {
                                 <div className="space-y-4">
                                     <h3 className="text-sm font-black text-azraq-navy">Orders Pipeline & EasyDrop Dispatch</h3>
                                     <div className="space-y-3">
-                                        {orders.map(order => (
-                                            <div key={order.id} className="p-4 rounded-[6px] border border-slate-200/90 bg-[#F8FBFF] space-y-3 shadow-2xs">
-                                                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-2">
-                                                    <div>
-                                                        <span className="font-mono font-black text-azraq-navy">{order.id}</span>
-                                                        <span className="text-xs text-gray-400 ml-2">• {order.customer.name} ({order.customer.phone})</span>
+                                        {orders.map(order => {
+                                            if (!order) return null;
+                                            const customer = order.customer || {};
+                                            const customerName = customer.name || order.customer_name || 'Customer';
+                                            const customerPhone = customer.phone || order.customer_phone || '';
+                                            const customerAddress = customer.address || order.customer_address || 'Address not specified';
+                                            const orderTotal = Number(order.total || order.total_amount || 0);
+
+                                            return (
+                                                <div key={order.id} className="p-4 rounded-[6px] border border-slate-200/90 bg-[#F8FBFF] space-y-3 shadow-2xs">
+                                                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-2">
+                                                        <div>
+                                                            <span className="font-mono font-black text-azraq-navy">{order.id}</span>
+                                                            <span className="text-xs text-gray-400 ml-2">• {customerName} ({customerPhone})</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <select
+                                                                value={order.order_status || order.status || 'Processing'}
+                                                                onChange={(e) => {
+                                                                    const next = e.target.value;
+                                                                    if (window.confirm(`Are you sure you want to change order ${order.id} status to "${next}"?`)) {
+                                                                        updateOrderStatus(order.id, next);
+                                                                        showToast(`Order status updated to ${next}`, 'success');
+                                                                    }
+                                                                }}
+                                                                className="px-2.5 py-1 rounded-[4px] border border-slate-200 text-xs font-bold text-[#101C35] bg-white focus:outline-none"
+                                                            >
+                                                                <option value="Processing">Processing</option>
+                                                                <option value="Confirmed">Confirmed</option>
+                                                                <option value="Sent to EasyDrop">Sent to EasyDrop</option>
+                                                                <option value="Dispatched">Dispatched</option>
+                                                                <option value="Delivered">Delivered</option>
+                                                                <option value="Cancelled">Cancelled</option>
+                                                            </select>
+                                                            <button
+                                                                onClick={() => copyEasyDropPayload(order)}
+                                                                className="px-3 py-1 rounded-[4px] bg-[#101C35] text-white text-xs font-bold flex items-center gap-1.5 hover:bg-[#0877C9] transition-colors"
+                                                            >
+                                                                <Copy className="w-3.5 h-3.5 text-[#50DDF0]" />
+                                                                <span>Copy Payload</span>
+                                                            </button>
+                                                        </div>
                                                     </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <select
-                                                            value={order.order_status || order.status || 'Processing'}
-                                                            onChange={(e) => {
-                                                                const next = e.target.value;
-                                                                if (window.confirm(`Are you sure you want to change order ${order.id} status to "${next}"?`)) {
-                                                                    updateOrderStatus(order.id, next);
-                                                                    showToast(`Order status updated to ${next}`, 'success');
-                                                                }
-                                                            }}
-                                                            className="px-2.5 py-1 rounded-[4px] border border-slate-200 text-xs font-bold text-[#101C35] bg-white focus:outline-none"
-                                                        >
-                                                            <option value="Processing">Processing</option>
-                                                            <option value="Confirmed">Confirmed</option>
-                                                            <option value="Sent to EasyDrop">Sent to EasyDrop</option>
-                                                            <option value="Dispatched">Dispatched</option>
-                                                            <option value="Delivered">Delivered</option>
-                                                            <option value="Cancelled">Cancelled</option>
-                                                        </select>
-                                                        <button
-                                                            onClick={() => copyEasyDropPayload(order)}
-                                                            className="px-3 py-1 rounded-[4px] bg-[#101C35] text-white text-xs font-bold flex items-center gap-1.5 hover:bg-[#0877C9] transition-colors"
-                                                        >
-                                                            <Copy className="w-3.5 h-3.5 text-[#50DDF0]" />
-                                                            <span>Copy Payload</span>
-                                                        </button>
+                                                    <div className="text-xs text-gray-600">
+                                                        Total: <strong>৳{orderTotal.toLocaleString()}</strong> ({order.paymentMethod || 'COD'}) • Address: {customerAddress}
                                                     </div>
                                                 </div>
-                                                <div className="text-xs text-gray-600">
-                                                    Total: <strong>৳{order.total.toLocaleString()}</strong> ({order.paymentMethod}) • Address: {order.customer.address}
-                                                </div>
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             )}
@@ -935,5 +956,58 @@ export default function AdminPanel({ isFullPage = false }) {
 
             </div>
         </div>
+    );
+}
+
+class AdminErrorBoundary extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { hasError: false, error: null };
+    }
+    static getDerivedStateFromError(error) {
+        return { hasError: true, error };
+    }
+    componentDidCatch(error, errorInfo) {
+        console.error('[AdminPanel Caught Error]:', error, errorInfo);
+    }
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div className="fixed inset-0 z-50 overflow-y-auto bg-[#101C35]/50 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 select-none">
+                    <div className="relative w-full max-w-md glass-modal rounded-2xl shadow-2xl border border-white/95 p-8 text-center space-y-4 bg-white/95">
+                        <div className="w-14 h-14 mx-auto rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center font-bold text-2xl shadow-xs">
+                            ⚠️
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-900">Admin Panel Reset Needed</h3>
+                        <p className="text-xs text-slate-600 leading-relaxed">
+                            A temporary data rendering issue occurred. Click below to clear admin session cache and reopen.
+                        </p>
+                        <div className="flex gap-3 justify-center pt-2">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (typeof window !== 'undefined') {
+                                        sessionStorage.removeItem('azraq_admin_key');
+                                    }
+                                    this.setState({ hasError: false, error: null });
+                                }}
+                                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
+                            >
+                                Reset & Reopen Admin
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
+
+export default function AdminPanel(props) {
+    return (
+        <AdminErrorBoundary>
+            <AdminPanelInner {...props} />
+        </AdminErrorBoundary>
     );
 }
