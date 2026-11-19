@@ -81,6 +81,32 @@ await runTest('Admin Auth: accepts request with Bearer token authorization heade
   }
 });
 
+await runTest('Production Invariant: hard-coded keys (0133865246, azraq-admin-secret-2026) are rejected in production', () => {
+  const prevNodeEnv = process.env.NODE_ENV;
+  const prevKey = process.env.ADMIN_API_KEY;
+  process.env.NODE_ENV = 'production';
+  process.env.ADMIN_API_KEY = 'configured_production_secret_key_8899';
+
+  try {
+    const legacyKeys = ['0133865246', 'azraq-admin-secret-2026', 'azraq_admin_2026', 'admin@azraq'];
+    for (const key of legacyKeys) {
+      const req = { headers: { 'x-admin-key': key } };
+      const auth = verifyAdminAuth(req);
+      assert.strictEqual(auth.authenticated, false, `Legacy key '${key}' must NOT be accepted in production!`);
+      assert.strictEqual(auth.statusCode, 401);
+    }
+
+    // Configured secret must succeed
+    const validReq = { headers: { 'x-admin-key': 'configured_production_secret_key_8899' } };
+    const validAuth = verifyAdminAuth(validReq);
+    assert.strictEqual(validAuth.authenticated, true, 'Configured production secret must be authenticated successfully');
+  } finally {
+    process.env.NODE_ENV = prevNodeEnv;
+    if (prevKey !== undefined) process.env.ADMIN_API_KEY = prevKey;
+    else delete process.env.ADMIN_API_KEY;
+  }
+});
+
 // 2. Production Fail-Closed Invariants
 await runTest('Production Invariant: verifyAdminAuth fails closed (500) if ADMIN_API_KEY missing in production', () => {
   const prevNodeEnv = process.env.NODE_ENV;
@@ -306,16 +332,33 @@ await runTest('Admin Refund: marks transaction REFUNDED, cancels order, and logs
 
   const orderId = verifiedOrderRes.order.id;
 
-  const refundRes = await processRefund({
+  // 1. Without automated provider refund, must mark REFUND_PENDING_MANUAL_REVIEW
+  const manualRefundRes = await processRefund({
     orderId,
     amount: 3200,
     reason: 'Customer requested return of defective unit',
-    actorSource: 'ADMIN_PANEL_SECURITY_TEST'
+    actorSource: 'ADMIN_PANEL_SECURITY_TEST',
+    providerResult: { supported: false, success: false }
   });
 
-  assert.strictEqual(refundRes.success, true);
-  assert.strictEqual(refundRes.status, 'REFUNDED');
-  assert.strictEqual(refundRes.refundAmount, 3200);
+  assert.strictEqual(manualRefundRes.success, true);
+  assert.strictEqual(manualRefundRes.status, 'REFUND_PENDING_MANUAL_REVIEW');
+  assert.strictEqual(manualRefundRes.requires_manual_disbursement, true);
+  assert.strictEqual(manualRefundRes.refundAmount, 3200);
+
+  // 2. With verified provider automated refund, marks REFUNDED
+  const provRefundRes = await processRefund({
+    orderId,
+    amount: 3200,
+    reason: 'Provider processed money disbursement',
+    actorSource: 'ADMIN_PANEL_SECURITY_TEST',
+    providerResult: { supported: true, success: true, refundId: 'ref_prov_auto_4455' }
+  });
+
+  assert.strictEqual(provRefundRes.success, true);
+  assert.strictEqual(provRefundRes.status, 'REFUNDED');
+  assert.strictEqual(provRefundRes.refund_id, 'ref_prov_auto_4455');
+  assert.strictEqual(provRefundRes.refundAmount, 3200);
 });
 
 // 4. Browser Storage Resiliency & Schema Validation

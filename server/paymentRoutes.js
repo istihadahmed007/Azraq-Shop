@@ -7,7 +7,8 @@ import {
   handlePaymentlyWebhook, 
   getAdminTransactions, 
   getAdminOrders,
-  getPaymentlyConfig 
+  getPaymentlyConfig,
+  requestPaymentlyRefund
 } from './paymentlyService.js';
 import { getAllTransactions, getAllOrders, processRefund, updateOrderFulfillmentStatus } from './db.js';
 import orderTrackingHandler from '../api/orders/track.js';
@@ -189,19 +190,46 @@ export async function handlePaymentRoutes(req, res) {
           return;
         }
 
+        const allTxns = await getAllTransactions();
+        const txn = allTxns.find(t => t.order_id === orderId);
+        
+        let providerResult = null;
+        const config = getPaymentlyConfig();
+        if (config.supportsAutomatedRefund && txn?.gateway_invoice_id) {
+          providerResult = await requestPaymentlyRefund({
+            orderId,
+            invoiceId: txn.gateway_invoice_id,
+            transactionId: txn.transaction_id,
+            amount: amount ? Number(amount) : Number(txn.amount),
+            reason
+          });
+        } else {
+          providerResult = {
+            success: false,
+            supported: false,
+            code: 'AUTOMATED_REFUND_UNSUPPORTED',
+            message: 'Payment gateway does not support automated refunds for this merchant account.'
+          };
+        }
+
         const refundResult = await processRefund({
           orderId,
-          amount: amount ? Number(amount) : null,
+          amount: amount !== undefined && amount !== null ? Number(amount) : null,
           reason: reason || 'Customer requested return / refund',
-          actorSource: 'ADMIN_PANEL'
+          actorSource: 'ADMIN_PANEL',
+          providerResult
         });
 
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(refundResult));
       } catch (err) {
-        res.statusCode = err.message.includes('not found') ? 404 : 500;
+        let statusCode = 500;
+        if (err.code === 'ORDER_NOT_FOUND' || err.message.includes('not found')) statusCode = 404;
+        else if (err.code === 'INVALID_REFUND_AMOUNT' || err.code === 'EXCEEDS_CAPTURED_AMOUNT') statusCode = 400;
+        else if (err.code === 'GATEWAY_REFUND_REJECTED') statusCode = 502;
+        res.statusCode = statusCode;
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ success: false, error: err.message }));
+        res.end(JSON.stringify({ success: false, code: err.code || 'REFUND_ERROR', error: err.message }));
       }
     });
     return true;
@@ -404,9 +432,17 @@ export async function handlePaymentRoutes(req, res) {
     req.on('end', async () => {
       try {
         const payload = JSON.parse(body || '{}');
-        const { checkoutId, invoiceId } = payload;
+        const { checkoutId, invoiceId, cancelToken, cancel_token, customerPhone, phone } = payload;
 
-        const cancelResult = await cancelPaymentlyCheckout({ checkoutId, invoiceId });
+        const cancelResult = await cancelPaymentlyCheckout({
+          checkoutId,
+          invoiceId,
+          cancelToken: cancelToken || cancel_token,
+          customerPhone: customerPhone || phone,
+          req
+        });
+
+        res.statusCode = cancelResult.success ? 200 : (cancelResult.statusCode || 403);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(cancelResult));
       } catch (err) {

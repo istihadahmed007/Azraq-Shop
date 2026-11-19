@@ -1,11 +1,35 @@
 import { getOrderByTrackingAuth, getOrderStatusHistory, initDb } from '../../server/db.js';
 
 // Sliding window in-memory rate limiter: max 25 requests per 5 minutes per IP
-const trackingRateLimits = new Map();
+export const trackingRateLimits = new Map();
 const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 25;
 
-function isRateLimited(clientIp) {
+/**
+ * Resolves client IP address adhering to trusted proxy configuration.
+ * Untrusted X-Forwarded-For headers are ignored unless TRUST_PROXY is explicitly enabled.
+ */
+export function getClientIp(req) {
+  const trustProxy = process.env.TRUST_PROXY === 'true' || process.env.TRUST_PROXY === '1';
+  if (trustProxy && req.headers) {
+    const forwarded = req.headers['x-forwarded-for'];
+    if (forwarded && typeof forwarded === 'string') {
+      const firstIp = forwarded.split(',')[0].trim();
+      if (firstIp) return firstIp;
+    }
+    const realIp = req.headers['x-real-ip'];
+    if (realIp && typeof realIp === 'string') {
+      return realIp.trim();
+    }
+  }
+  return req.socket?.remoteAddress || req.connection?.remoteAddress || '127.0.0.1';
+}
+
+export function resetTrackingRateLimits() {
+  trackingRateLimits.clear();
+}
+
+export function isRateLimited(clientIp) {
   const now = Date.now();
   const entry = trackingRateLimits.get(clientIp);
 
@@ -37,8 +61,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ success: false, error: 'Method Not Allowed' });
   }
 
-  // Rate Limiting by IP
-  const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || '127.0.0.1';
+  // Rate Limiting by IP (Strict Trusted Proxy Resolution)
+  const clientIp = getClientIp(req);
   if (isRateLimited(clientIp)) {
     return res.status(429).json({
       success: false,

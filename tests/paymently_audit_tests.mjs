@@ -13,13 +13,15 @@ import {
   cancelPaymentlyCheckout,
   handlePaymentlyWebhook,
   getPaymentlyConfig,
-  isTrustedPaymentUrl
+  isTrustedPaymentUrl,
+  processRefund
 } from '../server/paymentlyService.js';
 import { 
   getCheckoutAttempt, 
   getAllOrders, 
   getOrderWithItems,
-  saveCheckoutAttempt 
+  saveCheckoutAttempt,
+  memoryStore
 } from '../server/db.js';
 
 // Setup mock fetch for Paymently API
@@ -49,7 +51,7 @@ async function runAuditSuite() {
   console.log('================================================================\n');
 
   let passed = 0;
-  const total = 20;
+  const total = 24;
 
   const sampleCustomer = {
     name: 'Istihad Ahmed',
@@ -592,14 +594,18 @@ async function runAuditSuite() {
     console.error('  ✗ TEST 16 FAILED:', e.message);
   }
 
-  // --- TEST 17: Checkout Cancellation ---
+  // --- TEST 17: Protected Checkout Cancellation ---
   try {
-    console.log('\n▶ TEST 17 — Checkout Cancellation: Session marked CANCELLED, no order created:');
+    console.log('\n▶ TEST 17 — Protected Checkout Cancellation: Unauthorized cancel rejected; authorized owner cancel succeeds:');
     const chkId = `AZQ-CHK-TEST-17-${Date.now()}`;
+    const validCancelToken = `cct_secret_token_${Date.now()}`;
+    const customerPhone = '01711223313';
+
     await saveCheckoutAttempt({
       id: chkId,
+      cancel_token: validCancelToken,
       customer_name: 'Cancel User',
-      customer_phone: '01711223313',
+      customer_phone: customerPhone,
       shipping_address: 'Dhaka',
       items_snapshot: [],
       subtotal: 1000,
@@ -608,15 +614,29 @@ async function runAuditSuite() {
       status: 'AWAITING_PAYMENT'
     });
 
-    const cancelRes = await cancelPaymentlyCheckout({ checkoutId: chkId });
-    if (!cancelRes.success || cancelRes.status !== 'CANCELLED') {
-      throw new Error('Cancel checkout failed');
+    // 1. Unauthorized attempt without cancel token or phone must fail with 401
+    const unauthRes = await cancelPaymentlyCheckout({ checkoutId: chkId });
+    if (unauthRes.success !== false || unauthRes.statusCode !== 401) {
+      throw new Error(`Unauthorized cancellation was NOT rejected with 401! Got: ${JSON.stringify(unauthRes)}`);
     }
+
+    // 2. Unauthorized attempt with attacker guessed token must fail with 403
+    const attackerRes = await cancelPaymentlyCheckout({ checkoutId: chkId, cancelToken: 'cct_attacker_guessed_token' });
+    if (attackerRes.success !== false || attackerRes.statusCode !== 403) {
+      throw new Error(`Forged token cancellation was NOT rejected with 403! Got: ${JSON.stringify(attackerRes)}`);
+    }
+
+    // 3. Authorized cancellation with valid cancel_token must succeed
+    const validTokenRes = await cancelPaymentlyCheckout({ checkoutId: chkId, cancelToken: validCancelToken });
+    if (!validTokenRes.success || validTokenRes.status !== 'CANCELLED') {
+      throw new Error(`Authorized cancellation failed: ${JSON.stringify(validTokenRes)}`);
+    }
+
     const attempt = await getCheckoutAttempt(chkId);
     if (attempt.status !== 'CANCELLED' || attempt.order_id) {
       throw new Error('Attempt status was not set to CANCELLED');
     }
-    console.log('  ✓ Checkout attempt marked CANCELLED without creating confirmed order');
+    console.log('  ✓ Unauthorized cancel rejected (401/403); authorized cancel succeeded');
     passed++;
   } catch (e) {
     console.error('  ✗ TEST 17 FAILED:', e.message);
@@ -698,6 +718,213 @@ async function runAuditSuite() {
     passed++;
   } catch (e) {
     console.error('  ✗ TEST 20 FAILED:', e.message);
+  }
+
+  // --- TEST 21: Refund Amount Validation ---
+  try {
+    console.log('\n▶ TEST 21 — Refund Amount Validation: Reject zero, negative, and excessive amounts:');
+    const orderId = `AZQ-ORD-REFUND-VAL-${Date.now()}`;
+    const testOrder = {
+      id: orderId,
+      total_amount: 2500,
+      total: 2500,
+      payment_status: 'PAID',
+      fulfillment_status: 'Processing',
+      created_at: new Date().toISOString()
+    };
+    const testTxn = {
+      id: `TXN-REFUND-VAL-${Date.now()}`,
+      order_id: orderId,
+      amount: 2500,
+      status: 'PAID'
+    };
+
+    memoryStore.orders.set(orderId, testOrder);
+    memoryStore.payment_transactions.set(testTxn.id, testTxn);
+
+    // Negative amount
+    let threwNegative = false;
+    try {
+      await processRefund({ orderId, amount: -500 });
+    } catch (e) {
+      threwNegative = e.code === 'INVALID_REFUND_AMOUNT';
+    }
+
+    // Zero amount
+    let threwZero = false;
+    try {
+      await processRefund({ orderId, amount: 0 });
+    } catch (e) {
+      threwZero = e.code === 'INVALID_REFUND_AMOUNT';
+    }
+
+    // Exceeds captured amount
+    let threwExceeds = false;
+    try {
+      await processRefund({ orderId, amount: 99999 });
+    } catch (e) {
+      threwExceeds = e.code === 'EXCEEDS_CAPTURED_AMOUNT';
+    }
+
+    if (!threwNegative || !threwZero || !threwExceeds) {
+      throw new Error(`Refund validation failed: negative=${threwNegative}, zero=${threwZero}, exceeds=${threwExceeds}`);
+    }
+    console.log('  ✓ Negative, zero, and excessive refund amounts rejected safely');
+    passed++;
+  } catch (e) {
+    console.error('  ✗ TEST 21 FAILED:', e.message);
+  }
+
+  // --- TEST 22: Gateway Automated Refund Unsupported Fallback ---
+  try {
+    console.log('\n▶ TEST 22 — Refund Fallback: When gateway does not support automated refund, mark REFUND_PENDING_MANUAL_REVIEW:');
+    const orderId = `AZQ-ORD-REFUND-MANUAL-${Date.now()}`;
+    const testOrder = {
+      id: orderId,
+      total_amount: 3200,
+      total: 3200,
+      payment_status: 'PAID',
+      fulfillment_status: 'Processing',
+      created_at: new Date().toISOString()
+    };
+    const testTxn = {
+      id: `TXN-REFUND-MANUAL-${Date.now()}`,
+      order_id: orderId,
+      amount: 3200,
+      status: 'PAID'
+    };
+
+    memoryStore.orders.set(orderId, testOrder);
+    memoryStore.payment_transactions.set(testTxn.id, testTxn);
+
+    const providerResult = {
+      success: false,
+      supported: false,
+      code: 'AUTOMATED_REFUND_UNSUPPORTED',
+      message: 'Gateway does not support automated refund for this account'
+    };
+
+    const refundRes = await processRefund({
+      orderId,
+      amount: 3200,
+      reason: 'Damaged item return',
+      providerResult
+    });
+
+    if (refundRes.status !== 'REFUND_PENDING_MANUAL_REVIEW' || !refundRes.requires_manual_disbursement) {
+      throw new Error(`Expected REFUND_PENDING_MANUAL_REVIEW, got status: ${refundRes.status}`);
+    }
+
+    const updatedOrder = memoryStore.orders.get(orderId);
+    if (updatedOrder.payment_status === 'REFUNDED') {
+      throw new Error('Vulnerability: Order was silently marked REFUNDED without money moving!');
+    }
+    if (updatedOrder.payment_status !== 'REFUND_PENDING_MANUAL_REVIEW') {
+      throw new Error(`Expected payment_status REFUND_PENDING_MANUAL_REVIEW, got: ${updatedOrder.payment_status}`);
+    }
+
+    console.log('  ✓ Unsupported automated refund marked REFUND_PENDING_MANUAL_REVIEW (never falsely REFUNDED)');
+    passed++;
+  } catch (e) {
+    console.error('  ✗ TEST 22 FAILED:', e.message);
+  }
+
+  // --- TEST 23: Gateway Automated Refund Provider Success ---
+  try {
+    console.log('\n▶ TEST 23 — Provider Refund Success: When gateway executes refund, order marked REFUNDED with refund_id:');
+    const orderId = `AZQ-ORD-REFUND-PROV-${Date.now()}`;
+    const testOrder = {
+      id: orderId,
+      total_amount: 1500,
+      total: 1500,
+      payment_status: 'PAID',
+      fulfillment_status: 'Processing',
+      created_at: new Date().toISOString()
+    };
+    const testTxn = {
+      id: `TXN-REFUND-PROV-${Date.now()}`,
+      order_id: orderId,
+      amount: 1500,
+      status: 'PAID'
+    };
+
+    memoryStore.orders.set(orderId, testOrder);
+    memoryStore.payment_transactions.set(testTxn.id, testTxn);
+
+    const providerResult = {
+      success: true,
+      supported: true,
+      refundId: 'ref_prov_gateway_998811'
+    };
+
+    const refundRes = await processRefund({
+      orderId,
+      amount: 1500,
+      reason: 'Customer cancelled before dispatch',
+      providerResult
+    });
+
+    if (refundRes.status !== 'REFUNDED' || refundRes.refund_id !== 'ref_prov_gateway_998811') {
+      throw new Error(`Provider refund failed: status=${refundRes.status}, refund_id=${refundRes.refund_id}`);
+    }
+
+    const updatedOrder = memoryStore.orders.get(orderId);
+    if (updatedOrder.payment_status !== 'REFUNDED') {
+      throw new Error(`Expected order payment_status REFUNDED, got: ${updatedOrder.payment_status}`);
+    }
+
+    console.log('  ✓ Provider refund verified and marked REFUNDED with provider refund_id');
+    passed++;
+  } catch (e) {
+    console.error('  ✗ TEST 23 FAILED:', e.message);
+  }
+
+  // --- TEST 24: Gateway Automated Refund Provider Rejection ---
+  try {
+    console.log('\n▶ TEST 24 — Provider Rejection: Gateway rejection fails closed without marking order refunded:');
+    const orderId = `AZQ-ORD-REFUND-REJ-${Date.now()}`;
+    const testOrder = {
+      id: orderId,
+      total_amount: 2000,
+      total: 2000,
+      payment_status: 'PAID',
+      fulfillment_status: 'Processing',
+      created_at: new Date().toISOString()
+    };
+
+    memoryStore.orders.set(orderId, testOrder);
+
+    const providerResult = {
+      success: false,
+      supported: true,
+      code: 'GATEWAY_REFUND_REJECTED',
+      error: 'Insufficient merchant wallet balance for automated refund'
+    };
+
+    let threw = false;
+    try {
+      await processRefund({
+        orderId,
+        amount: 2000,
+        providerResult
+      });
+    } catch (e) {
+      threw = e.code === 'GATEWAY_REFUND_REJECTED';
+    }
+
+    if (!threw) {
+      throw new Error('Provider rejection did not throw GATEWAY_REFUND_REJECTED');
+    }
+
+    const order = memoryStore.orders.get(orderId);
+    if (order.payment_status === 'REFUNDED') {
+      throw new Error('Order was incorrectly marked REFUNDED on provider rejection');
+    }
+
+    console.log('  ✓ Provider rejection failed closed without modifying order status');
+    passed++;
+  } catch (e) {
+    console.error('  ✗ TEST 24 FAILED:', e.message);
   }
 
   console.log('\n================================================================');

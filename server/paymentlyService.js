@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 import { fileURLToPath } from 'url';
+import { verifyAdminAuth } from './adminAuth.js';
 import {
   initDb,
   saveCheckoutAttempt,
@@ -79,7 +81,8 @@ export function getPaymentlyConfig() {
     webhookSecret: (process.env.PAYMENTLY_WEBHOOK_SECRET || '').trim(),
     appBaseUrl: (process.env.APP_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://azraq.azraqtrips.com').replace(/\/+$/, ''),
     currency: 'BDT',
-    merchantName: 'AZRAQ'
+    merchantName: 'AZRAQ',
+    supportsAutomatedRefund: process.env.PAYMENTLY_SUPPORTS_AUTOMATED_REFUND === 'true'
   };
 }
 
@@ -202,12 +205,14 @@ export async function createPaymentlyCheckoutSession({
     throw new Error('Shopping cart is empty or total payable is invalid.');
   }
 
-  // Generate unique Checkout Reference (NOT an order ID)
+  // Generate unique Checkout Reference (NOT an order ID) and secure unguessable cancel token
   const checkoutId = `AZQ-CHK-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
+  const cancelToken = `cct_${crypto.randomBytes(24).toString('hex')}`;
 
   // Save the checkout attempt in PostgreSQL / Persistent Store
   const checkoutAttempt = await saveCheckoutAttempt({
     id: checkoutId,
+    cancel_token: cancelToken,
     customer_name: customer.name.trim(),
     customer_phone: customer.phone.trim(),
     customer_email: customer.email ? customer.email.trim() : null,
@@ -242,6 +247,7 @@ export async function createPaymentlyCheckoutSession({
         success: true,
         checkout_id: checkoutId,
         invoice_id: checkoutId,
+        cancel_token: cancelToken,
         amount: pricing.totalPayable,
         currency: 'BDT',
         payment_url: fallbackUrl,
@@ -347,6 +353,7 @@ export async function createPaymentlyCheckoutSession({
       success: true,
       checkout_id: checkoutId,
       invoice_id: invoiceId,
+      cancel_token: cancelToken,
       amount: pricing.totalPayable,
       currency: 'BDT',
       payment_url: paymentUrl,
@@ -811,28 +818,134 @@ export async function handlePaymentlyWebhook(payload, headers = {}) {
 
 /**
  * 5. Cancel Checkout Attempt
+ * Requires proof of ownership: cancel_token, matching customer phone, or admin authorization.
  */
-export async function cancelPaymentlyCheckout({ checkoutId, invoiceId }) {
+export async function cancelPaymentlyCheckout({
+  checkoutId,
+  invoiceId,
+  cancelToken,
+  customerPhone,
+  req = null
+}) {
   await initDb();
   let attempt = null;
   if (checkoutId) attempt = await getCheckoutAttempt(checkoutId);
   if (!attempt && invoiceId) attempt = await getCheckoutAttemptByInvoice(invoiceId);
 
-  if (attempt) {
-    await updateCheckoutAttempt(attempt.id, { status: 'CANCELLED' });
+  if (!attempt) {
     return {
-      success: true,
-      status: 'CANCELLED',
-      checkout_id: attempt.id,
-      message: 'Checkout attempt marked cancelled. No order created.'
+      success: false,
+      statusCode: 404,
+      code: 'CHECKOUT_NOT_FOUND',
+      error: 'Checkout attempt not found.'
     };
   }
 
-  return { success: false, error: 'Checkout attempt not found' };
+  // Invariant: Verify cancellation authorization
+  let isAuthorized = false;
+
+  // 1. Check cancel_token
+  const providedCancelToken = (cancelToken || req?.headers?.['x-cancel-token'] || '').trim();
+  if (providedCancelToken && attempt.cancel_token && providedCancelToken === attempt.cancel_token) {
+    isAuthorized = true;
+  }
+
+  // 2. Check customer phone
+  const providedPhone = (customerPhone || req?.headers?.['x-customer-phone'] || '').trim();
+  if (!isAuthorized && providedPhone && attempt.customer_phone) {
+    const normProvided = providedPhone.replace(/\D/g, '').slice(-11);
+    const normAttempt = String(attempt.customer_phone).replace(/\D/g, '').slice(-11);
+    if (normProvided.length >= 10 && normProvided === normAttempt) {
+      isAuthorized = true;
+    }
+  }
+
+  // 3. Check Admin Auth
+  if (!isAuthorized && req) {
+    const adminAuth = verifyAdminAuth(req);
+    if (adminAuth.authenticated) {
+      isAuthorized = true;
+    }
+  }
+
+  if (!isAuthorized) {
+    return {
+      success: false,
+      statusCode: (providedCancelToken || providedPhone) ? 403 : 401,
+      code: 'CANCELLATION_UNAUTHORIZED',
+      error: 'Unauthorized cancellation attempt. Valid cancel token, customer phone verification, or administrator authorization is required.'
+    };
+  }
+
+  await updateCheckoutAttempt(attempt.id, { status: 'CANCELLED' });
+  return {
+    success: true,
+    status: 'CANCELLED',
+    checkout_id: attempt.id,
+    message: 'Checkout attempt marked cancelled. No order created.'
+  };
 }
 
 /**
- * 6. Query Genuine Orders and Transactions for Admin
+ * 6. Request Refund from Payment Provider (Paymently / UddoktaPay)
+ * Checks provider automated refund capability; fails safely if unsupported.
+ */
+export async function requestPaymentlyRefund({ orderId, invoiceId, transactionId, amount, reason }) {
+  const config = getPaymentlyConfig();
+
+  if (!config.apiKey || !config.supportsAutomatedRefund) {
+    return {
+      success: false,
+      supported: false,
+      code: 'AUTOMATED_REFUND_UNSUPPORTED',
+      message: 'Automated refund is not supported by Paymently for this account. Manual merchant wallet disbursement is required.'
+    };
+  }
+
+  try {
+    const response = await fetch(`${config.baseUrl}/api/refund`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'RT-UDDOKTAPAY-API-KEY': config.apiKey,
+        'PAYMENTLY-API-KEY': config.apiKey
+      },
+      body: JSON.stringify({
+        invoice_id: invoiceId,
+        transaction_id: transactionId,
+        amount: String(amount),
+        reason
+      })
+    });
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      return {
+        success: false,
+        supported: true,
+        code: 'GATEWAY_REFUND_FAILED',
+        error: data.message || `Provider refund request failed with status ${response.status}`
+      };
+    }
+
+    const data = await response.json();
+    return {
+      success: true,
+      supported: true,
+      refundId: data.refund_id || data.id || `ref_${Date.now()}`
+    };
+  } catch (err) {
+    return {
+      success: false,
+      supported: true,
+      code: 'GATEWAY_NETWORK_ERROR',
+      error: err.message
+    };
+  }
+}
+
+/**
+ * 7. Query Genuine Orders and Transactions for Admin
  */
 export async function getAdminOrders() {
   await initDb();

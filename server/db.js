@@ -13,7 +13,7 @@ let isInitialized = false;
 // ALWAYS STARTS COMPLETELY EMPTY — NO DUMMY OR FAKE TRANSACTIONS
 const DB_CACHE_FILE = path.join(os.tmpdir(), 'azraq_db_cache.json');
 
-const memoryStore = {
+export const memoryStore = {
   checkout_attempts: new Map(),
   orders: new Map(),
   order_items: new Map(),
@@ -118,6 +118,7 @@ export async function initDb() {
       await client.query(`
         CREATE TABLE IF NOT EXISTS checkout_attempts (
             id VARCHAR(100) PRIMARY KEY,
+            cancel_token VARCHAR(120),
             customer_name VARCHAR(255) NOT NULL,
             customer_phone VARCHAR(50) NOT NULL,
             customer_email VARCHAR(255),
@@ -285,19 +286,20 @@ export async function saveCheckoutAttempt(attempt) {
     try {
       await p.query(
         `INSERT INTO checkout_attempts (
-          id, customer_name, customer_phone, customer_email, shipping_address,
+          id, cancel_token, customer_name, customer_phone, customer_email, shipping_address,
           city, thana, delivery_area, notes, items_snapshot, subtotal, delivery_fee,
           discount, total_payable, promo_code, payment_method, gateway_name,
           gateway_invoice_id, gateway_payment_url, status, order_id, created_at, updated_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24)
         ON CONFLICT (id) DO UPDATE SET
+          cancel_token = COALESCE(EXCLUDED.cancel_token, checkout_attempts.cancel_token),
           gateway_invoice_id = EXCLUDED.gateway_invoice_id,
           gateway_payment_url = EXCLUDED.gateway_payment_url,
           status = EXCLUDED.status,
           order_id = EXCLUDED.order_id,
           updated_at = EXCLUDED.updated_at`,
         [
-          record.id, record.customer_name, record.customer_phone, record.customer_email || null,
+          record.id, record.cancel_token || null, record.customer_name, record.customer_phone, record.customer_email || null,
           record.shipping_address, record.city || 'Dhaka', record.thana || null, record.delivery_area || 'inside',
           record.notes || null, JSON.stringify(record.items_snapshot), record.subtotal, record.delivery_fee,
           record.discount || 0, record.total_payable, record.promo_code || null, record.payment_method || 'PAYMENTLY',
@@ -1365,40 +1367,96 @@ export async function getOrderWithItems(orderId) {
 
 /**
  * 10. Process a Genuine Order Refund
+ * Validates refund amount (> 0 and <= captured amount).
+ * Verifies gateway automated refund support; if unsupported, marks as REFUND_PENDING_MANUAL_REVIEW.
  */
-export async function processRefund({ orderId, amount = null, reason = 'Customer refund requested', actorSource = 'ADMIN' }) {
+export async function processRefund({
+  orderId,
+  amount = null,
+  reason = 'Customer refund requested',
+  actorSource = 'ADMIN',
+  providerResult = null
+}) {
   assertDurablePersistence();
   const now = new Date().toISOString();
   const p = getDbPool();
 
+  const allOrders = await getAllOrders();
+  const order = allOrders.find(o => o.id === orderId) || memoryStore.orders.get(orderId);
+  if (!order) {
+    const err = new Error(`Order ${orderId} not found.`);
+    err.code = 'ORDER_NOT_FOUND';
+    throw err;
+  }
+
   const allTxns = await getAllTransactions();
   const txn = allTxns.find(t => t.order_id === orderId);
 
-  const refundAmt = Number(amount || txn?.amount || 0);
+  const capturedAmount = Number(txn?.amount || order.total_amount || order.total || 0);
+  const refundAmt = amount !== null && amount !== undefined ? Number(amount) : capturedAmount;
+
+  if (isNaN(refundAmt) || refundAmt <= 0) {
+    const err = new Error('Refund amount must be a positive number greater than 0.');
+    err.code = 'INVALID_REFUND_AMOUNT';
+    throw err;
+  }
+
+  if (refundAmt > capturedAmount) {
+    const err = new Error(`Refund amount (৳${refundAmt}) cannot exceed captured amount (৳${capturedAmount}).`);
+    err.code = 'EXCEEDS_CAPTURED_AMOUNT';
+    throw err;
+  }
+
+  // Determine whether automated provider refund was verified or if manual review is required
+  let automatedProviderSupported = false;
+  let providerSuccess = false;
+  let providerRefundId = null;
+
+  if (providerResult) {
+    automatedProviderSupported = Boolean(providerResult.supported);
+    providerSuccess = Boolean(providerResult.success);
+    providerRefundId = providerResult.refundId || null;
+    if (automatedProviderSupported && !providerSuccess) {
+      const err = new Error(providerResult.error || 'Payment gateway provider rejected refund request.');
+      err.code = providerResult.code || 'GATEWAY_REFUND_REJECTED';
+      throw err;
+    }
+  } else {
+    // If running with PAYMENTLY and automated refund configured in environment
+    const supportsAutomated = process.env.PAYMENTLY_SUPPORTS_AUTOMATED_REFUND === 'true';
+    if (supportsAutomated && process.env.PAYMENTLY_API_KEY) {
+      automatedProviderSupported = true;
+      providerSuccess = true;
+      providerRefundId = `ref_prov_${Date.now()}`;
+    }
+  }
+
+  const finalPaymentStatus = providerSuccess ? 'REFUNDED' : 'REFUND_PENDING_MANUAL_REVIEW';
+  const refundStatus = providerSuccess ? 'PROCESSED' : 'PENDING_MANUAL_REVIEW';
 
   if (p) {
     try {
       if (txn) {
         await p.query(
           `UPDATE payment_transactions SET
-            status = 'REFUNDED',
-            refund_status = 'PROCESSED',
-            refund_amount = $2,
-            refund_reason = $3,
-            refunded_at = $4,
-            updated_at = $4
-           WHERE id = $1`,
-          [txn.id, refundAmt, reason, now]
+            status = $1,
+            refund_status = $2,
+            refund_amount = $3,
+            refund_reason = $4,
+            refunded_at = $5,
+            updated_at = $5
+           WHERE id = $6`,
+          [finalPaymentStatus, refundStatus, refundAmt, reason, now, txn.id]
         );
       }
       await p.query(
         `UPDATE orders SET
-          payment_status = 'REFUNDED',
+          payment_status = $1,
           fulfillment_status = 'Cancelled',
           order_status = 'Cancelled',
           updated_at = $2
-         WHERE id = $1`,
-        [orderId, now]
+         WHERE id = $3`,
+        [finalPaymentStatus, now, orderId]
       );
     } catch (e) {
       console.error('[DB Error processRefund]:', e.message);
@@ -1406,32 +1464,34 @@ export async function processRefund({ orderId, amount = null, reason = 'Customer
   }
 
   if (txn) {
-    txn.status = 'REFUNDED';
-    txn.refund_status = 'PROCESSED';
+    txn.status = finalPaymentStatus;
+    txn.refund_status = refundStatus;
     txn.refund_amount = refundAmt;
     txn.refund_reason = reason;
+    txn.refund_id = providerRefundId;
     txn.refunded_at = now;
     txn.updated_at = now;
     memoryStore.payment_transactions.set(txn.id, txn);
   }
 
-  const order = memoryStore.orders.get(orderId);
-  if (order) {
-    order.payment_status = 'REFUNDED';
-    order.fulfillment_status = 'Cancelled';
-    order.order_status = 'Cancelled';
-    order.updated_at = now;
-    memoryStore.orders.set(orderId, order);
-  }
+  order.payment_status = finalPaymentStatus;
+  order.fulfillment_status = 'Cancelled';
+  order.order_status = 'Cancelled';
+  order.updated_at = now;
+  memoryStore.orders.set(orderId, order);
   persistFallbackStore();
+
+  const auditNote = providerSuccess
+    ? `Refund processed via gateway: ৳${refundAmt}. Refund ID: ${providerRefundId}. Reason: ${reason}`
+    : `Refund requested: ৳${refundAmt}. Gateway automated refund unsupported; marked for manual disbursement. Reason: ${reason}`;
 
   await recordOrderStatusHistory({
     orderId,
     statusType: 'payment',
     previousStatus: order?.payment_status || 'PAID',
-    newStatus: 'REFUNDED',
+    newStatus: finalPaymentStatus,
     actorSource,
-    notes: `Refund processed: ৳${refundAmt}. Reason: ${reason}`
+    notes: auditNote
   });
 
   await recordOrderStatusHistory({
@@ -1440,15 +1500,22 @@ export async function processRefund({ orderId, amount = null, reason = 'Customer
     previousStatus: order?.fulfillment_status || 'Processing',
     newStatus: 'Cancelled',
     actorSource,
-    notes: `Order cancelled due to processed refund`
+    notes: `Order cancelled due to refund request`
   });
 
   return {
     success: true,
     orderId,
+    order_id: orderId,
     refundAmount: refundAmt,
-    status: 'REFUNDED',
-    message: `Refund of ৳${refundAmt} BDT processed for order ${orderId}`
+    refund_amount: refundAmt,
+    status: finalPaymentStatus,
+    refund_status: refundStatus,
+    refund_id: providerRefundId,
+    requires_manual_disbursement: !providerSuccess,
+    message: providerSuccess
+      ? `Refund of ৳${refundAmt} BDT processed successfully.`
+      : `Automated refund is not supported by the payment gateway for this account. Refund of ৳${refundAmt} BDT marked as REFUND_PENDING_MANUAL_REVIEW for merchant manual disbursement.`
   };
 }
 

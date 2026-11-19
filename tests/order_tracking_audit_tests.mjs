@@ -20,6 +20,7 @@ import {
   createOrderWithManualTrx
 } from '../server/db.js';
 import { createCodCheckoutOrder } from '../server/paymentlyService.js';
+import orderTrackingHandler, { getClientIp, isRateLimited, resetTrackingRateLimits } from '../api/orders/track.js';
 
 let passed = 0;
 let total = 0;
@@ -284,6 +285,63 @@ await runTest('Manual TrxID Order: starts as PENDING_VERIFICATION and requires a
   const history = await getOrderStatusHistory(res.order.id);
   const pendingLog = history.find(h => h.new_status === 'PENDING_VERIFICATION');
   assert.ok(pendingLog, 'Must log PENDING_VERIFICATION in history');
+});
+
+// 14. Order Tracking Rate Limit & Trusted Proxy Resolution
+await runTest('Rate Limit: rotating X-Forwarded-For headers cannot bypass rate limit when TRUST_PROXY is disabled', async () => {
+  delete process.env.TRUST_PROXY;
+  resetTrackingRateLimits();
+
+  const socketIp = '198.51.100.45';
+
+  // Send 25 requests with different spoofed X-Forwarded-For headers from the same socket IP
+  for (let i = 1; i <= 25; i++) {
+    const mockReq = {
+      headers: { 'x-forwarded-for': `203.0.113.${i}, 10.0.0.1` },
+      socket: { remoteAddress: socketIp }
+    };
+    const resolvedIp = getClientIp(mockReq);
+    assert.strictEqual(resolvedIp, socketIp, 'Client IP must resolve to socket address when TRUST_PROXY is unset');
+    const blocked = isRateLimited(resolvedIp);
+    assert.strictEqual(blocked, false, `Request ${i} should be allowed`);
+  }
+
+  // Request 26 with yet another rotating X-Forwarded-For must be BLOCKED
+  const mockReq26 = {
+    method: 'GET',
+    headers: { 'x-forwarded-for': '192.0.2.99' },
+    socket: { remoteAddress: socketIp }
+  };
+  const resolvedIp26 = getClientIp(mockReq26);
+  assert.strictEqual(resolvedIp26, socketIp);
+  const blocked26 = isRateLimited(resolvedIp26);
+  assert.strictEqual(blocked26, true, 'Request 26 must be rate limited (429) regardless of rotating X-Forwarded-For');
+
+  // Verify the handler returns 429
+  let resStatus = 0;
+  let resJson = null;
+  const res = {
+    setHeader() {},
+    status(code) { resStatus = code; return this; },
+    json(data) { resJson = data; return this; }
+  };
+  await orderTrackingHandler(mockReq26, res);
+  assert.strictEqual(resStatus, 429);
+  assert.strictEqual(resJson.code, 'RATE_LIMITED');
+});
+
+await runTest('Rate Limit: honors X-Forwarded-For only when TRUST_PROXY is explicitly enabled', () => {
+  process.env.TRUST_PROXY = 'true';
+  try {
+    const mockReq = {
+      headers: { 'x-forwarded-for': '203.0.113.88, 10.0.0.1' },
+      socket: { remoteAddress: '127.0.0.1' }
+    };
+    const resolvedIp = getClientIp(mockReq);
+    assert.strictEqual(resolvedIp, '203.0.113.88');
+  } finally {
+    delete process.env.TRUST_PROXY;
+  }
 });
 
 console.log('='.repeat(64));

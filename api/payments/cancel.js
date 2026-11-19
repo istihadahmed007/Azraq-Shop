@@ -16,9 +16,16 @@ export default async function handler(req, res) {
       try { payload = JSON.parse(payload); } catch (e) {}
     }
 
-    const { checkoutId, invoiceId } = payload || {};
-    const cancelResult = await cancelPaymentlyCheckout({ checkoutId, invoiceId });
-    return res.status(200).json(cancelResult);
+    const { checkoutId, invoiceId, cancelToken, cancel_token, customerPhone, phone } = payload || {};
+    const cancelResult = await cancelPaymentlyCheckout({
+      checkoutId,
+      invoiceId,
+      cancelToken: cancelToken || cancel_token,
+      customerPhone: customerPhone || phone,
+      req
+    });
+    const statusCode = cancelResult.success ? 200 : (cancelResult.statusCode || 403);
+    return res.status(statusCode).json(cancelResult);
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }

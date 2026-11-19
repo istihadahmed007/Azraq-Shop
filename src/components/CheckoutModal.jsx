@@ -508,14 +508,16 @@ export default function CheckoutModal() {
     }
   };
 
-  // Cancel checkout with confirmation
+  // Cancel checkout with confirmation (providing cancel_token and phone proof of ownership)
   const handleConfirmCancel = async () => {
     setIsSubmitting(true);
     try {
       if (paymentSession) {
         await cancelCheckout({
           checkoutId: paymentSession.checkout_id,
-          invoiceId: paymentSession.invoice_id
+          invoiceId: paymentSession.invoice_id,
+          cancelToken: paymentSession.cancel_token,
+          customerPhone: customer.phone
         });
       }
     } catch (e) {}

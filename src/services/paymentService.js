@@ -296,14 +296,17 @@ export async function verifyPaymentStatus({ invoiceId, checkoutId, manualTrxId =
 }
 
 /**
- * 3. Cancel a pending checkout attempt
+ * 3. Cancel a pending checkout attempt (Requires ownership credential / cancelToken)
  */
-export async function cancelCheckout({ checkoutId, invoiceId }) {
+export async function cancelCheckout({ checkoutId, invoiceId, cancelToken, customerPhone }) {
   try {
     const response = await fetch(`${API_BASE}/api/payments/cancel`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ checkoutId, invoiceId })
+      headers: { 
+        'Content-Type': 'application/json',
+        ...(cancelToken ? { 'x-cancel-token': cancelToken } : {})
+      },
+      body: JSON.stringify({ checkoutId, invoiceId, cancelToken, customerPhone })
     });
     return await response.json();
   } catch (e) {
@@ -348,10 +351,8 @@ function getAdminAuthHeaders(adminKey = null) {
   return headers;
 }
 
-const AUTHORIZED_ADMIN_KEYS = ['0133865246', 'azraq-admin-secret-2026', 'azraq_admin_2026', 'admin@azraq'];
-
 /**
- * 5. Verify Administrator Credentials with Server (with resilient fallback for Hostinger/offline)
+ * 5. Verify Administrator Credentials with Server
  */
 export async function authenticateAdmin(adminKey) {
   const cleanKey = String(adminKey || '').trim();
@@ -375,20 +376,13 @@ export async function authenticateAdmin(adminKey) {
       if (response.ok && data.success) {
         return { success: true, message: data.message || 'Authenticated successfully' };
       }
-      if (data.error && !AUTHORIZED_ADMIN_KEYS.includes(cleanKey)) {
-        return { success: false, error: data.error };
-      }
+      return { success: false, error: data.error || 'Invalid administrative credentials.' };
     }
+    return { success: false, error: 'Server authentication returned unexpected response format.' };
   } catch (e) {
     console.warn('Server authentication endpoint unreachable:', e);
+    return { success: false, error: 'Administrative authentication service is currently unreachable.' };
   }
-
-  // Resilient fallback: grant access if valid admin key matches
-  if (AUTHORIZED_ADMIN_KEYS.includes(cleanKey)) {
-    return { success: true, message: 'Administrator session authenticated.' };
-  }
-
-  return { success: false, error: 'Invalid administrator key. Access denied.' };
 }
 
 /**

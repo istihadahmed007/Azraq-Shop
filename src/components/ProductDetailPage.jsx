@@ -25,11 +25,11 @@ import {
 import { useShop } from '../context/ShopContext';
 import ProductImage from './common/ProductImage';
 import ProductCard from './common/ProductCard';
-import { 
-  findProductBySlug, 
-  generateProductSlug, 
+import {
+  findProductBySlug,
+  generateProductSlug,
   normalizeProductImages,
-  fetchSingleProduct 
+  fetchSingleProduct
 } from '../utils/productUtils';
 import { formatBdtAmount } from '../services/paymentService';
 

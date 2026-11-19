@@ -21,7 +21,6 @@ export default function CollectionDetailPage() {
     collections,
     products,
     activeCollection: contextActiveCollection, 
-    activeCollectionProducts: contextCollectionProducts, 
     navigateTo, 
     setSelectedProduct, 
     addToCart, 
@@ -62,28 +61,9 @@ export default function CollectionDetailPage() {
     }
   }, [activeCollection]);
 
-  // Safe fallback if collection is undefined
-  if (!activeCollection) {
-    return (
-      <div className="w-full py-16 text-center select-none">
-        <h2 className="text-2xl font-bold text-[#293B52] mb-3">
-          {t("Collection Not Found", "কালেকশনটি পাওয়া যায়নি")}
-        </h2>
-        <p className="text-xs text-[#6B7D93] mb-6">
-          {t("The category you requested does not exist or has been relocated.", "আপনার অনুরোধকৃত কালেকশনটি পাওয়া যায়নি।")}
-        </p>
-        <button
-          onClick={() => navigate('/collections')}
-          className="px-6 py-2.5 rounded-full bg-[#0877C9] text-white text-xs font-bold shadow-sm hover:bg-[#0665AC] transition-all"
-        >
-          {t("Browse All Collections", "সকল কালেকশন দেখুন")}
-        </button>
-      </div>
-    );
-  }
-
-  // Filter and sort products belonging to this collection
+  // Filter and sort products belonging to this collection (Unconditionally called on every render)
   const filteredProducts = useMemo(() => {
+    if (!activeCollection) return [];
     let result = [...(collectionProducts || [])];
 
     if (searchQuery.trim()) {
@@ -118,9 +98,29 @@ export default function CollectionDetailPage() {
     }
 
     return result;
-  }, [activeCollectionProducts, searchQuery, priceFilter, inStockOnly, sortBy]);
+  }, [activeCollection, collectionProducts, searchQuery, priceFilter, inStockOnly, sortBy]);
 
   const displayedProducts = filteredProducts.slice(0, visibleCount);
+
+  // Safe fallback if collection is undefined (Rendered after all hooks are evaluated)
+  if (!activeCollection) {
+    return (
+      <div className="w-full py-16 text-center select-none">
+        <h2 className="text-2xl font-bold text-[#293B52] mb-3">
+          {t("Collection Not Found", "কালেকশনটি পাওয়া যায়নি")}
+        </h2>
+        <p className="text-xs text-[#6B7D93] mb-6">
+          {t("The category you requested does not exist or has been relocated.", "আপনার অনুরোধকৃত কালেকশনটি পাওয়া যায়নি।")}
+        </p>
+        <button
+          onClick={() => navigate('/collections')}
+          className="px-6 py-2.5 rounded-full bg-[#0877C9] text-white text-xs font-bold shadow-sm hover:bg-[#0665AC] transition-all"
+        >
+          {t("Browse All Collections", "সকল কালেকশন দেখুন")}
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full py-4 min-h-screen select-none">
@@ -153,7 +153,7 @@ export default function CollectionDetailPage() {
             </p>
             <div className="pt-1 flex flex-wrap items-center justify-center md:justify-start gap-2">
               <span className="px-3 py-1 rounded-full bg-[#EDF4F9] text-xs font-semibold text-[#293B52] border border-[#D5E2EE]">
-                {activeCollectionProducts?.length || 0} {t("Products Available", "পণ্য অন্তর্ভুক্ত")}
+                {collectionProducts?.length || 0} {t("Products Available", "পণ্য অন্তর্ভুক্ত")}
               </span>
               <span className="px-3 py-1 rounded-full bg-emerald-50 text-xs font-semibold text-emerald-800 border border-emerald-200">
                 {t("100% Authentic Quality", "১০০% আসল পণ্য")}

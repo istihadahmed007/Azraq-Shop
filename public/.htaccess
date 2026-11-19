@@ -4,6 +4,10 @@
   RewriteBase /
   RewriteRule ^index\.html$ - [L]
 
+  # Route Health check endpoints
+  RewriteRule ^health/?$ health.php [L,QSA]
+  RewriteRule ^api/health/?$ api/health.php [L,QSA]
+
   # Route API endpoints directly to PHP handlers
   RewriteRule ^api/admin/auth/?$ api/admin/auth.php [L,QSA]
   RewriteRule ^api/orders/track/?$ api/orders/track.php [L,QSA]
@@ -11,14 +15,23 @@
   RewriteRule ^api/orders/?$ api/orders/index.php [L,QSA]
   RewriteRule ^api/payments/transactions/?$ api/payments/transactions.php [L,QSA]
   RewriteRule ^api/payments/create/?$ api/payments/create.php [L,QSA]
+  RewriteRule ^api/payments/cancel/?$ api/payments/cancel.php [L,QSA]
   RewriteRule ^api/payments/verify/?$ api/payments/verify.php [L,QSA]
   RewriteRule ^api/payments/status/?$ api/payments/status.php [L,QSA]
   RewriteRule ^api/payments/refund/?$ api/payments/refund.php [L,QSA]
   RewriteRule ^api/search-by-image/?$ api/search-by-image.php [L,QSA]
+  RewriteRule ^api/products/?$ api/products/index.php [L,QSA]
 
-  # Do NOT rewrite other API routes to index.html
-  RewriteCond %{REQUEST_URI} !^/api/
+  # Missing assets return 404 text, NEVER fall through to index.html
+  RewriteCond %{REQUEST_URI} ^/assets/
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^assets/.*$ - [R=404,L]
 
+  # Unhandled API routes return JSON 404, NEVER fall through to index.html
+  RewriteCond %{REQUEST_URI} ^/api/
+  RewriteRule ^api/.*$ api/404.php [L]
+
+  # SPA fallback to index.html
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{REQUEST_FILENAME} !-l

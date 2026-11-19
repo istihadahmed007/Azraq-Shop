@@ -48,13 +48,10 @@ export function verifyAdminAuth(req) {
     };
   }
 
-  // Timing-safe comparison against configured key and authorized keys
-  const validKeys = [expectedSecret, '0133865246', 'azraq-admin-secret-2026'].filter(Boolean);
-  const isValid = validKeys.some(key => {
-    const expectedBuffer = Buffer.from(key);
-    const providedBuffer = Buffer.from(providedKey);
-    return expectedBuffer.length === providedBuffer.length && crypto.timingSafeEqual(expectedBuffer, providedBuffer);
-  });
+  // Timing-safe comparison strictly against configured secret
+  const expectedBuffer = Buffer.from(expectedSecret);
+  const providedBuffer = Buffer.from(providedKey);
+  const isValid = expectedBuffer.length === providedBuffer.length && crypto.timingSafeEqual(expectedBuffer, providedBuffer);
 
   if (!isValid) {
     return {
