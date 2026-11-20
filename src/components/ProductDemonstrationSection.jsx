@@ -36,7 +36,7 @@ export default function ProductDemonstrationSection() {
                   <div className="absolute inset-0 bg-[#0E2742]/40 backdrop-blur-[2px] flex items-center justify-center">
                     <button
                       onClick={() => setIsPlaying(true)}
-                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] hover:from-[#5CBDE5] text-white flex items-center justify-center shadow-[0_0_30px_rgba(112,200,237,0.6)] transition-all transform hover:scale-110 active:scale-95 group/btn"
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#185ADB] hover:bg-[#1044A3] text-white flex items-center justify-center shadow-lg transition-transform transform hover:scale-105 active:scale-95 group/btn"
                     >
                       <Play className="w-8 h-8 fill-current ml-1 transition-transform group-hover/btn:scale-110" />
                     </button>
@@ -111,7 +111,7 @@ export default function ProductDemonstrationSection() {
               </div>
               <button
                 onClick={() => addToCart(demoProduct, demoProduct.variants?.[0] || 'Default', 1)}
-                className="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] hover:from-[#5CBDE5] text-white font-bold text-xs shadow-[0_4px_16px_rgba(112,200,237,0.4)] transition-all flex items-center gap-2 cursor-pointer"
+                className="px-5 py-2.5 rounded-lg bg-[#185ADB] hover:bg-[#1044A3] text-white font-semibold text-xs shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
               >
                 <ShoppingBag className="w-4 h-4" />
                 <span>{t("Add to Bag", "ব্যাগে যোগ করুন")}</span>

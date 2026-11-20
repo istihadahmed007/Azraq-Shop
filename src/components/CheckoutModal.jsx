@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  X, CheckCircle2, ShieldCheck, ArrowRight, Banknote, 
+import {
+  X, CheckCircle2, ShieldCheck, ArrowRight, Banknote,
   ExternalLink, RefreshCw, AlertCircle, Clock, ChevronRight,
   Copy, Check, Lock, AlertTriangle, ShoppingBag, Info
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useShop } from '../context/ShopContext';
 import ProductImage from './common/ProductImage';
-import { 
-  createCheckoutSession, 
-  verifyPaymentStatus, 
+import {
+  createCheckoutSession,
+  verifyPaymentStatus,
   cancelCheckout,
   isTrustedPaymentUrl,
   formatBdtAmount,
@@ -61,7 +61,7 @@ export default function CheckoutModal() {
   const [city, setCity] = useState('Dhaka');
   const [thana, setThana] = useState('');
   const [notes, setNotes] = useState('');
-  
+
   // Payment method: 'PAYMENTLY' | 'COD'
   const [paymentMethod, setPaymentMethod] = useState('PAYMENTLY');
 
@@ -101,7 +101,7 @@ export default function CheckoutModal() {
               setConfirmedOrder(res.order);
               setVerifiedTransaction(res.transaction);
               setCheckoutStep('paid_success');
-              try { confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
+              try { confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } }); } catch (e) { }
               showToast(t("Payment verified successfully via Paymently!", "পেমেন্ট সফলভাবে ভেরিফাই হয়েছে!"), 'success');
             } else if (res.status === 'PENDING' || res.status === 'AWAITING_PAYMENT') {
               setPendingNotice(t("Payment has not yet cleared on Paymently. If you completed payment in your mobile wallet, please wait 30 seconds and click Check Again, or submit your TrxID below.", "পেমেন্টলি থেকে পেমেন্ট এখনো ক্লিয়ার হয়নি। অনুগ্রহ করে অপেক্ষা করে পুনরায় চেক করুন বা নিচে TrxID দিন।"));
@@ -118,7 +118,7 @@ export default function CheckoutModal() {
           });
         }
       }
-    } catch (e) {}
+    } catch (e) { }
   }, []);
 
   if (!isCheckoutOpen) return null;
@@ -198,7 +198,7 @@ export default function CheckoutModal() {
       localStorage.setItem('azraq_customer_phone', phone.trim());
       localStorage.setItem('azraq_customer_email', email.trim());
       localStorage.setItem('azraq_customer_address', address.trim());
-    } catch (e) {}
+    } catch (e) { }
 
     const customerData = {
       name: fullName.trim(),
@@ -256,7 +256,7 @@ export default function CheckoutModal() {
           try {
             sessionStorage.setItem('azraq_active_checkout_id', session.checkout_id);
             if (session.invoice_id) sessionStorage.setItem('azraq_active_invoice_id', session.invoice_id);
-          } catch (e) {}
+          } catch (e) { }
 
           // Immediately transfer directly to the gateway payment link
           window.location.href = session.payment_url;
@@ -279,7 +279,7 @@ export default function CheckoutModal() {
         try {
           sessionStorage.setItem('azraq_active_checkout_id', fallbackId);
           sessionStorage.setItem('azraq_active_invoice_id', fallbackId);
-        } catch (e) {}
+        } catch (e) { }
 
         showToast(t("Opening Paymently secure checkout...", "পেমেন্টলি পেমেন্ট পেইজে নিয়ে যাওয়া হচ্ছে..."), 'info');
         window.location.href = 'https://azraq.paymently.io/paymentlink/default/BDT';
@@ -367,7 +367,7 @@ export default function CheckoutModal() {
         setCheckoutStep('paid_success');
         try {
           confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
-        } catch (e) {}
+        } catch (e) { }
         showToast(t("Payment verified successfully via Paymently!", "পেমেন্ট সফলভাবে ভেরিফাই হয়েছে!"), 'success');
       } else if (res.status === 'PENDING' || res.status === 'AWAITING_PAYMENT') {
         // Clear pending notice: do NOT mark as paid!
@@ -438,7 +438,7 @@ export default function CheckoutModal() {
         // If provider verified it as paid:
         if (res.verified === true && res.status === 'PAID') {
           setCheckoutStep('paid_success');
-          try { confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
+          try { confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } }); } catch (e) { }
         } else {
           // Keep strictly as PENDING_VERIFICATION (never claim paid!)
           setCheckoutStep('pending_verification');
@@ -532,7 +532,7 @@ export default function CheckoutModal() {
           customerPhone: customer.phone
         });
       }
-    } catch (e) {}
+    } catch (e) { }
     setIsSubmitting(false);
     setShowCancelConfirm(false);
     setPaymentSession(null);
@@ -543,15 +543,15 @@ export default function CheckoutModal() {
   const displayTotal = paymentSession?.amount ? formatBdtAmount(paymentSession.amount) : formatBdtAmount(cartTotal);
 
   return (
-    <div 
-      className="fixed inset-0 z-50 bg-azraq-deep/40 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-hidden animate-in fade-in duration-200 select-none"
+    <div
+      className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-hidden animate-in fade-in duration-200 select-none"
       role="dialog"
       aria-modal="true"
       aria-labelledby="checkout-modal-title"
     >
-      {/* Modal Surface (Glassmorphic Rounded Panel) */}
-      <div 
-        className="relative w-full max-w-xl glass-panel rounded-t-3xl sm:rounded-3xl shadow-[0_24px_64px_rgba(25,59,91,0.24)] overflow-hidden max-h-[92dvh] flex flex-col my-auto border border-[rgba(130,170,205,0.35)]"
+      {/* Modal Surface */}
+      <div
+        className="relative w-full max-w-xl bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[92dvh] flex flex-col my-auto border border-slate-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Accessible live region for status announcements */}
@@ -563,18 +563,18 @@ export default function CheckoutModal() {
         </div>
 
         {/* Modal Top Bar */}
-        <div className="flex items-center justify-between px-6 py-4 bg-[rgba(248,251,255,0.92)] backdrop-blur-xl text-azraq-deep border-b border-[rgba(130,170,205,0.22)]">
+        <div className="flex items-center justify-between px-6 py-4 bg-white text-slate-900 border-b border-slate-200">
           <div className="flex items-center gap-2.5">
             <img src="/branding/azraq-icon.png" alt="AZRAQ Shop" className="w-5 h-5 object-contain shrink-0" />
-            <h2 id="checkout-modal-title" className="text-xs font-mono font-bold tracking-wider text-azraq-deep uppercase flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-azraq-cyan animate-pulse"></span>
+            <h2 id="checkout-modal-title" className="text-xs font-semibold tracking-wide text-slate-900 uppercase flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#185ADB]"></span>
               AZRAQ • {t("SECURE CHECKOUT", "নিরাপদ চেকআউট")}
             </h2>
           </div>
           <button
             onClick={handleClose}
             aria-label={t("Close checkout", "বন্ধ করুন")}
-            className="w-8 h-8 rounded-full glass-card hover:bg-white border border-[rgba(130,170,205,0.3)] flex items-center justify-center text-azraq-secondary hover:text-azraq-deep transition-all focus:outline-none"
+            className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 transition-colors focus:outline-none"
           >
             <X className="w-4 h-4" />
           </button>
@@ -585,11 +585,11 @@ export default function CheckoutModal() {
         {/* ==================================================================== */}
         {checkoutStep === 'form' && (
           <div className="overflow-y-auto flex-1">
-            <div className="p-5 sm:p-6 bg-[rgba(241,247,252,0.65)] border-b border-[rgba(130,170,205,0.18)]">
-              <h3 className="text-lg sm:text-xl font-bold text-azraq-deep">
+            <div className="p-5 sm:p-6 bg-slate-50 border-b border-slate-200">
+              <h3 className="text-lg sm:text-xl font-bold text-slate-900">
                 {t("Complete Your Order", "অর্ডার সম্পন্ন করুন")}
               </h3>
-              <p className="text-xs text-azraq-secondary mt-0.5">
+              <p className="text-xs text-slate-600 mt-0.5">
                 {t(
                   "Pay securely with bKash, Nagad, Rocket, or Card via Paymently, or choose Cash on Delivery.",
                   "বিকাশ, নগদ, রকেট, কার্ড অথবা ক্যাশ অন ডেলিভারিতে অর্ডার করুন।"
@@ -598,27 +598,27 @@ export default function CheckoutModal() {
             </div>
 
             {errorMessage && (
-              <div className="mx-5 mt-4 p-3 rounded-2xl bg-rose-50/80 border border-rose-200 text-xs text-rose-700 flex items-start gap-2">
+              <div className="mx-5 mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
                 <span>{errorMessage}</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-5" noValidate>
-              
+
               {/* Section 1: Customer Details */}
               <div className="space-y-3.5">
-                <div className="flex items-center justify-between pb-1 border-b border-[rgba(130,170,205,0.18)]">
-                  <span className="text-xs font-bold uppercase tracking-wider text-azraq-deep flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-gradient-to-r from-azraq-deep to-azraq-cyan text-white flex items-center justify-center text-[10px] font-bold">1</span>
+                <div className="flex items-center justify-between pb-1 border-b border-slate-200">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-900 flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-md bg-[#185ADB] text-white flex items-center justify-center text-[10px] font-bold">1</span>
                     {t("Delivery Details", "ডেলিভারি বিবরণ")}
                   </span>
-                  <span className="text-[11px] text-azraq-secondary">* {t("Required", "বাধ্যতামূলক")}</span>
+                  <span className="text-[11px] text-slate-500">* {t("Required", "বাধ্যতামূলক")}</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="customer-name" className="block text-xs font-semibold text-azraq-deep mb-1">
+                    <label htmlFor="customer-name" className="block text-xs font-semibold text-slate-800 mb-1">
                       {t("Full Name", "পূর্ণ নাম")} <span className="text-rose-500">*</span>
                     </label>
                     <input
@@ -631,8 +631,8 @@ export default function CheckoutModal() {
                         setFullName(e.target.value);
                         if (formErrors.fullName) setFormErrors(prev => ({ ...prev, fullName: null }));
                       }}
-                      className={`w-full px-3.5 py-2.5 rounded-xl border text-xs text-azraq-deep bg-white/80 transition-all focus:outline-none focus:ring-2 focus:ring-azraq-cyan/30 focus:border-azraq-cyan ${
-                        formErrors.fullName ? 'border-rose-400 bg-rose-50/30' : 'border-[rgba(130,170,205,0.3)] hover:border-azraq-cyan'
+                      className={`w-full px-3.5 py-2.5 rounded-lg border text-xs text-slate-900 bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#185ADB]/20 focus:border-[#185ADB] ${
+                        formErrors.fullName ? 'border-rose-400 bg-rose-50/30' : 'border-slate-200 hover:border-slate-300'
                       }`}
                     />
                     {formErrors.fullName && (
@@ -641,7 +641,7 @@ export default function CheckoutModal() {
                   </div>
 
                   <div>
-                    <label htmlFor="customer-phone" className="block text-xs font-semibold text-azraq-deep mb-1">
+                    <label htmlFor="customer-phone" className="block text-xs font-semibold text-slate-800 mb-1">
                       {t("Mobile Number", "মোবাইল নম্বর")} <span className="text-rose-500">*</span>
                     </label>
                     <input
@@ -654,8 +654,8 @@ export default function CheckoutModal() {
                         setPhone(e.target.value);
                         if (formErrors.phone) setFormErrors(prev => ({ ...prev, phone: null }));
                       }}
-                      className={`w-full px-3.5 py-2.5 rounded-xl border text-xs text-azraq-deep bg-white/80 transition-all focus:outline-none focus:ring-2 focus:ring-azraq-cyan/30 focus:border-azraq-cyan ${
-                        formErrors.phone ? 'border-rose-400 bg-rose-50/30' : 'border-[rgba(130,170,205,0.3)] hover:border-azraq-cyan'
+                      className={`w-full px-3.5 py-2.5 rounded-lg border text-xs text-slate-900 bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#185ADB]/20 focus:border-[#185ADB] ${
+                        formErrors.phone ? 'border-rose-400 bg-rose-50/30' : 'border-slate-200 hover:border-slate-300'
                       }`}
                     />
                     {formErrors.phone && (
@@ -664,8 +664,8 @@ export default function CheckoutModal() {
                   </div>
 
                   <div>
-                    <label htmlFor="customer-email" className="block text-xs font-semibold text-azraq-deep mb-1">
-                      {t("Email Address", "ইমেইল")} <span className="text-azraq-secondary font-normal">({t("Optional for receipt", "ঐচ্ছিক")})</span>
+                    <label htmlFor="customer-email" className="block text-xs font-semibold text-slate-800 mb-1">
+                      {t("Email Address", "ইমেইল")} <span className="text-slate-500 font-normal">({t("Optional for receipt", "ঐচ্ছিক")})</span>
                     </label>
                     <input
                       id="customer-email"
@@ -673,14 +673,14 @@ export default function CheckoutModal() {
                       placeholder="e.g. name@example.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-[rgba(130,170,205,0.3)] hover:border-azraq-cyan text-xs text-azraq-deep bg-white/80 transition-all focus:outline-none focus:ring-2 focus:ring-azraq-cyan/30 focus:border-azraq-cyan"
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 hover:border-slate-300 text-xs text-slate-900 bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#185ADB]/20 focus:border-[#185ADB]"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="customer-city" className="block text-xs font-semibold text-azraq-deep mb-1">
+                    <label htmlFor="customer-city" className="block text-xs font-semibold text-slate-800 mb-1">
                       {t("City / District", "শহর / জেলা")} <span className="text-rose-500">*</span>
                     </label>
                     <input
@@ -690,12 +690,12 @@ export default function CheckoutModal() {
                       placeholder="e.g. Dhaka"
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-[rgba(130,170,205,0.3)] hover:border-azraq-cyan text-xs text-azraq-deep bg-white/80 focus:outline-none focus:ring-2 focus:ring-azraq-cyan/30 focus:border-azraq-cyan"
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 hover:border-slate-300 text-xs text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#185ADB]/20 focus:border-[#185ADB]"
                     />
                   </div>
 
                   <div>
-                    <span className="block text-xs font-semibold text-azraq-deep mb-1">
+                    <span className="block text-xs font-semibold text-slate-800 mb-1">
                       {t("Delivery Area", "ডেলিভারি এরিয়া")}
                     </span>
                     <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label={t("Delivery Area", "ডেলিভারি এরিয়া")}>
@@ -704,10 +704,10 @@ export default function CheckoutModal() {
                         role="radio"
                         aria-checked={deliveryArea === 'inside'}
                         onClick={() => setDeliveryArea('inside')}
-                        className={`py-2 px-2.5 rounded-xl border text-xs font-bold transition-all text-center focus:outline-none focus:ring-2 focus:ring-azraq-cyan ${
+                        className={`py-2 px-2.5 rounded-lg border text-xs font-semibold transition-colors text-center focus:outline-none focus:ring-2 focus:ring-[#185ADB] ${
                           deliveryArea === 'inside'
-                            ? 'border-azraq-cyan bg-[#DDEEFF]/40 text-azraq-deep shadow-sm ring-1 ring-azraq-cyan/40'
-                            : 'border-[rgba(130,170,205,0.3)] text-azraq-secondary hover:bg-white/80'
+                            ? 'border-[#185ADB] bg-[#185ADB] text-white shadow-xs'
+                            : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
                         }`}
                       >
                         {t("Inside Dhaka (৳80)", "ঢাকার ভেতর (৳৮০)")}
@@ -717,10 +717,10 @@ export default function CheckoutModal() {
                         role="radio"
                         aria-checked={deliveryArea === 'outside'}
                         onClick={() => setDeliveryArea('outside')}
-                        className={`py-2 px-2.5 rounded-xl border text-xs font-bold transition-all text-center focus:outline-none focus:ring-2 focus:ring-azraq-cyan ${
+                        className={`py-2 px-2.5 rounded-lg border text-xs font-semibold transition-colors text-center focus:outline-none focus:ring-2 focus:ring-[#185ADB] ${
                           deliveryArea === 'outside'
-                            ? 'border-azraq-cyan bg-[#DDEEFF]/40 text-azraq-deep shadow-sm ring-1 ring-azraq-cyan/40'
-                            : 'border-[rgba(130,170,205,0.3)] text-azraq-secondary hover:bg-white/80'
+                            ? 'border-[#185ADB] bg-[#185ADB] text-white shadow-xs'
+                            : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
                         }`}
                       >
                         {t("Outside Dhaka (৳150)", "ঢাকার বাইরে (৳১৫০)")}
@@ -730,7 +730,7 @@ export default function CheckoutModal() {
                 </div>
 
                 <div>
-                  <label htmlFor="customer-address" className="block text-xs font-semibold text-azraq-deep mb-1">
+                  <label htmlFor="customer-address" className="block text-xs font-semibold text-slate-800 mb-1">
                     {t("Detailed Delivery Address", "সম্পূর্ণ ঠিকানা")} <span className="text-rose-500">*</span>
                   </label>
                   <textarea
@@ -743,8 +743,8 @@ export default function CheckoutModal() {
                       setAddress(e.target.value);
                       if (formErrors.address) setFormErrors(prev => ({ ...prev, address: null }));
                     }}
-                    className={`w-full px-3.5 py-2.5 rounded-xl border text-xs text-azraq-deep bg-white/80 transition-all focus:outline-none focus:ring-2 focus:ring-azraq-cyan/30 focus:border-azraq-cyan ${
-                      formErrors.address ? 'border-rose-400 bg-rose-50/30' : 'border-[rgba(130,170,205,0.3)] hover:border-azraq-cyan'
+                    className={`w-full px-3.5 py-2.5 rounded-lg border text-xs text-slate-900 bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#185ADB]/20 focus:border-[#185ADB] ${
+                      formErrors.address ? 'border-rose-400 bg-rose-50/30' : 'border-slate-200 hover:border-slate-300'
                     }`}
                   />
                   {formErrors.address && (
@@ -755,12 +755,12 @@ export default function CheckoutModal() {
 
               {/* Section 2: Payment Method */}
               <div className="space-y-3 pt-2">
-                <div className="flex items-center justify-between pb-1 border-b border-[rgba(130,170,205,0.18)]">
-                  <span className="text-xs font-bold uppercase tracking-wider text-azraq-deep flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-gradient-to-r from-azraq-deep to-azraq-cyan text-white flex items-center justify-center text-[10px] font-bold">2</span>
+                <div className="flex items-center justify-between pb-1 border-b border-slate-200">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-900 flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-md bg-[#185ADB] text-white flex items-center justify-center text-[10px] font-bold">2</span>
                     {t("Payment Method", "পেমেন্ট মাধ্যম")}
                   </span>
-                  <span className="text-[10px] text-azraq-secondary flex items-center gap-1">
+                  <span className="text-[10px] text-slate-500 flex items-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                     <span>256-Bit SSL Protection</span>
                   </span>
@@ -774,22 +774,22 @@ export default function CheckoutModal() {
                     aria-checked={paymentMethod === 'PAYMENTLY'}
                     onClick={() => setPaymentMethod('PAYMENTLY')}
                     onKeyDown={(e) => (e.key === ' ' || e.key === 'Enter') && setPaymentMethod('PAYMENTLY')}
-                    className={`p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between focus:outline-none focus:ring-2 focus:ring-azraq-cyan ${
+                    className={`p-3.5 rounded-xl border cursor-pointer transition-colors flex flex-col justify-between focus:outline-none focus:ring-2 focus:ring-[#185ADB] ${
                       paymentMethod === 'PAYMENTLY'
-                        ? 'border-azraq-cyan bg-gradient-to-br from-white/95 to-[#DDEEFF]/40 ring-1 ring-azraq-cyan shadow-[0_4px_16px_rgba(112,200,237,0.18)]'
-                        : 'border-[rgba(130,170,205,0.3)] bg-white/60 hover:bg-white/90'
+                        ? 'border-[#185ADB] bg-blue-50/40 ring-1 ring-[#185ADB] shadow-xs'
+                        : 'border-slate-200 bg-white hover:bg-slate-50'
                     }`}
                   >
                     <div>
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-xs text-azraq-deep">
+                        <span className="font-semibold text-xs text-slate-900">
                           Paymently Gateway
                         </span>
-                        <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-gradient-to-r from-azraq-deep to-azraq-cyan text-white">
+                        <span className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-[#185ADB] text-white">
                           Online
                         </span>
                       </div>
-                      <p className="text-[11px] text-azraq-secondary mt-1">
+                      <p className="text-[11px] text-slate-500 mt-1">
                         bKash, Nagad, Rocket, Upay & Cards
                       </p>
                     </div>
@@ -798,7 +798,7 @@ export default function CheckoutModal() {
                       <span className="px-1.5 py-0.5 rounded bg-[#E2136E] text-white font-bold text-[9px]">bKash</span>
                       <span className="px-1.5 py-0.5 rounded bg-[#F7941D] text-white font-bold text-[9px]">Nagad</span>
                       <span className="px-1.5 py-0.5 rounded bg-[#8C3494] text-white font-bold text-[9px]">Rocket</span>
-                      <span className="px-1.5 py-0.5 rounded bg-azraq-deep text-white font-bold text-[9px]">Cards</span>
+                      <span className="px-1.5 py-0.5 rounded bg-slate-800 text-white font-bold text-[9px]">Cards</span>
                     </div>
                   </div>
 
@@ -809,29 +809,29 @@ export default function CheckoutModal() {
                     aria-checked={paymentMethod === 'COD'}
                     onClick={() => setPaymentMethod('COD')}
                     onKeyDown={(e) => (e.key === ' ' || e.key === 'Enter') && setPaymentMethod('COD')}
-                    className={`p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between focus:outline-none focus:ring-2 focus:ring-azraq-cyan ${
+                    className={`p-3.5 rounded-xl border cursor-pointer transition-colors flex flex-col justify-between focus:outline-none focus:ring-2 focus:ring-[#185ADB] ${
                       paymentMethod === 'COD'
-                        ? 'border-azraq-deep bg-white/95 ring-1 ring-azraq-deep shadow-[0_4px_16px_rgba(25,59,91,0.12)]'
-                        : 'border-[rgba(130,170,205,0.3)] bg-white/60 hover:bg-white/90'
+                        ? 'border-slate-900 bg-slate-50 ring-1 ring-slate-900 shadow-xs'
+                        : 'border-slate-200 bg-white hover:bg-slate-50'
                     }`}
                   >
                     <div>
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-xs text-azraq-deep flex items-center gap-1.5">
+                        <span className="font-semibold text-xs text-slate-900 flex items-center gap-1.5">
                           <Banknote className="w-3.5 h-3.5 text-emerald-600" />
                           <span>Cash on Delivery</span>
                         </span>
-                        <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-[rgba(221,238,255,0.8)] text-azraq-deep">
+                        <span className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-slate-200 text-slate-800">
                           Doorstep
                         </span>
                       </div>
-                      <p className="text-[11px] text-azraq-secondary mt-1">
+                      <p className="text-[11px] text-slate-500 mt-1">
                         Pay in cash when parcel is delivered
                       </p>
                     </div>
 
                     <div className="pt-2.5">
-                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
                         Zero Advance Fee
                       </span>
                     </div>
@@ -841,17 +841,17 @@ export default function CheckoutModal() {
 
               {/* Itemized Order Review */}
               {cart.length > 0 && (
-                <div className="p-4 rounded-2xl bg-[rgba(248,251,255,0.7)] border border-[rgba(130,170,205,0.25)] space-y-2.5">
-                  <div className="flex items-center justify-between text-xs font-bold text-azraq-deep pb-1.5 border-b border-[rgba(130,170,205,0.18)]">
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
+                  <div className="flex items-center justify-between text-xs font-semibold text-slate-900 pb-1.5 border-b border-slate-200">
                     <span className="flex items-center gap-1.5">
-                      <ShoppingBag className="w-3.5 h-3.5 text-azraq-cyan" />
+                      <ShoppingBag className="w-3.5 h-3.5 text-[#185ADB]" />
                       <span>{t("Order Review", "অর্ডার রিভিউ")} ({cart.length} {t("items", "টি পণ্য")})</span>
                     </span>
                   </div>
                   <div className="max-h-40 overflow-y-auto space-y-2 pr-1 no-scrollbar">
                     {cart.map((item, idx) => (
                       <div key={`${item.product?.id || idx}-${item.variant}-${idx}`} className="flex items-center gap-2.5 text-xs">
-                        <div className="w-10 h-10 rounded-xl bg-white border border-[rgba(130,170,205,0.25)] p-0.5 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                        <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 p-0.5 flex-shrink-0 flex items-center justify-center overflow-hidden">
                           <ProductImage
                             src={item.product?.main_image}
                             alt={item.product?.name || 'Product'}
@@ -860,17 +860,17 @@ export default function CheckoutModal() {
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-azraq-deep truncate" title={item.product?.name}>
+                          <p className="font-semibold text-slate-900 truncate" title={item.product?.name}>
                             {item.product?.name || 'Item'}
                           </p>
-                          <div className="flex items-center gap-2 text-[10px] text-azraq-secondary mt-0.5">
-                            <span className="px-1.5 py-0.2 rounded bg-azraq-ice/60 font-medium text-azraq-deep">
+                          <div className="flex items-center gap-2 text-[10px] text-slate-500 mt-0.5">
+                            <span className="px-1.5 py-0.2 rounded bg-slate-200 font-medium text-slate-800">
                               {item.variant || 'Standard'}
                             </span>
                             <span>× {item.quantity}</span>
                           </div>
                         </div>
-                        <div className="text-right flex-shrink-0 font-bold text-azraq-deep">
+                        <div className="text-right flex-shrink-0 font-bold text-slate-900">
                           ৳{((item.product?.price || 0) * item.quantity).toLocaleString()}
                         </div>
                       </div>
@@ -880,12 +880,12 @@ export default function CheckoutModal() {
               )}
 
               {/* Order Summary Recap */}
-              <div className="p-4 rounded-2xl bg-[rgba(248,251,255,0.7)] border border-[rgba(130,170,205,0.25)] text-xs space-y-2">
-                <div className="flex justify-between text-azraq-secondary">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2">
+                <div className="flex justify-between text-slate-500">
                   <span>{t("Subtotal", "সাবটোটাল")} ({cart.length} {t("items", "আইটেম")})</span>
-                  <span className="font-medium text-azraq-deep">৳{cartSubtotal.toLocaleString()}</span>
+                  <span className="font-medium text-slate-900">৳{cartSubtotal.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between text-azraq-secondary">
+                <div className="flex justify-between text-slate-500">
                   <span>{t("Delivery Fee", "ডেলিভারি চার্জ")}</span>
                   <span>{deliveryFee === 0 ? <strong className="text-emerald-600">FREE</strong> : `৳${deliveryFee}`}</span>
                 </div>
@@ -895,9 +895,9 @@ export default function CheckoutModal() {
                     <span>-৳{appliedPromo.discount}</span>
                   </div>
                 )}
-                <div className="pt-2.5 border-t border-[rgba(130,170,205,0.22)] flex justify-between items-baseline text-sm font-bold text-azraq-deep">
+                <div className="pt-2.5 border-t border-slate-200 flex justify-between items-baseline text-sm font-bold text-slate-900">
                   <span>{t("Total Payable", "মোট প্রদেয়")}</span>
-                  <span className="text-base font-black text-azraq-deep">{formatBdtAmount(cartTotal)}</span>
+                  <span className="text-base font-bold text-[#185ADB]">{formatBdtAmount(cartTotal)}</span>
                 </div>
               </div>
 
@@ -905,7 +905,7 @@ export default function CheckoutModal() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 px-6 rounded-2xl btn-primary-icy text-azraq-deep font-bold text-xs sm:text-sm tracking-wide shadow-[0_8px_24px_rgba(112,200,237,0.35)] hover:shadow-[0_12px_32px_rgba(112,200,237,0.5)] transition-all flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-azraq-cyan disabled:opacity-50"
+                className="w-full py-3.5 px-6 rounded-xl bg-[#185ADB] hover:bg-[#1044A3] text-white font-semibold text-xs sm:text-sm tracking-wide shadow-xs transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#185ADB] disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <>
@@ -932,16 +932,16 @@ export default function CheckoutModal() {
         {/* ==================================================================== */}
         {checkoutStep === 'handoff' && paymentSession && (
           <div className="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1">
-            
+
             {/* 1. Concise Status Heading */}
             <div className="text-center space-y-1">
-              <span className="text-[10px] font-mono font-bold tracking-widest text-azraq-secondary uppercase">
+              <span className="text-[10px] font-mono font-bold tracking-widest text-slate-500 uppercase">
                 {t("SECURE GATEWAY HANDOFF", "নিরাপদ পেমেন্ট হ্যান্ডঅফ")}
               </span>
-              <h3 className="text-xl sm:text-2xl font-black text-azraq-deep">
+              <h3 className="text-xl sm:text-2xl font-bold text-slate-900">
                 {t("Complete Your Payment", "পেমেন্ট সম্পন্ন করুন")}
               </h3>
-              <p className="text-xs text-azraq-secondary max-w-md mx-auto">
+              <p className="text-xs text-slate-600 max-w-md mx-auto">
                 {t(
                   "Your payment session is ready on Paymently. Open the payment page to pay, then return here to confirm your order.",
                   "আপনার পেমেন্ট সেশন প্রস্তুত। পেমেন্ট পেইজে পেমেন্ট সম্পন্ন করে এখানে ফিরে আসুন।"
@@ -950,13 +950,13 @@ export default function CheckoutModal() {
             </div>
 
             {/* 2 & 3. Payable Total & Reference ID with Copy Button */}
-            <div className="p-4.5 rounded-2xl glass-card border border-[rgba(130,170,205,0.3)] text-left space-y-3">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-left space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[11px] text-azraq-secondary font-medium block">
+                  <span className="text-xs text-slate-500 font-medium block">
                     {t("Exact Payable Total", "মোট প্রদেয়")}
                   </span>
-                  <span className="text-2xl font-black text-azraq-deep">
+                  <span className="text-2xl font-bold text-slate-900">
                     {displayTotal}
                   </span>
                 </div>
@@ -964,26 +964,26 @@ export default function CheckoutModal() {
                   type="button"
                   onClick={handleCopyAmount}
                   aria-label={t("Copy exact payable amount", "টাকার পরিমাণ কপি করুন")}
-                  className="px-3 py-1.5 rounded-xl border border-[rgba(130,170,205,0.3)] bg-white/80 hover:bg-white text-xs font-semibold text-azraq-deep flex items-center gap-1.5 shadow-xs transition-colors"
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-800 flex items-center gap-1.5 shadow-2xs transition-colors"
                 >
-                  {isCopiedAmount ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-azraq-secondary" />}
+                  {isCopiedAmount ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
                   <span>{isCopiedAmount ? t("Copied!", "কপি হয়েছে!") : t("Copy ৳", "কপি ৳")}</span>
                 </button>
               </div>
 
-              <div className="pt-2.5 border-t border-[rgba(130,170,205,0.2)] flex items-center justify-between text-xs">
-                <span className="text-azraq-secondary font-medium">
+              <div className="pt-2.5 border-t border-slate-200 flex items-center justify-between text-xs">
+                <span className="text-slate-500 font-medium">
                   {t("Reference ID", "রেফারেন্স আইডি")}:
                 </span>
                 <div className="flex items-center gap-1.5">
-                  <span className="font-mono font-bold text-azraq-deep text-xs">
+                  <span className="font-mono font-bold text-slate-900 text-xs">
                     {paymentSession.invoice_id || paymentSession.checkout_id}
                   </span>
                   <button
                     type="button"
                     onClick={handleCopyId}
                     aria-label={t("Copy reference ID", "রেফারেন্স আইডি কপি করুন")}
-                    className="p-1 rounded-lg hover:bg-azraq-ice/50 text-azraq-secondary transition-colors"
+                    className="p-1 rounded-md hover:bg-slate-200 text-slate-500 transition-colors"
                     title={t("Copy ID", "আইডি কপি করুন")}
                   >
                     {isCopiedId ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
@@ -992,9 +992,9 @@ export default function CheckoutModal() {
               </div>
 
               {/* Dynamic vs Fallback Link Disclosure */}
-              <div className="pt-2 border-t border-[rgba(130,170,205,0.2)] text-[11px] leading-relaxed">
+              <div className="pt-2 border-t border-slate-200 text-[11px] leading-relaxed">
                 {paymentSession.is_fallback_link ? (
-                  <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200 text-amber-900 flex items-start gap-2">
+                  <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-2">
                     <Info className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
                     <span>
                       {t(
@@ -1009,8 +1009,8 @@ export default function CheckoutModal() {
                     </span>
                   </div>
                 ) : (
-                  <div className="p-2.5 rounded-xl bg-[#DDEEFF]/50 border border-[rgba(130,170,205,0.3)] text-azraq-deep flex items-center gap-2">
-                    <Lock className="w-3.5 h-3.5 text-azraq-cyan flex-shrink-0" />
+                  <div className="p-2.5 rounded-lg bg-blue-50/60 border border-blue-100 text-slate-800 flex items-center gap-2">
+                    <Lock className="w-3.5 h-3.5 text-[#185ADB] flex-shrink-0" />
                     <span>{t("Dynamic Session: Your order amount is pre-filled and locked on Paymently.", "ডাইনামিক সেশন: টাকার পরিমাণ পেমেন্টলিতে সরাসরি লক করা আছে।")}</span>
                   </div>
                 )}
@@ -1022,14 +1022,14 @@ export default function CheckoutModal() {
               <button
                 type="button"
                 onClick={handleOpenPaymentPortal}
-                className="w-full py-3.5 px-6 rounded-2xl btn-primary-icy text-azraq-deep font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-[0_8px_24px_rgba(112,200,237,0.35)] transition-all focus:outline-none focus:ring-2 focus:ring-azraq-cyan"
+                className="w-full py-3.5 px-6 rounded-xl bg-[#185ADB] hover:bg-[#1044A3] text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-colors focus:outline-none focus:ring-2 focus:ring-[#185ADB]"
               >
                 <span>{t("Open Paymently Checkout Page", "পেমেন্টলি পেমেন্ট পেইজ ওপেন করুন")}</span>
                 <ExternalLink className="w-4 h-4" />
               </button>
 
               {/* 5. Return Instructions */}
-              <p className="text-[11px] text-center text-azraq-secondary">
+              <p className="text-[11px] text-center text-slate-500">
                 {t(
                   "After completing your payment in Paymently or your wallet app, return to this tab to confirm your order.",
                   "পেমেন্টলি বা মোবাইল ওয়ালেটে পেমেন্ট শেষ করে এই ট্যাবে ফিরে এসে স্ট্যাটাস চেক করুন।"
@@ -1039,7 +1039,7 @@ export default function CheckoutModal() {
 
             {/* 8. Pending Alert Banner if checked and still pending */}
             {pendingNotice && (
-              <div className="p-3.5 rounded-2xl bg-amber-50/90 border border-amber-200 text-xs text-amber-800 flex items-start gap-2 animate-in fade-in">
+              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-start gap-2 animate-in fade-in">
                 <Clock className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <p className="font-bold">{t("Payment Not Yet Cleared", "পেমেন্ট এখনো ক্লিয়ার হয়নি")}</p>
@@ -1049,8 +1049,8 @@ export default function CheckoutModal() {
             )}
 
             {/* Manual TrxID Entry Field */}
-            <div className="p-4 rounded-2xl border border-[rgba(130,170,205,0.3)] bg-white/80 text-left space-y-2">
-              <label htmlFor="manual-trx-input" className="block text-xs font-bold text-azraq-deep">
+            <div className="p-4 rounded-xl border border-slate-200 bg-white text-left space-y-2">
+              <label htmlFor="manual-trx-input" className="block text-xs font-semibold text-slate-800">
                 {t("Paid via merchant link? Enter Transaction ID (TrxID):", "পেমেন্ট করেছেন? ট্রানজেকশন আইডি (TrxID) দিন:")}
               </label>
               <div className="flex gap-2">
@@ -1060,18 +1060,18 @@ export default function CheckoutModal() {
                   value={manualTrxId}
                   onChange={(e) => setManualTrxId(e.target.value.toUpperCase())}
                   placeholder="e.g. 9KA02194 or TRX-8821"
-                  className="flex-1 px-3.5 py-2.5 rounded-xl border border-[rgba(130,170,205,0.3)] text-xs font-mono uppercase focus:outline-none focus:ring-2 focus:ring-azraq-cyan"
+                  className="flex-1 px-3.5 py-2.5 rounded-lg border border-slate-200 text-xs font-mono uppercase focus:outline-none focus:ring-2 focus:ring-[#185ADB]"
                 />
                 <button
                   type="button"
                   onClick={handleManualTrxSubmit}
                   disabled={isSubmitting || manualTrxId.trim().length < 4}
-                  className="px-4 py-2.5 rounded-xl bg-azraq-deep hover:bg-azraq-cyan hover:text-azraq-deep text-white text-xs font-bold disabled:opacity-40 whitespace-nowrap shadow-xs transition-colors"
+                  className="px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold disabled:opacity-40 whitespace-nowrap shadow-xs transition-colors"
                 >
                   {isSubmitting ? <RefreshCw className="w-3.5 h-3.5 animate-spin mx-auto" /> : t("Submit TrxID", "জমা দিন")}
                 </button>
               </div>
-              <p className="text-[10px] text-azraq-secondary">
+              <p className="text-[10px] text-slate-500">
                 {t(
                   "Manual submissions are recorded as Pending Verification until cleared by our merchant desk.",
                   "ম্যানুয়ালি সাবমিট করা TrxID ভেরিফিকেশনের জন্য অপেক্ষমান থাকবে।"
@@ -1085,12 +1085,12 @@ export default function CheckoutModal() {
                 type="button"
                 onClick={handleCheckStatus}
                 disabled={isSubmitting}
-                className="w-full py-3 px-5 rounded-2xl glass-card border border-[rgba(130,170,205,0.3)] hover:bg-white text-azraq-deep font-bold text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                className="w-full py-3 px-5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 font-semibold text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isSubmitting ? 'animate-spin' : ''}`} />
                 <span>
-                  {isSubmitting 
-                    ? t("Checking Status with Paymently...", "স্ট্যাটাস চেক করা হচ্ছে...") 
+                  {isSubmitting
+                    ? t("Checking Status with Paymently...", "স্ট্যাটাস চেক করা হচ্ছে...")
                     : t("Check Payment Status", "পেমেন্ট স্ট্যাটাস চেক করুন")}
                 </span>
               </button>
@@ -1098,11 +1098,11 @@ export default function CheckoutModal() {
 
             {/* 7. Change Payment Method / Cancel with Confirmation */}
             {!showCancelConfirm ? (
-              <div className="pt-2 border-t border-[rgba(130,170,205,0.18)] flex items-center justify-between text-xs">
+              <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-xs">
                 <button
                   type="button"
                   onClick={() => setShowCancelConfirm(true)}
-                  className="text-azraq-secondary hover:text-rose-600 font-medium transition-colors"
+                  className="text-slate-500 hover:text-rose-600 font-medium transition-colors"
                 >
                   {t("Change Payment Method / Cancel", "পেমেন্ট মাধ্যম পরিবর্তন বা বাতিল করুন")}
                 </button>
@@ -1110,15 +1110,15 @@ export default function CheckoutModal() {
                   type="button"
                   onClick={handleDirectCod}
                   disabled={isSubmitting}
-                  className="text-emerald-700 font-bold hover:underline flex items-center gap-1"
+                  className="text-emerald-700 font-semibold hover:underline flex items-center gap-1"
                 >
                   <Banknote className="w-3.5 h-3.5" />
                   <span>{t("Switch to COD", "ক্যাশ অন ডেলিভারিতে নিন")}</span>
                 </button>
               </div>
             ) : (
-              <div className="p-4 rounded-2xl bg-[rgba(241,247,252,0.85)] border border-[rgba(130,170,205,0.3)] text-xs text-left space-y-2.5">
-                <p className="font-semibold text-azraq-deep">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-left space-y-2.5">
+                <p className="font-semibold text-slate-900">
                   {t(
                     "Cancel this payment session? Your items will remain safely in your cart.",
                     "পেমেন্ট সেশনটি বাতিল করতে চান? আপনার কার্টের পণ্যগুলো সংরক্ষিত থাকবে।"
@@ -1129,14 +1129,14 @@ export default function CheckoutModal() {
                     type="button"
                     onClick={handleConfirmCancel}
                     disabled={isSubmitting}
-                    className="px-3.5 py-2 rounded-xl bg-rose-600 text-white font-bold text-xs hover:bg-rose-700 transition-colors"
+                    className="px-3.5 py-2 rounded-lg bg-rose-600 text-white font-semibold text-xs hover:bg-rose-700 transition-colors"
                   >
                     {t("Yes, Cancel Session", "হ্যাঁ, বাতিল করুন")}
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowCancelConfirm(false)}
-                    className="px-3.5 py-2 rounded-xl glass-card border border-[rgba(130,170,205,0.3)] text-azraq-deep font-semibold text-xs hover:bg-white"
+                    className="px-3.5 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 font-semibold text-xs hover:bg-slate-50"
                   >
                     {t("Keep Session", "সেশনে থাকুন")}
                   </button>
@@ -1155,11 +1155,11 @@ export default function CheckoutModal() {
             <div className="flex justify-center mb-1">
               <img src="/branding/azraq-icon.png" alt="AZRAQ Shop" className="w-12 h-12 object-contain animate-pulse" />
             </div>
-            <RefreshCw className="w-8 h-8 text-azraq-cyan animate-spin mx-auto" />
-            <h3 className="text-lg font-bold text-azraq-deep">
+            <RefreshCw className="w-8 h-8 text-[#185ADB] animate-spin mx-auto" />
+            <h3 className="text-lg font-bold text-slate-900">
               {t("Verifying Payment with Gateway...", "পেমেন্ট গেটওয়েতে ভেরিফাই করা হচ্ছে...")}
             </h3>
-            <p className="text-xs text-azraq-secondary max-w-sm mx-auto leading-relaxed">
+            <p className="text-xs text-slate-600 max-w-sm mx-auto leading-relaxed">
               {t(
                 "Communicating directly with Paymently to authorize and confirm your transaction. Please do not close this window.",
                 "পেমেন্টলির সাথে সরাসরি যোগাযোগ করে সত্যতা যাচাই করা হচ্ছে। অনুগ্রহ করে অপেক্ষা করুন।"
@@ -1176,7 +1176,7 @@ export default function CheckoutModal() {
             <div className="flex justify-center mb-1">
               <img src="/branding/azraq-logo.png" alt="AZRAQ Shop" className="h-8 w-auto object-contain select-none" />
             </div>
-            <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto shadow-sm">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto shadow-2xs">
               <CheckCircle2 className="w-7 h-7" />
             </div>
 
@@ -1184,10 +1184,10 @@ export default function CheckoutModal() {
               <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 uppercase tracking-wide">
                 {t("PAID & VERIFIED", "পেমেন্ট সফল ও ভেরিফাইড")}
               </span>
-              <h3 className="text-xl sm:text-2xl font-black text-azraq-deep">
+              <h3 className="text-xl sm:text-2xl font-bold text-slate-900">
                 {t("Payment Successful!", "পেমেন্ট সফল হয়েছে!")}
               </h3>
-              <p className="text-xs text-azraq-secondary max-w-md mx-auto">
+              <p className="text-xs text-slate-600 max-w-md mx-auto">
                 {t(
                   "Your payment has been verified directly with Paymently. We are now preparing your order.",
                   "আপনার পেমেন্ট সফলভাবে ভেরিফাই হয়েছে। আপনার অর্ডার প্রস্তুত করা হচ্ছে।"
@@ -1196,24 +1196,24 @@ export default function CheckoutModal() {
             </div>
 
             {/* Receipt Summary Card */}
-            <div className="p-4.5 rounded-2xl glass-card border border-[rgba(130,170,205,0.3)] text-left text-xs space-y-2 max-w-md mx-auto">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-left text-xs space-y-2 max-w-md mx-auto">
               <div className="flex justify-between">
-                <span className="text-azraq-secondary">{t("Order Tracking ID", "অর্ডার ট্র্যাকিং আইডি")}:</span>
-                <span className="font-mono font-bold text-azraq-deep">{confirmedOrder.id}</span>
+                <span className="text-slate-500">{t("Order Tracking ID", "অর্ডার ট্র্যাকিং আইডি")}:</span>
+                <span className="font-mono font-bold text-slate-900">{confirmedOrder.id}</span>
               </div>
               {confirmedOrder.gateway_transaction_id && (
                 <div className="flex justify-between">
-                  <span className="text-azraq-secondary">{t("Provider TrxID", "প্রোভাইডার TrxID")}:</span>
-                  <span className="font-mono font-bold text-azraq-deep">{confirmedOrder.gateway_transaction_id}</span>
+                  <span className="text-slate-500">{t("Provider TrxID", "প্রোভাইডার TrxID")}:</span>
+                  <span className="font-mono font-bold text-slate-900">{confirmedOrder.gateway_transaction_id}</span>
                 </div>
               )}
               <div className="flex justify-between">
-                <span className="text-azraq-secondary">{t("Total Paid", "পরিশোধিত টাকা")}:</span>
-                <span className="font-bold text-azraq-deep">{formatBdtAmount(confirmedOrder.total)}</span>
+                <span className="text-slate-500">{t("Total Paid", "পরিশোধিত টাকা")}:</span>
+                <span className="font-bold text-slate-900">{formatBdtAmount(confirmedOrder.total)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-azraq-secondary">{t("Delivery To", "প্রাপক")}:</span>
-                <span className="text-azraq-deep font-medium truncate max-w-[200px]">
+                <span className="text-slate-500">{t("Delivery To", "প্রাপক")}:</span>
+                <span className="text-slate-900 font-medium truncate max-w-[200px]">
                   {confirmedOrder.customer_name} ({confirmedOrder.customer_phone})
                 </span>
               </div>
@@ -1226,13 +1226,13 @@ export default function CheckoutModal() {
                   handleClose();
                   setIsTrackingOpen(true);
                 }}
-                className="flex-1 py-3 px-5 rounded-2xl bg-azraq-deep hover:bg-azraq-cyan hover:text-azraq-deep text-white text-xs font-bold transition-all shadow-sm"
+                className="flex-1 py-3 px-5 rounded-xl bg-[#185ADB] hover:bg-[#1044A3] text-white text-xs font-semibold transition-colors shadow-xs"
               >
                 {t("Track My Order", "অর্ডার ট্র্যাক করুন")}
               </button>
               <button
                 onClick={handleClose}
-                className="flex-1 py-3 px-5 rounded-2xl glass-card border border-[rgba(130,170,205,0.3)] hover:bg-white text-azraq-deep text-xs font-bold transition-all"
+                className="flex-1 py-3 px-5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 text-xs font-semibold transition-colors"
               >
                 {t("Continue Shopping", "আরও কেনাকাটা করুন")}
               </button>
@@ -1245,52 +1245,52 @@ export default function CheckoutModal() {
         {/* ==================================================================== */}
         {checkoutStep === 'pending_verification' && confirmedOrder && (
           <div className="p-6 sm:p-8 text-center space-y-4 overflow-y-auto flex-1">
-            <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center mx-auto shadow-sm">
+            <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center mx-auto shadow-2xs">
               <Clock className="w-7 h-7" />
             </div>
 
             <div className="space-y-1">
               <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 uppercase tracking-wide">
-                {confirmedOrder.payment_method === 'COD' 
-                  ? t("CASH ON DELIVERY", "ক্যাশ অন ডেলিভারি") 
+                {confirmedOrder.payment_method === 'COD'
+                  ? t("CASH ON DELIVERY", "ক্যাশ অন ডেলিভারি")
                   : t("PAYMENT SUBMITTED — AWAITING VERIFICATION", "পেমেন্ট জমা — ভেরিফিকেশন অপেক্ষমান")}
               </span>
-              <h3 className="text-xl sm:text-2xl font-black text-azraq-deep">
-                {confirmedOrder.payment_method === 'COD' 
-                  ? t("Order Confirmed!", "অর্ডার গ্রহণ করা হয়েছে!") 
+              <h3 className="text-xl sm:text-2xl font-bold text-slate-900">
+                {confirmedOrder.payment_method === 'COD'
+                  ? t("Order Confirmed!", "অর্ডার গ্রহণ করা হয়েছে!")
                   : t("Order Placed — Verifying Payment", "অর্ডার গৃহীত — পেমেন্ট ভেরিফাই হচ্ছে")}
               </h3>
-              <p className="text-xs text-azraq-secondary max-w-md mx-auto leading-relaxed">
+              <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
                 {confirmedOrder.payment_method === 'COD'
                   ? t(
-                      "Your Cash on Delivery order is confirmed and will be dispatched. Please have the cash ready at delivery.",
-                      "আপনার ক্যাশ অন ডেলিভারি অর্ডার কনফার্ম হয়েছে। ডেলিভারির সময় নগদ টাকা প্রদান করুন।"
-                    )
+                    "Your Cash on Delivery order is confirmed and will be dispatched. Please have the cash ready at delivery.",
+                    "আপনার ক্যাশ অন ডেলিভারি অর্ডার কনফার্ম হয়েছে। ডেলিভারির সময় নগদ টাকা প্রদান করুন।"
+                  )
                   : t(
-                      "We have received your order and payment reference. Our merchant desk is reconciling the transaction with Paymently. You will receive an SMS confirmation once cleared.",
-                      "আপনার অর্ডার ও পেমেন্ট রেফারেন্স গ্রহণ করা হয়েছে। মার্চেন্ট ডেস্কে ভেরিফিকেশন সম্পন্ন হলে SMS এর মাধ্যমে কনফার্মেশন পাঠানো হবে।"
-                    )}
+                    "We have received your order and payment reference. Our merchant desk is reconciling the transaction with Paymently. You will receive an SMS confirmation once cleared.",
+                    "আপনার অর্ডার ও পেমেন্ট রেফারেন্স গ্রহণ করা হয়েছে। মার্চেন্ট ডেস্কে ভেরিফিকেশন সম্পন্ন হলে SMS এর মাধ্যমে কনফার্মেশন পাঠানো হবে।"
+                  )}
               </p>
             </div>
 
             {/* Receipt Summary Card */}
-            <div className="p-4.5 rounded-2xl glass-card border border-[rgba(130,170,205,0.3)] text-left text-xs space-y-2 max-w-md mx-auto">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-left text-xs space-y-2 max-w-md mx-auto">
               <div className="flex justify-between">
-                <span className="text-azraq-secondary">{t("Order Tracking ID", "অর্ডার ট্র্যাকিং আইডি")}:</span>
-                <span className="font-mono font-bold text-azraq-deep">{confirmedOrder.id}</span>
+                <span className="text-slate-500">{t("Order Tracking ID", "অর্ডার ট্র্যাকিং আইডি")}:</span>
+                <span className="font-mono font-bold text-slate-900">{confirmedOrder.id}</span>
               </div>
               {confirmedOrder.gateway_transaction_id && (
                 <div className="flex justify-between">
-                  <span className="text-azraq-secondary">{t("Submitted TrxID", "প্রদত্ত TrxID")}:</span>
-                  <span className="font-mono font-bold text-azraq-deep">{confirmedOrder.gateway_transaction_id}</span>
+                  <span className="text-slate-500">{t("Submitted TrxID", "প্রদত্ত TrxID")}:</span>
+                  <span className="font-mono font-bold text-slate-900">{confirmedOrder.gateway_transaction_id}</span>
                 </div>
               )}
               <div className="flex justify-between">
-                <span className="text-azraq-secondary">{t("Payable Amount", "প্রদেয় পরিমাণ")}:</span>
-                <span className="font-bold text-azraq-deep">{formatBdtAmount(confirmedOrder.total)}</span>
+                <span className="text-slate-500">{t("Payable Amount", "প্রদেয় পরিমাণ")}:</span>
+                <span className="font-bold text-slate-900">{formatBdtAmount(confirmedOrder.total)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-azraq-secondary">{t("Payment Status", "পেমেন্ট স্ট্যাটাস")}:</span>
+                <span className="text-slate-500">{t("Payment Status", "পেমেন্ট স্ট্যাটাস")}:</span>
                 <span className="font-bold text-amber-700">
                   {confirmedOrder.payment_status}
                 </span>
@@ -1304,13 +1304,13 @@ export default function CheckoutModal() {
                   handleClose();
                   setIsTrackingOpen(true);
                 }}
-                className="flex-1 py-3 px-5 rounded-2xl bg-azraq-deep hover:bg-azraq-cyan hover:text-azraq-deep text-white text-xs font-bold transition-all shadow-sm"
+                className="flex-1 py-3 px-5 rounded-xl bg-[#185ADB] hover:bg-[#1044A3] text-white text-xs font-semibold transition-colors shadow-xs"
               >
                 {t("Track My Order", "অর্ডার ট্র্যাক করুন")}
               </button>
               <button
                 onClick={handleClose}
-                className="flex-1 py-3 px-5 rounded-2xl glass-card border border-[rgba(130,170,205,0.3)] hover:bg-white text-azraq-deep text-xs font-bold transition-all"
+                className="flex-1 py-3 px-5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 text-xs font-semibold transition-colors"
               >
                 {t("Continue Shopping", "আরও কেনাকাটা করুন")}
               </button>
@@ -1324,28 +1324,28 @@ export default function CheckoutModal() {
         {checkoutStep === 'failed' && (() => {
           const isMaintenance = isStoreMaintenanceError({ code: errorCode, message: errorMessage });
           return (
-            <div 
+            <div
               role="alertdialog"
               aria-labelledby="checkout-dialog-title"
               aria-describedby="checkout-dialog-desc"
               className="p-6 sm:p-8 text-center space-y-4 overflow-y-auto flex-1 my-auto"
             >
-              <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto shadow-sm">
+              <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto shadow-2xs">
                 <AlertCircle className="w-7 h-7" aria-hidden="true" />
               </div>
 
               <div className="space-y-1.5">
-                <h3 id="checkout-dialog-title" className="text-xl sm:text-2xl font-black text-azraq-deep">
-                  {isMaintenance 
+                <h3 id="checkout-dialog-title" className="text-xl sm:text-2xl font-bold text-slate-900">
+                  {isMaintenance
                     ? t("Checkout Temporarily Unavailable", "চেকআউট সাময়িকভাবে বন্ধ আছে")
                     : t("Payment Was Not Completed", "পেমেন্ট সম্পন্ন হয়নি")}
                 </h3>
                 <p id="checkout-dialog-desc" className="text-xs sm:text-sm text-rose-600 max-w-md mx-auto font-medium leading-relaxed">
-                  {errorMessage || (isMaintenance 
+                  {errorMessage || (isMaintenance
                     ? t("Our checkout system is temporarily unavailable due to scheduled database maintenance. Your cart items are safe.", "সিস্টেম রক্ষণাবেক্ষণের কারণে চেকআউট সাময়িকভাবে বন্ধ আছে। পণ্যগুলো কার্টে সংরক্ষিত আছে।")
                     : t("The payment was cancelled or timed out. Your items are safe in your shopping bag.", "পেমেন্ট সম্পন্ন করা যায়নি। পণ্যগুলো কার্টে সংরক্ষিত আছে।"))}
                 </p>
-                <p className="text-[11px] text-azraq-secondary font-normal">
+                <p className="text-[11px] text-slate-500 font-normal">
                   {t("All items in your bag and entered delivery details have been preserved.", "আপনার ব্যাগের পণ্যসমূহ এবং প্রদত্ত তথ্য সম্পূর্ণ সুরক্ষিত আছে।")}
                 </p>
               </div>
@@ -1364,10 +1364,10 @@ export default function CheckoutModal() {
                     });
                     try {
                       sessionStorage.setItem('azraq_active_checkout_id', fallbackId);
-                    } catch (e) {}
+                    } catch (e) { }
                     window.location.href = 'https://azraq.paymently.io/paymentlink/default/BDT';
                   }}
-                  className="w-full min-h-[44px] py-3 px-5 rounded-2xl btn-primary-icy text-azraq-deep font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-[0_8px_24px_rgba(112,200,237,0.35)] transition-all focus:outline-none focus:ring-2 focus:ring-azraq-cyan"
+                  className="w-full min-h-[44px] py-3 px-5 rounded-xl bg-[#185ADB] hover:bg-[#1044A3] text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-colors focus:outline-none focus:ring-2 focus:ring-[#185ADB]"
                 >
                   <ExternalLink className="w-4 h-4 shrink-0" aria-hidden="true" />
                   <span>{t("Pay Online via Paymently Portal (bKash/Nagad/Card)", "পেমেন্টলি পোর্টালে সরাসরি পে করুন")}</span>
@@ -1378,7 +1378,7 @@ export default function CheckoutModal() {
                   <button
                     onClick={handleDirectCod}
                     disabled={isSubmitting}
-                    className="w-full min-h-[44px] py-3 px-5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full min-h-[44px] py-3 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-2xs transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   >
                     <Banknote className="w-4 h-4 shrink-0" aria-hidden="true" />
                     <span>{t("Switch to Cash on Delivery (Pay on Delivery)", "ক্যাশ অন ডেলিভারি (পণ্য হাতে পেয়ে মূল্য পরিশোধ)")}</span>
@@ -1388,7 +1388,7 @@ export default function CheckoutModal() {
                 <div className="flex gap-2.5">
                   <button
                     onClick={() => setCheckoutStep('form')}
-                    className="flex-1 min-h-[44px] py-3 px-4 rounded-2xl bg-azraq-deep hover:bg-azraq-cyan hover:text-azraq-deep text-white text-xs sm:text-sm font-bold transition-all focus:outline-none focus:ring-2 focus:ring-azraq-cyan"
+                    className="flex-1 min-h-[44px] py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-slate-900"
                   >
                     {t("Retry Checkout", "পুনরায় চেষ্টা করুন")}
                   </button>
@@ -1397,14 +1397,14 @@ export default function CheckoutModal() {
                       href="https://wa.me/8801700000000?text=Hello%20AZRAQ%2C%20I%20need%20help%20placing%20my%20order"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 min-h-[44px] py-3 px-3 rounded-2xl border border-emerald-600 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs sm:text-sm font-bold transition-colors flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="flex-1 min-h-[44px] py-3 px-3 rounded-xl border border-emerald-600 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     >
                       <span>{t("WhatsApp Concierge", "হোয়াটসঅ্যাপে সহায়তা")}</span>
                     </a>
                   ) : null}
                   <button
                     onClick={handleClose}
-                    className="px-5 min-h-[44px] py-3 rounded-2xl glass-card border border-[rgba(130,170,205,0.3)] text-azraq-deep hover:bg-white text-xs sm:text-sm font-bold transition-all focus:outline-none"
+                    className="px-5 min-h-[44px] py-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 text-xs sm:text-sm font-semibold transition-colors focus:outline-none"
                   >
                     {t("Close", "বন্ধ")}
                   </button>

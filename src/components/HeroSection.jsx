@@ -1,30 +1,28 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Sparkles, ChevronRight } from 'lucide-react';
+import { ArrowRight, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import ProductImage from './common/ProductImage';
 import AzraqDeliveryTruck from './common/AzraqDeliveryTruck';
 import { generateProductSlug } from '../utils/productUtils';
 
 /**
- * AZRAQ Shop — Exact Reference-Based Main Hero Section
+ * AZRAQ Shop — Editorial Main Hero Section
  * 
  * Three-part horizontal desktop composition:
  * 1. LEFT:
- *    - Premium Shopping Badge ("👑 Premium Selection")
- *    - Large Headline: "Discover Better. Live Better."
- *    - AZRAQ product description
- *    - Strong Blue "Shop Now ->" Pill Button
+ *    - Quiet category badge
+ *    - High-contrast headline: "Discover Better. Live Better."
+ *    - Authentic store description
+ *    - Solid AZRAQ Blue action button
  * 2. CENTER:
- *    - Large curved marble pedestal podium
- *    - 3 Complementary products from authentic catalogue:
+ *    - Grounded product stage with 3 authentic products from catalog:
  *      • Left: Earbuds (AZQ-0101 Awei T61 TWS Earbuds)
- *      • Center: Flagship Device (AZQ-0484 Baseus 20000mAh Power Bank / AZQ-0274 Smart Watch)
+ *      • Center: Flagship Device (AZQ-0484 Baseus 20000mAh Power Bank)
  *      • Right: Fast Charger (AZQ-0374 Anker 20W Cube Fast Charger)
- *      All with genuine main_image URLs, 100% full contain visibility, drop shadows
  * 3. RIGHT:
- *    - Top Glass Card: "Up to 50% OFF On Top Brands" with genuine AZRAQ headphones photograph (AZQ-0378)
- *    - Bottom Glass Card: "Fast & Reliable Delivery Across Bangladesh" with 3D AZRAQ Delivery Truck
+ *    - Top Card: Top Brands Offer with headphones photograph
+ *    - Bottom Card: Nationwide Delivery with Azraq Delivery Truck
  */
 export default function HeroSection() {
   const navigate = useNavigate();
@@ -54,72 +52,61 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="w-full select-none border border-[rgba(130,170,205,0.25)] border-t-white/95 bg-white/70 backdrop-blur-2xl rounded-[28px] sm:rounded-[32px] shadow-[0_16px_40px_-10px_rgba(112,200,237,0.14),0_2px_8px_-1px_rgba(25,59,91,0.03)] p-4 sm:p-6 lg:p-8 transition-all relative overflow-hidden">
-
-      {/* Ambient background glow dots matching reference */}
-      <div className="absolute top-1/4 left-1/3 w-72 h-72 bg-[#6366F1]/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-10 right-1/4 w-80 h-80 bg-[#245BDB]/10 rounded-full blur-3xl pointer-events-none" />
+    <section className="w-full select-none border border-slate-200/90 bg-white rounded-2xl shadow-xs p-5 sm:p-7 lg:p-8 transition-all relative overflow-hidden">
 
       {/* Three-Column Horizontal Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-stretch relative z-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch relative z-10">
 
         {/* 1. LEFT COLUMN: Headline, Description & CTA */}
-        <div className="lg:col-span-4 flex flex-col justify-center items-start space-y-4 sm:space-y-5 lg:pr-2">
+        <div className="lg:col-span-4 flex flex-col justify-center items-start space-y-4 lg:pr-2">
 
-          {/* Premium Shopping Badge */}
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#EEF2FF] border border-[#6366F1]/25 text-[#4F46E5] shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5 text-[#6366F1]" />
-            <span className="text-[11px] font-bold tracking-tight">
-              {t("👑 Premium Accessories & Essentials", "👑 প্রিমিয়াম সিলেকশন")}
-            </span>
+          {/* Clean Quality Badge */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-slate-100 border border-slate-200/70 text-slate-800 text-xs font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#185ADB]" />
+            <span>{t("Verified Everyday Essentials", "যাচাইকৃত আসল পণ্যতালিকা")}</span>
           </div>
 
-          {/* Huge Main Headline */}
-          <h1 className="text-3xl sm:text-4xl lg:text-[46px] xl:text-[52px] font-black text-[#193B5B] tracking-tight leading-[1.08]">
+          {/* Confident, Solid Headline */}
+          <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-extrabold text-slate-900 tracking-tight leading-[1.12]">
             {t("Discover Better.", "ডিসকভার বেটার।")}
-            <br />
-            <span className="bg-gradient-to-r from-[#245BDB] via-[#6366F1] to-[#7C3AED] bg-clip-text text-transparent">
+            <span className="text-[#185ADB] block mt-0.5">
               {t("Live Better.", "লিভ বেটার।")}
             </span>
           </h1>
 
           {/* Short AZRAQ Description */}
-          <p className="text-xs sm:text-[13px] text-[#718398] leading-relaxed max-w-sm font-medium">
+          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-sm">
             {t(
-              "Curated lifestyle essentials, authentic electronics, and premium daily gear for a smarter you — delivered nationwide across Bangladesh.",
-              "আসল গ্যাজেটস, ইলেকট্রনিক্স ও প্রিমিয়াম লাইফস্টাইল পণ্য। সরাসরি হোম ডেলিভারি ও শতভাগ ভেরিফাইড কোয়ালিটি।"
+              "Curated electronics, lifestyle accessories, and home goods — verified for quality with nationwide cash on delivery across Bangladesh.",
+              "আসল গ্যাজেটস, ইলেকট্রনিক্স ও লাইফস্টাইল পণ্য। সরাসরি হোম ডেলিভারি ও শতভাগ ভেরিফাইড কোয়ালিটি।"
             )}
           </p>
 
-          {/* Strong Blue/Violet Shop Now Button */}
+          {/* Solid Cerulean CTA Button */}
           <div className="pt-2">
             <button
               type="button"
               onClick={handleShopNow}
-              className="inline-flex items-center gap-2.5 px-7 py-3 rounded-full bg-gradient-to-r from-[#245BDB] via-[#3B82F6] to-[#6366F1] hover:from-[#1C4BB8] hover:via-[#2563EB] hover:to-[#4F46E5] text-white text-xs sm:text-sm font-bold shadow-[0_8px_24px_rgba(36,91,219,0.38)] hover:shadow-[0_12px_28px_rgba(99,102,241,0.45)] transition-all cursor-pointer active:scale-98"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#185ADB] hover:bg-[#1044A3] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-[#185ADB] focus-visible:ring-offset-2"
             >
-              <span>{t("Shop Now", "এখনই কিনুন")}</span>
+              <span>{t("Shop Catalog", "পণ্য দেখুন")}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
         </div>
 
-        {/* 2. CENTER COLUMN: Large 3D Marble Pedestal Photographic Composition */}
-        <div className="lg:col-span-5 relative flex flex-col items-center justify-end min-h-[290px] sm:min-h-[340px] lg:min-h-[380px] p-2">
+        {/* 2. CENTER COLUMN: Clean Photographic Pedestal Composition */}
+        <div className="lg:col-span-5 relative flex flex-col items-center justify-end min-h-[280px] sm:min-h-[320px] lg:min-h-[360px] p-2">
 
-          {/* Subtle floating particle glow in background */}
-          <div className="absolute top-8 left-12 w-2.5 h-2.5 rounded-full bg-[#70C8ED]/40 blur-xs" />
-          <div className="absolute top-16 right-16 w-3 h-3 rounded-full bg-[#0877C9]/30 blur-xs" />
+          {/* Photographic Arrangement on Stage */}
+          <div className="relative w-full max-w-[420px] flex items-end justify-center pb-8 sm:pb-10">
 
-          {/* Photographic Arrangement on 3D Pedestal */}
-          <div className="relative w-full max-w-[440px] flex items-end justify-center pb-8 sm:pb-10">
-
-            {/* PRODUCT 1: Left - Earbuds in open case */}
+            {/* PRODUCT 1: Left - Earbuds */}
             {earbudsProduct && (
               <div
                 onClick={() => handleOpenProduct(earbudsProduct)}
-                className="absolute left-0 bottom-7 sm:bottom-9 z-20 w-28 sm:w-36 aspect-square cursor-pointer group transition-transform hover:scale-105 duration-250"
+                className="absolute left-1 bottom-6 sm:bottom-8 z-20 w-28 sm:w-34 aspect-square cursor-pointer group transition-transform hover:scale-105 duration-200"
                 title={`${earbudsProduct.name} - ৳${(earbudsProduct.price || 0).toLocaleString()}`}
               >
                 <div className="w-full h-full p-2 flex items-center justify-center">
@@ -129,17 +116,17 @@ export default function HeroSection() {
                     fit="contain"
                     aspectRatio="square"
                     priority={true}
-                    className="drop-shadow-[0_16px_20px_rgba(8,119,201,0.22)] group-hover:scale-105 transition-transform"
+                    className="drop-shadow-md group-hover:scale-105 transition-transform"
                   />
                 </div>
               </div>
             )}
 
-            {/* PRODUCT 2: Center - Flagship Device (Power Bank / Smart Watch) standing tall */}
+            {/* PRODUCT 2: Center - Flagship Device standing tall */}
             {centerProduct && (
               <div
                 onClick={() => handleOpenProduct(centerProduct)}
-                className="relative z-10 w-40 sm:w-48 aspect-square cursor-pointer group transition-transform hover:scale-105 duration-250 mb-2 sm:mb-3"
+                className="relative z-10 w-38 sm:w-46 aspect-square cursor-pointer group transition-transform hover:scale-105 duration-200 mb-2"
                 title={`${centerProduct.name} - ৳${(centerProduct.price || 0).toLocaleString()}`}
               >
                 <div className="w-full h-full p-2 flex items-center justify-center">
@@ -149,17 +136,17 @@ export default function HeroSection() {
                     fit="contain"
                     aspectRatio="square"
                     priority={true}
-                    className="drop-shadow-[0_20px_26px_rgba(25,59,91,0.28)] group-hover:scale-105 transition-transform"
+                    className="drop-shadow-lg group-hover:scale-105 transition-transform"
                   />
                 </div>
               </div>
             )}
 
-            {/* PRODUCT 3: Right - Charger & Cable */}
+            {/* PRODUCT 3: Right - Fast Charger */}
             {chargerProduct && (
               <div
                 onClick={() => handleOpenProduct(chargerProduct)}
-                className="absolute right-0 bottom-6 sm:bottom-8 z-20 w-28 sm:w-36 aspect-square cursor-pointer group transition-transform hover:scale-105 duration-250"
+                className="absolute right-1 bottom-5 sm:bottom-7 z-20 w-28 sm:w-34 aspect-square cursor-pointer group transition-transform hover:scale-105 duration-200"
                 title={`${chargerProduct.name} - ৳${(chargerProduct.price || 0).toLocaleString()}`}
               >
                 <div className="w-full h-full p-2 flex items-center justify-center">
@@ -169,50 +156,45 @@ export default function HeroSection() {
                     fit="contain"
                     aspectRatio="square"
                     priority={true}
-                    className="drop-shadow-[0_16px_20px_rgba(8,119,201,0.22)] group-hover:scale-105 transition-transform"
+                    className="drop-shadow-md group-hover:scale-105 transition-transform"
                   />
                 </div>
               </div>
             )}
 
-            {/* 3D Curved Marble / Glass Pedestal Stage */}
-            <div className="absolute -bottom-1 w-[92%] sm:w-[96%] h-20 sm:h-24 pointer-events-none z-0">
-              {/* Marble Pedestal Top Surface */}
-              <div className="w-full h-12 sm:h-14 rounded-[50%/40%] bg-gradient-to-b from-white via-[#F4F9FD] to-[#E2EEF8] border border-white/95 shadow-[0_14px_32px_rgba(8,119,201,0.18),inset_0_2px_4px_rgba(255,255,255,0.95)] relative overflow-hidden">
-                {/* Subtle marble veins / gloss streak */}
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.9)_0%,rgba(221,238,255,0.4)_70%,transparent_100%)]" />
-              </div>
-              {/* Marble Pedestal Cylinder Edge */}
-              <div className="w-full h-8 sm:h-10 -mt-6 sm:-mt-7 rounded-b-[40px] bg-gradient-to-b from-[#E2EEF8] via-[#D5E5F4] to-[#C4D9ED] border-x border-b border-[rgba(130,170,205,0.35)] shadow-[0_16px_30px_rgba(8,119,201,0.16)]" />
+            {/* Clean Neutral Pedestal Stage */}
+            <div className="absolute -bottom-1 w-[90%] sm:w-[94%] h-16 sm:h-20 pointer-events-none z-0">
+              <div className="w-full h-10 sm:h-12 rounded-[50%/40%] bg-slate-100 border border-slate-200 shadow-sm" />
+              <div className="w-full h-6 sm:h-8 -mt-5 sm:-mt-6 rounded-b-2xl bg-slate-200/80 border-x border-b border-slate-300/70" />
             </div>
 
           </div>
 
         </div>
 
-        {/* 3. RIGHT COLUMN: Two Vertically Stacked Glass Cards */}
+        {/* 3. RIGHT COLUMN: Two Vertically Stacked Clean Cards */}
         <div className="lg:col-span-3 flex flex-col justify-between gap-3.5 sm:gap-4">
 
           {/* Card A: Up to 50% OFF On Top Brands */}
           <div
             onClick={() => handleOpenProduct(headphonesProduct)}
-            className="flex-1 bg-white/75 hover:bg-white/90 backdrop-blur-xl border border-[rgba(130,170,205,0.25)] border-t-white/95 rounded-[22px] p-4 sm:p-5 flex items-center justify-between shadow-2xs hover:shadow-xs transition-all duration-200 group cursor-pointer"
+            className="flex-1 bg-slate-50 hover:bg-slate-100/90 border border-slate-200/90 rounded-xl p-4 sm:p-5 flex items-center justify-between shadow-xs transition-colors group cursor-pointer"
           >
             <div className="flex flex-col justify-between h-full pr-2">
               <div>
-                <span className="text-[11px] font-bold text-[#718398] uppercase tracking-wider block">
-                  {t("Up to", "সর্বোচ্চ")}
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide block">
+                  {t("Curated Value", "বিশেষ অফার")}
                 </span>
-                <span className="text-xl sm:text-2xl font-black text-[#193B5B] leading-tight block mt-0.5">
+                <span className="text-xl sm:text-2xl font-bold text-slate-900 leading-tight block mt-0.5">
                   50% OFF
                 </span>
-                <span className="text-xs font-semibold text-[#718398] block mt-1">
+                <span className="text-xs font-medium text-slate-600 block mt-1">
                   {t("On Top Brands", "সেরা ব্র্যান্ডে")}
                 </span>
               </div>
 
               <div className="pt-3">
-                <span className="w-7 h-7 rounded-full bg-white border border-[rgba(130,170,205,0.3)] flex items-center justify-center text-[#0877C9] group-hover:bg-[#0877C9] group-hover:text-white transition-colors shadow-2xs">
+                <span className="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-[#185ADB] group-hover:bg-[#185ADB] group-hover:text-white transition-colors shadow-xs">
                   <ChevronRight className="w-4 h-4" />
                 </span>
               </div>
@@ -225,7 +207,7 @@ export default function HeroSection() {
                   alt={headphonesProduct.name}
                   fit="contain"
                   aspectRatio="square"
-                  className="group-hover:scale-105 transition-transform duration-300 drop-shadow-md"
+                  className="group-hover:scale-105 transition-transform duration-200 drop-shadow-sm"
                 />
               </div>
             )}
@@ -237,30 +219,30 @@ export default function HeroSection() {
               const el = document.getElementById('brand-value-ribbon');
               el?.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="flex-1 bg-white/75 hover:bg-white/90 backdrop-blur-xl border border-[rgba(130,170,205,0.25)] border-t-white/95 rounded-[22px] p-4 sm:p-5 flex items-center justify-between shadow-2xs hover:shadow-xs transition-all duration-200 group cursor-pointer"
+            className="flex-1 bg-slate-50 hover:bg-slate-100/90 border border-slate-200/90 rounded-xl p-4 sm:p-5 flex items-center justify-between shadow-xs transition-colors group cursor-pointer"
           >
             <div className="flex flex-col justify-between h-full pr-2">
               <div>
-                <span className="text-sm sm:text-base font-black text-[#193B5B] leading-snug block">
+                <span className="text-sm font-bold text-slate-900 leading-snug block">
                   {t("Fast & Reliable", "দ্রুত ও নিশ্চিত")}
                 </span>
-                <span className="text-sm sm:text-base font-black text-[#193B5B] leading-snug block">
+                <span className="text-sm font-bold text-slate-900 leading-snug block">
                   {t("Delivery", "হোম ডেলিভারি")}
                 </span>
-                <span className="text-xs font-semibold text-[#718398] block mt-1">
-                  {t("Across Bangladesh", "সারাদেশে")}
+                <span className="text-xs font-medium text-slate-600 block mt-1">
+                  {t("Across 64 Districts", "৬৪ জেলায়")}
                 </span>
               </div>
 
               <div className="pt-3">
-                <span className="w-7 h-7 rounded-full bg-white border border-[rgba(130,170,205,0.3)] flex items-center justify-center text-[#0877C9] group-hover:bg-[#0877C9] group-hover:text-white transition-colors shadow-2xs">
+                <span className="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-[#185ADB] group-hover:bg-[#185ADB] group-hover:text-white transition-colors shadow-xs">
                   <ChevronRight className="w-4 h-4" />
                 </span>
               </div>
             </div>
 
             {/* 3D Delivery Truck Graphic */}
-            <div className="w-24 h-18 sm:w-28 sm:h-20 flex items-center justify-center shrink-0 group-hover:translate-x-1 transition-transform duration-300">
+            <div className="w-24 h-18 sm:w-28 sm:h-20 flex items-center justify-center shrink-0 group-hover:translate-x-1 transition-transform duration-200">
               <AzraqDeliveryTruck className="w-full h-full" />
             </div>
           </div>

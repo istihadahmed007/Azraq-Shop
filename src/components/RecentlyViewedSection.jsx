@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { History, ArrowRight } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import ProductCard from './common/ProductCard';
 
 /**
- * AZRAQ Shop — Recently Viewed Section (Futuristic Glass Edition)
+ * AZRAQ Shop — Recently Viewed Section
  * 
  * Displays products recently inspected by the customer, tracked via localStorage ('azraq_recently_viewed').
  * Strictly returns null (hidden) when no recent browsing history is recorded.
@@ -49,15 +48,12 @@ export default function RecentlyViewedSection() {
 
   return (
     <section id="recently-viewed" className="w-full select-none">
-      <div className="bg-[#F8FBFF]/75 backdrop-blur-2xl border border-[rgba(130,170,205,0.25)] border-t-white/95 rounded-[28px] p-5 sm:p-7 shadow-[0_16px_40px_-10px_rgba(112,200,237,0.12),0_4px_16px_-2px_rgba(25,59,91,0.04)]">
-        
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-7 shadow-xs">
+
         {/* Section Heading */}
-        <div className="flex items-center justify-between pb-3.5 mb-5 border-b border-[rgba(130,170,205,0.18)]">
+        <div className="flex items-center justify-between pb-3.5 mb-5 border-b border-slate-100">
           <div>
-            <span className="text-[10px] font-mono text-[#0877C9] uppercase tracking-[0.18em] block font-bold">
-              + {t("BROWSING HISTORY", "ব্রাউজিং হিস্ট্রি")}
-            </span>
-            <h2 className="text-lg sm:text-xl font-extrabold text-[#193B5B] tracking-tight mt-0.5">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
               {t('Recently Viewed', 'সম্প্রতি দেখা পণ্য')}
             </h2>
           </div>
@@ -71,7 +67,7 @@ export default function RecentlyViewedSection() {
                 // Ignore
               }
             }}
-            className="text-xs font-bold text-[#718398] hover:text-[#193B5B] transition-colors px-3 py-1 rounded-full hover:bg-white/70"
+            className="text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors px-3 py-1 rounded-lg hover:bg-slate-100 cursor-pointer"
           >
             {t('Clear History', 'মুছে ফেলুন')}
           </button>

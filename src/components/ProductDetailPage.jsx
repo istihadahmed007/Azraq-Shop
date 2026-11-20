@@ -299,20 +299,20 @@ export default function ProductDetailPage() {
   if (!product && (fetchStatus === 'networkError' || fetchStatus === 'error')) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center select-none">
-        <div className="w-14 h-14 rounded-full bg-white/80 border border-[rgba(130,170,205,0.3)] flex items-center justify-center mb-4 text-[#CF1322] shadow-xs">
+        <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center mb-4 text-rose-600 shadow-2xs">
           <WifiOff className="w-6 h-6" />
         </div>
-        <h1 className="text-xl font-bold text-[#193B5B] mb-2">
+        <h1 className="text-xl font-bold text-slate-900 mb-2">
           {t("Network Connection Issue", "নেটওয়ার্ক সংযোগ সমস্যা")}
         </h1>
-        <p className="text-xs text-[#718398] max-w-md mb-6 leading-relaxed">
+        <p className="text-xs text-slate-600 max-w-md mb-6 leading-relaxed">
           {fetchError || t("A network connection or server timeout occurred while loading this product. Please check your connection and retry.", "সংযোগজনিত সমস্যার কারণে পণ্যটি লোড করা যায়নি। দয়া করে পুনরায় চেষ্টা করুন।")}
         </p>
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={handleRetry}
-            className="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] text-white font-bold text-xs shadow-[0_4px_16px_rgba(112,200,237,0.4)] hover:from-[#5CBDE5] transition-all flex items-center gap-2 cursor-pointer"
+            className="px-5 py-2.5 rounded-lg bg-[#185ADB] hover:bg-[#1044A3] text-white font-semibold text-xs shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>{t("Retry", "পুনরায় চেষ্টা করুন")}</span>
@@ -320,7 +320,7 @@ export default function ProductDetailPage() {
           <button
             type="button"
             onClick={() => navigate('/')}
-            className="px-6 py-2.5 rounded-full bg-white/75 border border-[rgba(130,170,205,0.3)] text-[#193B5B] font-semibold text-xs hover:bg-white transition-all flex items-center gap-2 cursor-pointer"
+            className="px-5 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 font-semibold text-xs transition-colors flex items-center gap-2 cursor-pointer"
           >
             <span>{t("Back to Home", "হোমপেজে ফিরে যান")}</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -334,20 +334,20 @@ export default function ProductDetailPage() {
   if (!product && fetchStatus === 'serverError') {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center select-none">
-        <div className="w-14 h-14 rounded-full bg-white/80 border border-[rgba(130,170,205,0.3)] flex items-center justify-center mb-4 text-[#D46B08] shadow-xs">
+        <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center mb-4 text-amber-600 shadow-2xs">
           <ServerCrash className="w-6 h-6" />
         </div>
-        <h1 className="text-xl font-bold text-[#193B5B] mb-2">
+        <h1 className="text-xl font-bold text-slate-900 mb-2">
           {t("Service Temporarily Unavailable", "সার্ভার সাময়িকভাবে অনুপলব্ধ")}
         </h1>
-        <p className="text-xs text-[#718398] max-w-md mb-6 leading-relaxed">
+        <p className="text-xs text-slate-600 max-w-md mb-6 leading-relaxed">
           {fetchError || t("The catalog server encountered a temporary error. Your cart and session are safe. Please retry.", "ক্যাটালগ সার্ভারে সাময়িক সমস্যা হয়েছে। দয়া করে পুনরায় চেষ্টা করুন।")}
         </p>
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={handleRetry}
-            className="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] text-white font-bold text-xs shadow-[0_4px_16px_rgba(112,200,237,0.4)] hover:from-[#5CBDE5] transition-all flex items-center gap-2 cursor-pointer"
+            className="px-5 py-2.5 rounded-lg bg-[#185ADB] hover:bg-[#1044A3] text-white font-semibold text-xs shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>{t("Retry", "পুনরায় চেষ্টা করুন")}</span>
@@ -355,7 +355,7 @@ export default function ProductDetailPage() {
           <button
             type="button"
             onClick={() => navigate('/')}
-            className="px-6 py-2.5 rounded-full bg-white/75 border border-[rgba(130,170,205,0.3)] text-[#193B5B] font-semibold text-xs hover:bg-white transition-all flex items-center gap-2 cursor-pointer"
+            className="px-5 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 font-semibold text-xs transition-colors flex items-center gap-2 cursor-pointer"
           >
             <span>{t("Back to Home", "হোমপেজে ফিরে যান")}</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -369,13 +369,13 @@ export default function ProductDetailPage() {
   if (!product) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center select-none">
-        <div className="w-14 h-14 rounded-full bg-white/80 border border-[rgba(130,170,205,0.3)] flex items-center justify-center mb-4 text-[#0877C9] shadow-xs">
+        <div className="w-14 h-14 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center mb-4 text-slate-700 shadow-2xs">
           <Package className="w-6 h-6 opacity-70" />
         </div>
-        <h1 className="text-xl font-bold text-[#193B5B] mb-2">
+        <h1 className="text-xl font-bold text-slate-900 mb-2">
           {t("Product Not Found", "পণ্যটি খুঁজে পাওয়া যায়নি")}
         </h1>
-        <p className="text-xs text-[#718398] max-w-md mb-6 leading-relaxed">
+        <p className="text-xs text-slate-600 max-w-md mb-6 leading-relaxed">
           {t(
             "The product you are looking for might have been moved or is currently unavailable in our catalog.",
             "আপনি যে পণ্যটি খুঁজছেন তা ক্যাটালগে নেই অথবা সরানো হয়েছে।"
@@ -383,7 +383,7 @@ export default function ProductDetailPage() {
         </p>
         <button
           onClick={() => navigate('/')}
-          className="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] text-white font-bold text-xs shadow-[0_4px_16px_rgba(112,200,237,0.4)] hover:from-[#5CBDE5] transition-all flex items-center gap-2 cursor-pointer"
+          className="px-5 py-2.5 rounded-lg bg-[#185ADB] hover:bg-[#1044A3] text-white font-semibold text-xs shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
         >
           <span>{t("Browse All Products", "সব পণ্য দেখুন")}</span>
           <ArrowRight className="w-3.5 h-3.5" />
@@ -465,7 +465,7 @@ export default function ProductDetailPage() {
       </nav>
 
       {/* 2. MAIN PRODUCT DETAIL SHOWCASE (55% Gallery Left / 45% Information Right) */}
-      <div className="rounded-[32px] bg-[#F8FBFF]/80 backdrop-blur-2xl border border-[rgba(130,170,205,0.25)] border-t-white/95 p-6 sm:p-8 md:p-10 shadow-[0_20px_48px_-12px_rgba(112,200,237,0.15),0_4px_16px_-2px_rgba(25,59,91,0.04)]">
+      <div className="rounded-2xl bg-white border border-slate-200/90 p-6 sm:p-8 md:p-10 shadow-xs">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
 
           {/* ========================================================= */}
@@ -476,7 +476,7 @@ export default function ProductDetailPage() {
             {/* Primary Main Image Viewer (Strictly Contain) */}
             <div
               onClick={() => setIsZoomOpen(true)}
-              className="relative w-full aspect-square max-h-[560px] mx-auto rounded-[24px] bg-white/80 backdrop-blur-md border border-[rgba(130,170,205,0.25)] overflow-hidden flex items-center justify-center group cursor-zoom-in shadow-inner"
+              className="relative w-full aspect-square max-h-[560px] mx-auto rounded-xl bg-slate-50 border border-slate-200/80 overflow-hidden flex items-center justify-center group cursor-zoom-in"
             >
 
               {/* Product Photograph with object-contain to preserve 100% of the image without distortion */}
@@ -521,7 +521,7 @@ export default function ProductDetailPage() {
                     e.stopPropagation();
                     setIsZoomOpen(true);
                   }}
-                  className="w-8 h-8 rounded-full bg-white/95 hover:bg-white border border-[rgba(130,170,205,0.3)] text-[#718398] hover:text-[#193B5B] flex items-center justify-center shadow-xs transition-colors"
+                  className="w-8 h-8 rounded-lg bg-white/95 hover:bg-white border border-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center shadow-xs transition-colors"
                   title={t("Zoom photo", "বড় করে দেখুন")}
                 >
                   <ZoomIn className="w-4 h-4" />
@@ -531,21 +531,21 @@ export default function ProductDetailPage() {
               {/* Top-Left Authentic Discount Badge */}
               {discountPercent && discountPercent > 0 ? (
                 <div className="absolute top-3 left-3 z-10 pointer-events-none">
-                  <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] text-white text-[11px] font-mono font-bold shadow-xs">
+                  <span className="px-2 py-0.5 rounded-md bg-rose-600 text-white text-[11px] font-mono font-bold shadow-xs">
                     -{discountPercent}%
                   </span>
                 </div>
               ) : null}
 
               {/* Hover Zoom Pill Indicator */}
-              <div className="absolute bottom-3 left-3 bg-[#193B5B]/90 backdrop-blur-xs text-white text-[11px] font-medium px-3 py-1 rounded-full flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xs z-10">
-                <ZoomIn className="w-3 h-3 text-[#70C8ED]" />
+              <div className="absolute bottom-3 left-3 bg-slate-900/90 text-white text-[11px] font-medium px-2.5 py-1 rounded-md flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xs z-10">
+                <ZoomIn className="w-3 h-3 text-white" />
                 <span>{t("Click to Zoom", "বড় করে দেখুন")}</span>
               </div>
 
               {/* Image counter indicator */}
               {images.length > 1 && (
-                <div className="absolute bottom-3 right-3 bg-[#193B5B]/85 backdrop-blur-xs text-white text-[10px] font-mono px-2.5 py-0.5 rounded-full z-10">
+                <div className="absolute bottom-3 right-3 bg-slate-900/80 text-white text-[10px] font-mono px-2 py-0.5 rounded-md z-10">
                   {activeImageIndex + 1} / {images.length}
                 </div>
               )}
@@ -559,10 +559,10 @@ export default function ProductDetailPage() {
                     key={idx}
                     type="button"
                     onClick={() => setActiveImageIndex(idx)}
-                    className={`relative w-16 h-16 sm:w-18 sm:h-18 rounded-[16px] bg-white/80 border flex items-center justify-center overflow-hidden shrink-0 transition-all ${
+                    className={`relative w-16 h-16 sm:w-18 sm:h-18 rounded-lg bg-white border flex items-center justify-center overflow-hidden shrink-0 transition-all ${
                       activeImageIndex === idx
-                        ? 'border-[#70C8ED] shadow-[0_0_12px_rgba(112,200,237,0.5)]'
-                        : 'border-[rgba(130,170,205,0.25)] opacity-70 hover:opacity-100'
+                        ? 'border-[#185ADB] ring-2 ring-[#185ADB]/30'
+                        : 'border-slate-200 opacity-70 hover:opacity-100'
                     }`}
                   >
                     <ProductImage
@@ -577,23 +577,23 @@ export default function ProductDetailPage() {
               </div>
             )}
 
-            {/* Guarantee Pills below gallery */}
+            {/* Guarantee Cards below gallery */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-2">
-              <div className="flex items-center gap-2 p-3 rounded-full bg-white/75 border border-[rgba(130,170,205,0.25)] shadow-xs">
-                <ShieldCheck className="w-4 h-4 text-[#0877C9] shrink-0" />
-                <span className="text-[11px] font-medium text-[#193B5B] leading-tight">
+              <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                <ShieldCheck className="w-4 h-4 text-[#185ADB] shrink-0" />
+                <span className="text-[11px] font-medium text-slate-800 leading-tight">
                   {t("100% Authentic Quality", "১০০% আসল পণ্য")}
                 </span>
               </div>
-              <div className="flex items-center gap-2 p-3 rounded-full bg-white/75 border border-[rgba(130,170,205,0.25)] shadow-xs">
-                <Truck className="w-4 h-4 text-[#0877C9] shrink-0" />
-                <span className="text-[11px] font-medium text-[#193B5B] leading-tight">
+              <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                <Truck className="w-4 h-4 text-[#185ADB] shrink-0" />
+                <span className="text-[11px] font-medium text-slate-800 leading-tight">
                   {t("Doorstep Delivery", "হোম ডেলিভারি")}
                 </span>
               </div>
-              <div className="flex items-center gap-2 p-3 rounded-full bg-white/75 border border-[rgba(130,170,205,0.25)] shadow-xs col-span-2 sm:col-span-1">
-                <RotateCcw className="w-4 h-4 text-[#0877C9] shrink-0" />
-                <span className="text-[11px] font-medium text-[#193B5B] leading-tight">
+              <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80 col-span-2 sm:col-span-1">
+                <RotateCcw className="w-4 h-4 text-[#185ADB] shrink-0" />
+                <span className="text-[11px] font-medium text-slate-800 leading-tight">
                   {t("Easy 7-Day Returns", "সহজ ৭ দিনের রিটার্ন")}
                 </span>
               </div>
@@ -609,33 +609,33 @@ export default function ProductDetailPage() {
             <div className="flex flex-col gap-4">
 
               {/* Category & Catalog ID */}
-              <div className="flex items-center justify-between gap-3 pb-2 border-b border-[rgba(130,170,205,0.2)]">
-                <span className="text-[10px] font-mono text-[#0877C9] uppercase tracking-[0.16em] font-bold">
+              <div className="flex items-center justify-between gap-3 pb-2 border-b border-slate-200">
+                <span className="text-xs font-semibold text-[#185ADB] uppercase tracking-wide">
                   {product.category || product.primary_collection_name || t("Catalog Item", "ক্যাটালগ পণ্য")}
                 </span>
 
-                <span className="text-xs font-mono font-semibold text-[#718398]">
+                <span className="text-xs font-mono font-medium text-slate-500">
                   SKU: {product.sku || product.id}
                 </span>
               </div>
 
               {/* Product Title */}
-              <h1 className="text-xl sm:text-2xl font-black text-[#193B5B] tracking-tight leading-snug">
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-snug">
                 {product.name}
               </h1>
 
               {/* Pricing Display */}
-              <div className="p-4 rounded-[20px] bg-white/75 border border-[rgba(130,170,205,0.25)] flex items-baseline justify-between gap-3 shadow-xs">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 flex items-baseline justify-between gap-3 shadow-2xs">
                 <div>
-                  <span className="text-[10px] uppercase font-mono text-[#718398] block mb-0.5 font-bold">
+                  <span className="text-xs uppercase font-medium text-slate-500 block mb-0.5">
                     {t("Price", "মূল্য")}
                   </span>
                   <div className="flex items-baseline gap-2.5 flex-wrap">
-                    <span className="text-2xl sm:text-3xl font-black text-[#193B5B] tracking-tight">
+                    <span className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
                       ৳{(product.price || 0).toLocaleString()}
                     </span>
                     {originalPrice && originalPrice > product.price && (
-                      <span className="text-sm sm:text-base text-[#718398] line-through font-mono">
+                      <span className="text-sm sm:text-base text-slate-400 line-through font-mono">
                         ৳{originalPrice.toLocaleString()}
                       </span>
                     )}
@@ -645,13 +645,13 @@ export default function ProductDetailPage() {
                 {/* Stock Status Badge */}
                 <div className="text-right">
                   <span
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium ${
                       isAvailable
                         ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                        : 'bg-red-50 text-red-800 border border-red-200'
+                        : 'bg-rose-50 text-rose-800 border border-rose-200'
                     }`}
                   >
-                    <span className={`w-1.5 h-1.5 rounded-full ${isAvailable ? 'bg-emerald-600' : 'bg-red-600'}`} />
+                    <span className={`w-1.5 h-1.5 rounded-full ${isAvailable ? 'bg-emerald-600' : 'bg-rose-600'}`} />
                     {isAvailable ? t("In Stock", "স্টকে আছে") : t("Out of Stock", "স্টক শেষ")}
                   </span>
                 </div>
@@ -660,7 +660,7 @@ export default function ProductDetailPage() {
               {/* Variant / Edition / Size Selector (Only when variants exist) */}
               {product.variants && product.variants.length > 0 && (
                 <div className="space-y-2 pt-1">
-                  <label className="text-xs font-bold text-[#193B5B] block uppercase tracking-wider font-mono">
+                  <label className="text-xs font-semibold text-slate-900 block uppercase tracking-wide">
                     {t("Select Edition / Size:", "এডিশন / সাইজ নির্বাচন করুন:")}
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -669,10 +669,10 @@ export default function ProductDetailPage() {
                         key={variant}
                         type="button"
                         onClick={() => setSelectedVariant(variant)}
-                        className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all border ${
+                        className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
                           selectedVariant === variant
-                            ? 'bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] text-white border-transparent shadow-[0_2px_10px_rgba(112,200,237,0.4)]'
-                            : 'bg-white/80 text-[#193B5B] border-[rgba(130,170,205,0.3)] hover:border-[#70C8ED]'
+                            ? 'bg-[#185ADB] text-white border-[#185ADB] shadow-xs'
+                            : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
                         }`}
                       >
                         {variant}
@@ -684,27 +684,27 @@ export default function ProductDetailPage() {
 
               {/* Quantity Selector */}
               <div className="space-y-1.5 pt-1">
-                <label className="text-xs font-bold text-[#193B5B] block uppercase tracking-wider font-mono">
+                <label className="text-xs font-semibold text-slate-900 block uppercase tracking-wide">
                   {t("Quantity:", "পরিমাণ:")}
                 </label>
-                <div className="inline-flex items-center rounded-full bg-white border border-[rgba(130,170,205,0.3)] p-0.5 shadow-xs">
+                <div className="inline-flex items-center rounded-lg bg-white border border-slate-200 p-0.5 shadow-2xs">
                   <button
                     type="button"
                     onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
                     disabled={quantity <= 1 || !isAvailable}
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-[#193B5B] hover:bg-[#DDEEFF]/40 disabled:opacity-30 transition-colors font-bold text-sm"
+                    className="w-8 h-8 rounded-md flex items-center justify-center text-slate-700 hover:bg-slate-100 disabled:opacity-30 transition-colors font-semibold text-sm"
                     aria-label="Decrease quantity"
                   >
                     −
                   </button>
-                  <span className="w-10 text-center text-xs font-mono font-bold text-[#193B5B]">
+                  <span className="w-10 text-center text-xs font-mono font-bold text-slate-900">
                     {quantity}
                   </span>
                   <button
                     type="button"
                     onClick={() => setQuantity(prev => prev + 1)}
                     disabled={!isAvailable}
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-[#193B5B] hover:bg-[#DDEEFF]/40 disabled:opacity-30 transition-colors font-bold text-sm"
+                    className="w-8 h-8 rounded-md flex items-center justify-center text-slate-700 hover:bg-slate-100 disabled:opacity-30 transition-colors font-semibold text-sm"
                     aria-label="Increase quantity"
                   >
                     +
@@ -720,18 +720,18 @@ export default function ProductDetailPage() {
                   type="button"
                   onClick={handleAddToCart}
                   disabled={!isAvailable}
-                  className="w-full sm:flex-1 py-3 px-5 rounded-full bg-white/80 hover:bg-white text-[#193B5B] border border-[rgba(130,170,205,0.32)] hover:border-[#70C8ED] font-bold text-xs sm:text-sm shadow-xs transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full sm:flex-1 py-3 px-5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-200 font-semibold text-xs sm:text-sm shadow-2xs transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <ShoppingBag className="w-4 h-4 text-[#0877C9]" />
+                  <ShoppingBag className="w-4 h-4 text-[#185ADB]" />
                   <span>{t("Add to Bag", "ব্যাগে যোগ করুন")}</span>
                 </button>
 
-                {/* Buy Now Button (Glowing Icy-Blue Gradient Pill) */}
+                {/* Buy Now Button */}
                 <button
                   type="button"
                   onClick={handleBuyNow}
                   disabled={!isAvailable}
-                  className="w-full sm:flex-1 py-3 px-5 rounded-full bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] hover:from-[#5CBDE5] hover:to-[#2563EB] text-white font-bold text-xs sm:text-sm shadow-[0_8px_24px_rgba(112,200,237,0.45)] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-98"
+                  className="w-full sm:flex-1 py-3 px-5 rounded-lg bg-[#185ADB] hover:bg-[#1044A3] text-white font-semibold text-xs sm:text-sm shadow-xs transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Zap className="w-4 h-4 fill-white" />
                   <span>{t("Buy Now", "সরাসরি কিনুন")}</span>
@@ -741,31 +741,31 @@ export default function ProductDetailPage() {
                 <button
                   type="button"
                   onClick={() => toggleFavorite(product.id)}
-                  className={`w-11 h-11 rounded-full border flex items-center justify-center transition-colors shrink-0 shadow-xs ${
+                  className={`w-11 h-11 rounded-lg border flex items-center justify-center transition-colors shrink-0 shadow-2xs ${
                     isFav
-                      ? 'bg-red-50 text-[#E53935] border-[#E53935]/40'
-                      : 'bg-white/80 text-[#718398] border-[rgba(130,170,205,0.3)] hover:text-[#193B5B] hover:border-[#70C8ED]'
+                      ? 'bg-rose-50 text-rose-600 border-rose-200'
+                      : 'bg-white text-slate-500 border-slate-200 hover:text-slate-900 hover:border-slate-300'
                   }`}
                   title={isFav ? t("Remove from Wishlist", "পছন্দ থেকে সরান") : t("Save to Wishlist", "পছন্দের তালিকায় রাখুন")}
                   aria-label="Toggle wishlist"
                 >
-                  <Heart className={`w-4 h-4 ${isFav ? 'fill-[#E53935] stroke-[#E53935]' : ''}`} />
+                  <Heart className={`w-4 h-4 ${isFav ? 'fill-rose-600 stroke-rose-600' : ''}`} />
                 </button>
 
               </div>
 
               {/* Delivery Rates & Guarantee Box */}
-              <div className="p-4 rounded-[20px] bg-white/75 border border-[rgba(130,170,205,0.25)] text-xs text-[#193B5B] space-y-1.5 mt-1 shadow-xs">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 text-xs text-slate-700 space-y-1.5 mt-1 shadow-2xs">
                 <div className="flex items-start gap-2.5">
-                  <Truck className="w-4 h-4 text-[#0877C9] shrink-0 mt-0.5" />
+                  <Truck className="w-4 h-4 text-[#185ADB] shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-[#193B5B] block">
+                    <span className="font-semibold text-slate-900 block">
                       {t("Delivery Timeline & Rates", "ডেলিভারি সময় ও চার্জ")}
                     </span>
-                    <p className="text-[#718398] text-[11px] leading-relaxed mt-0.5">
+                    <p className="text-slate-600 text-[11px] leading-relaxed mt-0.5">
                       • {t("Inside Dhaka: ৳80 (24–48 hours)", "ঢাকা সিটির ভেতরে: ৮০৳ (২৪–৪৮ ঘণ্টা)")}<br />
                       • {t("Outside Dhaka: ৳150 (2–4 business days)", "ঢাকা সিটির বাইরে: ১৫০৳ (২–৪ কার্যদিবস)")}<br />
-                      • <strong className="text-[#0877C9]">{t("FREE Delivery on orders over ৳3,000", "৩০০০৳ বা তদূর্ধ্ব অর্ডারে ফ্রি ডেলিভারি")}</strong>
+                      • <strong className="text-[#185ADB]">{t("FREE Delivery on orders over ৳3,000", "৩০০০৳ বা তদূর্ধ্ব অর্ডারে ফ্রি ডেলিভারি")}</strong>
                     </p>
                   </div>
                 </div>
@@ -779,46 +779,46 @@ export default function ProductDetailPage() {
       </div>
 
       {/* 3. PRODUCT SPECIFICATIONS & DETAILS TABS */}
-      <div className="rounded-[32px] bg-[#F8FBFF]/80 backdrop-blur-2xl border border-[rgba(130,170,205,0.25)] border-t-white/95 p-6 sm:p-8 shadow-[0_16px_40px_-10px_rgba(112,200,237,0.12)]">
+      <div className="rounded-2xl bg-white border border-slate-200/90 p-6 sm:p-8 shadow-xs">
 
         {/* Tab Headers */}
-        <div className="flex items-center gap-2 border-b border-[rgba(130,170,205,0.2)] pb-3 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-2 border-b border-slate-200 pb-3 overflow-x-auto no-scrollbar">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
               activeTab === 'overview'
-                ? 'bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] text-white shadow-xs'
-                : 'text-[#718398] hover:text-[#193B5B] bg-white/60 hover:bg-white border border-[rgba(130,170,205,0.2)]'
+                ? 'bg-[#185ADB] text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200'
             }`}
           >
             {t("Overview & Description", "পণ্যের বিবরণ")}
           </button>
           <button
             onClick={() => setActiveTab('specs')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
               activeTab === 'specs'
-                ? 'bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] text-white shadow-xs'
-                : 'text-[#718398] hover:text-[#193B5B] bg-white/60 hover:bg-white border border-[rgba(130,170,205,0.2)]'
+                ? 'bg-[#185ADB] text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200'
             }`}
           >
             {t("Specifications", "স্পেসিফিকেশন")}
           </button>
           <button
             onClick={() => setActiveTab('delivery')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
               activeTab === 'delivery'
-                ? 'bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] text-white shadow-xs'
-                : 'text-[#718398] hover:text-[#193B5B] bg-white/60 hover:bg-white border border-[rgba(130,170,205,0.2)]'
+                ? 'bg-[#185ADB] text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200'
             }`}
           >
             {t("Shipping & Logistics", "ডেলিভারি ও শিপিং")}
           </button>
           <button
             onClick={() => setActiveTab('returns')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
               activeTab === 'returns'
-                ? 'bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] text-white shadow-xs'
-                : 'text-[#718398] hover:text-[#193B5B] bg-white/60 hover:bg-white border border-[rgba(130,170,205,0.2)]'
+                ? 'bg-[#185ADB] text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200'
             }`}
           >
             {t("Return Policy", "রিটার্ন পলিসি")}
@@ -828,7 +828,7 @@ export default function ProductDetailPage() {
         {/* Tab Contents */}
         <div className="pt-6">
           {activeTab === 'overview' && (
-            <div className="prose max-w-none text-xs sm:text-sm text-[#193B5B] leading-relaxed whitespace-pre-line font-bengali">
+            <div className="prose max-w-none text-xs sm:text-sm text-slate-800 leading-relaxed whitespace-pre-line font-bengali">
               {product.description || product.description_en || product.description_bn || t(
                 "Authentic catalog specifications verified by EasyDrop manufacturing partner.",
                 "আসল পণ্যের নিশ্চয়তা ও মান যাচাইকৃত।"
@@ -838,40 +838,40 @@ export default function ProductDetailPage() {
 
           {activeTab === 'specs' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl text-xs">
-              <div className="p-3.5 rounded-[16px] bg-white/75 border border-[rgba(130,170,205,0.25)] flex justify-between shadow-2xs">
-                <span className="font-semibold text-[#718398]">{t("Product ID", "পণ্য আইডি")}:</span>
-                <span className="font-mono font-bold text-[#193B5B]">{product.id}</span>
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex justify-between shadow-2xs">
+                <span className="font-semibold text-slate-500">{t("Product ID", "পণ্য আইডি")}:</span>
+                <span className="font-mono font-bold text-slate-900">{product.id}</span>
               </div>
-              <div className="p-3.5 rounded-[16px] bg-white/75 border border-[rgba(130,170,205,0.25)] flex justify-between shadow-2xs">
-                <span className="font-semibold text-[#718398]">{t("Catalog SKU", "ক্যাটালগ এসকেইউ")}:</span>
-                <span className="font-mono font-bold text-[#193B5B]">{product.sku || 'N/A'}</span>
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex justify-between shadow-2xs">
+                <span className="font-semibold text-slate-500">{t("Catalog SKU", "ক্যাটালগ এসকেইউ")}:</span>
+                <span className="font-mono font-bold text-slate-900">{product.sku || 'N/A'}</span>
               </div>
-              <div className="p-3.5 rounded-[16px] bg-white/75 border border-[rgba(130,170,205,0.25)] flex justify-between shadow-2xs">
-                <span className="font-semibold text-[#718398]">{t("Primary Category", "মূল ক্যাটাগরি")}:</span>
-                <span className="font-bold text-[#193B5B]">{product.category || product.primary_collection_name}</span>
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex justify-between shadow-2xs">
+                <span className="font-semibold text-slate-500">{t("Primary Category", "মূল ক্যাটাগরি")}:</span>
+                <span className="font-semibold text-slate-900">{product.category || product.primary_collection_name}</span>
               </div>
-              <div className="p-3.5 rounded-[16px] bg-white/75 border border-[rgba(130,170,205,0.25)] flex justify-between shadow-2xs">
-                <span className="font-semibold text-[#718398]">{t("Quality Guarantee", "কোয়ালিটি গ্যারান্টি")}:</span>
-                <span className="font-bold text-emerald-700">{t("100% Verified Authentic", "১০০% ভেরিফাইড আসল")}</span>
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex justify-between shadow-2xs">
+                <span className="font-semibold text-slate-500">{t("Quality Guarantee", "কোয়ালিটি গ্যারান্টি")}:</span>
+                <span className="font-semibold text-emerald-700">{t("100% Verified Authentic", "১০০% ভেরিফাইড আসল")}</span>
               </div>
               {product.supplier_url && (
-                <div className="p-3.5 rounded-[16px] bg-white/75 border border-[rgba(130,170,205,0.25)] flex justify-between col-span-1 sm:col-span-2 shadow-2xs">
-                  <span className="font-semibold text-[#718398]">{t("Fulfillment Partner", "ফুলফিলমেন্ট পার্টনার")}:</span>
-                  <span className="font-bold text-[#193B5B]">EasyDrop Verified Supplier</span>
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex justify-between col-span-1 sm:col-span-2 shadow-2xs">
+                  <span className="font-semibold text-slate-500">{t("Fulfillment Partner", "ফুলফিলমেন্ট পার্টনার")}:</span>
+                  <span className="font-semibold text-slate-900">EasyDrop Verified Supplier</span>
                 </div>
               )}
             </div>
           )}
 
           {activeTab === 'delivery' && (
-            <div className="space-y-3 text-xs text-[#193B5B] max-w-2xl leading-relaxed">
+            <div className="space-y-3 text-xs text-slate-800 max-w-2xl leading-relaxed">
               <p>
                 {t(
                   "All orders are processed and dispatched within 24 hours from verified hubs in Dhaka. You will receive an instant SMS tracking ID once the courier receives your package.",
                   "সকল অর্ডার ২৪ ঘণ্টার মধ্যে ঢাকা হাব থেকে প্রসেস ও ডিসপ্যাচ করা হয়। কুরিয়ারে হস্তান্তরের সাথে সাথে এসএমএস ও ট্র্যাকিং আইডি দেওয়া হয়।"
                 )}
               </p>
-              <ul className="list-disc pl-5 space-y-1 text-[#718398]">
+              <ul className="list-disc pl-5 space-y-1 text-slate-600">
                 <li>{t("Inside Dhaka City: Delivered within 24–48 hours via Steedfast / Pathao.", "ঢাকা সিটির ভেতরে: ২৪–৪৮ ঘণ্টার মধ্যে ডেলিভারি।")}</li>
                 <li>{t("Outside Dhaka: Delivered within 48–72 hours across all 64 districts.", "ঢাকা সিটির বাইরে: ৪৮–৭২ ঘণ্টার মধ্যে দেশব্যাপী ৬৪ জেলায় ডেলিভারি।")}</li>
                 <li>{t("Cash on Delivery (COD) and Paymently secure digital payments supported.", "ক্যাশ অন ডেলিভারি এবং ডিজিটাল পেমেন্ট দুটিই প্রযোজ্য।")}</li>
@@ -880,14 +880,14 @@ export default function ProductDetailPage() {
           )}
 
           {activeTab === 'returns' && (
-            <div className="space-y-3 text-xs text-[#193B5B] max-w-2xl leading-relaxed">
+            <div className="space-y-3 text-xs text-slate-800 max-w-2xl leading-relaxed">
               <p>
                 {t(
                   "Shop with confidence. If you receive a damaged, defective, or mismatched product, you are eligible for an immediate replacement or full refund within 7 calendar days.",
                   "কোনো পণ্য ত্রুটিপূর্ণ বা ছবির সাথে অমিল হলে আপনি ৭ দিনের মধ্যে রিপ্লেসমেন্ট অথবা রিফান্ডের সুবিধা পাবেন।"
                 )}
               </p>
-              <p className="text-[#718398]">
+              <p className="text-slate-600">
                 {t(
                   "Please ensure original packaging, tags, and accessories remain intact when requesting an exchange or return.",
                   "রিটার্নের ক্ষেত্রে মূল প্যাকেট ও ট্যাগ অক্ষত রাখা আবশ্যক।"
@@ -901,13 +901,13 @@ export default function ProductDetailPage() {
 
       {/* 4. RELATED PRODUCTS SECTION (Strictly 5 Product Cards per Row on Desktop) */}
       {relatedProducts.length > 0 && (
-        <section className="rounded-[32px] bg-[#F8FBFF]/80 backdrop-blur-2xl border border-[rgba(130,170,205,0.25)] border-t-white/95 p-6 sm:p-8 shadow-[0_16px_40px_-10px_rgba(112,200,237,0.12)]">
-          <div className="flex items-center justify-between pb-3.5 mb-5 border-b border-[rgba(130,170,205,0.2)]">
+        <section className="rounded-2xl bg-white border border-slate-200/90 p-6 sm:p-8 shadow-xs">
+          <div className="flex items-center justify-between pb-3.5 mb-5 border-b border-slate-200">
             <div>
-              <span className="text-[10px] font-mono text-[#0877C9] uppercase tracking-[0.18em] block font-bold">
-                + {t("COMPANION PIECES", "সম্পর্কিত সংগ্রহ")}
+              <span className="text-xs font-semibold text-[#185ADB] uppercase tracking-wide block">
+                {t("Companion Pieces", "সম্পর্কিত সংগ্রহ")}
               </span>
-              <h2 className="text-lg sm:text-xl font-extrabold text-[#193B5B] tracking-tight mt-0.5">
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight mt-0.5">
                 {t("Related Products You May Like", "সম্পর্কিত অন্যান্য পণ্য")}
               </h2>
             </div>
@@ -915,10 +915,10 @@ export default function ProductDetailPage() {
             {productCollection && (
               <Link
                 to={`/collection/${productCollection.slug}`}
-                className="text-xs font-bold text-[#193B5B] hover:text-[#0877C9] flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/75 hover:bg-white border border-[rgba(130,170,205,0.3)] transition-colors shadow-xs"
+                className="text-xs font-semibold text-slate-700 hover:text-[#185ADB] flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-colors shadow-2xs"
               >
                 <span>{t("View Collection", "সম্পূর্ণ কালেকশন")}</span>
-                <ChevronRight className="w-3.5 h-3.5 text-[#718398]" />
+                <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
               </Link>
             )}
           </div>
@@ -1047,7 +1047,7 @@ export default function ProductDetailPage() {
                     type="button"
                     onClick={() => setActiveImageIndex(idx)}
                     className={`w-12 h-12 rounded-[10px] bg-white border-2 flex items-center justify-center overflow-hidden shrink-0 transition-all ${activeImageIndex === idx
-                      ? 'border-[#0877C9] scale-105 shadow-md'
+                      ? 'border-[#185ADB] scale-105 shadow-md'
                       : 'border-white/40 opacity-60 hover:opacity-100'
                       }`}
                   >

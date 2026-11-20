@@ -173,7 +173,7 @@ export default function OrderTrackingModal() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full sm:w-auto px-7 py-2.5 rounded-full bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] hover:from-[#5CBDE5] hover:to-[#2563EB] text-white text-xs font-bold flex items-center justify-center gap-2 disabled:opacity-50 shadow-[0_4px_16px_rgba(112,200,237,0.4)] cursor-pointer"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-[#185ADB] hover:bg-[#1044A3] text-white text-xs font-semibold flex items-center justify-center gap-2 disabled:opacity-50 shadow-xs transition-colors cursor-pointer"
               >
                 {isLoading ? (
                   <>

@@ -3,43 +3,34 @@
 @tailwind utilities;
 
 :root {
-  --azraq-bg: #F1F6FD;
-  --azraq-surface: #F8FBFF;
-  --azraq-ice: #DDEEFF;
-  --azraq-cyan: #70C8ED;
-  --azraq-deep: #193B5B;
-  --azraq-secondary: #718398;
-  --azraq-border: rgba(130, 170, 205, 0.25);
-  --azraq-border-glass: rgba(255, 255, 255, 0.85);
-  --azraq-card-bg: rgba(255, 255, 255, 0.8);
-  --azraq-primary-blue: #245BDB;
-  --azraq-blue: #245BDB;
-  --azraq-blue-hover: #1C4BB8;
-  --azraq-azure: #245BDB;
-  --azraq-violet: #6366F1;
-  --azraq-purple: #7C3AED;
-  --azraq-lavender: #EEF2FF;
-  --azraq-lime: #10B981;
-  --azraq-muted: #718398;
+  --azraq-bg: #F8FAFC;
+  --azraq-surface: #FFFFFF;
+  --azraq-ice: #F1F5F9;
+  --azraq-cyan: #0284C7;
+  --azraq-deep: #0F172A;
+  --azraq-secondary: #475569;
+  --azraq-border: #E2E8F0;
+  --azraq-border-glass: #E2E8F0;
+  --azraq-card-bg: #FFFFFF;
+  --azraq-primary-blue: #185ADB;
+  --azraq-blue: #185ADB;
+  --azraq-blue-hover: #1044A3;
+  --azraq-azure: #185ADB;
+  --azraq-lime: #059669;
+  --azraq-muted: #64748B;
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
-    background-color: #F1F6FD;
-    color: #193B5B;
+    background-color: #F8FAFC;
+    color: #0F172A;
   }
 
   body {
-    background-color: #F1F6FD;
-    background-image: 
-      radial-gradient(circle at 12% 8%, rgba(99, 102, 241, 0.09) 0%, transparent 40%),
-      radial-gradient(circle at 88% 10%, rgba(36, 91, 219, 0.1) 0%, transparent 45%),
-      radial-gradient(circle at 50% 45%, rgba(112, 200, 237, 0.12) 0%, transparent 50%),
-      radial-gradient(circle at 85% 90%, rgba(124, 58, 237, 0.07) 0%, transparent 42%);
-    background-attachment: fixed;
-    color: #193B5B;
+    background-color: #F8FAFC;
+    color: #0F172A;
     font-family: 'Manrope', 'Hind Siliguri', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
@@ -51,25 +42,31 @@
     font-family: 'Hind Siliguri', 'Manrope', -apple-system, sans-serif;
     line-height: 1.5;
   }
+
+  /* Consistent, high-contrast focus rings for accessibility */
+  :focus-visible {
+    outline: 2px solid #185ADB;
+    outline-offset: 2px;
+  }
 }
 
-/* Clean, translucent scrollbars */
+/* Clean, unobtrusive scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(241, 247, 252, 0.6);
+  background: #F1F5F9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(130, 170, 205, 0.4);
+  background: #CBD5E1;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(112, 200, 237, 0.7);
+  background: #94A3B8;
 }
 
 /* Hide scrollbar for category bars and carousels */
@@ -83,177 +80,131 @@
 }
 
 /* ========================================================
-   AZRAQ — PREMIUM FUTURISTIC ICY-BLUE GLASSMORPHISM SYSTEM
-   Translucent crystal surfaces, backdrop-blur(18px-24px),
-   thin translucent borders, soft ambient glow, deep-blue text
+   AZRAQ — Grounded Editorial Surface & Utility Tokens
+   Clean white and neutral surfaces, quiet borders, 
+   crisp typography, zero violet/cyan glows
    ======================================================== */
 
-/* 1. Transparent Glass Large Panel */
+/* Clean Large Panel */
 .glass-panel,
 .editorial-panel {
-  background: rgba(248, 251, 255, 0.76);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(130, 170, 205, 0.24);
-  border-top: 1px solid rgba(255, 255, 255, 0.9);
-  border-radius: 28px;
-  box-shadow: 0 20px 48px -12px rgba(112, 200, 237, 0.14), 0 4px 16px -2px rgba(25, 59, 91, 0.04);
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 20px;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.05);
 }
 
-/* 2. Frosted Glass Product Card */
+/* Clean Product & Editorial Card */
 .glass-card,
 .glass-product,
 .editorial-card {
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(130, 170, 205, 0.25);
-  border-top: 1px solid rgba(255, 255, 255, 0.95);
-  border-radius: 22px;
-  box-shadow: 0 10px 28px -4px rgba(112, 200, 237, 0.1), 0 2px 8px -1px rgba(25, 59, 91, 0.03);
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, background 0.2s ease;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
   overflow: hidden;
 }
 
 .glass-card:hover,
 .glass-product:hover,
 .editorial-card:hover {
-  background: rgba(255, 255, 255, 0.95);
-  transform: translateY(-4px);
-  border-color: rgba(112, 200, 237, 0.65);
-  box-shadow: 0 22px 48px -6px rgba(112, 200, 237, 0.26), 0 6px 16px 0 rgba(25, 59, 91, 0.06);
+  background: #FFFFFF;
+  border-color: #CBD5E1;
+  box-shadow: 0 6px 16px -2px rgba(15, 23, 42, 0.08);
 }
 
-/* 3. Floating Glass Header */
+/* Header Container */
 .glass-header {
-  background: rgba(248, 251, 255, 0.82);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(130, 170, 205, 0.24);
-  border-top: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 12px 36px -8px rgba(112, 200, 237, 0.12), 0 2px 8px -1px rgba(25, 59, 91, 0.03);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04);
 }
 
-/* 4. Glass Button (Secondary / Frosted Pill) */
+/* Secondary Button */
 .glass-button,
 .editorial-btn-secondary,
 .btn-secondary-glass {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(130, 170, 205, 0.32);
-  border-top: 1px solid rgba(255, 255, 255, 0.9);
-  border-radius: 9999px;
-  color: #193B5B;
-  font-weight: 600;
-  box-shadow: 0 2px 10px rgba(112, 200, 237, 0.08);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  color: #0F172A;
+  font-weight: 500;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .glass-button:hover,
 .editorial-btn-secondary:hover,
 .btn-secondary-glass:hover {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(112, 200, 237, 0.6);
-  color: #0877C9;
-  box-shadow: 0 6px 20px rgba(112, 200, 237, 0.22);
-  transform: translateY(-1px);
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+  color: #0F172A;
 }
 
-/* 5. Primary Action Button (Icy-Blue Gradient Pill with Glow) */
+/* Primary Action Button (Solid Cerulean Blue) */
 .glass-button-primary,
 .editorial-btn-primary,
 .btn-primary-icy {
-  background: linear-gradient(135deg, #70C8ED 0%, #3B82F6 100%);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 9999px;
+  background: #185ADB;
+  border: 1px solid #185ADB;
+  border-radius: 8px;
   color: #FFFFFF;
-  font-weight: 700;
-  box-shadow: 0 8px 24px -2px rgba(112, 200, 237, 0.45);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-weight: 600;
+  box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .glass-button-primary:hover,
 .editorial-btn-primary:hover,
 .btn-primary-icy:hover {
-  background: linear-gradient(135deg, #5CBDE5 0%, #2563EB 100%);
-  box-shadow: 0 12px 30px 0 rgba(112, 200, 237, 0.6);
-  transform: translateY(-1px);
+  background: #1044A3;
+  border-color: #1044A3;
 }
 
-/* 6. Dark Blue Glass Button (Deep navy surface with cyan edge) */
+/* Dark Button */
 .editorial-btn-dark {
-  background: #193B5B;
-  border: 1px solid rgba(112, 200, 237, 0.3);
-  border-radius: 9999px;
+  background: #0F172A;
+  border: 1px solid #0F172A;
+  border-radius: 8px;
   color: #FFFFFF;
-  font-weight: 600;
-  box-shadow: 0 6px 20px rgba(25, 59, 91, 0.2);
-  transition: all 0.2s ease;
+  font-weight: 500;
+  transition: background-color 0.15s ease;
 }
 
 .editorial-btn-dark:hover {
-  background: #132D47;
-  border-color: rgba(112, 200, 237, 0.6);
-  transform: translateY(-1px);
+  background: #1E293B;
+  border-color: #1E293B;
 }
 
-/* 7. Glass Input */
+/* Clean Input */
 .glass-input,
 .editorial-input {
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(130, 170, 205, 0.3);
-  border-radius: 14px;
-  color: #193B5B;
-  box-shadow: inset 0 1px 3px rgba(25, 59, 91, 0.03);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  color: #0F172A;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .glass-input:focus,
 .editorial-input:focus {
   outline: none;
-  background: rgba(255, 255, 255, 0.98);
-  border-color: #70C8ED;
-  box-shadow: 0 0 0 3px rgba(112, 200, 237, 0.22);
+  border-color: #185ADB;
+  box-shadow: 0 0 0 1px #185ADB;
 }
 
-/* 8. Glass Modal Dialog */
+/* Clean Modal Dialog */
 .glass-modal,
 .editorial-modal {
-  background: rgba(248, 251, 255, 0.88);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(130, 170, 205, 0.3);
-  border-top: 1px solid rgba(255, 255, 255, 0.95);
-  border-radius: 28px;
-  box-shadow: 0 28px 72px rgba(25, 59, 91, 0.18), 0 8px 24px rgba(112, 200, 237, 0.15);
-}
-
-/* 9. Glass Feature Surface */
-.glass-feature,
-.editorial-feature {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(130, 170, 205, 0.24);
-  border-top: 1px solid rgba(255, 255, 255, 0.9);
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
   border-radius: 20px;
+  box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.1);
 }
 
-/* 10. Glass Badge / Pill */
-.neu-pill,
-.editorial-badge,
-.glass-pill {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(130, 170, 205, 0.26);
-  border-radius: 9999px;
-}
-
-/* 11. Requirement 5 — Card Image Wrapper for strictly full containment */
+/* Card Image Wrapper */
 .card-image-wrapper {
   width: 100%;
   aspect-ratio: 1 / 1;
@@ -261,9 +212,9 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.65);
-  border: 1px solid rgba(130, 170, 205, 0.18);
+  border-radius: 12px;
+  background: #F8FAFC;
+  border: 1px solid #F1F5F9;
 }
 
 .card-image-wrapper img {
@@ -274,20 +225,7 @@
   display: block;
 }
 
-/* Chrome metallic typography effect for headers */
-.crystal-heading {
-  background: linear-gradient(180deg, #193B5B 0%, #2A5A84 50%, #193B5B 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.crystal-badge-ring {
-  background: radial-gradient(circle, rgba(112, 200, 237, 0.15) 0%, rgba(221, 238, 255, 0.05) 70%, transparent 100%);
-  border: 1px solid rgba(112, 200, 237, 0.35);
-  box-shadow: 0 0 20px rgba(112, 200, 237, 0.2);
-}
-
-/* Respect reduced-motion preferences */
+/* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;

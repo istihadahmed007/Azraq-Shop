@@ -3,12 +3,9 @@ import { Package, Truck, ShieldCheck, Headphones } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 
 /**
- * AZRAQ Shop — Section B: Compact Horizontal Statistics & Trust Glass Panel
- * 
- * Accurately reproduces the reference screenshot's horizontal statistics panel:
- * - Frosted translucent glass pill/panel with backdrop-blur-xl and delicate 1px border.
- * - 4 compact statistic columns separated by subtle vertical hairlines.
- * - Elegant typography with large bold numbers and muted secondary labels.
+ * AZRAQ Shop — Horizontal Statistics & Trust Panel
+ * - 4 clean statistic columns separated by subtle vertical hairlines.
+ * - Large, crisp tabular numbers and quiet secondary labels.
  * - Right-hand side brand guarantee quote.
  */
 export default function StatsRibbon() {
@@ -43,10 +40,10 @@ export default function StatsRibbon() {
 
   return (
     <section className="w-full select-none">
-      <div className="w-full bg-[#F8FBFF]/75 backdrop-blur-2xl border border-[rgba(130,170,205,0.25)] border-t-white/95 rounded-[28px] p-5 sm:p-6 shadow-[0_12px_36px_-8px_rgba(112,200,237,0.12),0_2px_8px_-1px_rgba(25,59,91,0.03)] flex flex-col lg:flex-row items-center justify-between gap-6 transition-all">
+      <div className="w-full bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col lg:flex-row items-center justify-between gap-6 transition-all">
         
         {/* 4 Compact Stat Columns */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 flex-1 w-full divide-y sm:divide-y-0 sm:divide-x divide-[rgba(130,170,205,0.2)]">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 flex-1 w-full divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
           {stats.map((stat, idx) => {
             const Icon = stat.icon;
             return (
@@ -56,16 +53,16 @@ export default function StatsRibbon() {
                   idx > 0 ? 'sm:pl-6' : ''
                 } ${idx >= 2 ? 'pt-3 sm:pt-0' : ''}`}
               >
-                <div className="w-8 h-8 rounded-full bg-white/80 border border-[rgba(130,170,205,0.3)] text-[#0877C9] flex items-center justify-center mb-2 shadow-2xs">
+                <div className="w-9 h-9 rounded-lg bg-slate-100 text-[#185ADB] flex items-center justify-center mb-2.5">
                   <Icon className="w-4 h-4" />
                 </div>
-                <div className="text-2xl sm:text-[26px] font-black text-[#193B5B] tracking-tight">
+                <div className="text-2xl sm:text-[26px] font-bold text-slate-900 tracking-tight tabular-nums">
                   {stat.value}
                 </div>
-                <div className="text-xs font-bold text-[#193B5B] mt-0.5">
+                <div className="text-xs font-semibold text-slate-800 mt-0.5">
                   {stat.label}
                 </div>
-                <div className="text-[10px] text-[#718398] font-medium">
+                <div className="text-[11px] text-slate-500 font-medium">
                   {stat.sub}
                 </div>
               </div>
@@ -73,15 +70,15 @@ export default function StatsRibbon() {
           })}
         </div>
 
-        {/* Right Quote / Guarantee (Identical in composition to reference) */}
-        <div className="w-full lg:w-80 shrink-0 border-t lg:border-t-0 lg:border-l border-[rgba(130,170,205,0.2)] pt-4 lg:pt-0 lg:pl-8 flex flex-col justify-center">
-          <p className="text-xs text-[#193B5B] font-medium leading-relaxed italic">
+        {/* Right Guarantee Quote */}
+        <div className="w-full lg:w-80 shrink-0 border-t lg:border-t-0 lg:border-l border-slate-100 pt-4 lg:pt-0 lg:pl-8 flex flex-col justify-center">
+          <p className="text-xs text-slate-700 font-medium leading-relaxed italic">
             "{t(
               "Authentic quality is not just what it looks and feels like. Authentic quality is how it works.",
               "আসল মান কেবল দেখতে বা ছুঁতে কেমন তা নয়, আসল মান হলো এটি ব্যবহারে কতটা নির্ভরতা দেয়।"
             )}"
           </p>
-          <span className="text-[10px] font-mono uppercase tracking-wider text-[#718398] font-bold mt-1.5 block">
+          <span className="text-[11px] font-mono text-slate-500 font-semibold mt-1.5 block">
             — {t("Azraq Direct Promise", "আজরাক ডিরেক্ট নিশ্চয়তা")}
           </span>
         </div>

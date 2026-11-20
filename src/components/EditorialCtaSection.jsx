@@ -56,7 +56,7 @@ export default function EditorialCtaSection() {
                   />
                   <button
                     type="submit"
-                    className="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] hover:from-[#5CBDE5] text-white font-bold text-xs shadow-[0_4px_16px_rgba(112,200,237,0.35)] transition-all whitespace-nowrap cursor-pointer"
+                    className="px-5 py-2.5 rounded-lg bg-[#185ADB] hover:bg-[#1044A3] text-white font-semibold text-xs shadow-xs transition-colors whitespace-nowrap cursor-pointer"
                   >
                     {t("Unlock ৳200 Off", "২০০৳ ভাউচার নিন")}
                   </button>

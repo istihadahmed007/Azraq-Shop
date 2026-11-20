@@ -79,7 +79,7 @@ class RouteErrorBoundary extends React.Component {
             <button
               type="button"
               onClick={this.handleReload}
-              className="px-6 py-2.5 rounded-full bg-[#0877C9] text-white font-bold text-xs shadow-md hover:bg-[#0665AC] transition-all flex items-center gap-2 cursor-pointer"
+              className="px-6 py-2.5 rounded-lg bg-[#185ADB] text-white font-semibold text-xs shadow-xs hover:bg-[#1044A3] transition-colors flex items-center gap-2 cursor-pointer"
             >
               <RotateCcw className="w-4 h-4" />
               <span>Reload Page</span>
@@ -87,7 +87,7 @@ class RouteErrorBoundary extends React.Component {
             <button
               type="button"
               onClick={this.handleGoHome}
-              className="px-6 py-2.5 rounded-full bg-[#EDF4F9] border border-[#D5E2EE] text-[#293B52] font-semibold text-xs hover:bg-[#E4EEF5] transition-all flex items-center gap-2 cursor-pointer"
+              className="px-6 py-2.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-800 font-semibold text-xs hover:bg-slate-200 transition-colors flex items-center gap-2 cursor-pointer"
             >
               <span>Back to Home</span>
               <ArrowRight className="w-4 h-4" />
@@ -116,7 +116,7 @@ const VisualSearchModal = lazy(() => import('./components/VisualSearchModal'));
 function LoadingFallback() {
   return (
     <div className="w-full min-h-[40vh] flex items-center justify-center">
-      <div className="w-10 h-10 rounded-full border-3 border-[#70C8ED]/30 border-t-[#0877C9] animate-spin" />
+      <div className="w-8 h-8 rounded-full border-2 border-slate-200 border-t-[#185ADB] animate-spin" />
     </div>
   );
 }
@@ -125,18 +125,18 @@ function NotFoundPage() {
   const { t } = useShop();
   return (
     <div className="py-20 text-center select-none flex flex-col items-center justify-center">
-      <div className="w-16 h-16 rounded-[20px] bg-white/80 border border-[rgba(130,170,205,0.3)] flex items-center justify-center mb-4 text-[#0877C9] shadow-xs">
-        <Package className="w-8 h-8 opacity-70" />
+      <div className="w-14 h-14 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center mb-4 text-[#185ADB] shadow-xs">
+        <Package className="w-7 h-7 text-slate-500" />
       </div>
-      <h2 className="text-2xl font-bold text-[#193B5B] mb-2 tracking-tight">
+      <h2 className="text-2xl font-bold text-slate-900 mb-2 tracking-tight">
         {t("Page Not Found (404)", "পৃষ্ঠাটি পাওয়া যায়নি (৪০৪)")}
       </h2>
-      <p className="text-xs text-[#718398] max-w-sm mb-6 leading-relaxed">
+      <p className="text-xs text-slate-500 max-w-sm mb-6 leading-relaxed">
         {t("The page or product you requested could not be found or has been relocated.", "আপনার অনুরোধকৃত পেজটি পাওয়া যায়নি।")}
       </p>
       <Link
         to="/"
-        className="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] hover:from-[#5CBDE5] text-white text-xs font-bold shadow-[0_4px_16px_rgba(112,200,237,0.4)] transition-all flex items-center gap-2 cursor-pointer"
+        className="px-6 py-2.5 rounded-lg bg-[#185ADB] hover:bg-[#1044A3] text-white text-xs font-semibold shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
       >
         <span>{t("Back to Home", "হোমপেজে ফিরে যান")}</span>
         <ArrowRight className="w-4 h-4" />
@@ -179,7 +179,7 @@ function StorefrontContent() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-transparent text-[#193B5B] selection:bg-[#6366F1]/25 selection:text-[#193B5B] font-sans relative overflow-x-hidden">
+    <div className="min-h-screen bg-transparent text-slate-900 selection:bg-[#185ADB]/20 selection:text-slate-900 font-sans relative overflow-x-hidden">
       <RouteSynchronizer />
 
       {/* Main Container (Spacious ~1600px desktop layout matching reference proportions) */}

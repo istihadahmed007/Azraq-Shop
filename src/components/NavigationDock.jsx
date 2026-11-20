@@ -57,7 +57,7 @@ export default function NavigationDock() {
         >
           <Heart className="w-5 h-5" />
           {favorites.length > 0 && (
-            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] text-[10px] font-bold text-white flex items-center justify-center shadow-xs">
+            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#185ADB] text-[10px] font-bold text-white flex items-center justify-center shadow-xs">
               {favorites.length}
             </span>
           )}
@@ -74,7 +74,7 @@ export default function NavigationDock() {
         >
           <ShoppingBag className="w-5 h-5" />
           {totalCartItems > 0 && (
-            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-gradient-to-r from-[#70C8ED] to-[#3B82F6] text-[10px] font-extrabold text-white flex items-center justify-center animate-pulse shadow-xs">
+            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#185ADB] text-[10px] font-bold text-white flex items-center justify-center shadow-xs">
               {totalCartItems}
             </span>
           )}

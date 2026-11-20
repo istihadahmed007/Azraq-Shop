@@ -1,25 +1,24 @@
 import React, { useState, useMemo } from 'react';
-import { Search, ArrowUpDown, RefreshCw, X, ArrowRight, ShieldCheck, ShoppingBag, Heart } from 'lucide-react';
+import { Search, ArrowUpDown, RefreshCw, X, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import ProductCard from './common/ProductCard';
-import ProductImage from './common/ProductImage';
 import AzraqDeliveryTruck from './common/AzraqDeliveryTruck';
 import { generateProductSlug } from '../utils/productUtils';
 import { useNavigate } from 'react-router-dom';
 
 /**
  * AZRAQ Shop — Popular Products Showcase & Full Catalog Engine
- * Exactly matches the reference design layout:
  * 
  * 1. Popular Products Section:
- *    - Desktop: Strictly 6 product cards in one row + 1 promotional delivery banner on the right.
+ *    - Desktop: 6 product cards in one row + 1 promotional delivery banner on the right.
  *    - Header: "Popular Products" with "View All ->" link.
  *    - Authentic product data from ShopContext, unique products, zero duplicates.
- *    - 100% full image containment, wishlist button, BDT price, small add-to-cart button.
- *    - Truthful delivery promo banner ("100% FREE NATIONWIDE DELIVERY on orders over ৳3,000").
+ *    - Edge-to-edge product cards with BDT pricing and prominent Buy Now button.
+ *    - Reassuring delivery banner ("100% Free Nationwide Delivery on orders over ৳3,000").
  * 
- * 2. Full Catalog Directory (Accessible through View All / Active Filter / Search):
- *    - Preserves all 1,206 products, category filter pills, search, sorting, and pagination.
+ * 2. Full Catalog Directory:
+ *    - Accessible via View All / search / active category filter.
+ *    - Clean category tabs, search, sorting, and pagination.
  */
 export default function ProductGrid() {
   const navigate = useNavigate();
@@ -50,7 +49,6 @@ export default function ProductGrid() {
   const popularProducts = useMemo(() => {
     if (!products || products.length === 0) return [];
 
-    // Target product IDs for genuine variety matching reference
     const preferredIds = [
       'AZQ-0101', // Awei T61 TWS Earbuds
       'AZQ-0008', // Awei PD91-US 30W GaN Mini Charger
@@ -63,7 +61,6 @@ export default function ProductGrid() {
     const selected = [];
     const usedIds = new Set();
 
-    // 1. First add preferred products if available
     for (const id of preferredIds) {
       const match = products.find(p => p.id === id && p.main_image);
       if (match && !usedIds.has(match.id)) {
@@ -72,7 +69,6 @@ export default function ProductGrid() {
       }
     }
 
-    // 2. Fill up to 6 with featured / high-quality catalog items if any preferred item is missing
     if (selected.length < 6) {
       for (const p of products) {
         if (selected.length >= 6) break;
@@ -88,50 +84,38 @@ export default function ProductGrid() {
 
   // Categories extracted from authentic database products
   const categories = useMemo(() => {
-    const rawCategories = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
-    const priority = [
-      'Gadgets & IT Accessories',
-      'Sports & Kids',
-      'Men Clothing',
-      'Kitchen Appliances',
-      'Health & Beauty',
-      'Home & Lifestyle',
-      'Jewelries & Accessories',
-      'Gifts'
-    ];
-    const sorted = [
-      ...priority.filter(p => rawCategories.includes(p)),
-      ...rawCategories.filter(r => !priority.includes(r))
-    ];
-    return ['All', ...sorted];
+    if (!products || products.length === 0) return ['All'];
+    const set = new Set();
+    products.forEach((p) => {
+      if (p.category) set.add(p.category);
+    });
+    return ['All', ...Array.from(set).sort()];
   }, [products]);
 
-  // Filter and Sort Pipeline for full catalog
+  // Filter and sort catalog products
   const filteredAndSortedProducts = useMemo(() => {
-    let result = [...products];
+    if (!products) return [];
 
-    // Category Filter
-    if (activeCategory && activeCategory !== 'All') {
-      result = result.filter(p => p.category === activeCategory);
-    }
+    let result = products.filter((p) => {
+      if (!p.main_image || p.price <= 0) return false;
+      if (inStockOnly && (p.stock === 0 || p.status === 'out_of_stock')) return false;
 
-    // Search Query Filter
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      result = result.filter(p =>
-        (p.name && p.name.toLowerCase().includes(q)) ||
-        (p.description && p.description.toLowerCase().includes(q)) ||
-        (p.category && p.category.toLowerCase().includes(q)) ||
-        (p.sku && p.sku.toLowerCase().includes(q))
-      );
-    }
+      if (activeCategory && activeCategory !== 'All') {
+        const cat = p.category || p.primary_collection_name;
+        if (cat !== activeCategory) return false;
+      }
 
-    // In Stock Only Filter
-    if (inStockOnly) {
-      result = result.filter(p => p.stock !== 0 && p.status !== 'out_of_stock');
-    }
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        const nameMatch = p.name?.toLowerCase().includes(q);
+        const catMatch = p.category?.toLowerCase().includes(q);
+        const idMatch = p.id?.toLowerCase().includes(q);
+        if (!nameMatch && !catMatch && !idMatch) return false;
+      }
 
-    // Sorting
+      return true;
+    });
+
     switch (sortBy) {
       case 'price-low':
         result.sort((a, b) => (a.price || 0) - (b.price || 0));
@@ -153,41 +137,14 @@ export default function ProductGrid() {
 
   const displayedProducts = filteredAndSortedProducts.slice(0, visibleCount);
 
-  const handleOpenProduct = (p) => {
-    if (!p) return;
-    try {
-      const slug = generateProductSlug(p);
-      navigate(`/product/${slug}`);
-    } catch {
-      navigate(`/product/${p.id}`);
-    }
-  };
-
-  const handleQuickAdd = (e, product) => {
-    e.stopPropagation();
-    if (addToCart && product) {
-      addToCart(product, product.variants?.[0] || 'Standard', 1);
-    }
-  };
-
-  const handleToggleFav = (e, productId) => {
-    e.stopPropagation();
-    if (toggleFavorite) {
-      toggleFavorite(productId);
-    }
-  };
-
   return (
     <section id="popular-products" className="w-full select-none flex flex-col gap-5 sm:gap-6">
 
-      {/* ========================================================
-          1. EXACT REFERENCE POPULAR PRODUCTS ROW (6 Cards + 1 Banner)
-          ======================================================== */}
+      {/* 1. POPULAR PRODUCTS ROW (6 Cards + 1 Delivery Banner on Desktop) */}
       <div className="w-full">
-        {/* Section Header: Left Title + Right View All Link */}
-        <div className="flex items-center justify-between pb-3 mb-3 border-b border-[rgba(130,170,205,0.18)]">
+        <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-200/80">
           <div className="flex items-center gap-2">
-            <h2 className="text-base sm:text-lg lg:text-xl font-black text-[#193B5B] tracking-tight">
+            <h2 className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 tracking-tight">
               {t("Popular Products", "জনপ্রিয় পণ্যসমূহ")}
             </h2>
           </div>
@@ -199,7 +156,7 @@ export default function ProductGrid() {
                 document.getElementById('all-products-catalog')?.scrollIntoView({ behavior: 'smooth' });
               }, 100);
             }}
-            className="text-xs font-bold text-[#0877C9] hover:text-[#0665AC] flex items-center gap-1.5 transition-colors cursor-pointer group"
+            className="text-xs font-semibold text-[#185ADB] hover:text-[#1044A3] flex items-center gap-1.5 transition-colors cursor-pointer group"
           >
             <span>{shouldShowFullCatalog ? t("Hide Full Catalog", "ক্যাটালগ সংক্ষেপ করুন") : t("View All", "সব দেখুন")}</span>
             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -209,7 +166,7 @@ export default function ProductGrid() {
         {/* 7-Item Grid on Desktop: 6 Product Cards + 1 Delivery Banner */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-3.5 items-stretch">
 
-          {/* 6 PRODUCT CARDS (Screenshot-2 Image-First Style) */}
+          {/* 6 PRODUCT CARDS */}
           {popularProducts.map((p, idx) => (
             <div key={p.id} className="h-full">
               <ProductCard
@@ -220,33 +177,32 @@ export default function ProductGrid() {
             </div>
           ))}
 
-          {/* 7. PROMOTIONAL DELIVERY BANNER (On the far right of the 7-item desktop row) */}
+          {/* 7. PROMOTIONAL DELIVERY BANNER (Solid Grounded Dark Navy) */}
           <div
             onClick={() => {
               const el = document.getElementById('brand-value-ribbon');
               el?.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="col-span-2 sm:col-span-1 lg:col-span-1 bg-gradient-to-br from-[#EEF2FF]/95 via-[#E8F4FD]/90 to-[#DDEEFF]/95 border border-[#6366F1]/20 hover:border-[#6366F1]/45 rounded-[22px] p-3.5 sm:p-4 flex flex-col justify-between items-center text-center shadow-2xs hover:shadow-sm hover:-translate-y-0.5 transition-all relative overflow-hidden group cursor-pointer"
+            className="col-span-2 sm:col-span-1 lg:col-span-1 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between items-center text-center shadow-xs hover:shadow-md transition-shadow relative overflow-hidden group cursor-pointer"
           >
-            {/* Top Shield & Delivery Claim */}
             <div className="flex flex-col items-center">
-              <div className="w-9 h-9 rounded-full bg-white/95 border border-[#6366F1]/25 flex items-center justify-center text-[#245BDB] shadow-2xs mb-2 group-hover:scale-105 transition-transform">
-                <ShieldCheck className="w-5 h-5 text-[#245BDB]" />
+              <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[#185ADB] shadow-xs mb-2 group-hover:scale-105 transition-transform">
+                <ShieldCheck className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xs sm:text-[13px] font-black text-[#193B5B] uppercase tracking-tight leading-tight">
-                {t("100% FREE", "১০০% ফ্রি")}
+              <span className="text-xs sm:text-[13px] font-bold text-white uppercase tracking-tight leading-tight">
+                {t("100% Free", "১০০% ফ্রি")}
                 <br />
-                {t("NATIONWIDE", "দেশজুড়ে")}
+                {t("Nationwide", "দেশজুড়ে")}
                 <br />
-                {t("DELIVERY", "ডেলিভারি")}
+                {t("Delivery", "ডেলিভারি")}
               </span>
-              <span className="text-[10px] font-bold text-[#245BDB] mt-1 bg-white/80 px-2 py-0.5 rounded-full border border-[#6366F1]/20">
+              <span className="text-[10px] font-semibold text-slate-300 mt-1.5 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
                 {t("Orders > ৳3,000", "৩০০০৳+ অর্ডারে")}
               </span>
             </div>
 
-            {/* Bottom 3D Truck Graphic */}
-            <div className="w-full flex items-center justify-center pt-2 group-hover:scale-105 transition-transform duration-300">
+            {/* Delivery Truck Graphic */}
+            <div className="w-full flex items-center justify-center pt-2 group-hover:scale-105 transition-transform duration-200">
               <AzraqDeliveryTruck className="w-24 sm:w-28 h-16 sm:h-18" animated={true} />
             </div>
           </div>
@@ -254,24 +210,18 @@ export default function ProductGrid() {
         </div>
       </div>
 
-      {/* ========================================================
-          2. FULL CATALOG DIRECTORY (1,200+ Products)
-          Preserves full catalog browsing, search, category filtering & pagination
-          ======================================================== */}
+      {/* 2. FULL CATALOG DIRECTORY */}
       {shouldShowFullCatalog && (
-        <div id="all-products-catalog" className="border border-[rgba(130,170,205,0.25)] border-t-white/95 bg-white/75 backdrop-blur-2xl rounded-[28px] p-5 sm:p-7 shadow-[0_16px_40px_-10px_rgba(112,200,237,0.12),0_4px_16px_-2px_rgba(25,59,91,0.04)] flex flex-col gap-5 animate-in fade-in duration-200">
+        <div id="all-products-catalog" className="border border-slate-200/90 bg-white rounded-2xl p-5 sm:p-7 shadow-xs flex flex-col gap-5 animate-in fade-in duration-150">
 
           {/* Section Header */}
-          <div className="flex items-center justify-between pb-3.5 border-b border-[rgba(130,170,205,0.18)]">
+          <div className="flex items-center justify-between pb-3.5 border-b border-slate-100">
             <div>
-              <span className="text-[10px] font-mono text-[#0877C9] uppercase tracking-[0.18em] block font-bold">
-                + {t("COMPLETE CATALOGUE DIRECTORY", "সম্পূর্ণ ক্যাটালগ")}
-              </span>
-              <div className="flex items-center gap-3 mt-0.5">
-                <h3 className="text-lg sm:text-xl font-extrabold text-[#193B5B] tracking-tight">
+              <div className="flex items-center gap-3">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
                   {t("Browse All Products", "সকল পণ্য দেখুন")}
                 </h3>
-                <span className="text-xs font-mono font-bold text-[#193B5B] bg-[#DDEEFF]/70 border border-[rgba(130,170,205,0.3)] px-3 py-0.5 rounded-full shadow-2xs">
+                <span className="text-xs font-mono font-medium text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-md tabular-nums">
                   {filteredAndSortedProducts.length} {t("Items", "টি")}
                 </span>
               </div>
@@ -281,10 +231,10 @@ export default function ProductGrid() {
             <button
               onClick={syncWithEasyDrop}
               disabled={syncStatus.isSyncing}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold text-[#193B5B] hover:text-[#0877C9] bg-white/80 hover:bg-white border border-[rgba(130,170,205,0.3)] shadow-xs transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
               title="Sync with EasyDrop API"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-[#0877C9] ${syncStatus.isSyncing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 text-[#185ADB] ${syncStatus.isSyncing ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">{syncStatus.isSyncing ? t('Syncing...', 'সিংকিং...') : t('Catalog Verified', 'ক্যাটালগ ভেরিফাইড')}</span>
             </button>
           </div>
@@ -302,9 +252,9 @@ export default function ProductGrid() {
                   <button
                     key={cat}
                     onClick={() => setActiveCategory(cat)}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border cursor-pointer ${isActive
-                      ? 'bg-gradient-to-r from-[#0877C9] to-[#3B82F6] text-white border-transparent shadow-[0_4px_14px_rgba(8,119,201,0.4)]'
-                      : 'bg-white/70 hover:bg-white text-[#718398] hover:text-[#193B5B] border-[rgba(130,170,205,0.22)]'
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${isActive
+                      ? 'bg-[#185ADB] text-white'
+                      : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700'
                       }`}
                   >
                     {displayName}
@@ -314,40 +264,40 @@ export default function ProductGrid() {
             </div>
 
             {/* Filter Controls Row: Search + Sort + In-stock */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 border-t border-[rgba(130,170,205,0.18)]">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 border-t border-slate-100">
 
               {/* Search input */}
               <div className="relative flex-1 sm:max-w-xs">
-                <Search className="w-3.5 h-3.5 text-[#718398] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
                   placeholder={t("Filter within catalog...", "পণ্য ফিল্টার করুন...")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-8 py-2 rounded-full bg-white/85 border border-[rgba(130,170,205,0.28)] text-xs text-[#193B5B] focus:bg-white focus:outline-none focus:border-[#0877C9] shadow-inner font-medium placeholder-[#718398]"
+                  className="w-full pl-8 pr-8 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-[#185ADB] focus:ring-1 focus:ring-[#185ADB]"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#718398] hover:text-[#193B5B]"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
                   >
-                    <X className="w-3 h-3" />
+                    <X className="w-3.5 h-3.5" />
                   </button>
                 )}
               </div>
 
-              {/* Sort Dropdown & Toggles */}
+              {/* Sort Options */}
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs text-[#718398] flex items-center gap-1 font-semibold">
+                <span className="text-xs text-slate-500 flex items-center gap-1 font-medium">
                   <ArrowUpDown className="w-3 h-3" />
                   <span className="hidden md:inline">{t("Sort:", "বাছাই:")}</span>
                 </span>
 
                 <button
                   onClick={() => setSortBy('featured')}
-                  className={`px-3 py-1.5 rounded-full font-bold border transition-all text-xs cursor-pointer ${sortBy === 'featured'
-                    ? 'bg-gradient-to-r from-[#0877C9] to-[#3B82F6] text-white border-transparent shadow-xs'
-                    : 'bg-white/70 hover:bg-white text-[#193B5B] border-[rgba(130,170,205,0.25)]'
+                  className={`px-2.5 py-1.5 rounded-lg font-medium text-xs transition-colors cursor-pointer ${sortBy === 'featured'
+                    ? 'bg-[#185ADB] text-white'
+                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700'
                     }`}
                 >
                   {t("Featured", "সেরা")}
@@ -355,9 +305,9 @@ export default function ProductGrid() {
 
                 <button
                   onClick={() => setSortBy('price-low')}
-                  className={`px-3 py-1.5 rounded-full font-bold border transition-all text-xs cursor-pointer ${sortBy === 'price-low'
-                    ? 'bg-gradient-to-r from-[#0877C9] to-[#3B82F6] text-white border-transparent shadow-xs'
-                    : 'bg-white/70 hover:bg-white text-[#193B5B] border-[rgba(130,170,205,0.25)]'
+                  className={`px-2.5 py-1.5 rounded-lg font-medium text-xs transition-colors cursor-pointer ${sortBy === 'price-low'
+                    ? 'bg-[#185ADB] text-white'
+                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700'
                     }`}
                 >
                   {t("Price: Low to High", "দাম: কম")}
@@ -365,21 +315,21 @@ export default function ProductGrid() {
 
                 <button
                   onClick={() => setSortBy('price-high')}
-                  className={`px-3 py-1.5 rounded-full font-bold border transition-all text-xs cursor-pointer ${sortBy === 'price-high'
-                    ? 'bg-gradient-to-r from-[#0877C9] to-[#3B82F6] text-white border-transparent shadow-xs'
-                    : 'bg-white/70 hover:bg-white text-[#193B5B] border-[rgba(130,170,205,0.25)]'
+                  className={`px-2.5 py-1.5 rounded-lg font-medium text-xs transition-colors cursor-pointer ${sortBy === 'price-high'
+                    ? 'bg-[#185ADB] text-white'
+                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700'
                     }`}
                 >
                   {t("Price: High to Low", "দাম: বেশি")}
                 </button>
 
                 {/* In-Stock Toggle */}
-                <label className="flex items-center gap-1.5 ml-1 cursor-pointer font-semibold text-[#193B5B] select-none px-3 py-1.5 rounded-full hover:bg-white/70 transition-colors text-xs border border-transparent hover:border-[rgba(130,170,205,0.25)]">
+                <label className="flex items-center gap-1.5 ml-1 cursor-pointer font-medium text-slate-700 select-none px-2.5 py-1.5 rounded-lg hover:bg-slate-100 transition-colors text-xs">
                   <input
                     type="checkbox"
                     checked={inStockOnly}
                     onChange={(e) => setInStockOnly(e.target.checked)}
-                    className="w-3.5 h-3.5 text-[#0877C9] rounded border-[rgba(130,170,205,0.4)] focus:ring-0"
+                    className="w-3.5 h-3.5 text-[#185ADB] rounded border-slate-300 focus:ring-0"
                   />
                   <span>{t("In Stock Only", "স্টকে আছে")}</span>
                 </label>
@@ -391,15 +341,15 @@ export default function ProductGrid() {
 
           {/* 5-Columns Grid on Desktop for Full Catalog */}
           {displayedProducts.length === 0 ? (
-            <div className="bg-white/50 border border-[rgba(130,170,205,0.25)] rounded-[22px] p-10 text-center text-[#718398]">
-              <p className="text-sm font-semibold">{t("No products found matching your filter.", "কোন পণ্য পাওয়া যায়নি।")}</p>
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-10 text-center text-slate-500">
+              <p className="text-sm font-medium">{t("No products found matching your filter.", "কোন পণ্য পাওয়া যায়নি।")}</p>
               <button
                 onClick={() => {
                   setActiveCategory('All');
                   setSearchQuery('');
                   setInStockOnly(false);
                 }}
-                className="mt-3 px-5 py-2 rounded-full bg-gradient-to-r from-[#0877C9] to-[#3B82F6] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+                className="mt-3 px-4 py-2 rounded-lg bg-[#185ADB] hover:bg-[#1044A3] text-white text-xs font-semibold transition-colors cursor-pointer"
               >
                 {t("Reset Filters", "ফিল্টার রিসেট করুন")}
               </button>
@@ -425,10 +375,10 @@ export default function ProductGrid() {
 
           {/* Load More Pagination Button */}
           {visibleCount < filteredAndSortedProducts.length && (
-            <div className="flex justify-center mt-3 pt-4 border-t border-[rgba(130,170,205,0.18)]">
+            <div className="flex justify-center mt-3 pt-4 border-t border-slate-100">
               <button
                 onClick={() => setVisibleCount(prev => prev + 25)}
-                className="px-8 py-3 bg-gradient-to-r from-[#0877C9] to-[#3B82F6] hover:from-[#0665AC] hover:to-[#2563EB] text-white text-xs sm:text-sm font-bold rounded-full transition-all active:scale-98 shadow-[0_8px_24px_rgba(8,119,201,0.35)] cursor-pointer"
+                className="px-6 py-2.5 bg-[#185ADB] hover:bg-[#1044A3] text-white text-xs sm:text-sm font-semibold rounded-lg transition-colors active:scale-[0.98] shadow-xs cursor-pointer"
               >
                 {t("Load More Products", "আরও পণ্য দেখুন")} ({filteredAndSortedProducts.length - visibleCount} {t("remaining", "বাকি")})
               </button>
