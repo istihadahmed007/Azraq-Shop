@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Search, LayoutGrid, List, ArrowRight, ArrowUpDown, ChevronRight } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
