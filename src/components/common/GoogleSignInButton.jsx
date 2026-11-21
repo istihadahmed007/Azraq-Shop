@@ -8,7 +8,11 @@ import { AlertCircle, Loader2 } from 'lucide-react';
  * 
  * Embeds the official Google Identity Services (GIS) button using
  * `google.accounts.id.renderButton()`.
- * Validates configuration and handles credential callback securely.
+ * 
+ * NOTE: The container element for Google's button is strictly maintained
+ * as an empty leaf element in React Virtual DOM. React must never render
+ * child components inside `buttonContainerRef` to prevent DOMException:
+ * "Failed to execute 'removeChild' on 'Node'" during reconciliation.
  */
 export default function GoogleSignInButton({ onSuccess, onError, buttonText = 'continue_with' }) {
   const { loginWithGoogle } = useAuth();
@@ -18,16 +22,31 @@ export default function GoogleSignInButton({ onSuccess, onError, buttonText = 'c
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  const onSuccessRef = useRef(onSuccess);
+  const onErrorRef = useRef(onError);
+  const loginWithGoogleRef = useRef(loginWithGoogle);
+
+  useEffect(() => {
+    onSuccessRef.current = onSuccess;
+    onErrorRef.current = onError;
+    loginWithGoogleRef.current = loginWithGoogle;
+  });
+
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
   useEffect(() => {
+    let isMounted = true;
+    let intervalId = null;
+
     // If no client ID configured in environment, show clear understandable configuration notice
     if (!clientId || clientId === 'YOUR_WEB_CLIENT_ID') {
-      setIsInitializing(false);
-      setErrorMessage(t(
-        "Google Sign-In is not configured. Please set VITE_GOOGLE_CLIENT_ID in your environment.",
-        "গুগল সাইন-ইন কনফিগার করা হয়নি। অনুগ্রহ করে VITE_GOOGLE_CLIENT_ID সেট করুন।"
-      ));
+      if (isMounted) {
+        setIsInitializing(false);
+        setErrorMessage(t(
+          "Google Sign-In is not configured. Please set VITE_GOOGLE_CLIENT_ID in your environment.",
+          "গুগল সাইন-ইন কনফিগার করা হয়নি। অনুগ্রহ করে VITE_GOOGLE_CLIENT_ID সেট করুন।"
+        ));
+      }
       return;
     }
 
@@ -43,50 +62,58 @@ export default function GoogleSignInButton({ onSuccess, onError, buttonText = 'c
       }
     }
 
-    let intervalId = null;
     let attempts = 0;
-    const maxAttempts = 50; // Wait up to 5 seconds for GIS script to load
+    const maxAttempts = 60; // Wait up to 6 seconds for GIS script to load
 
     const initGIS = () => {
+      if (!isMounted) return true;
       if (typeof window !== 'undefined' && window.google?.accounts?.id && buttonContainerRef.current) {
         try {
-          // Initialize GIS client once with credential response callback
+          // Initialize GIS client with credential response callback
           window.google.accounts.id.initialize({
             client_id: clientId,
             callback: async (response) => {
               if (!response?.credential) {
                 const err = 'No credential returned from Google.';
-                setErrorMessage(err);
-                if (onError) onError(err);
+                if (isMounted) setErrorMessage(err);
+                if (onErrorRef.current) onErrorRef.current(err);
                 return;
               }
 
-              setIsSubmitting(true);
-              setErrorMessage('');
+              if (isMounted) {
+                setIsSubmitting(true);
+                setErrorMessage('');
+              }
 
               try {
-                const res = await loginWithGoogle(response.credential);
+                const res = await loginWithGoogleRef.current(response.credential);
                 if (res.success) {
-                  if (onSuccess) onSuccess(res.user);
+                  if (onSuccessRef.current) onSuccessRef.current(res.user);
                 } else {
                   const errText = res.error || 'Authentication with Google failed.';
-                  setErrorMessage(errText);
-                  if (onError) onError(errText);
+                  if (isMounted) setErrorMessage(errText);
+                  if (onErrorRef.current) onErrorRef.current(errText);
                 }
               } catch (err) {
                 const errText = err.message || 'Network error during Google authentication.';
-                setErrorMessage(errText);
-                if (onError) onError(errText);
+                if (isMounted) setErrorMessage(errText);
+                if (onErrorRef.current) onErrorRef.current(errText);
               } finally {
-                setIsSubmitting(false);
+                if (isMounted) setIsSubmitting(false);
               }
             },
             auto_select: false,
             cancel_on_tap_outside: true
           });
 
-          // Render official Google button
+          // Measure container width and clamp to Google's allowed range [200, 400]
+          const containerWidth = buttonContainerRef.current.getBoundingClientRect().width || buttonContainerRef.current.offsetWidth || 320;
+          const targetWidth = Math.min(400, Math.max(200, Math.floor(containerWidth)));
+
+          // Clear previous native DOM nodes if any
           buttonContainerRef.current.innerHTML = '';
+
+          // Render official Google button
           window.google.accounts.id.renderButton(buttonContainerRef.current, {
             theme: 'outline',
             size: 'large',
@@ -94,17 +121,22 @@ export default function GoogleSignInButton({ onSuccess, onError, buttonText = 'c
             text: buttonText,
             shape: 'rectangular',
             logo_alignment: 'left',
-            width: buttonContainerRef.current.clientWidth || 320
+            width: targetWidth
           });
 
-          setIsInitializing(false);
+          if (isMounted) {
+            setIsInitializing(false);
+          }
           if (intervalId) clearInterval(intervalId);
+          return true;
         } catch (err) {
           console.error('[Google GIS Init Error]:', err);
-          setIsInitializing(false);
-          setErrorMessage('Failed to initialize Google Sign-In widget.');
+          if (isMounted) {
+            setIsInitializing(false);
+            setErrorMessage('Failed to initialize Google Sign-In widget.');
+          }
+          return true;
         }
-        return true;
       }
       return false;
     };
@@ -113,19 +145,22 @@ export default function GoogleSignInButton({ onSuccess, onError, buttonText = 'c
       intervalId = setInterval(() => {
         attempts++;
         if (initGIS() || attempts >= maxAttempts) {
-          clearInterval(intervalId);
-          setIsInitializing(false);
-          if (attempts >= maxAttempts && !window.google?.accounts?.id) {
-            setErrorMessage('Google Identity Services script could not be loaded. Please check your internet connection.');
+          if (intervalId) clearInterval(intervalId);
+          if (isMounted) {
+            setIsInitializing(false);
+            if (attempts >= maxAttempts && !window.google?.accounts?.id) {
+              setErrorMessage('Google Identity Services script could not be loaded. Please check your internet connection.');
+            }
           }
         }
       }, 100);
     }
 
     return () => {
+      isMounted = false;
       if (intervalId) clearInterval(intervalId);
     };
-  }, [clientId, loginWithGoogle, buttonText, t, onSuccess, onError]);
+  }, [clientId, buttonText, t]);
 
   return (
     <div className="w-full flex flex-col items-center gap-2.5">
@@ -145,19 +180,27 @@ export default function GoogleSignInButton({ onSuccess, onError, buttonText = 'c
         </div>
       )}
 
-      {/* Official GIS Button Container */}
-      <div
-        ref={buttonContainerRef}
-        className={`w-full min-h-[44px] flex justify-center items-center rounded-xl overflow-hidden ${
-          isSubmitting ? 'pointer-events-none opacity-50' : ''
-        }`}
-      >
+      {/* Button Wrapper with overlay loader to prevent React DOM reconciliation conflicts */}
+      <div className="relative w-full min-h-[44px] flex justify-center items-center">
+        {/* Loading placeholder when initializing GIS */}
         {isInitializing && !errorMessage && (
-          <div className="w-full py-3 rounded-xl bg-slate-100 animate-pulse flex items-center justify-center gap-2 text-xs text-slate-400">
+          <div className="absolute inset-0 z-10 w-full py-3 rounded-xl bg-slate-100 animate-pulse flex items-center justify-center gap-2 text-xs text-slate-400">
             <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-400" />
             <span>{t("Loading Google Sign-In...", "গুগল সাইন-ইন লোড হচ্ছে...")}</span>
           </div>
         )}
+
+        {/* 
+          Official GIS Button Container:
+          CRITICAL: Kept strictly empty in React JSX so React Virtual DOM has zero child nodes
+          to reconcile or call `removeChild()` on when Google mutates inner DOM.
+        */}
+        <div
+          ref={buttonContainerRef}
+          className={`w-full min-h-[44px] flex justify-center items-center rounded-xl overflow-hidden ${
+            isSubmitting ? 'pointer-events-none opacity-50' : ''
+          }`}
+        />
       </div>
     </div>
   );
