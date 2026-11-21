@@ -9,6 +9,11 @@
   RewriteRule ^api/health/?$ api/health.php [L,QSA]
 
   # Route API endpoints directly to PHP handlers
+  RewriteRule ^api/auth/google/?$ api/auth/google.php [L,QSA]
+  RewriteRule ^api/auth/me/?$ api/auth/me.php [L,QSA]
+  RewriteRule ^api/auth/login/?$ api/auth/login.php [L,QSA]
+  RewriteRule ^api/auth/register/?$ api/auth/register.php [L,QSA]
+  RewriteRule ^api/auth/logout/?$ api/auth/logout.php [L,QSA]
   RewriteRule ^api/admin/auth/?$ api/admin/auth.php [L,QSA]
   RewriteRule ^api/orders/track/?$ api/orders/track.php [L,QSA]
   RewriteRule ^api/orders/update-status/?$ api/orders/update-status.php [L,QSA]
