@@ -2,12 +2,19 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { searchProductsByImage } from './server/visualSearchService.js';
 import { handlePaymentRoutes } from './server/paymentRoutes.js';
+import { handleCustomerAuthRoutes } from './server/customerAuth.js';
 import productsHandler from './api/products/index.js';
 
 // Custom API route plugin for AI Visual Product Search & Paymently Gateway
 function azraqApiPlugin() {
   const attachMiddleware = (server) => {
     server.middlewares.use(async (req, res, next) => {
+      // 0. Customer Authentication Endpoints (/api/auth/*)
+      if (req.url?.startsWith('/api/auth')) {
+        const handled = await handleCustomerAuthRoutes(req, res);
+        if (handled) return;
+      }
+
       // 1. Paymently Gateway API & Checkout Session Endpoints & Order Tracking & Admin API
       if (req.url?.startsWith('/api/payments') || req.url?.startsWith('/api/orders') || req.url?.startsWith('/api/admin') || req.url?.startsWith('/payment-checkout')) {
         const handled = await handlePaymentRoutes(req, res);

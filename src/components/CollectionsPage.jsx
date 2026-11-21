@@ -11,9 +11,48 @@ export default function CollectionsPage() {
   const navigate = useNavigate();
   const { collections, t } = useShop();
 
-  const [viewMode, setViewMode] = useState('grid');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('count');
+  const [viewMode, setViewMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = sessionStorage.getItem('azraq_collections_directory_state');
+        if (raw) return JSON.parse(raw).viewMode || 'grid';
+      } catch (e) {}
+    }
+    return 'grid';
+  });
+
+  const [searchQuery, setSearchQuery] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = sessionStorage.getItem('azraq_collections_directory_state');
+        if (raw) return JSON.parse(raw).searchQuery || '';
+      } catch (e) {}
+    }
+    return '';
+  });
+
+  const [sortBy, setSortBy] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = sessionStorage.getItem('azraq_collections_directory_state');
+        if (raw) return JSON.parse(raw).sortBy || 'count';
+      } catch (e) {}
+    }
+    return 'count';
+  });
+
+  // Persist collection directory browsing state
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.setItem('azraq_collections_directory_state', JSON.stringify({
+          viewMode,
+          searchQuery,
+          sortBy
+        }));
+      } catch (e) {}
+    }
+  }, [viewMode, searchQuery, sortBy]);
 
   const filteredCollections = useMemo(() => {
     let result = [...collections];
@@ -76,18 +115,16 @@ export default function CollectionsPage() {
             <div className="flex items-center bg-slate-100 rounded-lg p-1 border border-slate-200">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded-md transition-colors ${
-                  viewMode === 'grid' ? 'bg-[#185ADB] text-white shadow-xs' : 'text-slate-500 hover:text-slate-900'
-                }`}
+                className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-[#185ADB] text-white shadow-xs' : 'text-slate-500 hover:text-slate-900'
+                  }`}
                 title="Grid Mode"
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-1.5 rounded-md transition-colors ${
-                  viewMode === 'list' ? 'bg-[#185ADB] text-white shadow-xs' : 'text-slate-500 hover:text-slate-900'
-                }`}
+                className={`p-1.5 rounded-md transition-colors ${viewMode === 'list' ? 'bg-[#185ADB] text-white shadow-xs' : 'text-slate-500 hover:text-slate-900'
+                  }`}
                 title="List Mode"
               >
                 <List className="w-3.5 h-3.5" />

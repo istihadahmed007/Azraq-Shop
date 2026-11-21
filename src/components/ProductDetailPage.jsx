@@ -224,7 +224,7 @@ export default function ProductDetailPage() {
     }
   }, [product]);
 
-  // Dynamic SEO & Metadata
+  // 1. Dynamic SEO & Metadata (Separated responsibility: depends only on product)
   useEffect(() => {
     if (product) {
       const pageTitle = `${product.name} — AZRAQ Shop`;
@@ -247,35 +247,36 @@ export default function ProductDetailPage() {
         setMeta('og:image', product.main_image);
       }
       setMeta('og:url', window.location.href);
-
-      // Preload primary photograph with high priority
-      const targetImage = images[activeImageIndex] || product.main_image;
-      if (targetImage) {
-        let preloadLink = document.querySelector(`link[rel="preload"][href="${targetImage}"]`);
-        if (!preloadLink) {
-          preloadLink = document.createElement('link');
-          preloadLink.rel = 'preload';
-          preloadLink.as = 'image';
-          preloadLink.href = targetImage;
-          preloadLink.fetchPriority = 'high';
-          document.head.appendChild(preloadLink);
-        }
-      }
-
-      // Pre-cache other gallery thumbnails in browser memory
-      if (images && images.length > 1) {
-        images.forEach((url, i) => {
-          if (i !== activeImageIndex && url) {
-            const img = new Image();
-            img.src = url;
-          }
-        });
-      }
-
-      // Scroll smoothly to top on navigation
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, [product, images, activeImageIndex]);
+  }, [product]);
+
+  // 2. Main Image High-Priority Preload (Separated responsibility)
+  useEffect(() => {
+    const mainImg = product?.main_image || (images && images[0]);
+    if (mainImg) {
+      let preloadLink = document.querySelector(`link[rel="preload"][href="${mainImg}"]`);
+      if (!preloadLink) {
+        preloadLink = document.createElement('link');
+        preloadLink.rel = 'preload';
+        preloadLink.as = 'image';
+        preloadLink.href = mainImg;
+        preloadLink.fetchPriority = 'high';
+        document.head.appendChild(preloadLink);
+      }
+    }
+  }, [product?.main_image, images]);
+
+  // 3. Gallery Thumbnails Pre-caching (Separated responsibility: thumbnails change never scrolls page)
+  useEffect(() => {
+    if (images && images.length > 1) {
+      images.forEach((url, i) => {
+        if (i !== 0 && url) {
+          const img = new Image();
+          img.src = url;
+        }
+      });
+    }
+  }, [images]);
 
   // 1. Loading state: active when product is being loaded from single record or catalog
   const isStillLoading = !product && (
@@ -559,11 +560,10 @@ export default function ProductDetailPage() {
                     key={idx}
                     type="button"
                     onClick={() => setActiveImageIndex(idx)}
-                    className={`relative w-16 h-16 sm:w-18 sm:h-18 rounded-lg bg-white border flex items-center justify-center overflow-hidden shrink-0 transition-all ${
-                      activeImageIndex === idx
-                        ? 'border-[#185ADB] ring-2 ring-[#185ADB]/30'
-                        : 'border-slate-200 opacity-70 hover:opacity-100'
-                    }`}
+                    className={`relative w-16 h-16 sm:w-18 sm:h-18 rounded-lg bg-white border flex items-center justify-center overflow-hidden shrink-0 transition-all ${activeImageIndex === idx
+                      ? 'border-[#185ADB] ring-2 ring-[#185ADB]/30'
+                      : 'border-slate-200 opacity-70 hover:opacity-100'
+                      }`}
                   >
                     <ProductImage
                       src={imgUrl}
@@ -645,11 +645,10 @@ export default function ProductDetailPage() {
                 {/* Stock Status Badge */}
                 <div className="text-right">
                   <span
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium ${
-                      isAvailable
-                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                        : 'bg-rose-50 text-rose-800 border border-rose-200'
-                    }`}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium ${isAvailable
+                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                      : 'bg-rose-50 text-rose-800 border border-rose-200'
+                      }`}
                   >
                     <span className={`w-1.5 h-1.5 rounded-full ${isAvailable ? 'bg-emerald-600' : 'bg-rose-600'}`} />
                     {isAvailable ? t("In Stock", "স্টকে আছে") : t("Out of Stock", "স্টক শেষ")}
@@ -669,11 +668,10 @@ export default function ProductDetailPage() {
                         key={variant}
                         type="button"
                         onClick={() => setSelectedVariant(variant)}
-                        className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
-                          selectedVariant === variant
-                            ? 'bg-[#185ADB] text-white border-[#185ADB] shadow-xs'
-                            : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
-                        }`}
+                        className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border ${selectedVariant === variant
+                          ? 'bg-[#185ADB] text-white border-[#185ADB] shadow-xs'
+                          : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                          }`}
                       >
                         {variant}
                       </button>
@@ -741,11 +739,10 @@ export default function ProductDetailPage() {
                 <button
                   type="button"
                   onClick={() => toggleFavorite(product.id)}
-                  className={`w-11 h-11 rounded-lg border flex items-center justify-center transition-colors shrink-0 shadow-2xs ${
-                    isFav
-                      ? 'bg-rose-50 text-rose-600 border-rose-200'
-                      : 'bg-white text-slate-500 border-slate-200 hover:text-slate-900 hover:border-slate-300'
-                  }`}
+                  className={`w-11 h-11 rounded-lg border flex items-center justify-center transition-colors shrink-0 shadow-2xs ${isFav
+                    ? 'bg-rose-50 text-rose-600 border-rose-200'
+                    : 'bg-white text-slate-500 border-slate-200 hover:text-slate-900 hover:border-slate-300'
+                    }`}
                   title={isFav ? t("Remove from Wishlist", "পছন্দ থেকে সরান") : t("Save to Wishlist", "পছন্দের তালিকায় রাখুন")}
                   aria-label="Toggle wishlist"
                 >
@@ -785,41 +782,37 @@ export default function ProductDetailPage() {
         <div className="flex items-center gap-2 border-b border-slate-200 pb-3 overflow-x-auto no-scrollbar">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
-              activeTab === 'overview'
-                ? 'bg-[#185ADB] text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200'
-            }`}
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${activeTab === 'overview'
+              ? 'bg-[#185ADB] text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200'
+              }`}
           >
             {t("Overview & Description", "পণ্যের বিবরণ")}
           </button>
           <button
             onClick={() => setActiveTab('specs')}
-            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
-              activeTab === 'specs'
-                ? 'bg-[#185ADB] text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200'
-            }`}
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${activeTab === 'specs'
+              ? 'bg-[#185ADB] text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200'
+              }`}
           >
             {t("Specifications", "স্পেসিফিকেশন")}
           </button>
           <button
             onClick={() => setActiveTab('delivery')}
-            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
-              activeTab === 'delivery'
-                ? 'bg-[#185ADB] text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200'
-            }`}
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${activeTab === 'delivery'
+              ? 'bg-[#185ADB] text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200'
+              }`}
           >
             {t("Shipping & Logistics", "ডেলিভারি ও শিপিং")}
           </button>
           <button
             onClick={() => setActiveTab('returns')}
-            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
-              activeTab === 'returns'
-                ? 'bg-[#185ADB] text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200'
-            }`}
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${activeTab === 'returns'
+              ? 'bg-[#185ADB] text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200'
+              }`}
           >
             {t("Return Policy", "রিটার্ন পলিসি")}
           </button>

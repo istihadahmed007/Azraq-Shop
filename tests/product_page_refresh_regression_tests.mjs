@@ -121,6 +121,7 @@ try {
     assert.ok(scriptMatches.length > 0, 'Must have at least one script tag');
     for (const match of scriptMatches) {
       const src = match[1];
+      if (src.startsWith('http://') || src.startsWith('https://')) continue;
       assert.ok(src.startsWith('/'), `Script src "${src}" must start with "/" (root-absolute), never "./"`);
     }
 
@@ -147,6 +148,7 @@ try {
     const scriptMatches = [...html.matchAll(/<script[^>]+src=["']([^"']+)["']/gi)];
     for (const match of scriptMatches) {
       const assetPath = match[1];
+      if (assetPath.startsWith('http://') || assetPath.startsWith('https://')) continue;
       const res = await request(TEST_PORT, assetPath);
       assert.strictEqual(res.statusCode, 200, `Asset ${assetPath} must return 200`);
       assert.ok(

@@ -19,6 +19,7 @@ import {
   Toast
 } from './components';
 import Sidebar from './components/Sidebar';
+import ScrollRestorationManager from './components/common/ScrollRestorationManager';
 import { Package, ArrowRight, RotateCcw, AlertTriangle } from 'lucide-react';
 
 // Route Error Boundary protecting against chunk load failures on new deployments
@@ -180,6 +181,7 @@ function StorefrontContent() {
 
   return (
     <div className="min-h-screen bg-transparent text-slate-900 selection:bg-[#185ADB]/20 selection:text-slate-900 font-sans relative overflow-x-hidden">
+      <ScrollRestorationManager />
       <RouteSynchronizer />
 
       {/* Main Container (Spacious ~1600px desktop layout matching reference proportions) */}

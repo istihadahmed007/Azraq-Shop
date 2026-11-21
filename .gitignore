@@ -35,3 +35,18 @@ scratch/
 *.log
 .cache/
 
+# Agent workspace and tooling artifacts
+.agent/
+.agents/
+.gemini/
+.gsd/
+GSD-STYLE.md
+PROJECT_RULES.md
+VERSION
+adapters/
+model_capabilities.yaml
+scripts/search_repo.*
+scripts/setup_search.*
+scripts/validate-*
+
+

@@ -37,10 +37,71 @@ export default function ProductGrid() {
     t
   } = useShop();
 
-  const [sortBy, setSortBy] = useState('featured');
-  const [inStockOnly, setInStockOnly] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(35);
-  const [isCatalogExpanded, setIsCatalogExpanded] = useState(false);
+  const [sortBy, setSortBy] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = sessionStorage.getItem('azraq_storefront_grid_state');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed.sortBy) return parsed.sortBy;
+        }
+      } catch (e) {}
+    }
+    return 'featured';
+  });
+
+  const [inStockOnly, setInStockOnly] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = sessionStorage.getItem('azraq_storefront_grid_state');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (typeof parsed.inStockOnly === 'boolean') return parsed.inStockOnly;
+        }
+      } catch (e) {}
+    }
+    return false;
+  });
+
+  const [visibleCount, setVisibleCount] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = sessionStorage.getItem('azraq_storefront_grid_state');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (typeof parsed.visibleCount === 'number' && parsed.visibleCount >= 35) return parsed.visibleCount;
+        }
+      } catch (e) {}
+    }
+    return 35;
+  });
+
+  const [isCatalogExpanded, setIsCatalogExpanded] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = sessionStorage.getItem('azraq_storefront_grid_state');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (typeof parsed.isCatalogExpanded === 'boolean') return parsed.isCatalogExpanded;
+        }
+      } catch (e) {}
+    }
+    return false;
+  });
+
+  // Persist browsing state across route transitions so Back button preserves exact catalog layout
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.setItem('azraq_storefront_grid_state', JSON.stringify({
+          sortBy,
+          inStockOnly,
+          visibleCount,
+          isCatalogExpanded
+        }));
+      } catch (e) {}
+    }
+  }, [sortBy, inStockOnly, visibleCount, isCatalogExpanded]);
 
   // Auto-expand catalog when user has searched or chosen a category
   const shouldShowFullCatalog = isCatalogExpanded || searchQuery.trim().length > 0 || (activeCategory && activeCategory !== 'All');

@@ -189,11 +189,12 @@ export default function Header({ onToggleSidebar }) {
                 className="w-9 h-9 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-900 transition-colors cursor-pointer overflow-hidden"
                 title={user.name}
               >
-                {user.avatar ? (
+                {(user.avatar || user.avatar_url) ? (
                   <img
-                    src={user.avatar}
+                    src={user.avatar || user.avatar_url}
                     alt={user.name}
                     className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
                   />
                 ) : (
                   <User className="w-4 h-4 text-[#185ADB]" />
@@ -201,7 +202,7 @@ export default function Header({ onToggleSidebar }) {
               </button>
 
               {isUserMenuOpen && (
-                <div 
+                <div
                   className="absolute right-0 mt-2 w-56 rounded-xl bg-white border border-slate-200 shadow-lg p-2 z-50 animate-in fade-in duration-100"
                   onMouseLeave={() => setIsUserMenuOpen(false)}
                 >
@@ -344,11 +345,10 @@ export default function Header({ onToggleSidebar }) {
           {/* Home */}
           <button
             onClick={() => handleNavClick('home')}
-            className={`text-xs font-semibold transition-colors relative py-1 cursor-pointer ${
-              currentView === 'home'
-                ? 'text-[#185ADB]'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
+            className={`text-xs font-semibold transition-colors relative py-1 cursor-pointer ${currentView === 'home'
+              ? 'text-[#185ADB]'
+              : 'text-slate-600 hover:text-slate-900'
+              }`}
           >
             <span>{t("Home", "হোম")}</span>
             {currentView === 'home' && (

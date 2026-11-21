@@ -9,7 +9,9 @@
     "generate:records": "node scripts/generate_product_records.mjs",
     "build": "node scripts/generate_product_records.mjs && vite build",
     "preview": "vite preview",
-    "test": "node tests/paymently_audit_tests.mjs && node tests/storefront_audit_tests.mjs && node tests/order_tracking_audit_tests.mjs && node tests/localization_and_currency_tests.mjs && node tests/security_and_durability_tests.mjs && node tests/visual_search_accuracy.test.mjs && node tests/product_page_and_routing_tests.mjs && node tests/direct_load_and_hydration_tests.mjs && node tests/collection_detail_page_tests.mjs && node tests/product_page_refresh_regression_tests.mjs",
+    "test": "node tests/paymently_audit_tests.mjs && node tests/storefront_audit_tests.mjs && node tests/order_tracking_audit_tests.mjs && node tests/localization_and_currency_tests.mjs && node tests/security_and_durability_tests.mjs && node tests/visual_search_accuracy.test.mjs && node tests/product_page_and_routing_tests.mjs && node tests/direct_load_and_hydration_tests.mjs && node tests/collection_detail_page_tests.mjs && node tests/product_page_refresh_regression_tests.mjs && node tests/navigation_and_scroll_restoration_tests.mjs && node tests/customer_auth_and_google_gis_tests.mjs",
+    "test:auth": "node tests/customer_auth_and_google_gis_tests.mjs",
+    "test:nav": "node tests/navigation_and_scroll_restoration_tests.mjs",
     "test:refresh": "node tests/product_page_refresh_regression_tests.mjs",
     "test:direct": "node tests/direct_load_and_hydration_tests.mjs",
     "test:visual": "node tests/visual_search_accuracy.test.mjs",
@@ -23,6 +25,7 @@
   "dependencies": {
     "canvas-confetti": "^1.9.2",
     "clsx": "^2.1.1",
+    "google-auth-library": "^11.3.4",
     "image-decode": "^1.2.2",
     "jpeg-js": "^0.4.4",
     "lucide-react": "^0.344.0",

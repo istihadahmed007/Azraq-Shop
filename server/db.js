@@ -19,7 +19,10 @@ export const memoryStore = {
   order_items: new Map(),
   payment_transactions: new Map(),
   payment_webhook_logs: new Map(),
-  order_status_history: new Map()
+  order_status_history: new Map(),
+  customer_users: new Map(),
+  customer_identities: new Map(),
+  customer_sessions: new Map()
 };
 
 function persistFallbackStore() {
@@ -30,7 +33,10 @@ function persistFallbackStore() {
       order_items: Array.from(memoryStore.order_items.entries()),
       payment_transactions: Array.from(memoryStore.payment_transactions.entries()),
       payment_webhook_logs: Array.from(memoryStore.payment_webhook_logs.entries()),
-      order_status_history: Array.from(memoryStore.order_status_history.entries())
+      order_status_history: Array.from(memoryStore.order_status_history.entries()),
+      customer_users: Array.from(memoryStore.customer_users.entries()),
+      customer_identities: Array.from(memoryStore.customer_identities.entries()),
+      customer_sessions: Array.from(memoryStore.customer_sessions.entries())
     };
     fs.writeFileSync(DB_CACHE_FILE, JSON.stringify(data), 'utf8');
   } catch (e) {
@@ -60,6 +66,15 @@ function hydrateFallbackStore() {
       }
       if (data.order_status_history) {
         data.order_status_history.forEach(([k, v]) => memoryStore.order_status_history.set(k, v));
+      }
+      if (data.customer_users) {
+        data.customer_users.forEach(([k, v]) => memoryStore.customer_users.set(k, v));
+      }
+      if (data.customer_identities) {
+        data.customer_identities.forEach(([k, v]) => memoryStore.customer_identities.set(k, v));
+      }
+      if (data.customer_sessions) {
+        data.customer_sessions.forEach(([k, v]) => memoryStore.customer_sessions.set(k, v));
       }
     }
   } catch (e) {
@@ -252,6 +267,52 @@ export async function initDb() {
             is_verified BOOLEAN DEFAULT FALSE,
             processed_at TIMESTAMPTZ DEFAULT NOW()
         );
+
+        CREATE TABLE IF NOT EXISTS customer_users (
+            id VARCHAR(100) PRIMARY KEY,
+            email VARCHAR(255) UNIQUE,
+            name VARCHAR(255),
+            phone VARCHAR(50),
+            avatar_url TEXT,
+            password_hash VARCHAR(255),
+            email_verified BOOLEAN DEFAULT FALSE,
+            last_login_at TIMESTAMPTZ,
+            created_at TIMESTAMPTZ DEFAULT NOW(),
+            updated_at TIMESTAMPTZ DEFAULT NOW()
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_customer_users_email ON customer_users(email);
+        CREATE INDEX IF NOT EXISTS idx_customer_users_phone ON customer_users(phone);
+
+        CREATE TABLE IF NOT EXISTS customer_identities (
+            id VARCHAR(100) PRIMARY KEY,
+            customer_id VARCHAR(100) NOT NULL REFERENCES customer_users(id) ON DELETE CASCADE,
+            provider VARCHAR(50) NOT NULL,
+            provider_id VARCHAR(255) NOT NULL,
+            email VARCHAR(255),
+            profile_data JSONB DEFAULT '{}'::jsonb,
+            created_at TIMESTAMPTZ DEFAULT NOW(),
+            updated_at TIMESTAMPTZ DEFAULT NOW(),
+            CONSTRAINT uq_customer_provider UNIQUE (provider, provider_id)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_customer_identities_provider ON customer_identities(provider, provider_id);
+        CREATE INDEX IF NOT EXISTS idx_customer_identities_customer_id ON customer_identities(customer_id);
+
+        CREATE TABLE IF NOT EXISTS customer_sessions (
+            id VARCHAR(100) PRIMARY KEY,
+            customer_id VARCHAR(100) NOT NULL REFERENCES customer_users(id) ON DELETE CASCADE,
+            token_hash VARCHAR(64) UNIQUE NOT NULL,
+            ip_address VARCHAR(100),
+            user_agent TEXT,
+            is_revoked BOOLEAN DEFAULT FALSE,
+            expires_at TIMESTAMPTZ NOT NULL,
+            created_at TIMESTAMPTZ DEFAULT NOW()
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_customer_sessions_token_hash ON customer_sessions(token_hash);
+        CREATE INDEX IF NOT EXISTS idx_customer_sessions_customer_id ON customer_sessions(customer_id);
+        CREATE INDEX IF NOT EXISTS idx_customer_sessions_expires_at ON customer_sessions(expires_at);
       `);
       isInitialized = true;
       console.log('[PostgreSQL] Database tables initialized successfully.');
@@ -1569,4 +1630,408 @@ export async function isInvoiceFulfilled(invoiceId) {
   }
   return false;
 }
+
+// ====================================================================
+// 12. CUSTOMER AUTHENTICATION & SECURE SESSIONS PERSISTENCE
+// ====================================================================
+
+/**
+ * Find customer by Google unique 'sub' claim
+ */
+export async function findCustomerByGoogleSub(googleSub) {
+  if (!googleSub) return null;
+  const p = getDbPool();
+  if (p) {
+    try {
+      const res = await p.query(
+        `SELECT u.* FROM customer_users u
+         JOIN customer_identities i ON u.id = i.customer_id
+         WHERE i.provider = 'google' AND i.provider_id = $1
+         LIMIT 1`,
+        [String(googleSub)]
+      );
+      if (res.rows.length > 0) return res.rows[0];
+    } catch (e) {
+      console.error('[DB Error findCustomerByGoogleSub]:', e.message);
+    }
+  }
+
+  // Fallback memoryStore
+  for (const ident of memoryStore.customer_identities.values()) {
+    if (ident.provider === 'google' && String(ident.provider_id) === String(googleSub)) {
+      const u = memoryStore.customer_users.get(ident.customer_id);
+      if (u) return { ...u };
+    }
+  }
+  return null;
+}
+
+/**
+ * Find customer by email
+ */
+export async function findCustomerByEmail(email) {
+  if (!email) return null;
+  const p = getDbPool();
+  const cleanEmail = String(email).trim().toLowerCase();
+  if (p) {
+    try {
+      const res = await p.query(
+        `SELECT * FROM customer_users WHERE LOWER(email) = $1 LIMIT 1`,
+        [cleanEmail]
+      );
+      if (res.rows.length > 0) return res.rows[0];
+    } catch (e) {
+      console.error('[DB Error findCustomerByEmail]:', e.message);
+    }
+  }
+
+  // Fallback memoryStore
+  for (const user of memoryStore.customer_users.values()) {
+    if (user.email && user.email.toLowerCase() === cleanEmail) {
+      return { ...user };
+    }
+  }
+  return null;
+}
+
+/**
+ * Find customer by ID
+ */
+export async function findCustomerById(id) {
+  if (!id) return null;
+  const p = getDbPool();
+  if (p) {
+    try {
+      const res = await p.query(
+        `SELECT * FROM customer_users WHERE id = $1 LIMIT 1`,
+        [id]
+      );
+      if (res.rows.length > 0) return res.rows[0];
+    } catch (e) {
+      console.error('[DB Error findCustomerById]:', e.message);
+    }
+  }
+
+  // Fallback memoryStore
+  const user = memoryStore.customer_users.get(id);
+  return user ? { ...user } : null;
+}
+
+/**
+ * Atomically create or link customer with genuine Google OAuth profile
+ */
+export async function upsertGoogleCustomer({ email, name, avatarUrl, googleSub, profileData = {} }) {
+  if (!googleSub) throw new Error('Google sub identifier is required');
+  const p = getDbPool();
+  const cleanEmail = email ? String(email).trim().toLowerCase() : null;
+  const now = new Date().toISOString();
+
+  // 1. Check existing customer by Google Sub
+  let existingCustomer = await findCustomerByGoogleSub(googleSub);
+  if (existingCustomer) {
+    // Update last_login_at and avatar/name if changed
+    if (p) {
+      try {
+        await p.query(
+          `UPDATE customer_users 
+           SET last_login_at = NOW(),
+               name = COALESCE($2, name),
+               avatar_url = COALESCE($3, avatar_url),
+               updated_at = NOW()
+           WHERE id = $1`,
+          [existingCustomer.id, name || null, avatarUrl || null]
+        );
+      } catch (e) {
+        console.error('[DB Error updateCustomerOnGoogleLogin]:', e.message);
+      }
+    }
+    const memUser = memoryStore.customer_users.get(existingCustomer.id);
+    if (memUser) {
+      memUser.last_login_at = now;
+      if (name) memUser.name = name;
+      if (avatarUrl) memUser.avatar_url = avatarUrl;
+      memUser.updated_at = now;
+      persistFallbackStore();
+    }
+    return await findCustomerById(existingCustomer.id);
+  }
+
+  // 2. Check if customer with same verified email already exists
+  if (cleanEmail) {
+    existingCustomer = await findCustomerByEmail(cleanEmail);
+  }
+
+  let customerId = existingCustomer ? existingCustomer.id : null;
+
+  if (p) {
+    const client = await p.connect();
+    try {
+      await client.query('BEGIN');
+
+      if (!customerId) {
+        // Create new customer
+        customerId = 'usr_' + crypto.randomBytes(12).toString('hex');
+        await client.query(
+          `INSERT INTO customer_users (id, email, name, avatar_url, email_verified, last_login_at, created_at, updated_at)
+           VALUES ($1, $2, $3, $4, true, NOW(), NOW(), NOW())`,
+          [customerId, cleanEmail, name || 'AZRAQ Customer', avatarUrl || null]
+        );
+      } else {
+        // Update existing customer record
+        await client.query(
+          `UPDATE customer_users
+           SET last_login_at = NOW(),
+               email_verified = true,
+               avatar_url = COALESCE($2, avatar_url),
+               name = COALESCE($3, name),
+               updated_at = NOW()
+           WHERE id = $1`,
+          [customerId, avatarUrl || null, name || null]
+        );
+      }
+
+      // Link Google identity
+      const identityId = 'idn_' + crypto.randomBytes(12).toString('hex');
+      await client.query(
+        `INSERT INTO customer_identities (id, customer_id, provider, provider_id, email, profile_data, created_at, updated_at)
+         VALUES ($1, $2, 'google', $3, $4, $5, NOW(), NOW())
+         ON CONFLICT (provider, provider_id) DO UPDATE
+         SET email = EXCLUDED.email,
+             profile_data = EXCLUDED.profile_data,
+             updated_at = NOW()`,
+        [identityId, customerId, String(googleSub), cleanEmail, JSON.stringify(profileData)]
+      );
+
+      await client.query('COMMIT');
+    } catch (err) {
+      await client.query('ROLLBACK');
+      console.error('[DB Error upsertGoogleCustomer pg]:', err.message);
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
+  // Sync memoryStore
+  if (!customerId) {
+    customerId = 'usr_' + crypto.randomBytes(12).toString('hex');
+    const newUser = {
+      id: customerId,
+      email: cleanEmail,
+      name: name || 'AZRAQ Customer',
+      phone: null,
+      avatar_url: avatarUrl || null,
+      password_hash: null,
+      email_verified: true,
+      last_login_at: now,
+      created_at: now,
+      updated_at: now
+    };
+    memoryStore.customer_users.set(customerId, newUser);
+  } else {
+    const existing = memoryStore.customer_users.get(customerId);
+    if (existing) {
+      existing.last_login_at = now;
+      existing.email_verified = true;
+      if (avatarUrl) existing.avatar_url = avatarUrl;
+      if (name) existing.name = name;
+      existing.updated_at = now;
+    }
+  }
+
+  const identityId = 'idn_' + crypto.randomBytes(12).toString('hex');
+  memoryStore.customer_identities.set(identityId, {
+    id: identityId,
+    customer_id: customerId,
+    provider: 'google',
+    provider_id: String(googleSub),
+    email: cleanEmail,
+    profile_data: profileData,
+    created_at: now,
+    updated_at: now
+  });
+  persistFallbackStore();
+
+  return await findCustomerById(customerId);
+}
+
+/**
+ * Create or register customer with email and password hash
+ */
+export async function createCustomerWithPassword({ email, name, phone = null, passwordHash }) {
+  const cleanEmail = String(email).trim().toLowerCase();
+  const now = new Date().toISOString();
+  const customerId = 'usr_' + crypto.randomBytes(12).toString('hex');
+  const p = getDbPool();
+
+  if (p) {
+    try {
+      await p.query(
+        `INSERT INTO customer_users (id, email, name, phone, password_hash, email_verified, last_login_at, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, false, NOW(), NOW(), NOW())`,
+        [customerId, cleanEmail, name || 'AZRAQ Customer', phone, passwordHash]
+      );
+    } catch (e) {
+      console.error('[DB Error createCustomerWithPassword]:', e.message);
+      throw e;
+    }
+  }
+
+  const newUser = {
+    id: customerId,
+    email: cleanEmail,
+    name: name || 'AZRAQ Customer',
+    phone,
+    avatar_url: null,
+    password_hash: passwordHash,
+    email_verified: false,
+    last_login_at: now,
+    created_at: now,
+    updated_at: now
+  };
+  memoryStore.customer_users.set(customerId, newUser);
+  persistFallbackStore();
+
+  return newUser;
+}
+
+/**
+ * Save new session token hash for a customer
+ */
+export async function saveCustomerSession({ customerId, tokenHash, ipAddress = null, userAgent = null, expiresAt }) {
+  if (!customerId || !tokenHash || !expiresAt) {
+    throw new Error('customerId, tokenHash, and expiresAt are required to save session');
+  }
+
+  const sessionId = 'ses_' + crypto.randomBytes(16).toString('hex');
+  const now = new Date().toISOString();
+  const expIso = expiresAt instanceof Date ? expiresAt.toISOString() : expiresAt;
+  const p = getDbPool();
+
+  if (p) {
+    try {
+      await p.query(
+        `INSERT INTO customer_sessions (id, customer_id, token_hash, ip_address, user_agent, is_revoked, expires_at, created_at)
+         VALUES ($1, $2, $3, $4, $5, false, $6, NOW())`,
+        [sessionId, customerId, tokenHash, ipAddress, userAgent, expIso]
+      );
+    } catch (e) {
+      console.error('[DB Error saveCustomerSession]:', e.message);
+      throw e;
+    }
+  }
+
+  memoryStore.customer_sessions.set(sessionId, {
+    id: sessionId,
+    customer_id: customerId,
+    token_hash: tokenHash,
+    ip_address: ipAddress,
+    user_agent: userAgent,
+    is_revoked: false,
+    expires_at: expIso,
+    created_at: now
+  });
+  persistFallbackStore();
+
+  return { id: sessionId, customer_id: customerId, expires_at: expIso };
+}
+
+/**
+ * Find active customer and session by token hash
+ */
+export async function findSessionByTokenHash(tokenHash) {
+  if (!tokenHash) return null;
+  const p = getDbPool();
+
+  if (p) {
+    try {
+      const res = await p.query(
+        `SELECT s.id as session_id, s.customer_id, s.expires_at, s.is_revoked,
+                u.id as user_id, u.email, u.name, u.phone, u.avatar_url, u.email_verified, u.created_at as user_created_at
+         FROM customer_sessions s
+         JOIN customer_users u ON s.customer_id = u.id
+         WHERE s.token_hash = $1 AND s.is_revoked = false AND s.expires_at > NOW()
+         LIMIT 1`,
+        [tokenHash]
+      );
+      if (res.rows.length > 0) {
+        const row = res.rows[0];
+        return {
+          session: {
+            id: row.session_id,
+            customer_id: row.customer_id,
+            expires_at: row.expires_at,
+            is_revoked: row.is_revoked
+          },
+          customer: {
+            id: row.user_id,
+            email: row.email,
+            name: row.name,
+            phone: row.phone,
+            avatar_url: row.avatar_url,
+            email_verified: row.email_verified,
+            created_at: row.user_created_at
+          }
+        };
+      }
+    } catch (e) {
+      console.error('[DB Error findSessionByTokenHash]:', e.message);
+    }
+  }
+
+  // Fallback memoryStore
+  const nowTime = Date.now();
+  for (const s of memoryStore.customer_sessions.values()) {
+    if (s.token_hash === tokenHash && !s.is_revoked) {
+      const expTime = new Date(s.expires_at).getTime();
+      if (expTime > nowTime) {
+        const u = memoryStore.customer_users.get(s.customer_id);
+        if (u) {
+          return {
+            session: { ...s },
+            customer: {
+              id: u.id,
+              email: u.email,
+              name: u.name,
+              phone: u.phone,
+              avatar_url: u.avatar_url,
+              email_verified: u.email_verified,
+              created_at: u.created_at
+            }
+          };
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Revoke customer session
+ */
+export async function revokeCustomerSession(tokenHash) {
+  if (!tokenHash) return false;
+  const p = getDbPool();
+
+  if (p) {
+    try {
+      await p.query(
+        `UPDATE customer_sessions SET is_revoked = true WHERE token_hash = $1`,
+        [tokenHash]
+      );
+    } catch (e) {
+      console.error('[DB Error revokeCustomerSession]:', e.message);
+    }
+  }
+
+  for (const s of memoryStore.customer_sessions.values()) {
+    if (s.token_hash === tokenHash) {
+      s.is_revoked = true;
+    }
+  }
+  persistFallbackStore();
+  return true;
+}
+
 

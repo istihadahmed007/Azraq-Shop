@@ -15,6 +15,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { handlePaymentRoutes } from './server/paymentRoutes.js';
+import { handleCustomerAuthRoutes } from './server/customerAuth.js';
 import searchByImageHandler from './api/search-by-image.js';
 import productsHandler from './api/products/index.js';
 
@@ -65,8 +66,15 @@ const server = http.createServer(async (req, res) => {
     };
   }
 
-  // Cross-Origin Resource Sharing (CORS) Headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Cross-Origin Resource Sharing (CORS) Headers (supports credentials without permissive wildcard)
+  const reqOrigin = req.headers.origin;
+  if (reqOrigin) {
+    res.setHeader('Access-Control-Allow-Origin', reqOrigin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Vary', 'Origin');
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE, PATCH');
   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Authorization, x-admin-key');
 
@@ -106,6 +114,22 @@ const server = http.createServer(async (req, res) => {
   // 2. Existing API Routes (/api/*) — Strictly JSON, never returns index.html
   // =========================================================================
   if (pathname.startsWith('/api/')) {
+    // 2-auth. Customer Authentication & Sessions (Google Identity Services)
+    if (pathname.startsWith('/api/auth')) {
+      try {
+        const handled = await handleCustomerAuthRoutes(req, res);
+        if (handled) return;
+      } catch (err) {
+        console.error('[API Auth Error]:', err.message);
+        if (!res.headersSent) {
+          res.statusCode = 500;
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+          res.end(JSON.stringify({ success: false, code: 'AUTH_API_ERROR', error: err.message }));
+        }
+        return;
+      }
+    }
+
     // 2a. Standalone Single Product Lookup Endpoint
     if (pathname === '/api/products' || pathname.startsWith('/api/products/')) {
       try {

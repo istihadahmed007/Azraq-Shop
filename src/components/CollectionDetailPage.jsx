@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { 
-  ChevronRight, 
-  Search, 
-  ArrowUpDown, 
+import {
+  ChevronRight,
+  Search,
+  ArrowUpDown,
   Sparkles,
   ArrowRight
 } from 'lucide-react';
@@ -17,23 +17,63 @@ import ProductImage from './common/ProductImage';
 export default function CollectionDetailPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { 
+  const {
     collections,
     products,
-    activeCollection: contextActiveCollection, 
-    navigateTo, 
-    setSelectedProduct, 
-    addToCart, 
-    favorites, 
-    toggleFavorite, 
-    t 
+    activeCollection: contextActiveCollection,
+    navigateTo,
+    setSelectedProduct,
+    addToCart,
+    favorites,
+    toggleFavorite,
+    t
   } = useShop();
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [priceFilter, setPriceFilter] = useState('all');
-  const [inStockOnly, setInStockOnly] = useState(false);
-  const [sortBy, setSortBy] = useState('featured');
-  const [visibleCount, setVisibleCount] = useState(25);
+  const [searchQuery, setSearchQuery] = useState(() => {
+    if (typeof window !== 'undefined' && slug) {
+      try {
+        const raw = sessionStorage.getItem(`azraq_col_state_${slug}`);
+        if (raw) return JSON.parse(raw).searchQuery || '';
+      } catch (e) {}
+    }
+    return '';
+  });
+  const [priceFilter, setPriceFilter] = useState(() => {
+    if (typeof window !== 'undefined' && slug) {
+      try {
+        const raw = sessionStorage.getItem(`azraq_col_state_${slug}`);
+        if (raw) return JSON.parse(raw).priceFilter || 'all';
+      } catch (e) {}
+    }
+    return 'all';
+  });
+  const [inStockOnly, setInStockOnly] = useState(() => {
+    if (typeof window !== 'undefined' && slug) {
+      try {
+        const raw = sessionStorage.getItem(`azraq_col_state_${slug}`);
+        if (raw) return Boolean(JSON.parse(raw).inStockOnly);
+      } catch (e) {}
+    }
+    return false;
+  });
+  const [sortBy, setSortBy] = useState(() => {
+    if (typeof window !== 'undefined' && slug) {
+      try {
+        const raw = sessionStorage.getItem(`azraq_col_state_${slug}`);
+        if (raw) return JSON.parse(raw).sortBy || 'featured';
+      } catch (e) {}
+    }
+    return 'featured';
+  });
+  const [visibleCount, setVisibleCount] = useState(() => {
+    if (typeof window !== 'undefined' && slug) {
+      try {
+        const raw = sessionStorage.getItem(`azraq_col_state_${slug}`);
+        if (raw) return JSON.parse(raw).visibleCount || 25;
+      } catch (e) {}
+    }
+    return 25;
+  });
 
   // Resolve collection either from URL parameter or fallback to context activeCollection
   const activeCollection = useMemo(() => {
@@ -46,20 +86,30 @@ export default function CollectionDetailPage() {
   // Resolve products belonging to this collection
   const collectionProducts = useMemo(() => {
     if (!activeCollection) return [];
-    return products.filter(p => 
+    return products.filter(p =>
       (p.collection_ids && p.collection_ids.includes(activeCollection.id)) ||
       p.category === activeCollection.name ||
       p.primary_collection_name === activeCollection.name
     );
   }, [activeCollection, products]);
 
-  // Dynamic SEO Page Title
+  // Dynamic SEO Page Title & Browsing State Persistence (Route-level scroll restoration handled centrally)
   useEffect(() => {
     if (activeCollection) {
       document.title = `${activeCollection.name} — AZRAQ Collections`;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, [activeCollection]);
+    if (typeof window !== 'undefined' && slug) {
+      try {
+        sessionStorage.setItem(`azraq_col_state_${slug}`, JSON.stringify({
+          searchQuery,
+          priceFilter,
+          inStockOnly,
+          sortBy,
+          visibleCount
+        }));
+      } catch (e) {}
+    }
+  }, [activeCollection, slug, searchQuery, priceFilter, inStockOnly, sortBy, visibleCount]);
 
   // Filter and sort products belonging to this collection (Unconditionally called on every render)
   const filteredProducts = useMemo(() => {
@@ -68,8 +118,8 @@ export default function CollectionDetailPage() {
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      result = result.filter(p => 
-        (p.name && p.name.toLowerCase().includes(q)) || 
+      result = result.filter(p =>
+        (p.name && p.name.toLowerCase().includes(q)) ||
         (p.raw_supplier_name && p.raw_supplier_name.toLowerCase().includes(q)) ||
         (p.description && p.description.toLowerCase().includes(q)) ||
         (p.sku && p.sku.toLowerCase().includes(q)) ||
@@ -124,7 +174,7 @@ export default function CollectionDetailPage() {
 
   return (
     <div className="w-full py-4 min-h-screen select-none space-y-6">
-      
+
       {/* Breadcrumb Navigation */}
       <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
         <Link to="/" className="hover:text-[#185ADB] transition-colors">
@@ -173,7 +223,7 @@ export default function CollectionDetailPage() {
 
         {/* Filter and Search Bar inside the header container */}
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 mt-6 pt-5 border-t border-slate-200">
-          
+
           {/* Search within collection */}
           <div className="relative flex-1 md:max-w-xs">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -188,18 +238,17 @@ export default function CollectionDetailPage() {
 
           {/* Filter Badges & Sort */}
           <div className="flex flex-wrap items-center gap-1.5">
-            
+
             {/* Price Quick Filter */}
             <div className="flex items-center gap-1 text-xs">
               {['all', 'under-1500', '1500-3000', 'above-3000'].map((p) => (
                 <button
                   key={p}
                   onClick={() => setPriceFilter(p)}
-                  className={`px-3 py-1.5 rounded-lg font-semibold transition-colors text-xs border ${
-                    priceFilter === p 
-                      ? 'bg-[#185ADB] text-white border-[#185ADB] shadow-xs' 
-                      : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border-slate-200'
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg font-semibold transition-colors text-xs border ${priceFilter === p
+                    ? 'bg-[#185ADB] text-white border-[#185ADB] shadow-xs'
+                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border-slate-200'
+                    }`}
                 >
                   {p === 'all' && t('All Prices', 'সব দাম')}
                   {p === 'under-1500' && '< ৳1,500'}

@@ -1,123 +1,186 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const AuthContext = createContext(null);
 
+/**
+ * AZRAQ Shop — Genuine Customer Authentication Provider
+ * 
+ * Secure session-based authentication backed by Google Identity Services
+ * and PostgreSQL database sessions. No fake user generation or localStorage tokens.
+ */
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    if (typeof window === 'undefined') return null;
-    try {
-      const saved = localStorage.getItem('azraq_customer_user');
-      return saved ? JSON.parse(saved) : null;
-    } catch (e) {
-      return null;
-    }
-  });
-
+  const [user, setUser] = useState(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState('login'); // 'login' | 'register'
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+  // Initialize and verify customer session from server cookie on startup and browser refresh
+  const checkSession = useCallback(async () => {
     try {
-      if (user) {
-        localStorage.setItem('azraq_customer_user', JSON.stringify(user));
+      const res = await fetch('/api/auth/me', {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.authenticated && data?.customer) {
+          setUser(data.customer);
+        } else {
+          setUser(null);
+        }
       } else {
-        localStorage.removeItem('azraq_customer_user');
+        setUser(null);
       }
-    } catch (e) {
-      console.warn('Failed to save customer auth state:', e);
+    } catch (err) {
+      console.warn('[Customer Auth Check Notice]:', err.message);
+      setUser(null);
+    } finally {
+      setIsAuthLoading(false);
     }
-  }, [user]);
+  }, []);
+
+  useEffect(() => {
+    checkSession();
+  }, [checkSession]);
 
   /**
-   * Google Sign-In
-   * Authentic Google OAuth flow & 1-click customer login
+   * Genuine Google Sign-In
+   * Submits real Google ID token to /api/auth/google for verification and session establishment
    */
-  const loginWithGoogle = async (customEmail = null) => {
-    return new Promise((resolve) => {
-      // Simulate fast Google popup response
-      setTimeout(() => {
-        const defaultName = customEmail ? customEmail.split('@')[0] : 'Istihad Ahmed';
-        const defaultEmail = customEmail || 'istihad@azraqshop.com';
-        const googleUser = {
-          id: 'goog_' + Date.now().toString(36),
-          name: defaultName,
-          email: defaultEmail,
-          phone: '01851172032',
-          avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(defaultName)}&backgroundColor=245bdb&textColor=ffffff`,
-          provider: 'google',
-          createdAt: new Date().toISOString()
-        };
+  const loginWithGoogle = async (credential) => {
+    if (!credential) {
+      return { success: false, error: 'Google credential is required.' };
+    }
 
-        setUser(googleUser);
+    try {
+      const res = await fetch('/api/auth/google', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ credential })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success && data.customer) {
+        setUser(data.customer);
         setIsAuthModalOpen(false);
-        resolve({ success: true, user: googleUser });
-      }, 600);
-    });
+        return { success: true, user: data.customer };
+      } else {
+        return {
+          success: false,
+          error: data.error || 'Google authentication was rejected by the server.'
+        };
+      }
+    } catch (err) {
+      console.error('[Google Login Network Error]:', err);
+      return { success: false, error: 'Unable to connect to authentication server.' };
+    }
   };
 
   /**
-   * Phone or Email Credentials Login
+   * Server-Verified Credentials Login
    */
   const loginWithCredentials = async (identifier, password) => {
     const cleanId = String(identifier || '').trim();
+    const cleanPass = String(password || '');
+
     if (!cleanId) {
-      return { success: false, error: 'Phone number or email is required.' };
+      return { success: false, error: 'Email is required.' };
+    }
+    if (!cleanPass) {
+      return { success: false, error: 'Password is required.' };
     }
 
-    const isEmail = cleanId.includes('@');
-    const displayName = isEmail ? cleanId.split('@')[0] : `Customer (${cleanId.slice(-4)})`;
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ identifier: cleanId, password: cleanPass })
+      });
 
-    const loggedUser = {
-      id: 'usr_' + Date.now().toString(36),
-      name: displayName,
-      email: isEmail ? cleanId : `${cleanId.replace(/\D/g, '')}@azraq.customer`,
-      phone: isEmail ? '' : cleanId,
-      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(displayName)}&backgroundColor=172333&textColor=ffffff`,
-      provider: isEmail ? 'email' : 'phone',
-      createdAt: new Date().toISOString()
-    };
+      const data = await res.json();
 
-    setUser(loggedUser);
-    setIsAuthModalOpen(false);
-    return { success: true, user: loggedUser };
+      if (res.ok && data.success && data.customer) {
+        setUser(data.customer);
+        setIsAuthModalOpen(false);
+        return { success: true, user: data.customer };
+      } else {
+        return { success: false, error: data.error || 'Invalid credentials.' };
+      }
+    } catch (err) {
+      return { success: false, error: 'Network error connecting to authentication service.' };
+    }
   };
 
   /**
-   * Customer Registration
+   * Server-Verified Customer Registration
    */
   const registerUser = async ({ name, identifier, password }) => {
     const cleanName = String(name || '').trim();
     const cleanId = String(identifier || '').trim();
+    const cleanPass = String(password || '');
 
     if (!cleanName) {
       return { success: false, error: 'Full name is required.' };
     }
     if (!cleanId) {
-      return { success: false, error: 'Phone number or email is required.' };
+      return { success: false, error: 'Email address is required.' };
+    }
+    if (cleanPass.length < 6) {
+      return { success: false, error: 'Password must be at least 6 characters long.' };
     }
 
-    const isEmail = cleanId.includes('@');
-    const newUser = {
-      id: 'usr_' + Date.now().toString(36),
-      name: cleanName,
-      email: isEmail ? cleanId : '',
-      phone: isEmail ? '' : cleanId,
-      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(cleanName)}&backgroundColor=245bdb&textColor=ffffff`,
-      provider: isEmail ? 'email' : 'phone',
-      createdAt: new Date().toISOString()
-    };
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ name: cleanName, identifier: cleanId, password: cleanPass })
+      });
 
-    setUser(newUser);
-    setIsAuthModalOpen(false);
-    return { success: true, user: newUser };
+      const data = await res.json();
+
+      if (res.ok && data.success && data.customer) {
+        setUser(data.customer);
+        setIsAuthModalOpen(false);
+        return { success: true, user: data.customer };
+      } else {
+        return { success: false, error: data.error || 'Failed to create customer account.' };
+      }
+    } catch (err) {
+      return { success: false, error: 'Network error registering customer account.' };
+    }
   };
 
   /**
-   * Sign Out
+   * Revoke Server Session & Clear Client State
    */
-  const logout = () => {
-    setUser(null);
+  const logout = async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+    } catch (e) {
+      console.warn('[Logout API Warning]:', e.message);
+    } finally {
+      setUser(null);
+    }
   };
 
   const openAuthModal = (mode = 'login') => {
@@ -134,6 +197,7 @@ export function AuthProvider({ children }) {
       value={{
         user,
         isAuthenticated: Boolean(user),
+        isAuthLoading,
         isAuthModalOpen,
         authModalMode,
         openAuthModal,

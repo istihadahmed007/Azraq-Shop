@@ -40,7 +40,15 @@ export function ShopProvider({ children }) {
   // Routing / View State
   const [currentView, setCurrentView] = useState('home'); // 'home' | 'collections' | 'collection-detail'
   const [activeCollectionSlug, setActiveCollectionSlug] = useState('gadgets-it-accessories');
-  const [activeCategory, setActiveCategory] = useState('All');
+  const [activeCategory, setActiveCategory] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = sessionStorage.getItem('azraq_active_category');
+        if (saved) return saved;
+      } catch (e) {}
+    }
+    return 'All';
+  });
 
   // Sync Status
   const [syncStatus, setSyncStatus] = useState({
@@ -161,8 +169,33 @@ export function ShopProvider({ children }) {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isBrandAssetsOpen, setIsBrandAssetsOpen] = useState(false);
   const [isVisualSearchOpen, setIsVisualSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = sessionStorage.getItem('azraq_search_query');
+        if (saved) return saved;
+      } catch (e) {}
+    }
+    return '';
+  });
   const [toast, setToast] = useState(null);
+
+  // Sync activeCategory and searchQuery to sessionStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.setItem('azraq_active_category', activeCategory || 'All');
+      } catch (e) {}
+    }
+  }, [activeCategory]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.setItem('azraq_search_query', searchQuery || '');
+      } catch (e) {}
+    }
+  }, [searchQuery]);
 
   // Safe, versioned, quota-resilient storage sync
   useEffect(() => {
