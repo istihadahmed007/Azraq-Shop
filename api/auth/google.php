@@ -38,17 +38,30 @@ if (empty($expectedClientId) || $expectedClientId === 'YOUR_WEB_CLIENT_ID') {
 
 // Verify token cryptographically with Google Identity Services endpoint
 $tokenInfoUrl = 'https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($credential);
+$response = false;
 
-$context = stream_context_create([
-    'http' => [
-        'method' => 'GET',
-        'timeout' => 8,
-        'ignore_errors' => true,
-        'header' => "User-Agent: AZRAQ-Shop-Auth/1.0\r\n"
-    ]
-]);
+if (function_exists('curl_init')) {
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $tokenInfoUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_USERAGENT, 'AZRAQ-Shop-Auth/1.0');
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+    $response = curl_exec($ch);
+    curl_close($ch);
+}
 
-$response = @file_get_contents($tokenInfoUrl, false, $context);
+if ($response === false) {
+    $context = stream_context_create([
+        'http' => [
+            'method' => 'GET',
+            'timeout' => 10,
+            'ignore_errors' => true,
+            'header' => "User-Agent: AZRAQ-Shop-Auth/1.0\r\n"
+        ]
+    ]);
+    $response = @file_get_contents($tokenInfoUrl, false, $context);
+}
 
 if ($response === false) {
     http_response_code(502);
@@ -67,7 +80,7 @@ if (!is_array($payload) || !empty($payload['error']) || empty($payload['sub'])) 
     echo json_encode([
         'success' => false,
         'code' => 'INVALID_GOOGLE_TOKEN',
-        'error' => $payload['error_description'] ?? 'Invalid or unverified Google token.'
+        'error' => $payload['error_description'] ?? ($payload['error'] ?? 'Invalid or unverified Google token.')
     ]);
     exit;
 }
@@ -171,9 +184,11 @@ saveCustomer($customer);
 
 // Issue cryptographically secure session
 $sessionToken = createCustomerSession($customer['id']);
+$sanitized = sanitizeCustomerUser($customer);
 
 echo json_encode([
     'success' => true,
-    'user' => sanitizeCustomerUser($customer),
+    'user' => $sanitized,
+    'customer' => $sanitized,
     'token' => $sessionToken
 ]);

@@ -356,17 +356,20 @@ export async function handleCustomerAuthRoutes(req, res) {
       // Set HttpOnly, SameSite=Lax, Secure session cookie
       res.setHeader('Set-Cookie', buildSessionCookie(sessionToken));
 
+      const customerPayload = {
+        id: customer.id,
+        name: customer.name,
+        email: customer.email,
+        phone: customer.phone,
+        avatar: customer.avatar_url,
+        provider: 'google'
+      };
+
       res.status(200).json({
         success: true,
         authenticated: true,
-        customer: {
-          id: customer.id,
-          name: customer.name,
-          email: customer.email,
-          phone: customer.phone,
-          avatar: customer.avatar_url,
-          provider: 'google'
-        }
+        user: customerPayload,
+        customer: customerPayload
       });
       return true;
     } catch (err) {
@@ -409,16 +412,19 @@ export async function handleCustomerAuthRoutes(req, res) {
         return true;
       }
 
+      const customerPayload = {
+        id: sessionData.customer.id,
+        name: sessionData.customer.name,
+        email: sessionData.customer.email,
+        phone: sessionData.customer.phone,
+        avatar: sessionData.customer.avatar_url,
+        provider: 'google'
+      };
+
       res.status(200).json({
         authenticated: true,
-        customer: {
-          id: sessionData.customer.id,
-          name: sessionData.customer.name,
-          email: sessionData.customer.email,
-          phone: sessionData.customer.phone,
-          avatar: sessionData.customer.avatar_url,
-          provider: 'google'
-        }
+        user: customerPayload,
+        customer: customerPayload
       });
       return true;
     } catch (err) {

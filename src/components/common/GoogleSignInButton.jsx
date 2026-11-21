@@ -164,8 +164,8 @@ export default function GoogleSignInButton({ onSuccess, onError, buttonText = 'c
 
   return (
     <div className="w-full flex flex-col items-center gap-2.5">
-      {/* Error state */}
-      {errorMessage && (
+      {/* Error state: only display inline if parent did not provide an onError handler */}
+      {errorMessage && !onError && (
         <div className="w-full p-3 rounded-xl bg-amber-50/90 border border-amber-200 text-amber-800 text-xs font-medium flex items-start gap-2 text-left">
           <AlertCircle className="w-4 h-4 shrink-0 text-amber-600 mt-0.5" />
           <span className="leading-relaxed">{errorMessage}</span>

@@ -8,15 +8,18 @@ setAuthCorsHeaders();
 $customer = getAuthenticatedCustomer();
 
 if ($customer) {
+    $sanitized = sanitizeCustomerUser($customer);
     echo json_encode([
         'success' => true,
         'authenticated' => true,
-        'user' => sanitizeCustomerUser($customer)
+        'user' => $sanitized,
+        'customer' => $sanitized
     ]);
 } else {
     echo json_encode([
         'success' => true,
         'authenticated' => false,
-        'user' => null
+        'user' => null,
+        'customer' => null
     ]);
 }

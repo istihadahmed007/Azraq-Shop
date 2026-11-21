@@ -27,8 +27,9 @@ export function AuthProvider({ children }) {
 
       if (res.ok) {
         const data = await res.json();
-        if (data?.authenticated && data?.customer) {
-          setUser(data.customer);
+        const customer = data?.user || data?.customer;
+        if (data?.authenticated && customer) {
+          setUser(customer);
         } else {
           setUser(null);
         }
@@ -68,15 +69,16 @@ export function AuthProvider({ children }) {
       });
 
       const data = await res.json();
+      const customer = data?.user || data?.customer;
 
-      if (res.ok && data.success && data.customer) {
-        setUser(data.customer);
+      if (res.ok && data?.success && customer) {
+        setUser(customer);
         setIsAuthModalOpen(false);
-        return { success: true, user: data.customer };
+        return { success: true, user: customer };
       } else {
         return {
           success: false,
-          error: data.error || 'Google authentication was rejected by the server.'
+          error: data?.error || 'Google authentication was rejected by the server.'
         };
       }
     } catch (err) {
@@ -111,13 +113,14 @@ export function AuthProvider({ children }) {
       });
 
       const data = await res.json();
+      const customer = data?.user || data?.customer;
 
-      if (res.ok && data.success && data.customer) {
-        setUser(data.customer);
+      if (res.ok && data?.success && customer) {
+        setUser(customer);
         setIsAuthModalOpen(false);
-        return { success: true, user: data.customer };
+        return { success: true, user: customer };
       } else {
-        return { success: false, error: data.error || 'Invalid credentials.' };
+        return { success: false, error: data?.error || 'Invalid credentials.' };
       }
     } catch (err) {
       return { success: false, error: 'Network error connecting to authentication service.' };
@@ -154,13 +157,14 @@ export function AuthProvider({ children }) {
       });
 
       const data = await res.json();
+      const customer = data?.user || data?.customer;
 
-      if (res.ok && data.success && data.customer) {
-        setUser(data.customer);
+      if (res.ok && data?.success && customer) {
+        setUser(customer);
         setIsAuthModalOpen(false);
-        return { success: true, user: data.customer };
+        return { success: true, user: customer };
       } else {
-        return { success: false, error: data.error || 'Failed to create customer account.' };
+        return { success: false, error: data?.error || 'Failed to create customer account.' };
       }
     } catch (err) {
       return { success: false, error: 'Network error registering customer account.' };

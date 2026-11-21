@@ -68,9 +68,11 @@ $customer = [
 saveCustomer($customer);
 
 $sessionToken = createCustomerSession($customer['id']);
+$sanitized = sanitizeCustomerUser($customer);
 
 echo json_encode([
     'success' => true,
-    'user' => sanitizeCustomerUser($customer),
+    'user' => $sanitized,
+    'customer' => $sanitized,
     'token' => $sessionToken
 ]);
