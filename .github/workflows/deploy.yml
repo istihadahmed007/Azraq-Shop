@@ -39,6 +39,8 @@ jobs:
 
       - name: Run Production Bundle Build
         run: npm run build
+        env:
+          VITE_GOOGLE_CLIENT_ID: "335688416251-7cqlcbjbjstcc0jccafp73ukndemtlan.apps.googleusercontent.com"
 
       - name: Prepare GitHub Pages Mirror
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
