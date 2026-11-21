@@ -78,11 +78,24 @@ function getGoogleClientId() {
 
 // Persistent Storage Paths
 function getDataDir() {
-    $dir = __DIR__ . '/../../data';
-    if (!is_dir($dir)) {
-        @mkdir($dir, 0755, true);
+    $possibleDirs = [
+        __DIR__ . '/../../data',
+        __DIR__ . '/../data',
+        __DIR__ . '/../../public/data',
+        __DIR__ . '/../../dist/data',
+        isset($_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'] . '/data' : '',
+        isset($_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'] . '/dist/data' : ''
+    ];
+
+    foreach ($possibleDirs as $dir) {
+        if (!empty($dir) && is_dir($dir)) {
+            return $dir;
+        }
     }
-    return $dir;
+
+    $fallback = __DIR__ . '/../../data';
+    @mkdir($fallback, 0755, true);
+    return $fallback;
 }
 
 function getCustomersFile() {

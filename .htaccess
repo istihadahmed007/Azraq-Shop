@@ -1,0 +1,92 @@
+# AZRAQ Shop - Hostinger Apache / LiteSpeed Configuration
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+
+  # Route Health check endpoints
+  RewriteRule ^health/?$ health.php [L,QSA]
+  RewriteRule ^api/health/?$ api/health.php [L,QSA]
+
+  # Route API endpoints directly to PHP handlers
+  RewriteRule ^api/auth/google/?$ api/auth/google.php [L,QSA]
+  RewriteRule ^api/auth/me/?$ api/auth/me.php [L,QSA]
+  RewriteRule ^api/auth/login/?$ api/auth/login.php [L,QSA]
+  RewriteRule ^api/auth/register/?$ api/auth/register.php [L,QSA]
+  RewriteRule ^api/auth/logout/?$ api/auth/logout.php [L,QSA]
+  RewriteRule ^api/admin/auth/?$ api/admin/auth.php [L,QSA]
+  RewriteRule ^api/orders/track/?$ api/orders/track.php [L,QSA]
+  RewriteRule ^api/orders/update-status/?$ api/orders/update-status.php [L,QSA]
+  RewriteRule ^api/orders/?$ api/orders/index.php [L,QSA]
+  RewriteRule ^api/payments/transactions/?$ api/payments/transactions.php [L,QSA]
+  RewriteRule ^api/payments/create/?$ api/payments/create.php [L,QSA]
+  RewriteRule ^api/payments/cancel/?$ api/payments/cancel.php [L,QSA]
+  RewriteRule ^api/payments/verify/?$ api/payments/verify.php [L,QSA]
+  RewriteRule ^api/payments/status/?$ api/payments/status.php [L,QSA]
+  RewriteRule ^api/payments/refund/?$ api/payments/refund.php [L,QSA]
+  RewriteRule ^api/search-by-image/?$ api/search-by-image.php [L,QSA]
+  RewriteRule ^api/products/?$ api/products/index.php [L,QSA]
+
+  # Normalize nested relative asset and data requests (e.g. /product/*/assets/* -> /assets/*)
+  RewriteRule ^(?:product|collection|collections)/[^/]+/assets/(.*)$ assets/$1 [L]
+  RewriteRule ^(?:product|collection|collections)/assets/(.*)$ assets/$1 [L]
+  RewriteRule ^(?:product|collection|collections)/[^/]+/data/(.*)$ data/$1 [L]
+  RewriteRule ^(?:product|collection|collections)/data/(.*)$ data/$1 [L]
+  RewriteRule ^(?:product|collection|collections)/[^/]+/branding/(.*)$ branding/$1 [L]
+  RewriteRule ^(?:product|collection|collections)/branding/(.*)$ branding/$1 [L]
+
+  # Missing assets return 404 text, NEVER fall through to index.html
+  RewriteCond %{REQUEST_URI} ^/assets/
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^assets/.*$ - [R=404,L]
+
+  # Missing asset files with known extensions return 404, NEVER fall through to index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule \.(js|mjs|css|json|png|jpe?g|gif|svg|ico|webp|woff2?|ttf|map)$ - [R=404,L]
+
+  # Unhandled API routes return JSON 404, NEVER fall through to index.html
+  RewriteCond %{REQUEST_URI} ^/api/
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^api/.*$ api/404.php [L]
+
+  # SPA fallback to index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-l
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# Browser Caching & Cache Busting
+<IfModule mod_headers.c>
+  # Never cache index.html or root
+  <FilesMatch "\.(html|htm)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+
+  # Security Headers
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set X-XSS-Protection "1; mode=block"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+# Gzip Compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
